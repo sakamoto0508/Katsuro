@@ -1,21 +1,27 @@
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("PlayerStatus")]
+    [SerializeField] private PlayerStatus _playerStatus;
+
     private InputBuffer _inputBuffer;
     private PlayerMover _playerMover;
-    private Vector2 _currentInput;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
-    public void Init(InputBuffer inputBuffer)
+    public void Init(InputBuffer inputBuffer, CinemachineCamera cameraPositoin)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
-        _playerMover = new PlayerMover();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        _playerMover = new PlayerMover(_playerStatus, rb
+            , this.transform, cameraPositoin.transform);
     }
 
     private void OnDestroy()
@@ -24,6 +30,11 @@ public class PlayerController : MonoBehaviour
         {
             InputEventUnRegistry(_inputBuffer);
         }
+    }
+
+    private void FixedUpdate()
+    {
+        _playerMover?.FixedUpdate();
     }
 
     private void InputEventRegistry(InputBuffer inputBuffer)
@@ -40,14 +51,15 @@ public class PlayerController : MonoBehaviour
 
     private void OnMove(InputAction.CallbackContext context)
     {
-        _currentInput = context.ReadValue<Vector2>();
+        Vector2 currentInput = context.ReadValue<Vector2>();
         if (context.performed)
         {
-
+            _playerMover?.OnMove(currentInput);
         }
         else if (context.canceled)
         {
-            _currentInput = Vector2.zero;
+            currentInput = Vector2.zero;
+            _playerMover?.OnMove(currentInput);
         }
     }
 }
