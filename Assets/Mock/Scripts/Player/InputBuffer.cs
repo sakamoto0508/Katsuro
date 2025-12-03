@@ -8,7 +8,7 @@ public class InputBuffer : MonoBehaviour
     public InputAction LightAttackAction => _lightAttackAction;
     public InputAction StrongAttackAction => _strongAttackAction;
     public InputAction EvasionAction => _evasionAction;
-    public InputAction BuffeAction => _buffeAction;
+    public InputAction BuffAction => _buffAction;
     public InputAction LookOnAction => _lookOnAction;
     public InputAction HealAction => _healAction;
 
@@ -16,7 +16,7 @@ public class InputBuffer : MonoBehaviour
     private const string LIGHTATTACK_ACTION = "LightAttack";
     private const string STRONGATTACK_ACTION = "StrongAttack";
     private const string EVASION_ACTION = "Evasion";
-    private const string BUFFE_ACTION = "Buffe";
+    private const string BUFF_ACTION = "Buff";
     private const string LOOKON_ACTION = "LookOn";
     private const string HEAL_ACTION = "Heal";
 
@@ -24,7 +24,7 @@ public class InputBuffer : MonoBehaviour
     private InputAction _lightAttackAction;
     private InputAction _strongAttackAction;
     private InputAction _evasionAction;
-    private InputAction _buffeAction;
+    private InputAction _buffAction;
     private InputAction _lookOnAction;
     private InputAction _healAction;
     
@@ -36,7 +36,7 @@ public class InputBuffer : MonoBehaviour
             _lightAttackAction = playerInput.actions[LIGHTATTACK_ACTION];
             _strongAttackAction = playerInput.actions[STRONGATTACK_ACTION];
             _evasionAction = playerInput.actions[EVASION_ACTION];
-            _buffeAction = playerInput.actions[BUFFE_ACTION];
+            _buffAction = playerInput.actions[BUFF_ACTION];
             _lookOnAction = playerInput.actions[LOOKON_ACTION];
             _healAction = playerInput.actions[HEAL_ACTION];
         }
