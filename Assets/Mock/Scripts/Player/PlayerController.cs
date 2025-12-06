@@ -32,6 +32,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        _playerMover?.Update();
+    }
+
     private void FixedUpdate()
     {
         _playerMover?.FixedUpdate();

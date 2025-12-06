@@ -16,16 +16,18 @@ public class PlayerMover
     private Transform _cameraPosition;
     private Vector2 _currentInput;
     private Vector3 _targetVelocity;
+    private Vector3 _moveDirection;
+    private Vector3 _lookDirection;
 
     public void Update()
     {
-
+        UpdateDirection();
     }
 
     public void FixedUpdate()
     {
         Movement();
-        Rotation();
+        UpdateRotation();
         SpeedControll();
     }
 
@@ -37,13 +39,16 @@ public class PlayerMover
     /// <summary>
     /// ë¨ìxÇï‘Ç∑ÅB
     /// </summary>
-    private Vector3 Direction()
+    private void UpdateDirection()
     {
         Vector3 direction = (_cameraPosition.forward * _currentInput.y
             + _cameraPosition.right * _currentInput.x).normalized;
         direction.y = 0;
-
-        return direction;
+        _moveDirection = direction.normalized;
+        // âÒì]ï˚å¸ÇÕë¨ìxóDêÊÅB
+        Vector3 vel = _rb.linearVelocity;
+        vel.y = 0;
+        _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
     }
 
     /// <summary>
@@ -52,20 +57,15 @@ public class PlayerMover
     private void Movement()
     {
         float inputMagnitude = Mathf.Clamp01(_currentInput.magnitude);
-        _rb.AddForce(Direction() * _playerStatus.MoveSpeed * 10f, ForceMode.Acceleration);
+        _rb.AddForce(_moveDirection * _playerStatus.MoveSpeed * _playerStatus.Acceleration
+            , ForceMode.Acceleration);
     }
 
-    private void Rotation()
+    private void UpdateRotation()
     {
-        // ì¸óÕï˚å¸Ç©ÇÁâÒì]ñ⁄ïWÇåàÇﬂÇÈÅií‚é~éûÇ‡âÒì]Ç≈Ç´ÇÈÅjÅB
-        Vector3 inputDir = Direction();
-        //  à⁄ìÆÇµÇƒÇ¢ÇÈèÍçáÇÕvelocityÇóDêÊÅB
-        Vector3 vel=_rb.linearVelocity;
-        vel.y = 0;
-        Vector3 lookDir = vel.sqrMagnitude > 0.1f ? vel : inputDir;
-        if (lookDir.sqrMagnitude > 0.1f)
+        if (_lookDirection.sqrMagnitude > 0.1f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDir);
+            Quaternion targetRotation = Quaternion.LookRotation(_lookDirection);
             _playerPosition.rotation = Quaternion.Slerp(_playerPosition.rotation
                 , targetRotation, _playerStatus.RoationSmoothness);
         }

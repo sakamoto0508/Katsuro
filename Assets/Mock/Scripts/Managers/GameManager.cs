@@ -12,8 +12,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        
+    }
+
+    private void Start()
+    {
         Init();
     }
+
 
     private void Init()
     {
