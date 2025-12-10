@@ -41,7 +41,8 @@ public class PlayerMover
     /// </summary>
     public float ReturnVelocity()
     {
-        return _rb.linearVelocity.magnitude;
+        Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+        return velXZ.magnitude;
     }
 
     /// <summary>

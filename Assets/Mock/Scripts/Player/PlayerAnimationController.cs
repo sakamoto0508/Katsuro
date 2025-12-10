@@ -13,7 +13,7 @@ public class PlayerAnimationController : MonoBehaviour
     /// <param name="speed"></param>
     public void MoveVelocity(float speed)
     {
-        _animator?.SetFloat(_moveVelocityHash, speed);
+        _animator?.SetFloat(_moveVelocityHash, speed, 0.1f, Time.deltaTime);
     }
 
     private void Start()
