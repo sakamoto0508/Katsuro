@@ -3,8 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
 {
+    [SerializeField] private string _moveVelocity = "MoveVelocity";
     private Animator _animator;
-    private string _moveVelocity = "MoveVelocity";
     private int _moveVelocityHash;
 
     /// <summary>
