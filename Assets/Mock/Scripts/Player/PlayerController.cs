@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 
     private InputBuffer _inputBuffer;
     private PlayerMover _playerMover;
+    private PlayerAnimationController _animationController;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         _playerMover = new PlayerMover(_playerStatus, rb
             , this.transform, cameraPositoin.transform);
+        _animationController=GetComponent<PlayerAnimationController>();
     }
 
     private void OnDestroy()
@@ -35,6 +37,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _playerMover?.Update();
+        _animationController?.MoveVelocity(_playerMover.ReturnVelocity());
     }
 
     private void FixedUpdate()

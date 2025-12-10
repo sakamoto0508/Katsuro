@@ -37,7 +37,15 @@ public class PlayerMover
     }
 
     /// <summary>
-    /// 速度を返す。
+    /// プレイヤーの速度を返す。
+    /// </summary>
+    public float ReturnVelocity()
+    {
+        return _rb.linearVelocity.magnitude;
+    }
+
+    /// <summary>
+    /// 方向処理。
     /// </summary>
     private void UpdateDirection()
     {
@@ -61,6 +69,9 @@ public class PlayerMover
             , ForceMode.Acceleration);
     }
 
+    /// <summary>
+    /// 回転処理。
+    /// </summary>
     private void UpdateRotation()
     {
         if (_lookDirection.sqrMagnitude > 0.1f)

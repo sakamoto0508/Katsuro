@@ -7,6 +7,15 @@ public class PlayerAnimationController : MonoBehaviour
     private string _moveVelocity = "MoveVelocity";
     private int _moveVelocityHash;
 
+    /// <summary>
+    /// Moveのアニメーション。
+    /// </summary>
+    /// <param name="speed"></param>
+    public void MoveVelocity(float speed)
+    {
+        _animator?.SetFloat(_moveVelocityHash, speed, 0.1f, Time.deltaTime);
+    }
+
     private void Start()
     {
         _animator = GetComponent<Animator>();
