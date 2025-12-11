@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class CameraConfig : MonoBehaviour
+[CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
+public class CameraConfig : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public float LookScreenX => _lockScreenX;
+    public float LookScreenY => _lockScreenY;
+    public float LerpSpeed => _lerpSpeed;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [Header("LookON Settings")]
+    [SerializeField] private float _lockScreenX = 0.55f;
+    [SerializeField] private float _lockScreenY = 0.50f;
+    [SerializeField] private float _lerpSpeed = 6.0f;
 }
