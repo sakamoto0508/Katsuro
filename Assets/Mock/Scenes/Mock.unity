@@ -160,6 +160,7 @@ GameObject:
   - component: {fileID: 152771639}
   - component: {fileID: 152771645}
   - component: {fileID: 152771646}
+  - component: {fileID: 152771647}
   m_Layer: 0
   m_Name: FreeLook Camera
   m_TagString: Untagged
@@ -379,7 +380,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 152771638}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.099733025, y: -0.000000038259177, z: -0.0000000024384366, w: 0.99501425}
+  m_LocalRotation: {x: 0.09973304, y: -0.000000101121806, z: 0.0000000114469305, w: 0.99501425}
   m_LocalPosition: {x: 1.986, y: 2.363, z: -10.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -398,11 +399,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23aa91de4ced1714590671a340e26730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LookOnCamera
-  _camera: {fileID: 152771643}
-  _composer: {fileID: 0}
-  _playerPosition: {fileID: 403529628}
-  _enemyPosition: {fileID: 113574622}
-  _cameraConfig: {fileID: 11400000, guid: ce01e025afe7070438cf640ef32e50e8, type: 2}
+  _playerTarget: {fileID: 0}
+  _enemyTarget: {fileID: 0}
+  _playerWeight: 1
+  _enemyWeight: 1
+  _boundsPadding: 1
 --- !u!114 &152771646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -423,6 +424,20 @@ MonoBehaviour:
     Weight: 0
     Radius: 0
   m_LegacyTargets: []
+--- !u!114 &152771647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 152771638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e73e9783888bc448ee081704bf13aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinemachineLockOnBody
+  _centerOffset: {x: 0, y: 0, z: 0}
+  _offset: {x: 0, y: 0, z: 0}
 --- !u!4 &184617134 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 397743367516346889, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
@@ -1290,7 +1305,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 891350252}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09973304, y: -0.000000038894353, z: 0.000000003898488, w: 0.99501425}
+  m_LocalRotation: {x: 0.099733055, y: -0.00000010098907, z: 0.000000010122415, w: 0.99501425}
   m_LocalPosition: {x: 1.986, y: 2.363, z: -10.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1473,6 +1488,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1459362431586216111, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
   m_PrefabInstance: {fileID: 172323333988187476}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1101740669
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1101740671}
+  - component: {fileID: 1101740670}
+  m_Layer: 0
+  m_Name: LockOnTargetGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1101740670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101740669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23aa91de4ced1714590671a340e26730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LockOnTargetGroup
+  _playerTarget: {fileID: 403529628}
+  _enemyTarget: {fileID: 113574622}
+  _playerWeight: 1
+  _enemyWeight: 1
+  _boundsPadding: 1
+--- !u!4 &1101740671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101740669}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1107657066 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8724937352119612484, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
@@ -2818,3 +2882,4 @@ SceneRoots:
   - {fileID: 1714902573}
   - {fileID: 324120011}
   - {fileID: 209290166}
+  - {fileID: 1101740671}
