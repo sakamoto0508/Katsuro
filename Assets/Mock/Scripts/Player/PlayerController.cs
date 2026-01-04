@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     private InputBuffer _inputBuffer;
     private PlayerMover _playerMover;
     private PlayerAnimationController _animationController;
+    private LookOnCamera _lookOnCamera;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -103,5 +104,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnLookOnAction(InputAction.CallbackContext context)
     {
+
     }
 }

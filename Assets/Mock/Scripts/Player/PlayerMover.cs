@@ -14,6 +14,7 @@ public class PlayerMover
     private Rigidbody _rb;
     private Transform _playerPosition;
     private Transform _cameraPosition;
+    private Vector3 _externalLookDirection;
     private Vector2 _currentInput;
     private Vector3 _targetVelocity;
     private Vector3 _moveDirection;
@@ -31,6 +32,10 @@ public class PlayerMover
         SpeedControll();
     }
 
+    /// <summary>
+    /// “ü—Í‚Ìó‚¯æ‚èB
+    /// </summary>
+    /// <param name="input"></param>
     public void OnMove(Vector2 input)
     {
         _currentInput = input;
