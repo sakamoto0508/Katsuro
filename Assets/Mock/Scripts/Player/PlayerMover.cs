@@ -14,11 +14,12 @@ public class PlayerMover
     private Rigidbody _rb;
     private Transform _playerPosition;
     private Transform _cameraPosition;
-    private Vector3 _externalLookDirection;
     private Vector2 _currentInput;
     private Vector3 _targetVelocity;
     private Vector3 _moveDirection;
     private Vector3 _lookDirection;
+    private Vector3 _lockOnDirection;
+    private bool _isLockOn;
 
     public void Update()
     {
@@ -50,6 +51,17 @@ public class PlayerMover
         return velXZ.magnitude;
     }
 
+    public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
+    {
+        _isLockOn = isLockOn;
+
+        lockOnDirection.y = 0;
+        // 正規化して代入。ただしゼロベクトルの場合はそのままゼロベクトルを代入。
+        _lockOnDirection = lockOnDirection.sqrMagnitude > 0.001f
+            ? lockOnDirection.normalized
+            : Vector3.zero;
+    }
+
     /// <summary>
     /// 方向処理。
     /// </summary>
@@ -59,6 +71,13 @@ public class PlayerMover
             + _cameraPosition.right * _currentInput.x).normalized;
         direction.y = 0;
         _moveDirection = direction.normalized;
+
+        if (_isLockOn)
+        {
+            _lookDirection = _lockOnDirection;
+            return;
+        }
+
         // 回転方向は速度優先。
         Vector3 vel = _rb.linearVelocity;
         vel.y = 0;

@@ -17,14 +17,15 @@ public class PlayerController : MonoBehaviour
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
-    public void Init(InputBuffer inputBuffer, CinemachineCamera cameraPositoin)
+    public void Init(InputBuffer inputBuffer, CinemachineCamera cameraPositoin, Transform enemyPosition)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         Rigidbody rb = GetComponent<Rigidbody>();
-        _playerMover = new PlayerMover(_playerStatus, rb
-            , this.transform, cameraPositoin.transform);
-        _animationController=GetComponent<PlayerAnimationController>();
+        _animationController = GetComponent<PlayerAnimationController>();
+
+        _playerMover = new PlayerMover(_playerStatus, rb, this.transform, cameraPositoin.transform);
+        _lookOnCamera = new LookOnCamera(this.transform, enemyPosition);
     }
 
     private void OnDestroy()
@@ -37,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         _playerMover?.Update();
         _animationController?.MoveVelocity(_playerMover.ReturnVelocity());
     }
@@ -86,7 +88,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnLightAttackAction(InputAction.CallbackContext context)
     {
-        
+
     }
 
     private void OnStrongAttackAction(InputAction.CallbackContext context)
@@ -104,6 +106,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnLookOnAction(InputAction.CallbackContext context)
     {
-
+        if (_lookOnCamera.IsLockOn == false)
+        {
+            _lookOnCamera?.LockOn();
+        }
+        else
+        {
+            _lookOnCamera?.UnLockOn();
+        }
     }
 }
