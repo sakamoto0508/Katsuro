@@ -2,14 +2,16 @@ using UnityEngine;
 
 public class LookOnCamera
 {
-    public LookOnCamera(Transform playerPosition, Transform enemyPosition)
+    public LookOnCamera(CameraConfig cameraConfig)
     {
         IsLockOn = false;
-        _playerPosition = playerPosition;
-        _enemyPosition = enemyPosition;
+        _cameraConfig = cameraConfig;
+        _playerPosition = _cameraConfig.PlayerPosition;
+        _enemyPosition = _cameraConfig.EnemyPosition;
     }
 
     public bool IsLockOn { get; private set; }
+    private CameraConfig _cameraConfig; 
     private Transform _playerPosition;
     private Transform _enemyPosition;
 
