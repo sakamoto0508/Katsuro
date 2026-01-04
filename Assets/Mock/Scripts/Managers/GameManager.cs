@@ -12,7 +12,6 @@ public class GameManager : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private CinemachineCamera _cinemachineCamera;
-    [SerializeField] private CameraConfig _cameraConfig;
 
     private void Awake()
     {
