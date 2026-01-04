@@ -630,6 +630,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   _inputBuffer: {fileID: 403529623}
   _playerController: {fileID: 403529622}
+  _enemyPosition: {fileID: 1286366702}
   _cinemachineCamera: {fileID: 152771643}
 --- !u!4 &229919953
 Transform:
@@ -1036,6 +1037,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!4 &1286366702 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4159128148933803238, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+  m_PrefabInstance: {fileID: 7830044195058167225}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1456316778
 Mesh:
   m_ObjectHideFlags: 0
@@ -1543,7 +1549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 441482e8936e35048a1dffac814e3ef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.StaticLightingSky
-  m_Profile: {fileID: 0}
+  m_Profile: {fileID: 11400000, guid: 9fe3ce6a6bd10af449d80c83b3763da8, type: 2}
   m_StaticLightingSkyUniqueID: 0
   m_StaticLightingCloudsUniqueID: 0
   m_StaticLightingVolumetricClouds: 0
