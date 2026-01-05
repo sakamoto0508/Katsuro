@@ -17,7 +17,8 @@ public class PlayerController : MonoBehaviour
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
-    public void Init(InputBuffer inputBuffer, CinemachineCamera camera, Transform enemyPosition)
+    public void Init(InputBuffer inputBuffer, CinemachineCamera camera
+        , Transform enemyPosition, CinemachineTargetGroup targetGroup)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform);
-        _lookOnCamera = new LookOnCamera(this.transform, enemyPosition, camera);
+        _lookOnCamera = new LookOnCamera(this.transform, enemyPosition, camera, targetGroup);
     }
 
     private void OnDestroy()

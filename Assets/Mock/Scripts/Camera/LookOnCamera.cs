@@ -4,38 +4,41 @@ using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class LookOnCamera
 {
-    public LookOnCamera(Transform playerPosition, Transform enemyPosition, CinemachineCamera camera)
+    public LookOnCamera(Transform playerPosition, Transform enemyPosition
+        , CinemachineCamera camera, CinemachineTargetGroup targetGroup)
     {
         IsLockOn = false;
         _playerPosition = playerPosition;
         _enemyPosition = enemyPosition;
         _camera = camera;
+        _targetGroup = targetGroup;
     }
 
     public bool IsLockOn { get; private set; }
     private Transform _playerPosition;
     private Transform _enemyPosition;
-    private Transform _cameraTarget;
     private CinemachineCamera _camera;
+    private CinemachineTargetGroup _targetGroup;
 
     public void Update()
     {
         if (!IsLockOn) return;
 
-        // プレイヤーのYawだけをコピー
-        Vector3 euler = _cameraTarget.eulerAngles;
-        euler.y = _playerPosition.eulerAngles.y;
-        _cameraTarget.eulerAngles = euler;
+
     }
 
     public void LockOn()
     {
         IsLockOn = true;
+        // すでに入っていなければ追加
+        _targetGroup.AddMember(_playerPosition, 1f, 0f);
+        _targetGroup.AddMember(_enemyPosition, 1f, 0f);
     }
 
     public void UnLockOn()
     {
         IsLockOn = false;
+        _targetGroup.RemoveMember(_enemyPosition);
     }
 
     public Vector3 ReturnLockOnDirection()

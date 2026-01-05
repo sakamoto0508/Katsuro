@@ -321,7 +321,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 403529628}
+    TrackingTarget: {fileID: 498848935}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -632,6 +632,7 @@ MonoBehaviour:
   _playerController: {fileID: 403529622}
   _enemyPosition: {fileID: 1286366702}
   _cinemachineCamera: {fileID: 152771643}
+  _targetGroup: {fileID: 498848934}
 --- !u!4 &229919953
 Transform:
   m_ObjectHideFlags: 0
@@ -772,6 +773,58 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7917865514115926464, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
   m_PrefabInstance: {fileID: 172323333988187476}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &498848933
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 498848935}
+  - component: {fileID: 498848934}
+  m_Layer: 0
+  m_Name: Target Group
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &498848934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 498848933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5eb80d8e62d9d145bb50fb783c0f731, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineTargetGroup
+  PositionMode: 0
+  RotationMode: 1
+  UpdateMethod: 2
+  Targets:
+  - Object: {fileID: 403529628}
+    Weight: 1
+    Radius: 1
+  m_LegacyTargets: []
+--- !u!4 &498848935
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 498848933}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.24929759, z: 0, w: 0.96842694}
+  m_LocalPosition: {x: 1.986, y: -0.047, z: -6.35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &891350252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1697,3 +1750,4 @@ SceneRoots:
   - {fileID: 1808447238}
   - {fileID: 172323333988187476}
   - {fileID: 7830044195058167225}
+  - {fileID: 498848935}
