@@ -4,7 +4,7 @@ using UnityEngine;
 public class LookOnCamera
 {
     public LookOnCamera(Transform playerPosition, Transform enemyPosition
-        , CinemachineCamera camera,CameraConfig config)
+        , CinemachineCamera camera, CameraConfig config)
     {
         IsLockOn = false;
         _playerPosition = playerPosition;
@@ -23,6 +23,17 @@ public class LookOnCamera
     {
         if (!IsLockOn) return;
 
+        Vector3 toEnemy = _enemyPosition.position - _playerPosition.position;
+        toEnemy.y = 0;
+        if (toEnemy.sqrMagnitude < 0.01f)
+        {
+            UnLockOn();
+            return;
+        }
+        Vector3 forward = toEnemy.normalized;
+        //プレイヤーの後ろにカメラを移動させる
+        Vector3 desiredPos = _playerPosition.position - forward
+            * _cameraConfig.CameraDistance + Vector3.up * _cameraConfig.CameraHeight;
 
     }
 
