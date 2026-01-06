@@ -30,11 +30,7 @@ public class LockOnCameraMover
         //敵の方向ベクトルを求める。メソッドを使わないのはy成分を0にしているため。
         Vector3 toEnemy = _enemyPosition.position - _playerPosition.position;
         toEnemy.y = 0;
-        //if (toEnemy.sqrMagnitude < 0.01f)
-        //{
-        //    _lockOnCamera.UnLockOn();
-        //    return;
-        //}
+       
         Vector3 forward = toEnemy.normalized;
         //プレイヤーの後ろにカメラを移動させる。
         Vector3 desiredPos = _playerPosition.position - forward
