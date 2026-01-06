@@ -9,6 +9,7 @@ public class CameraConfig : ScriptableObject
     public float CameraHeight => _cameraHeight;
     public float PositionSmooth => _positionSmooth;
     public float RotationSmooth => _rotationSmooth;
+    public float LookAtHeight => _lookAtHeight;
 
     [SerializeField] private Transform _playerPosition;
     [SerializeField] protected Transform _enemyPosition;
@@ -16,4 +17,5 @@ public class CameraConfig : ScriptableObject
     [SerializeField] private float _cameraHeight = 2.0f;
     [SerializeField] private float _positionSmooth = 10f;
     [SerializeField] private float _rotationSmooth = 12f;
+    [SerializeField] private float _lookAtHeight = 1.2f;
 }
