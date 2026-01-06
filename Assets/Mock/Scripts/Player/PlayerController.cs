@@ -10,8 +10,9 @@ public class PlayerController : MonoBehaviour
 
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
-    private PlayerMover _playerMover;
     private LockOnCamera _lookOnCamera;
+    private PlayerMover _playerMover;
+    private PlayerAttacker _playerAttacker;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -26,8 +27,10 @@ public class PlayerController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
 
-        _playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform);
+        _playerMover = new PlayerMover(_playerStatus, rb, this.transform
+            , camera.transform,_animationController);
         _lookOnCamera = lockOnCamera;
+        _playerAttacker = new PlayerAttacker();
     }
 
     private void OnDestroy()
@@ -42,7 +45,6 @@ public class PlayerController : MonoBehaviour
     {
         _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         _playerMover?.Update();
-        _animationController?.MoveVelocity(_playerMover.ReturnVelocity());
     }
 
     private void FixedUpdate()
@@ -88,7 +90,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnLightAttackAction(InputAction.CallbackContext context)
     {
-
+        if (_playerAttacker.IsDrawingSword == false)
+        {
+            _playerAttacker.DrawSword();
+        }
     }
 
     private void OnStrongAttackAction(InputAction.CallbackContext context)

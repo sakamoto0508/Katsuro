@@ -2,15 +2,17 @@ using UnityEngine;
 
 public class PlayerMover
 {
-    public PlayerMover(PlayerStatus playerStatus, Rigidbody rb
-        , Transform playerPosition, Transform cameraPosition)
+    public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition
+        , Transform cameraPosition, PlayerAnimationController animationController)
     {
         _playerStatus = playerStatus;
         _rb = rb;
         _playerPosition = playerPosition;
         _cameraPosition = cameraPosition;
+        _animationController = animationController;
     }
     private PlayerStatus _playerStatus;
+    private PlayerAnimationController _animationController;
     private Rigidbody _rb;
     private Transform _playerPosition;
     private Transform _cameraPosition;
@@ -24,6 +26,7 @@ public class PlayerMover
     public void Update()
     {
         UpdateDirection();
+        _animationController?.MoveVelocity(ReturnVelocity());
     }
 
     public void FixedUpdate()
@@ -42,15 +45,6 @@ public class PlayerMover
         _currentInput = input;
     }
 
-    /// <summary>
-    /// プレイヤーの速度を返す。
-    /// </summary>
-    public float ReturnVelocity()
-    {
-        Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
-        return velXZ.magnitude;
-    }
-
     public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
     {
         _isLockOn = isLockOn;
@@ -60,6 +54,15 @@ public class PlayerMover
         _lockOnDirection = lockOnDirection.sqrMagnitude > 0.001f
             ? lockOnDirection.normalized
             : Vector3.zero;
+    }
+
+    /// <summary>
+    /// プレイヤーの速度を返す。
+    /// </summary>
+    private float ReturnVelocity()
+    {
+        Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+        return velXZ.magnitude;
     }
 
     /// <summary>

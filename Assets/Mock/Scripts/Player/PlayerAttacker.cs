@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class PlayerAttacker : MonoBehaviour
+public class PlayerAttacker
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public bool IsDrawingSword { get; private set; } = false;
 
-    // Update is called once per frame
-    void Update()
+    public void DrawSword()
     {
-        
+        if (IsDrawingSword) return;
+
+        IsDrawingSword = true;
+
     }
 }
