@@ -28,9 +28,9 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        _lockOnCameraMover?.Update();
+        _lockOnCameraMover?.LateUpdate();
     }
 
     private void InputEventRegistry(InputBuffer inputBuffer)

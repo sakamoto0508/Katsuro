@@ -19,7 +19,7 @@ public class LockOnCameraMover
     private CinemachineCamera _camera;
     private CameraConfig _cameraConfig;
 
-    public void Update()
+    public void LateUpdate()
     {
         if (!_lockOnCamera.IsLockOn) return;
         UpdateLockOnCamera();

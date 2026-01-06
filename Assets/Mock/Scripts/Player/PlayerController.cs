@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="inputBuffer"></param>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition
         , CinemachineCamera camera,CameraManager cameraManager
-        ,CinemachineInputAxisController inputCamera,LockOnCamera lockOnCamera)
+        ,LockOnCamera lockOnCamera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
