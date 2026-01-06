@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CameraManager _cameraManager;
     [SerializeField] private Camera _camera;
     [SerializeField] private CinemachineCamera _cinemachineCamera;
+    [SerializeField] private CinemachineCamera _cinemachineLockOncamera;
     [SerializeField] private CinemachineInputAxisController _inputCamera;
     [SerializeField] private CinemachineBrain _cinemachineBrain;
 
@@ -35,11 +36,11 @@ public class GameManager : MonoBehaviour
     private void Init()
     {
         _lockOnCamera = new LockOnCamera(_playerPosition, _enemyPosition
-            , _cinemachineCamera, _cinemachineBrain);
-        _playerController?.Init(_inputBuffer, _enemyPosition, _cinemachineCamera
+            , _cinemachineCamera, _cinemachineLockOncamera);
+        _playerController?.Init(_inputBuffer, _enemyPosition, _camera
             , _cameraManager, _lockOnCamera);
         _cameraManager?.Init(_inputBuffer, _playerPosition
-            , _enemyPosition, _cameraConfig, _lockOnCamera, _camera);
+            , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineLockOncamera);
     }
 }
 

@@ -1,9 +1,10 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class LockOnCameraMover
 {
     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition
-        , Transform enemyPosition, Camera camera, CameraConfig config)
+        , Transform enemyPosition, CinemachineCamera camera, CameraConfig config)
     {
         _lockOnCamera = lockOnCamera;
         _playerPosition = playerPosition;
@@ -15,7 +16,7 @@ public class LockOnCameraMover
     private LockOnCamera _lockOnCamera;
     private Transform _playerPosition;
     private Transform _enemyPosition;
-    private Camera _camera;
+    private CinemachineCamera _camera;
     private CameraConfig _cameraConfig;
 
     public void LateUpdate()

@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,7 +8,7 @@ public class CameraManager : MonoBehaviour
     private LockOnCamera _lookOnCamera;
     private LockOnCameraMover _lockOnCameraMover;
     public void Init(InputBuffer inputBuffer, Transform playerPosition
-        , Transform enemyPosition, CameraConfig config, LockOnCamera lockOnCamera, Camera camera)
+        , Transform enemyPosition, CameraConfig config, LockOnCamera lockOnCamera, CinemachineCamera camera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);

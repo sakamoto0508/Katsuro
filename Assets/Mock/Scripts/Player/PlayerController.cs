@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="inputBuffer"></param>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition
-        , CinemachineCamera camera, CameraManager cameraManager
+        , Camera camera, CameraManager cameraManager
         , LockOnCamera lockOnCamera)
     {
         _inputBuffer = inputBuffer;
