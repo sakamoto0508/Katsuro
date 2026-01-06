@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     {
         _playerController?.Init(_inputBuffer, _enemyPosition
             , _cinemachineCamera, _cameraConfig);
-        _cameraManager?.Init();
+        _cameraManager?.Init(_inputBuffer);
     }
 }
 
