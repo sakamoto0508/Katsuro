@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private CameraConfig _cameraConfig;
+    [SerializeField] private CameraManager _cameraManager;
     [SerializeField] private CinemachineCamera _cinemachineCamera;
 
     private void Awake()
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     {
         _playerController?.Init(_inputBuffer, _enemyPosition
             , _cinemachineCamera, _cameraConfig);
+        _cameraManager?.Init();
     }
 }
 
