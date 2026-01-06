@@ -11,14 +11,15 @@ public class PlayerController : MonoBehaviour
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
     private PlayerMover _playerMover;
-    private LookOnCamera _lookOnCamera;
+    private LockOnCamera _lookOnCamera;
+    private CameraManager _cameraManager;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition
-        , CinemachineCamera camera, CameraConfig cameraConfig)
+        , CinemachineCamera camera,CameraManager cameraManager,CinemachineInputAxisController inputCamera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
@@ -26,7 +27,9 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform);
-        _lookOnCamera = new LookOnCamera(this.transform, enemyPosition, camera, cameraConfig);
+        _lookOnCamera = new LockOnCamera(this.transform, enemyPosition, inputCamera);
+        _cameraManager = cameraManager;
+        _cameraManager.SetLockOnCamera(_lookOnCamera);
     }
 
     private void OnDestroy()
@@ -40,7 +43,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
-        _lookOnCamera?.Update();
         _playerMover?.Update();
         _animationController?.MoveVelocity(_playerMover.ReturnVelocity());
     }
