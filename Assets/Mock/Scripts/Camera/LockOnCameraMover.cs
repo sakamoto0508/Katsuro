@@ -1,10 +1,9 @@
-using Unity.Cinemachine;
 using UnityEngine;
 
 public class LockOnCameraMover
 {
     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition
-        , Transform enemyPosition, CinemachineCamera camera, CameraConfig config)
+        , Transform enemyPosition, Camera camera, CameraConfig config)
     {
         _lockOnCamera = lockOnCamera;
         _playerPosition = playerPosition;
@@ -16,12 +15,12 @@ public class LockOnCameraMover
     private LockOnCamera _lockOnCamera;
     private Transform _playerPosition;
     private Transform _enemyPosition;
-    private CinemachineCamera _camera;
+    private Camera _camera;
     private CameraConfig _cameraConfig;
 
     public void LateUpdate()
     {
-        if (!_lockOnCamera.IsLockOn) return;
+        if (_lockOnCamera.IsLockOn == false) return;
         UpdateLockOnCamera();
     }
 
@@ -30,11 +29,11 @@ public class LockOnCameraMover
         //敵の方向ベクトルを求める。メソッドを使わないのはy成分を0にしているため。
         Vector3 toEnemy = _enemyPosition.position - _playerPosition.position;
         toEnemy.y = 0;
-        if (toEnemy.sqrMagnitude < 0.01f)
-        {
-            _lockOnCamera.UnLockOn();
-            return;
-        }
+        //if (toEnemy.sqrMagnitude < 0.01f)
+        //{
+        //    _lockOnCamera.UnLockOn();
+        //    return;
+        //}
         Vector3 forward = toEnemy.normalized;
         //プレイヤーの後ろにカメラを移動させる。
         Vector3 desiredPos = _playerPosition.position - forward

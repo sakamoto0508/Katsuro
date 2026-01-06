@@ -4,27 +4,27 @@ using UnityEngine;
 public class LockOnCamera
 {
     public LockOnCamera(Transform playerPosition, Transform enemyPosition
-        , CinemachineInputAxisController cameraInput,CinemachineBrain brain)
+        , CinemachineCamera camera, CinemachineBrain brain)
     {
         IsLockOn = false;
         _playerPosition = playerPosition;
         _enemyPosition = enemyPosition;
-        _cameraInput = cameraInput;
+        _camera = camera;
         _brain = brain;
     }
 
     public bool IsLockOn { get; private set; }
     private Transform _playerPosition;
     private Transform _enemyPosition;
-    private CinemachineInputAxisController _cameraInput;
+    private CinemachineCamera _camera;
     private CinemachineBrain _brain;
 
     public void LockOn()
     {
         IsLockOn = true;
         // Cinemachine Ç…ÇÊÇÈêßå‰Çé~ÇﬂÇÈÅB
-        _cameraInput.enabled = false;
-        _brain.enabled = false;
+        _camera.enabled = false;
+        //_brain.enabled = false;
     }
 
     public void UnLockOn()
@@ -33,8 +33,8 @@ public class LockOnCamera
 
         IsLockOn = false;
         // Cinemachine ÇñﬂÇ∑ÅB
-        _cameraInput.enabled = true;
-        _brain.enabled = false;
+        _camera.enabled = true;
+        //_brain.enabled = true;
     }
 
     /// <summary>

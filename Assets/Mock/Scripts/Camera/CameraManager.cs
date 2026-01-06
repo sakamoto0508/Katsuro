@@ -1,23 +1,19 @@
-using System;
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class CameraManager : MonoBehaviour
 {
     private InputBuffer _inputBuffer;
-    private CinemachineCamera _camera;
-    private LockOnCamera _lookOnCamera; 
+    private LockOnCamera _lookOnCamera;
     private LockOnCameraMover _lockOnCameraMover;
     public void Init(InputBuffer inputBuffer, Transform playerPosition
-        , Transform enemyPosition, CameraConfig config,LockOnCamera lockOnCamera)
+        , Transform enemyPosition, CameraConfig config, LockOnCamera lockOnCamera, Camera camera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
-        _camera = GetComponent<CinemachineCamera>();
         _lookOnCamera = lockOnCamera;
         _lockOnCameraMover = new LockOnCameraMover(lockOnCamera, playerPosition
-            , enemyPosition, _camera, config);
+            , enemyPosition, camera, config);
     }
 
     private void OnDestroy()
