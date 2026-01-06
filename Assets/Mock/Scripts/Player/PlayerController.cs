@@ -17,7 +17,8 @@ public class PlayerController : MonoBehaviour
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
-    public void Init(InputBuffer inputBuffer, Transform enemyPosition, CinemachineCamera camera, CameraConfig cameraConfig)
+    public void Init(InputBuffer inputBuffer, Transform enemyPosition
+        , CinemachineCamera camera, CameraConfig cameraConfig)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
