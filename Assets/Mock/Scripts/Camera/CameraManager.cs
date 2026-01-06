@@ -7,21 +7,17 @@ public class CameraManager : MonoBehaviour
 {
     private InputBuffer _inputBuffer;
     private CinemachineCamera _camera;
-    private LockOnCamera _lockOnCamera;
+    private LockOnCamera _lookOnCamera; 
     private LockOnCameraMover _lockOnCameraMover;
     public void Init(InputBuffer inputBuffer, Transform playerPosition
-        , Transform enemyPosition, CameraConfig config)
+        , Transform enemyPosition, CameraConfig config,LockOnCamera lockOnCamera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         _camera = GetComponent<CinemachineCamera>();
-        _lockOnCameraMover = new LockOnCameraMover(_lockOnCamera, playerPosition
+        _lookOnCamera = lockOnCamera;
+        _lockOnCameraMover = new LockOnCameraMover(lockOnCamera, playerPosition
             , enemyPosition, _camera, config);
-    }
-
-    public void SetLockOnCamera(LockOnCamera lockOnCamera)
-    {
-        _lockOnCamera = lockOnCamera;
     }
 
     private void OnDestroy()
@@ -49,6 +45,15 @@ public class CameraManager : MonoBehaviour
 
     private void OnLookOnAction(InputAction.CallbackContext context)
     {
-
+        if (_lookOnCamera.IsLockOn == false)
+        {
+            _lookOnCamera?.LockOn();
+            Debug.Log("LockOn");
+        }
+        else
+        {
+            _lookOnCamera?.UnLockOn();
+            Debug.Log("UnLockOn");
+        }
     }
 }

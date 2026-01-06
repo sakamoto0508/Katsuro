@@ -12,14 +12,14 @@ public class PlayerController : MonoBehaviour
     private PlayerAnimationController _animationController;
     private PlayerMover _playerMover;
     private LockOnCamera _lookOnCamera;
-    private CameraManager _cameraManager;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
     /// </summary>
     /// <param name="inputBuffer"></param>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition
-        , CinemachineCamera camera,CameraManager cameraManager,CinemachineInputAxisController inputCamera)
+        , CinemachineCamera camera,CameraManager cameraManager
+        ,CinemachineInputAxisController inputCamera,LockOnCamera lockOnCamera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
@@ -27,9 +27,7 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform);
-        _lookOnCamera = new LockOnCamera(this.transform, enemyPosition, inputCamera);
-        _cameraManager = cameraManager;
-        _cameraManager.SetLockOnCamera(_lookOnCamera);
+        _lookOnCamera = lockOnCamera;
     }
 
     private void OnDestroy()
@@ -61,7 +59,6 @@ public class PlayerController : MonoBehaviour
         inputBuffer.EvasionAction.started += OnEvasionAction;
         inputBuffer.EvasionAction.canceled += OnEvasionAction;
         inputBuffer.BuffAction.started += OnBuffAction;
-        inputBuffer.LookOnAction.started += OnLookOnAction;
     }
 
     private void InputEventUnRegistry(InputBuffer inputBuffer)
@@ -73,7 +70,6 @@ public class PlayerController : MonoBehaviour
         inputBuffer.EvasionAction.started -= OnEvasionAction;
         inputBuffer.EvasionAction.canceled -= OnEvasionAction;
         inputBuffer.BuffAction.started -= OnBuffAction;
-        inputBuffer.LookOnAction.started -= OnLookOnAction;
     }
 
     private void OnMove(InputAction.CallbackContext context)
@@ -106,19 +102,5 @@ public class PlayerController : MonoBehaviour
 
     private void OnBuffAction(InputAction.CallbackContext context)
     {
-    }
-
-    private void OnLookOnAction(InputAction.CallbackContext context)
-    {
-        if (_lookOnCamera.IsLockOn == false)
-        {
-            _lookOnCamera?.LockOn();
-            Debug.Log("LockOn");
-        }
-        else
-        {
-            _lookOnCamera?.UnLockOn();
-            Debug.Log("UnLockOn");
-        }
     }
 }
