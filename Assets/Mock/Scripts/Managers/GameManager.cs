@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private CinemachineCamera _cinemachineCamera;
-    [SerializeField] private CinemachineTargetGroup _targetGroup;
+
     private void Awake()
     {
 
@@ -27,6 +27,6 @@ public class GameManager : MonoBehaviour
     private void Init()
     {
         _playerController?.Init(_inputBuffer, _cinemachineCamera
-            , _enemyPosition,_targetGroup);
+            , _enemyPosition);
     }
 }

@@ -30,13 +30,13 @@ public class LookOnCamera
     public void LockOn()
     {
         IsLockOn = true;
-        // ‚·‚Å‚É“ü‚Á‚Ä‚¢‚È‚¯‚ê‚Î’Ç‰Á
-        _targetGroup.AddMember(_playerPosition, 1f, 0f);
         _targetGroup.AddMember(_enemyPosition, 1f, 0f);
     }
 
     public void UnLockOn()
     {
+        if (!IsLockOn) return;
+
         IsLockOn = false;
         _targetGroup.RemoveMember(_enemyPosition);
     }
