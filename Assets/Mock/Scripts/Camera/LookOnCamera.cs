@@ -35,9 +35,16 @@ public class LookOnCamera
         Vector3 desiredPos = _playerPosition.position - forward
             * _cameraConfig.CameraDistance + Vector3.up * _cameraConfig.CameraHeight;
         //スムーズに移動させる
-        Transform camTransfrom= _camera.transform;
-        camTransfrom.position=Vector3.Lerp(camTransfrom.position, desiredPos
+        Transform camTransfrom = _camera.transform;
+        camTransfrom.position = Vector3.Lerp(camTransfrom.position, desiredPos
             , Time.deltaTime * _cameraConfig.PositionSmooth);
+        //カメラを敵に向ける
+        Vector3 lookDir = (_enemyPosition.position + Vector3.up * _cameraConfig.LookAtHeight)
+            - camTransfrom.position;
+        //スムーズに回転させる
+        Quaternion targetRot =Quaternion.LookRotation(lookDir.normalized);
+        camTransfrom.rotation = Quaternion.Slerp(camTransfrom.rotation, targetRot
+            , Time.deltaTime * _cameraConfig.RotationSmooth);
     }
 
     public void LockOn()
