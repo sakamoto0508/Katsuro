@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
   m_Name: CameraConfig
   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
-  _lockScreenX: 0.55
-  _lockScreenY: 0.5
-  _lerpSpeed: 6
+  _cameraDistance: 3.81
+  _cameraHeight: 2.13
+  _positionSmooth: 20
+  _rotationSmooth: 20
+  _lookAtHeight: 2
