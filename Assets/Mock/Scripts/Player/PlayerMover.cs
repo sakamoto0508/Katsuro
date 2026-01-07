@@ -77,7 +77,15 @@ public class PlayerMover
 
         if (_isLockOn)
         {
-            _lookDirection = _lockOnDirection;
+            // ロックオン中はロックオン方向基準。
+            Vector3 forward = _lockOnDirection; 
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            direction = (forward * _currentInput.y
+                + right * _currentInput.x);
+            direction.y = 0;
+            _moveDirection = direction.normalized;
+
+            _lookDirection = forward;
             return;
         }
 
