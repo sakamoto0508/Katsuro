@@ -11,6 +11,7 @@ public class InputBuffer : MonoBehaviour
     public InputAction BuffAction => _buffAction;
     public InputAction LookOnAction => _lookOnAction;
     public InputAction HealAction => _healAction;
+    public InputAction SprintAction => _sprintAction;
 
     private const string MOVE_ACTION = "Move";
     private const string LIGHTATTACK_ACTION = "LightAttack";
@@ -19,6 +20,7 @@ public class InputBuffer : MonoBehaviour
     private const string BUFF_ACTION = "Buff";
     private const string LOOKON_ACTION = "LookOn";
     private const string HEAL_ACTION = "Heal";
+    private const string SPRINT_ACTION = "Sprint";
 
     private InputAction _moveAction;
     private InputAction _lightAttackAction;
@@ -27,7 +29,8 @@ public class InputBuffer : MonoBehaviour
     private InputAction _buffAction;
     private InputAction _lookOnAction;
     private InputAction _healAction;
-    
+    private InputAction _sprintAction;
+
     private void Awake()
     {
         if(TryGetComponent<PlayerInput>(out var playerInput))
@@ -39,6 +42,7 @@ public class InputBuffer : MonoBehaviour
             _buffAction = playerInput.actions[BUFF_ACTION];
             _lookOnAction = playerInput.actions[LOOKON_ACTION];
             _healAction = playerInput.actions[HEAL_ACTION];
+            _sprintAction = playerInput.actions[SPRINT_ACTION];
         }
     }
 }

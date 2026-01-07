@@ -61,6 +61,10 @@ public class PlayerController : MonoBehaviour
         inputBuffer.EvasionAction.started += OnEvasionAction;
         inputBuffer.EvasionAction.canceled += OnEvasionAction;
         inputBuffer.BuffAction.started += OnBuffAction;
+        inputBuffer.HealAction.started += OnHeal;
+        inputBuffer.HealAction.canceled += OnHeal;
+        inputBuffer.SprintAction.started += OnSprint;
+        inputBuffer.SprintAction.canceled += OnSprint;
     }
 
     private void InputEventUnRegistry(InputBuffer inputBuffer)
@@ -72,6 +76,10 @@ public class PlayerController : MonoBehaviour
         inputBuffer.EvasionAction.started -= OnEvasionAction;
         inputBuffer.EvasionAction.canceled -= OnEvasionAction;
         inputBuffer.BuffAction.started -= OnBuffAction;
+        inputBuffer.HealAction.started -= OnHeal;
+        inputBuffer.HealAction.canceled -= OnHeal;
+        inputBuffer.SprintAction.started -= OnSprint;
+        inputBuffer.SprintAction.canceled -= OnSprint;
     }
 
     private void OnMove(InputAction.CallbackContext context)
@@ -106,6 +114,14 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnBuffAction(InputAction.CallbackContext context)
+    {
+    }
+
+    private void OnHeal(InputAction.CallbackContext context)
+    {
+    }
+
+    private void OnSprint(InputAction.CallbackContext context)
     {
     }
 }
