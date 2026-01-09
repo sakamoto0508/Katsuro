@@ -101,7 +101,7 @@ public class PlayerMover
     private void Movement()
     {
         float inputMagnitude = Mathf.Clamp01(_currentInput.magnitude);
-        _rb.AddForce(_moveDirection * _playerStatus.MoveSpeed * _playerStatus.Acceleration
+        _rb.AddForce(_moveDirection * _playerStatus.WalkSpeed * _playerStatus.Acceleration
             , ForceMode.Acceleration);
     }
 
@@ -127,9 +127,9 @@ public class PlayerMover
         vel.y = 0;
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         // 最大速度を超過している場合は制限をかける。
-        if (velXZ.magnitude >= _playerStatus.MoveSpeed)
+        if (velXZ.magnitude >= _playerStatus.WalkSpeed)
         {
-            Vector3 limited = velXZ.normalized * _playerStatus.MoveSpeed;
+            Vector3 limited = velXZ.normalized * _playerStatus.WalkSpeed;
             _rb.linearVelocity = new Vector3(limited.x, _rb.linearVelocity.y, limited.z);
         }
         // 入力無し → ブレーキをかける。
