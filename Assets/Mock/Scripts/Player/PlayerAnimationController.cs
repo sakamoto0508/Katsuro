@@ -16,6 +16,11 @@ public class PlayerAnimationController : MonoBehaviour
         _animator?.SetFloat(_moveVelocityHash, speed, 0.1f, Time.deltaTime);
     }
 
+    public void PlayTrriger(string animationName)
+    {
+        _animator?.SetTrigger(animationName);
+    }
+
     private void Start()
     {
         _animator = GetComponent<Animator>();

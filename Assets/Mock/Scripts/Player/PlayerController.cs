@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("PlayerStatus")]
     [SerializeField] private PlayerStatus _playerStatus;
+    [SerializeField] private AnimationName _animationName;
 
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
@@ -30,7 +31,7 @@ public class PlayerController : MonoBehaviour
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform,_animationController);
         _lookOnCamera = lockOnCamera;
-        _playerAttacker = new PlayerAttacker();
+        _playerAttacker = new PlayerAttacker(_animationController,_animationName);
     }
 
     private void OnDestroy()

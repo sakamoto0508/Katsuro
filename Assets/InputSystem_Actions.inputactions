@@ -226,10 +226,10 @@
                 {
                     "name": "",
                     "id": "d0f99d16-9d15-4eec-8eed-c49b00985c45",
-                    "path": "",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "LightAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -237,7 +237,7 @@
                 {
                     "name": "",
                     "id": "50c41530-6cdb-48a6-9c7f-8fa4fa561681",
-                    "path": "",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
