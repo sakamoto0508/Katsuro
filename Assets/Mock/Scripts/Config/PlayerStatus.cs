@@ -18,4 +18,4 @@ public class PlayerStatus : ScriptableObject
     [SerializeField] private float _roationSmoothness = 0.25f;
     [SerializeField] private float _acceleration = 5f;
     [SerializeField] private float _breakForce = 0.90f;
-}
+} 
