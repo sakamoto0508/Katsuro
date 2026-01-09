@@ -3,14 +3,16 @@ using UnityEngine;
 
 public class LockOnCamera
 {
-    public LockOnCamera(Transform playerPosition, Transform enemyPosition
-        , CinemachineCamera camera, CinemachineCamera lockOnCamera)
+    public LockOnCamera(Transform playerPosition, Transform enemyPosition, CinemachineCamera camera
+        , CinemachineCamera lockOnCamera, PlayerAnimationController animController, AnimationName animationName)
     {
         IsLockOn = false;
         _playerPosition = playerPosition;
         _enemyPosition = enemyPosition;
         _camera = camera;
         _lockOnCamera = lockOnCamera;
+        _animController = animController;
+        _animationName = animationName;
     }
 
     public bool IsLockOn { get; private set; }
@@ -18,14 +20,16 @@ public class LockOnCamera
     private Transform _enemyPosition;
     private CinemachineCamera _camera;
     private CinemachineCamera _lockOnCamera;
-    private CinemachineBrain _brain;
+    private PlayerAnimationController _animController;
+    private AnimationName _animationName;
 
     public void LockOn()
     {
         IsLockOn = true;
-        
+
         _camera.Priority = 0;
         _lockOnCamera.Priority = 10;
+        _animController.PlayBool(_animationName.IsLockOn, IsLockOn);
     }
 
     public void UnLockOn()
@@ -35,6 +39,7 @@ public class LockOnCamera
         IsLockOn = false;
         _camera.Priority = 10;
         _lockOnCamera.Priority = 0;
+        _animController.PlayBool(_animationName.IsLockOn, IsLockOn);
     }
 
     /// <summary>

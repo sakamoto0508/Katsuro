@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: AnimName
   m_EditorClassIdentifier: Assembly-CSharp::AnimationName
   _isDrawingSword: IsDrawing
+  _isLockOn: IsLockOn

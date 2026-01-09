@@ -4,5 +4,8 @@ using UnityEngine;
 public class AnimationName : ScriptableObject
 {
     public string IsDrawingSword => _isDrawingSword;
+    public string IsLockOn => _isLockOn;
+
     [SerializeField] string _isDrawingSword = "";
+    [SerializeField] string _isLockOn = "";
 }

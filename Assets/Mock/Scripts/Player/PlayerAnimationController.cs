@@ -21,6 +21,11 @@ public class PlayerAnimationController : MonoBehaviour
         _animator?.SetTrigger(animationName);
     }
 
+    public void PlayBool(string animationName, bool value)
+    {
+        _animator?.SetBool(animationName, value);
+    }
+
     private void Start()
     {
         _animator = GetComponent<Animator>();

@@ -719,14 +719,15 @@ MonoBehaviour:
   _inputBuffer: {fileID: 1707831961}
   _playerPosition: {fileID: 403529628}
   _playerController: {fileID: 403529622}
-  _enemyPosition: {fileID: 1286366702}
+  _playerAnimationController: {fileID: 1705746135}
+  _animationName: {fileID: 11400000, guid: 644e59fbcdac44b4a9a4764d1fd92687, type: 2}
   _cameraConfig: {fileID: 11400000, guid: ce01e025afe7070438cf640ef32e50e8, type: 2}
+  _enemyPosition: {fileID: 1286366702}
   _cameraManager: {fileID: 1307119452}
   _camera: {fileID: 891350254}
   _cinemachineCamera: {fileID: 152771643}
   _cinemachineLockOncamera: {fileID: 227339637}
   _inputCamera: {fileID: 152771639}
-  _cinemachineBrain: {fileID: 891350257}
 --- !u!4 &229919953
 Transform:
   m_ObjectHideFlags: 0
@@ -1348,6 +1349,17 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!114 &1705746135 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7004581145326067259, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+  m_PrefabInstance: {fileID: 172323333988187476}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58d9e0aac82fccd45853981d9e915c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationController
 --- !u!1 &1707831960
 GameObject:
   m_ObjectHideFlags: 0
