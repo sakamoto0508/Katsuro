@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
 
+    //テスト用フラグ
+    [SerializeField] private bool _canAttack;
+
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
     private LockOnCamera _lookOnCamera;
@@ -29,9 +32,9 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
-            , camera.transform,_animationController);
+            , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
-        _playerAttacker = new PlayerAttacker(_animationController,_animationName);
+        _playerAttacker = new PlayerAttacker(_animationController, _animationName);
     }
 
     private void OnDestroy()
@@ -99,7 +102,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnLightAttackAction(InputAction.CallbackContext context)
     {
-        if (_playerAttacker.IsDrawingSword == false)
+        if (_playerAttacker.IsDrawingSword == false && _canAttack)
         {
             _playerAttacker.DrawSword();
         }

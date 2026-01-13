@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus
   _maxHealth: 100
   _attackPower: 10
-  _moveSpeed: 10
+  _noWeaponMoveSpeed: 5
+  _noWeaponSprintSpeed: 8
+  _unLockWalkSpeed: 8
+  _unLockSprintSpeed: 8
+  _lockOnWalkSpeed: 3
+  _lockOnSprintSpeed: 5
   _roationSmoothness: 0.25
   _acceleration: 5
   _breakForce: 4
