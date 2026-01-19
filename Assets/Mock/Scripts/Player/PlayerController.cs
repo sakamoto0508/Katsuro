@@ -1,4 +1,3 @@
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private PlayerAnimationController _animationController;
     private LockOnCamera _lookOnCamera;
     private PlayerMover _playerMover;
+    private PlayerSprint _playerSprint;
     private PlayerAttacker _playerAttacker;
 
     /// <summary>
@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
 
+        _playerSprint = new PlayerSprint();
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
