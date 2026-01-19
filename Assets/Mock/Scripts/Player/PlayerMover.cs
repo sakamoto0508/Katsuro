@@ -17,7 +17,6 @@ public class PlayerMover
     private Transform _playerPosition;
     private Transform _cameraPosition;
     private Vector2 _currentInput;
-    private Vector3 _targetVelocity;
     private Vector3 _moveDirection;
     private Vector3 _lookDirection;
     private Vector3 _lockOnDirection;
@@ -36,10 +35,6 @@ public class PlayerMover
         SpeedControll();
     }
 
-    /// <summary>
-    /// 入力の受け取り。
-    /// </summary>
-    /// <param name="input"></param>
     public void OnMove(Vector2 input)
     {
         _currentInput = input;
@@ -50,64 +45,68 @@ public class PlayerMover
         _isLockOn = isLockOn;
 
         lockOnDirection.y = 0;
-        // 正規化して代入。ただしゼロベクトルの場合はそのままゼロベクトルを代入。
         _lockOnDirection = lockOnDirection.sqrMagnitude > 0.001f
             ? lockOnDirection.normalized
             : Vector3.zero;
     }
 
-    /// <summary>
-    /// プレイヤーの速度を返す。
-    /// </summary>
     private float ReturnVelocity()
     {
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         return velXZ.magnitude;
     }
 
-    /// <summary>
-    /// 方向処理。
-    /// </summary>
     private void UpdateDirection()
     {
-        Vector3 direction = (_cameraPosition.forward * _currentInput.y
-            + _cameraPosition.right * _currentInput.x).normalized;
-        direction.y = 0;
-        _moveDirection = direction.normalized;
+        // カメラ基準の前後・左右を水平面に投影し、入力からワールド方向を求める。
+        Vector3 cameraForward = _cameraPosition.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
 
-        if (_isLockOn)
+        Vector3 cameraRight = _cameraPosition.right;
+        cameraRight.y = 0f;
+        cameraRight.Normalize();
+
+        Vector3 worldDirection = cameraForward * _currentInput.y + cameraRight * _currentInput.x;
+        _moveDirection = worldDirection.sqrMagnitude > 0.001f ? worldDirection.normalized : Vector3.zero;
+
+        if (_isLockOn && _lockOnDirection.sqrMagnitude > 0.001f)
         {
-            // ロックオン中はロックオン方向基準。
-            Vector3 forward = _lockOnDirection; 
-            Vector3 right = Vector3.Cross(Vector3.up, forward);
-            direction = (forward * _currentInput.y
-                + right * _currentInput.x);
-            direction.y = 0;
-            _moveDirection = direction.normalized;
+            // 敵方向(forward)とカメラ右方向(lateral)を直交化し、純粋なストレーフ軸を作る。
+            Vector3 forward = _lockOnDirection;
+            Vector3 lateral = cameraRight;
+            Vector3 up = Vector3.up;
+            Vector3.OrthoNormalize(ref up, ref forward, ref lateral);
 
+            Vector3 lockMove = forward * _currentInput.y + lateral * _currentInput.x;
+            _moveDirection = lockMove.sqrMagnitude > 0.001f ? lockMove.normalized : Vector3.zero;
+
+            // ロックオン時は常に敵方向を向く。
             _lookDirection = forward;
             return;
         }
 
-        // 回転方向は速度優先。
+        // 非ロックオン時は移動速度が十分あれば速度方向を、なければ入力方向を向く。
         Vector3 vel = _rb.linearVelocity;
         vel.y = 0;
         _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
     }
 
-    /// <summary>
-    /// プレイヤーの移動処理。
-    /// </summary>
     private void Movement()
     {
+        if (_moveDirection.sqrMagnitude < 0.001f)
+        {
+            // 入力が極小なら力を加えない。
+            return;
+        }
+
         float inputMagnitude = Mathf.Clamp01(_currentInput.magnitude);
-        _rb.AddForce(_moveDirection * _playerStatus.UnLockWalkSpeed * _playerStatus.Acceleration
-            , ForceMode.Acceleration);
+        float targetSpeed = _isLockOn ? _playerStatus.LockOnWalkSpeed : _playerStatus.UnLockWalkSpeed;
+        // ロックオン状態に応じた目標速度で加速力を決定。
+        Vector3 acceleration = _moveDirection * targetSpeed * _playerStatus.Acceleration * inputMagnitude;
+        _rb.AddForce(acceleration, ForceMode.Acceleration);
     }
 
-    /// <summary>
-    /// 回転処理。
-    /// </summary>
     private void UpdateRotation()
     {
         if (_lookDirection.sqrMagnitude > 0.1f)
@@ -118,32 +117,29 @@ public class PlayerMover
         }
     }
 
-    /// <summary>
-    /// 速度制御。
-    /// </summary>
+
     private void SpeedControll()
     {
-        Vector3 vel = _rb.linearVelocity;
-        vel.y = 0;
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
-        // 最大速度を超過している場合は制限をかける。
-        if (velXZ.magnitude >= _playerStatus.UnLockWalkSpeed)
+        float maxSpeed = _isLockOn ? _playerStatus.LockOnWalkSpeed : _playerStatus.UnLockWalkSpeed;
+
+        // 速度上限を超えていたら水平方向のみ制限。
+        if (velXZ.magnitude >= maxSpeed)
         {
-            Vector3 limited = velXZ.normalized * _playerStatus.UnLockWalkSpeed;
+            Vector3 limited = velXZ.normalized * maxSpeed;
             _rb.linearVelocity = new Vector3(limited.x, _rb.linearVelocity.y, limited.z);
         }
-        // 入力無し → ブレーキをかける。
+
+        // 入力が無いときは減速力を与えるか完全停止させる。
         if (_currentInput.sqrMagnitude < 0.01f)
         {
             if (velXZ.sqrMagnitude > 0.01f)
             {
-                // まだ動いているならブレーキ力を与える。
                 Vector3 brakeForce = -velXZ.normalized * _playerStatus.BreakForce;
                 _rb.AddForce(brakeForce, ForceMode.Acceleration);
             }
             else
             {
-                // 完全停止。
                 _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
             }
         }
