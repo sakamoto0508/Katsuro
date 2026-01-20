@@ -15,11 +15,11 @@ MonoBehaviour:
   _maxHealth: 100
   _attackPower: 10
   _noWeaponMoveSpeed: 5
-  _noWeaponSprintSpeed: 8
+  _noWeaponSprintSpeed: 10
   _unLockWalkSpeed: 4
   _unLockSprintSpeed: 8
   _lockOnWalkSpeed: 4
-  _lockOnSprintSpeed: 5
+  _lockOnSprintSpeed: 8
   _roationSmoothness: 0.25
   _acceleration: 5
   _breakForce: 4
