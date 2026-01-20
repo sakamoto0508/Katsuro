@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーの状態遷移と更新処理を管理するステートマシン。
+/// 登録済みステートを ID で切り替え、各種入力を現在ステートへ委譲する。
+/// </summary>
 public sealed class PlayerStateMachine
 {
     private readonly Dictionary<PlayerStateId, PlayerState> _states;
@@ -19,8 +23,13 @@ public sealed class PlayerStateMachine
         ChangeState(PlayerStateId.Locomotion);
     }
 
+    /// <summary>ステート間で共有される依存情報。</summary>
     public PlayerStateContext Context { get; }
 
+    /// <summary>
+    /// 指定 ID のステートへ遷移する。
+    /// 未登録 ID の場合は警告を出し遷移しない。
+    /// </summary>
     public void ChangeState(PlayerStateId next)
     {
         if (!_states.TryGetValue(next, out var state))
@@ -39,18 +48,25 @@ public sealed class PlayerStateMachine
         _currentState.Enter();
     }
 
+    /// <summary>MonoBehaviour.Update 相当の処理を現在ステートへ委譲する。</summary>
     public void Update(float deltaTime)
     {
         //Context?.Sprint?.Tick(deltaTime);
         _currentState?.Update(deltaTime);
     }
 
+    /// <summary>MonoBehaviour.FixedUpdate 相当の処理を現在ステートへ委譲する。</summary>
     public void FixedUpdate(float fixedDeltaTime)
     {
         _currentState?.FixedUpdate(fixedDeltaTime);
     }
 
+    /// <summary>移動入力を現在ステートへ転送する。</summary>
     public void HandleMove(Vector2 input) => _currentState?.OnMove(input);
+
+    /// <summary>スプリント開始入力を現在ステートへ転送する。</summary>
     public void HandleSprintStarted() => _currentState?.OnSprintStarted();
+
+    /// <summary>スプリント解除入力を現在ステートへ転送する。</summary>
     public void HandleSprintCanceled() => _currentState?.OnSprintCanceled();
 }
