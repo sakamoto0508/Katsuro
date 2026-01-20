@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("PlayerStatus")]
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
+    [SerializeField] private PlayerStateConfig _playerStateConfig;
 
     //テスト用フラグ
     [SerializeField] private bool _canAttack;
@@ -34,7 +35,7 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         //クラス生成
-        _playerSprint = new PlayerSprint();
+        _playerSprint = new PlayerSprint(_playerStateConfig);
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
