@@ -21,6 +21,7 @@ public class PlayerMover
     private Vector3 _lookDirection;
     private Vector3 _lockOnDirection;
     private bool _isLockOn;
+    private bool _isSprinting;
 
     public void Update()
     {
@@ -105,6 +106,16 @@ public class PlayerMover
         // ロックオン状態に応じた目標速度で加速力を決定。
         Vector3 acceleration = _moveDirection * targetSpeed * _playerStatus.Acceleration * inputMagnitude;
         _rb.AddForce(acceleration, ForceMode.Acceleration);
+    }
+
+    private float ResolveTargetSpeed()
+    {
+        if (_isLockOn)
+        {
+            return _isSprinting ? _playerStatus.LockOnSprintSpeed : _playerStatus.LockOnWalkSpeed;
+        }
+
+        return _isSprinting ? _playerStatus.UnLockSprintSpeed : _playerStatus.UnLockWalkSpeed;
     }
 
     private void UpdateRotation()
