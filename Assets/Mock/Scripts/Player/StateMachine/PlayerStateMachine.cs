@@ -16,8 +16,8 @@ public sealed class PlayerStateMachine
 
         _states = new Dictionary<PlayerStateId, PlayerState>
         {
-            //{ PlayerStateId.Locomotion, new PlayerLocomotionState(context, this) },
-            //{ PlayerStateId.Dash, new PlayerDashState(context, this) }
+            { PlayerStateId.Locomotion, new PlayerLocomotionState(context, this) },
+            { PlayerStateId.Dash, new PlayerDashState(context, this) }
         };
 
         ChangeState(PlayerStateId.Locomotion);
@@ -51,7 +51,7 @@ public sealed class PlayerStateMachine
     /// <summary>MonoBehaviour.Update 相当の処理を現在ステートへ委譲する。</summary>
     public void Update(float deltaTime)
     {
-        //Context?.Sprint?.Tick(deltaTime);
+        Context?.Sprint?.Tick(deltaTime);
         _currentState?.Update(deltaTime);
     }
 
