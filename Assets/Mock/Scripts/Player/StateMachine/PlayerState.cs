@@ -27,11 +27,6 @@ public abstract class PlayerState
     public virtual void OnSprintCanceled() { }
 }
 
-public enum PlayerStateId
-{
-    Locomotion,
-    Dash
-}
 
 public enum PlayerAttackType
 {
