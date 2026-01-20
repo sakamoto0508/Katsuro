@@ -41,6 +41,11 @@ public class PlayerMover
         _currentInput = input;
     }
 
+    public void SetSprint(bool isSprinting)
+    {
+        _isSprinting = isSprinting;
+    }
+
     public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
     {
         _isLockOn = isLockOn;
@@ -102,8 +107,8 @@ public class PlayerMover
         }
 
         float inputMagnitude = Mathf.Clamp01(_currentInput.magnitude);
-        float targetSpeed = _isLockOn ? _playerStatus.LockOnWalkSpeed : _playerStatus.UnLockWalkSpeed;
-        // ロックオン状態に応じた目標速度で加速力を決定。
+        float targetSpeed = ResolveTargetSpeed();
+        // ロックオン／スプリント状態に応じた目標速度で加速力を決定。
         Vector3 acceleration = _moveDirection * targetSpeed * _playerStatus.Acceleration * inputMagnitude;
         _rb.AddForce(acceleration, ForceMode.Acceleration);
     }
@@ -132,7 +137,7 @@ public class PlayerMover
     private void SpeedControll()
     {
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
-        float maxSpeed = _isLockOn ? _playerStatus.LockOnWalkSpeed : _playerStatus.UnLockWalkSpeed;
+        float maxSpeed = ResolveTargetSpeed();
 
         // 速度上限を超えていたら水平方向のみ制限。
         if (velXZ.magnitude >= maxSpeed)

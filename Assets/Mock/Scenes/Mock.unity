@@ -1892,6 +1892,10 @@ PrefabInstance:
       propertyPath: _animationName
       value: 
       objectReference: {fileID: 11400000, guid: 644e59fbcdac44b4a9a4764d1fd92687, type: 2}
+    - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: _playerStateConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 6ebeb0b9df0964a4ba1413fb5b282c5a, type: 2}
     - target: {fileID: 7397786981939434362, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
       propertyPath: m_Name
       value: Player

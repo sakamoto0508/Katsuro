@@ -16,9 +16,9 @@ MonoBehaviour:
   _attackPower: 10
   _noWeaponMoveSpeed: 5
   _noWeaponSprintSpeed: 8
-  _unLockWalkSpeed: 8
+  _unLockWalkSpeed: 4
   _unLockSprintSpeed: 8
-  _lockOnWalkSpeed: 3
+  _lockOnWalkSpeed: 4
   _lockOnSprintSpeed: 5
   _roationSmoothness: 0.25
   _acceleration: 5
