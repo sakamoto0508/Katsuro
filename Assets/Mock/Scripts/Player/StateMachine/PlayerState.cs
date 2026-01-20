@@ -2,48 +2,35 @@ using UnityEngine;
 
 public abstract class PlayerState
 {
-    //protected PlayerState(PlayerStateContext context, PlayerStateMachine stateMachine)
-    //{
-    //    Context = context;
-    //    StateMachine = stateMachine;
-    //}
+    protected PlayerState(PlayerStateContext context, PlayerStateMachine stateMachine)
+    {
+        Context = context;
+        StateMachine = stateMachine;
+    }
 
-    //protected PlayerStateContext Context { get; }
-    //protected PlayerStateMachine StateMachine { get; }
+    protected PlayerStateContext Context { get; }
+    protected PlayerStateMachine StateMachine { get; }
 
-    //public abstract PlayerStateId Id { get; }
+    public abstract PlayerStateId Id { get; }
 
-    //public virtual void Enter() { }
-    //public virtual void Exit() { }
-    //public virtual void Update(float deltaTime) { }
-    //public virtual void FixedUpdate(float fixedDeltaTime) { }
+    public virtual void Enter() { }
+    public virtual void Exit() { }
+    public virtual void Update(float deltaTime) { }
+    public virtual void FixedUpdate(float deltaTime) { }
 
-    //public virtual void OnMove(Vector2 input)
-    //{
-    //    Context?.Mover?.OnMove(input);
-    //}
+    public virtual void OnMove(Vector2 input)
+    {
+        Context?.Mover?.OnMove(input);
+    }
 
-    //public virtual void OnLightAttack() { }
-    //public virtual void OnStrongAttack() { }
-    //public virtual void OnEvasionStarted() { }
-    //public virtual void OnEvasionCanceled() { }
-    //public virtual void OnBuffStarted() { }
-    //public virtual void OnBuffCanceled() { }
-    //public virtual void OnHealStarted() { }
-    //public virtual void OnHealCanceled() { }
-    //public virtual void OnSprintStarted() { }
-    //public virtual void OnSprintCanceled() { }
-    //public virtual void OnGhostContact() { }
+    public virtual void OnSprintStarted() { }
+    public virtual void OnSprintCanceled() { }
 }
 
 public enum PlayerStateId
 {
     Locomotion,
-    Sprint,
-    Attack,
-    Ghost,
-    SelfSacrifice,
-    Heal
+    Dash
 }
 
 public enum PlayerAttackType
