@@ -4,8 +4,12 @@ using UnityEngine;
 public class PlayerAnimationController : MonoBehaviour
 {
     [SerializeField] private string _moveVelocity = "MoveVelocity";
+    [SerializeField] private string _moveX = "MoveX";
+    [SerializeField] private string _moveY = "MoveY";
     private Animator _animator;
     private int _moveVelocityHash;
+    private int _moveXHash;
+    private int _moveYHash;
 
     /// <summary>
     /// Moveのアニメーション。
@@ -14,6 +18,12 @@ public class PlayerAnimationController : MonoBehaviour
     public void MoveVelocity(float speed)
     {
         _animator?.SetFloat(_moveVelocityHash, speed, 0.1f, Time.deltaTime);
+    }
+
+    public void MoveVector(Vector2 input)
+    {
+        _animator?.SetFloat(_moveXHash, input.x, 0.1f, Time.deltaTime);
+        _animator?.SetFloat(_moveYHash, input.y, 0.1f, Time.deltaTime);
     }
 
     public void PlayTrriger(string animationName)
@@ -34,5 +44,7 @@ public class PlayerAnimationController : MonoBehaviour
     private void OnValidate()
     {
         _moveVelocityHash = Animator.StringToHash(_moveVelocity);
+        _moveXHash = Animator.StringToHash(_moveX);
+        _moveYHash = Animator.StringToHash(_moveY);
     }
 }

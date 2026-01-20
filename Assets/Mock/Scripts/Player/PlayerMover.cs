@@ -27,6 +27,7 @@ public class PlayerMover
     {
         UpdateDirection();
         _animationController?.MoveVelocity(ReturnVelocity());
+        _animationController?.MoveVector(_currentInput);
     }
 
     public void FixedUpdate()

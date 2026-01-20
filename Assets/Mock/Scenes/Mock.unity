@@ -1889,6 +1889,10 @@ PrefabInstance:
       value: 23.637
       objectReference: {fileID: 0}
     - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: _canAttack
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
       propertyPath: _animationName
       value: 
       objectReference: {fileID: 11400000, guid: 644e59fbcdac44b4a9a4764d1fd92687, type: 2}
