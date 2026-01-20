@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     private PlayerMover _playerMover;
     private PlayerSprint _playerSprint;
     private PlayerAttacker _playerAttacker;
+    private PlayerStateContext _stateContext;
+    private PlayerStateMachine _stateMachine;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -31,11 +33,14 @@ public class PlayerController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
 
+        //クラス生成
         _playerSprint = new PlayerSprint();
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
         _playerAttacker = new PlayerAttacker(_animationController, _animationName);
+        _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint, _lookOnCamera);
+        _stateMachine = new PlayerStateMachine(_stateContext);
     }
 
     private void OnDestroy()
@@ -44,17 +49,22 @@ public class PlayerController : MonoBehaviour
         {
             InputEventUnRegistry(_inputBuffer);
         }
+        _stateMachine = null;
+        _stateContext = null;
     }
 
     private void Update()
     {
-        _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
-        _playerMover?.Update();
+        if (_playerMover != null && _lookOnCamera != null)
+        {
+            _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
+        }
+        _stateMachine?.Update(Time.deltaTime);
     }
 
     private void FixedUpdate()
     {
-        _playerMover?.FixedUpdate();
+        _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
 
     private void InputEventRegistry(InputBuffer inputBuffer)
@@ -90,15 +100,12 @@ public class PlayerController : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector2 currentInput = context.ReadValue<Vector2>();
-        if (context.performed)
-        {
-            _playerMover?.OnMove(currentInput);
-        }
-        else if (context.canceled)
+        if (context.canceled)
         {
             currentInput = Vector2.zero;
-            _playerMover?.OnMove(currentInput);
         }
+
+        _stateMachine?.HandleMove(currentInput);
     }
 
     private void OnLightAttackAction(InputAction.CallbackContext context)
@@ -128,5 +135,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnSprint(InputAction.CallbackContext context)
     {
+        if (context.started)
+        {
+            _stateMachine?.HandleSprintStarted();
+        }
+        else if (context.canceled)
+        {
+            _stateMachine?.HandleSprintCanceled();
+        }
     }
 }
