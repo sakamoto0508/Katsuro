@@ -1,16 +1,43 @@
 using UnityEngine;
 
-public class PlayerWeapon : MonoBehaviour
+public sealed class PlayerWeapon : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private Collider[] _weaponColliders;
+
+    private void Awake()
     {
-        
+        SetHitboxActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDisable()
     {
-        
+        SetHitboxActive(false);
+    }
+
+    public void EnableHitbox() => SetHitboxActive(true);
+
+    public void DisableHitbox() => SetHitboxActive(false);
+
+    private void SetHitboxActive(bool isActive)
+    {
+        if (_weaponColliders == null)
+        {
+            return;
+        }
+
+        foreach (var weaponCollider in _weaponColliders)
+        {
+            if (weaponCollider == null)
+            {
+                continue;
+            }
+
+            weaponCollider.enabled = isActive;
+        }
+    }
+
+    private void Reset()
+    {
+        _weaponColliders = GetComponentsInChildren<Collider>(true);
     }
 }
