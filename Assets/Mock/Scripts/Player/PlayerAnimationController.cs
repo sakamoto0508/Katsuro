@@ -4,8 +4,8 @@ using UnityEngine;
 public class PlayerAnimationController : MonoBehaviour
 {
     [SerializeField] private string _moveVelocity = "MoveVelocity";
-    [SerializeField] private string _moveX = "MoveX";
-    [SerializeField] private string _moveY = "MoveY";
+    [SerializeField] private string _moveX = "MoveVectorX";
+    [SerializeField] private string _moveY = "MoveVectorY";
     private Animator _animator;
     private int _moveVelocityHash;
     private int _moveXHash;

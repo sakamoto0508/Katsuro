@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     private PlayerAttacker _playerAttacker;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
-    private Vector2 _currentInput;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -101,13 +100,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnMove(InputAction.CallbackContext context)
     {
-        _currentInput = context.ReadValue<Vector2>();
+        Vector2 currentInput = context.ReadValue<Vector2>();
         if (context.canceled)
         {
-            _currentInput = Vector2.zero;
+            currentInput = Vector2.zero;
         }
 
-        _stateMachine?.HandleMove(_currentInput);
+        _stateMachine?.HandleMove(currentInput);
     }
 
     private void OnLightAttackAction(InputAction.CallbackContext context)

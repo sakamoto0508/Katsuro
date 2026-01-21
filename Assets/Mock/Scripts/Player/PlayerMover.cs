@@ -27,7 +27,7 @@ public class PlayerMover
     {
         UpdateDirection();
         _animationController?.MoveVelocity(ReturnVelocity());
-        _animationController?.MoveVector(_currentInput);
+        _animationController?.MoveVector(ReturnVector());
     }
 
     public void FixedUpdate()
@@ -160,5 +160,16 @@ public class PlayerMover
                 _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
             }
         }
+    }
+
+    private Vector2 ReturnVector()
+    {
+        Vector2 animInput = Vector2.zero;
+        if (_moveDirection.sqrMagnitude > 0.0001f)
+        {
+            Vector3 localDir = _playerPosition.InverseTransformDirection(_moveDirection);
+            animInput = new Vector2(localDir.x, localDir.z);
+        }
+        return animInput;
     }
 }
