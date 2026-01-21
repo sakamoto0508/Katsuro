@@ -20,7 +20,6 @@ public sealed class PlayerStateMachine
             { PlayerStateId.Dash, new PlayerDashState(context, this) },
             { PlayerStateId.LightAttack, new PlayerLightAttackState(context, this) },
             { PlayerStateId.StrongAttack, new PlayerStrongAttackState(context, this) },
-            { PlayerStateId.JustAvoidAttack, new PlayerJustAvoidAttackState(context, this) },
         };
 
         ChangeState(PlayerStateId.Locomotion);
@@ -78,7 +77,4 @@ public sealed class PlayerStateMachine
 
     /// <summary>強攻撃入力を現在ステートへ転送する。</summary>
     public void HandleStrongAttack() => _currentState?.OnStrongAttack();
-
-    /// <summary>ジャスト回避攻撃入力を現在ステートへ転送する。</summary>
-    public void HandleJustAvoidAttack() => _currentState?.OnJustAvoidAttack();
 }

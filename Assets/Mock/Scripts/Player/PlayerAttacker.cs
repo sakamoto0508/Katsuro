@@ -2,53 +2,50 @@ using UnityEngine;
 
 public class PlayerAttacker
 {
-    public PlayerAttacker(PlayerAnimationController animController, AnimationName animName, PlayerWeapon plaerWeapon)
+    public PlayerAttacker(PlayerAnimationController animController, AnimationName animName, PlayerWeapon playerWeapon)
     {
         _animController = animController;
         _animName = animName;
-        _weapon = plaerWeapon;
+        _weapon = playerWeapon;
     }
 
-    public bool IsDrawingSword { get; private set; } = false;
-    private PlayerAnimationController _animController;
-    private AnimationName _animName;
-    private PlayerWeapon _weapon;
+    public bool IsDrawingSword { get; private set; }
+
+    private readonly PlayerAnimationController _animController;
+    private readonly AnimationName _animName;
+    private readonly PlayerWeapon _weapon;
 
     public void DrawSword()
     {
-        if (IsDrawingSword) return;
+        if (IsDrawingSword)
+        {
+            return;
+        }
 
         IsDrawingSword = true;
+
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
+        {
             _animController?.PlayTrriger(_animName.IsDrawingSword);
+        }
     }
 
-    public void PlayLightAttack(bool enableWeaponHitbox)
-        => PlayAttack(_animName?.LightAttack, enableWeaponHitbox);
-    public void PlayStrongAttack(bool enableWeaponHitbox)
-        => PlayAttack(_animName?.StrongAttack, enableWeaponHitbox);
-    public void PlayJustAvoidAttack(bool enableWeaponHitbox)
-        => PlayAttack(_animName?.JustAvoidAttack, enableWeaponHitbox);
+    public void PlayLightAttack() => PlayAttack(_animName?.LightAttack);
+    public void PlayStrongAttack() => PlayAttack(_animName?.StrongAttack);
 
     public void EndAttack()
     {
         _weapon?.DisableHitbox();
     }
 
-    private void PlayAttack(string triggerName, bool enableWeaponHitbox)
+    private void PlayAttack(string triggerName)
     {
-        if (!string.IsNullOrEmpty(triggerName))
+        if (string.IsNullOrEmpty(triggerName))
         {
-            _animController?.PlayTrriger(triggerName);
+            Debug.LogWarning("PlayerAttacker: Attack trigger is not assigned.");
+            return;
         }
 
-        if (enableWeaponHitbox)
-        {
-            _weapon?.EnableHitbox();
-        }
-        else
-        {
-            _weapon?.DisableHitbox();
-        }
+        _animController?.PlayTrriger(triggerName);
     }
 }

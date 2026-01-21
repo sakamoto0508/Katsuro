@@ -49,12 +49,4 @@ public sealed class PlayerLocomotionState : PlayerState
             StateMachine.ChangeState(PlayerStateId.StrongAttack);
         }
     }
-
-    public override void OnJustAvoidAttack()
-    {
-        if (CanAttack)
-        {
-            StateMachine.ChangeState(PlayerStateId.JustAvoidAttack);
-        }
-    }
 }

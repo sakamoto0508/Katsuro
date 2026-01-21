@@ -50,7 +50,4 @@ public abstract class PlayerState
 
     /// <summary>強攻撃のフック。</summary>
     public virtual void OnStrongAttack() { }
-
-    /// <summary>攻撃回避のフック。</summary>
-    public virtual void OnJustAvoidAttack() { }
 }

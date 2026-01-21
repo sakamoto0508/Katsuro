@@ -4,5 +4,4 @@ public enum PlayerStateId
     Dash,
     LightAttack,
     StrongAttack,
-    JustAvoidAttack,
 }

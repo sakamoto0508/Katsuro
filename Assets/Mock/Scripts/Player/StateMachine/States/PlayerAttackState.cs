@@ -23,7 +23,6 @@ public abstract class PlayerAttackState : PlayerState
 
         Context.Mover?.SetSprint(false);
         _elapsedTime = 0f;
-
         TriggerAttack();
     }
 

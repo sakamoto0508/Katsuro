@@ -44,7 +44,8 @@ public class PlayerController : MonoBehaviour
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
         _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon);
-        _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint, _lookOnCamera);
+        _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint,
+            _lookOnCamera, _playerStateConfig, _playerAttacker);
         _stateMachine = new PlayerStateMachine(_stateContext);
     }
 
@@ -115,15 +116,24 @@ public class PlayerController : MonoBehaviour
 
     private void OnLightAttackAction(InputAction.CallbackContext context)
     {
-        if (_playerAttacker.IsDrawingSword == false && _canAttack)
+        if (!context.started || !_canAttack)
         {
-            _playerAttacker.DrawSword();
+            return;
         }
+
+        TryDrawSword();
+        _stateMachine?.HandleLightAttack();
     }
 
     private void OnStrongAttackAction(InputAction.CallbackContext context)
     {
+        if (!context.started || !_canAttack)
+        {
+            return;
+        }
 
+        TryDrawSword();
+        _stateMachine?.HandleStrongAttack();
     }
 
     private void OnEvasionAction(InputAction.CallbackContext context)
@@ -147,6 +157,19 @@ public class PlayerController : MonoBehaviour
         else if (context.canceled)
         {
             _stateMachine?.HandleSprintCanceled();
+        }
+    }
+
+    private void TryDrawSword()
+    {
+        if (_playerAttacker == null)
+        {
+            return;
+        }
+
+        if (!_playerAttacker.IsDrawingSword)
+        {
+            _playerAttacker.DrawSword();
         }
     }
 
