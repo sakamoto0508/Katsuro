@@ -1,5 +1,8 @@
 public enum PlayerStateId
 {
     Locomotion,
-    Dash
+    Dash,
+    LightAttack,
+    StrongAttack,
+    JustAvoidAttack,
 }
