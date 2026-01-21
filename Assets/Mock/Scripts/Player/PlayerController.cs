@@ -149,4 +149,21 @@ public class PlayerController : MonoBehaviour
             _stateMachine?.HandleSprintCanceled();
         }
     }
+
+    //＝＝＝＝＝＝＝＝ アニメーションイベント＝＝＝＝＝＝＝＝＝＝＝
+    public void AnimEvent_EnableWeaponHitbox()
+    {
+        if (_stateContext != null && _stateContext.IsGhostMode)
+        {
+            _playerWeapon?.DisableHitbox();
+            return;
+        }
+
+        _playerWeapon?.EnableHitbox();
+    }
+
+    public void AnimEvent_DisableWeaponHitbox()
+    {
+        _playerWeapon?.DisableHitbox();
+    }
 }
