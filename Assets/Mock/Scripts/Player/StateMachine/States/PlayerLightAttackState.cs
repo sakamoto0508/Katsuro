@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class PlayerLightAttackState : MonoBehaviour
+public sealed class PlayerLightAttackState : PlayerAttackState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public PlayerLightAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
+        : base(context, stateMachine, context?.StateConfig?.GetLightAttackDuration() ?? 0.8f)
     {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    public override PlayerStateId Id => PlayerStateId.LightAttack;
+
+    protected override void TriggerAttack()
     {
-        
+        Context.Attacker?.PlayLightAttack();
     }
 }

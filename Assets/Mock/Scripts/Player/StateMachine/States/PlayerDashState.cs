@@ -7,6 +7,8 @@ public sealed class PlayerDashState : PlayerState
     {
     }
 
+    private bool CanAttack => Context.Attacker != null;
+
     public override PlayerStateId Id => PlayerStateId.Dash;
 
     public override void Enter()
@@ -39,5 +41,29 @@ public sealed class PlayerDashState : PlayerState
     public override void OnSprintCanceled()
     {
         StateMachine.ChangeState(PlayerStateId.Locomotion);
+    }
+
+    public override void OnLightAttack()
+    {
+        if (CanAttack)
+        {
+            StateMachine.ChangeState(PlayerStateId.LightAttack);
+        }
+    }
+
+    public override void OnStrongAttack()
+    {
+        if (CanAttack)
+        {
+            StateMachine.ChangeState(PlayerStateId.StrongAttack);
+        }
+    }
+
+    public override void OnJustAvoidAttack()
+    {
+        if (CanAttack)
+        {
+            StateMachine.ChangeState(PlayerStateId.JustAvoidAttack);
+        }
     }
 }

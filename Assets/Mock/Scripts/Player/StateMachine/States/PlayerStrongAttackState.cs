@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class PlayerStrongAttackState : MonoBehaviour
+public sealed class PlayerStrongAttackState : PlayerAttackState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public PlayerStrongAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
+        : base(context, stateMachine, context?.StateConfig?.GetStrongAttackDuration() ?? 1.0f)
     {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    public override PlayerStateId Id => PlayerStateId.StrongAttack;
+
+    protected override void TriggerAttack()
     {
-        
+        Context.Attacker?.PlayStrongAttack();
     }
 }

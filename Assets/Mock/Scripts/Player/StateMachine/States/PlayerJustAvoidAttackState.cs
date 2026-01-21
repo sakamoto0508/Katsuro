@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class PlayerJustAvoidAttackState : MonoBehaviour
+public sealed class PlayerJustAvoidAttackState : PlayerAttackState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public PlayerJustAvoidAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
+        : base(context, stateMachine, context?.StateConfig?.GetJustAvoidAttackDuration() ?? 0.9f)
     {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    public override PlayerStateId Id => PlayerStateId.JustAvoidAttack;
+
+    protected override void TriggerAttack()
     {
-        
+        Context.Attacker?.PlayJustAvoidAttack();
     }
 }
