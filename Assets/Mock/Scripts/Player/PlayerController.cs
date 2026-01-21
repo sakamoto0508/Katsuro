@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("PlayerStatus")]
+    [SerializeField] private Collider[] _weaponColliders;
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
@@ -15,11 +16,13 @@ public class PlayerController : MonoBehaviour
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
     private LockOnCamera _lookOnCamera;
+    private PlayerWeapon _playerWeapon;
     private PlayerMover _playerMover;
     private PlayerSprint _playerSprint;
     private PlayerAttacker _playerAttacker;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
+
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -35,11 +38,12 @@ public class PlayerController : MonoBehaviour
         _animationController = GetComponent<PlayerAnimationController>();
 
         //クラス生成
+        _playerWeapon = new PlayerWeapon(_weaponColliders);
         _playerSprint = new PlayerSprint(_playerStateConfig);
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
-        _playerAttacker = new PlayerAttacker(_animationController, _animationName);
+        _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon);
         _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint, _lookOnCamera);
         _stateMachine = new PlayerStateMachine(_stateContext);
     }
