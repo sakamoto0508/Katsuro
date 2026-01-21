@@ -5,13 +5,16 @@
 public sealed class PlayerStateContext
 {
     public PlayerStateContext(PlayerController controller, PlayerStatus status,
-        PlayerMover mover, PlayerSprint sprint, LockOnCamera lockOnCamera)
+        PlayerMover mover, PlayerSprint sprint, LockOnCamera lockOnCamera,
+        PlayerStateConfig stateConfig, PlayerAttacker attacker)
     {
         Controller = controller;
         Status = status;
         Mover = mover;
         Sprint = sprint;
         LockOnCamera = lockOnCamera;
+        StateConfig = stateConfig;
+        Attacker = attacker;
     }
 
     /// <summary>プレイヤー本体のコントローラー。</summary>
@@ -28,6 +31,15 @@ public sealed class PlayerStateContext
 
     /// <summary>ロックオン状態の参照先。</summary>
     public LockOnCamera LockOnCamera { get; }
+
+    /// <summary>現在のステートに設定されたプレイヤーの設定。</summary>
+    public PlayerStateConfig StateConfig { get; }
+
+    /// <summary>プレイヤーの攻撃関連の操作を行うコンポーネント。</summary>
+    public PlayerAttacker Attacker { get; }
+
+    /// <summary>ゴーストモードかどうか。</summary>
+    public bool IsGhostMode { get; set; }
 
     /// <summary>現在ロックオン中かどうかを示すショートカット。</summary>
     public bool IsLockOn => LockOnCamera != null && LockOnCamera.IsLockOn;
