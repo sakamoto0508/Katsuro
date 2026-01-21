@@ -18,4 +18,9 @@ public class PlayerAttacker
         IsDrawingSword = true;
         _animController?.PlayTrriger(_animName.IsDrawingSword);
     }
+
+    private void PlayAttack(string triggerName,bool enableWeaponHitbox)
+    {
+
+    }
 }
