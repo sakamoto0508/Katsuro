@@ -2,22 +2,13 @@ using UnityEngine;
 
 public sealed class PlayerWeapon
 {
-    public PlayerWeapon(Collider[] coliders)
+    public PlayerWeapon(Collider[] weaponColliders)
     {
-        _weaponColliders = coliders;
-    }
-
-    private Collider[] _weaponColliders;
-
-    private void Awake()
-    {
+        _weaponColliders = weaponColliders;
         SetHitboxActive(false);
     }
 
-    private void OnDisable()
-    {
-        SetHitboxActive(false);
-    }
+    private readonly Collider[] _weaponColliders;
 
     public void EnableHitbox() => SetHitboxActive(true);
 
@@ -40,9 +31,4 @@ public sealed class PlayerWeapon
             weaponCollider.enabled = isActive;
         }
     }
-
-    //private void Reset()
-    //{
-    //    _weaponColliders = GetComponentsInChildren<Collider>(true);
-    //}
 }
