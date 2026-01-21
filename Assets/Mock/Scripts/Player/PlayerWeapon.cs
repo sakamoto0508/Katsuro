@@ -1,8 +1,13 @@
 using UnityEngine;
 
-public sealed class PlayerWeapon : MonoBehaviour
+public sealed class PlayerWeapon
 {
-    [SerializeField] private Collider[] _weaponColliders;
+    public PlayerWeapon(Collider[] coliders)
+    {
+        _weaponColliders = coliders;
+    }
+
+    private Collider[] _weaponColliders;
 
     private void Awake()
     {
@@ -36,8 +41,8 @@ public sealed class PlayerWeapon : MonoBehaviour
         }
     }
 
-    private void Reset()
-    {
-        _weaponColliders = GetComponentsInChildren<Collider>(true);
-    }
+    //private void Reset()
+    //{
+    //    _weaponColliders = GetComponentsInChildren<Collider>(true);
+    //}
 }
