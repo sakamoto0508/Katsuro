@@ -44,4 +44,13 @@ public abstract class PlayerState
 
     /// <summary>スプリント入力終了時のフック。</summary>
     public virtual void OnSprintCanceled() { }
+
+    /// <summary>通常攻撃のフック。</summary>
+    public virtual void OnLightAttack() { }
+
+    /// <summary>強攻撃のフック。</summary>
+    public virtual void OnStrongAttack() { }
+
+    /// <summary>攻撃回避のフック。</summary>
+    public virtual void OnJustAvoidAttack() { }
 }
