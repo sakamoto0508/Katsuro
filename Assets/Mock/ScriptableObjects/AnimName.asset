@@ -12,5 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83d1a267df4b7a43acf234c203a6557, type: 3}
   m_Name: AnimName
   m_EditorClassIdentifier: Assembly-CSharp::AnimationName
+  _moveVelocity: MoveVelocity
+  _moveVectorX: MoveVectorX
+  _moveVectorY: MoveVectorY
   _isDrawingSword: IsDrawing
   _isLockOn: IsLockOn
+  _lightAttack: LightAttack
+  _strongAttack: StrongAttack
+  _justAvoidAttack: 

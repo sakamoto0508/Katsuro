@@ -122,6 +122,7 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
+        if (!_playerAttacker.IsSwordReady) return;
         _stateMachine?.HandleLightAttack();
     }
 
@@ -133,6 +134,7 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
+        if (!_playerAttacker.IsSwordReady) return;
         _stateMachine?.HandleStrongAttack();
     }
 
@@ -167,7 +169,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (!_playerAttacker.IsDrawingSword)
+        if (!_playerAttacker.IsSwordReady && !_playerAttacker.IsDrawingSword)
         {
             _playerAttacker.DrawSword();
         }
@@ -188,5 +190,10 @@ public class PlayerController : MonoBehaviour
     public void AnimEvent_DisableWeaponHitbox()
     {
         _playerWeapon?.DisableHitbox();
+    }
+
+    public void AnimEvent_OnSwordDrawCompleted()
+    {
+        _playerAttacker?.CompleteDrawSword();
     }
 }

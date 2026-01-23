@@ -9,20 +9,23 @@ public class PlayerAttacker
         _weapon = playerWeapon;
     }
 
-    public bool IsDrawingSword { get; private set; }
+    public bool IsSwordReady => _isSwordReady;
+    public bool IsDrawingSword => _isDrawingSword;
 
     private readonly PlayerAnimationController _animController;
     private readonly AnimationName _animName;
     private readonly PlayerWeapon _weapon;
+    private bool _isSwordReady;
+    private bool _isDrawingSword;
 
     public void DrawSword()
     {
-        if (IsDrawingSword)
+        if (_isSwordReady || _isDrawingSword)
         {
             return;
         }
 
-        IsDrawingSword = true;
+        _isDrawingSword = true;
 
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
         {
@@ -30,15 +33,26 @@ public class PlayerAttacker
         }
     }
 
-    public void PlayLightAttack() => PlayAttack(_animName?.LightAttack);
-    public void PlayStrongAttack() => PlayAttack(_animName?.StrongAttack);
+    public void CompleteDrawSword()
+    {
+        if (!_isDrawingSword)
+        {
+            return;
+        }
+
+        _isDrawingSword = false;
+        _isSwordReady = true;
+    }
+
+    public void PlayLightAttack() => PlayTrigger(_animName?.LightAttack);
+    public void PlayStrongAttack() => PlayTrigger(_animName?.StrongAttack);
 
     public void EndAttack()
     {
         _weapon?.DisableHitbox();
     }
 
-    private void PlayAttack(string triggerName)
+    private void PlayTrigger(string triggerName)
     {
         if (string.IsNullOrEmpty(triggerName))
         {
