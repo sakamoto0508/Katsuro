@@ -6,26 +6,38 @@ using UnityEngine;
 /// </summary>
 public abstract class PlayerAttackState : PlayerState
 {
-    /// <summary>単発攻撃として想定される継続時間（保険用タイムアウト）。</summary>
-    private readonly float _attackDuration;
+    /// <summary>ステップ情報が無いときに使うフォールバック継続秒数。</summary>
+    private readonly float _fallbackAttackDuration;
 
-    /// <summary>状態遷移後に経過した時間。</summary>
+    /// <summary>現在の攻撃開始からの経過時間。</summary>
     private float _elapsedTime;
 
-    /// <summary>コンボ入力がバッファリングされているか。</summary>
+    /// <summary>次段コンボが入力済みか。</summary>
     private bool _comboQueued;
 
-    /// <summary>現在コンボ受付ウィンドウが開いているか。</summary>
+    /// <summary>アニメーション側でコンボ受付が開いているか。</summary>
     private bool _comboWindowOpen;
+
+    /// <summary>現在のコンボ段（0 起点）。</summary>
+    private int _comboStepIndex;
+
+    /// <summary>現行攻撃の継続秒数。</summary>
+    private float _currentAttackDuration;
 
     protected PlayerAttackState(PlayerStateContext context, PlayerStateMachine stateMachine, float attackDuration)
         : base(context, stateMachine)
     {
-        _attackDuration = Mathf.Max(0.1f, attackDuration);
+        _fallbackAttackDuration = Mathf.Max(0.1f, attackDuration);
     }
 
+    /// <summary>最大コンボ段数。派生クラスでクリップ数に応じて上書きする。</summary>
+    protected virtual int MaxComboSteps => 1;
+
+    /// <summary>段数に応じた攻撃継続秒数を返す。未設定ならフォールバックを使用。</summary>
+    protected virtual float ResolveAttackDuration(int comboStep) => _fallbackAttackDuration;
+
     /// <summary>
-    /// ステート突入時に攻撃を開始し、タイマー／フラグを初期化する。
+    /// 攻撃開始時に段数とタイマーを初期化し、1 段目を再生する。
     /// </summary>
     public override void Enter()
     {
@@ -38,14 +50,14 @@ public abstract class PlayerAttackState : PlayerState
         }
 
         Context.Mover?.SetSprint(false);
-        _elapsedTime = 0f;
+        _comboStepIndex = 0;
         _comboQueued = false;
         _comboWindowOpen = false;
-        TriggerAttack();
+        BeginCurrentAttack();
     }
 
     /// <summary>
-    /// 攻撃終了時にヒットボックスを閉じる。
+    /// ステート離脱時にヒットボックス等をクリーンアップする。
     /// </summary>
     public override void Exit()
     {
@@ -54,49 +66,48 @@ public abstract class PlayerAttackState : PlayerState
     }
 
     /// <summary>
-    /// コンボ入力が無く、タイムアウトした場合のみロコモーションへ戻す。
+    /// タイムアウト判定とモーション更新を実行する。
     /// </summary>
     public override void Update(float deltaTime)
     {
         Context.Mover?.Update();
         _elapsedTime += deltaTime;
 
-        if (_elapsedTime >= _attackDuration && !_comboWindowOpen && !_comboQueued)
+        if (_elapsedTime >= _currentAttackDuration && !_comboWindowOpen && !_comboQueued)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
     }
 
     /// <summary>
-    /// 攻撃中も移動物理処理を継続する。
+    /// 攻撃中でも移動物理を更新し続ける。
     /// </summary>
     public override void FixedUpdate(float deltaTime)
     {
         Context.Mover?.FixedUpdate();
     }
 
-    /// <summary>ライト攻撃入力を受けたらコンボ予約を行う。</summary>
+    /// <summary>ライト攻撃入力を受けたら次段予約する。</summary>
     public override void OnLightAttack() => QueueComboRequest();
 
-    /// <summary>強攻撃入力でも同様にコンボ予約する。</summary>
+    /// <summary>強攻撃入力でも同様に予約する。</summary>
     public override void OnStrongAttack() => QueueComboRequest();
 
-    /// <summary>アニメーションイベント経由でコンボ受付を開始。</summary>
+    /// <summary>アニメーションイベントで受付開始を通知されたときの処理。</summary>
     public override void OnComboWindowOpened()
     {
         _comboWindowOpen = true;
         TryConsumeComboRequest();
     }
 
-    /// <summary>コンボ受付終了イベント。</summary>
+    /// <summary>アニメーションイベントで受付終了を通知されたときの処理。</summary>
     public override void OnComboWindowClosed()
     {
         _comboWindowOpen = false;
     }
 
     /// <summary>
-    /// 攻撃アニメ完了時、予約があれば次の攻撃を即時再生し、
-    /// 無ければロコモーションへ戻す。
+    /// 攻撃アニメーションが終わった際、予約があれば次段へ、無ければ終了。
     /// </summary>
     public override void OnAttackAnimationFinished()
     {
@@ -106,30 +117,44 @@ public abstract class PlayerAttackState : PlayerState
         }
     }
 
-    /// <summary>コンボ入力をバッファし、可能ならその場で消費する。</summary>
+    /// <summary>comboStep に応じて具体的な攻撃アニメーションを再生する。</summary>
+    protected abstract void TriggerAttack(int comboStep);
+
+    /// <summary>現在の段の攻撃を開始し、タイマーをリセットする。</summary>
+    private void BeginCurrentAttack()
+    {
+        _elapsedTime = 0f;
+        _currentAttackDuration = Mathf.Max(0.1f, ResolveAttackDuration(_comboStepIndex));
+        TriggerAttack(_comboStepIndex);
+    }
+
+    /// <summary>次段予約が可能ならキューへ登録する。</summary>
     private void QueueComboRequest()
     {
+        if (!CanQueueNextCombo())
+        {
+            return;
+        }
+
         _comboQueued = true;
         TryConsumeComboRequest();
     }
 
-    /// <summary>
-    /// コンボ受付中かつ予約済みなら、攻撃アニメを再トリガーする。
-    /// </summary>
+    /// <summary>受付中かつ予約済みなら次段を即時開始する。</summary>
     private bool TryConsumeComboRequest()
     {
-        if (!_comboQueued || !_comboWindowOpen)
+        if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo())
         {
             return false;
         }
 
         _comboQueued = false;
         _comboWindowOpen = false;
-        _elapsedTime = 0f;
-        TriggerAttack();
+        _comboStepIndex = Mathf.Min(_comboStepIndex + 1, MaxComboSteps - 1);
+        BeginCurrentAttack();
         return true;
     }
 
-    /// <summary>具体的な攻撃アニメーションを再生する具象クラス実装。</summary>
-    protected abstract void TriggerAttack();
+    /// <summary>次段に進める余地があるか判定する。</summary>
+    private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
 }

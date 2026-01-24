@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerAttacker
 {
     /// <summary>
-    /// 攻撃制御に必要な依存コンポーネントを受け取り、初期化する。
+    /// 必要なコンポーネント参照を受け取って攻撃制御を初期化する。
     /// </summary>
     public PlayerAttacker(PlayerAnimationController animController, AnimationName animName, PlayerWeapon playerWeapon)
     {
@@ -30,7 +30,6 @@ public class PlayerAttacker
 
     /// <summary>
     /// 抜刀可能なら対応アニメーションを再生する。
-    /// 既に抜刀済み／モーション中の場合は何もしない。
     /// </summary>
     public void DrawSword()
     {
@@ -48,7 +47,7 @@ public class PlayerAttacker
     }
 
     /// <summary>
-    /// 抜刀アニメーション完了時に呼び出し、抜刀状態を更新する。
+    /// 抜刀アニメ完了イベントで呼び、抜刀状態を更新する。
     /// </summary>
     public void CompleteDrawSword()
     {
@@ -61,14 +60,20 @@ public class PlayerAttacker
         _isSwordReady = true;
     }
 
-    /// <summary>ライト攻撃アニメーションを再生する。</summary>
-    public void PlayLightAttack() => PlayTrigger(_animName?.LightAttack);
+    /// <summary>ライト攻撃（0 段目）を再生するショートカット。</summary>
+    public void PlayLightAttack() => PlayLightAttack(0);
 
-    /// <summary>強攻撃アニメーションを再生する。</summary>
-    public void PlayStrongAttack() => PlayTrigger(_animName?.StrongAttack);
+    /// <summary>指定段のライト攻撃アニメーションを再生する。</summary>
+    public void PlayLightAttack(int comboStep) => PlayAttackTrigger(_animName?.LightAttack, comboStep);
+
+    /// <summary>強攻撃（0 段目）を再生するショートカット。</summary>
+    public void PlayStrongAttack() => PlayStrongAttack(0);
+
+    /// <summary>指定段の強攻撃アニメーションを再生する。</summary>
+    public void PlayStrongAttack(int comboStep) => PlayAttackTrigger(_animName?.StrongAttack, comboStep);
 
     /// <summary>
-    /// 攻撃終了時に武器のヒットボックスを無効化する。
+    /// 攻撃終了時にヒットボックスを明示的に無効化する。
     /// </summary>
     public void EndAttack()
     {
@@ -76,10 +81,9 @@ public class PlayerAttacker
     }
 
     /// <summary>
-    /// 指定したトリガー名を Animator に送信する。
-    /// 未設定の場合は警告を出して終了する。
+    /// コンボ段数を Animator に渡した上で指定トリガーを実行する。
     /// </summary>
-    private void PlayTrigger(string triggerName)
+    private void PlayAttackTrigger(string triggerName, int comboStep)
     {
         if (string.IsNullOrEmpty(triggerName))
         {
@@ -87,6 +91,20 @@ public class PlayerAttacker
             return;
         }
 
+        ApplyComboStep(comboStep);
         _animController?.PlayTrriger(triggerName);
+    }
+
+    /// <summary>
+    /// コンボ段数パラメーターを Animator に反映する。
+    /// </summary>
+    private void ApplyComboStep(int comboStep)
+    {
+        if (string.IsNullOrEmpty(_animName?.ComboStep))
+        {
+            return;
+        }
+
+        _animController?.SetInteger(_animName.ComboStep, comboStep);
     }
 }

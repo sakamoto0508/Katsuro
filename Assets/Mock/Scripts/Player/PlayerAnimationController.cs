@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Animator パラメーター操作を一元化し、移動値や攻撃トリガーを安全に更新するコンポーネント。
+/// </summary>
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
 {
@@ -10,35 +13,62 @@ public class PlayerAnimationController : MonoBehaviour
     private int _moveVectorYHash;
 
     /// <summary>
-    /// Moveのアニメーション。
+    /// 速度をスムージング付きで Animator に反映する。
     /// </summary>
-    /// <param name="speed"></param>
     public void MoveVelocity(float speed)
     {
         _animator?.SetFloat(_moveVelocityHash, speed, 0.1f, Time.deltaTime);
     }
 
+    /// <summary>
+    /// 移動ベクトル（X/Z）をスムージング付きで設定する。
+    /// </summary>
     public void MoveVector(Vector2 input)
     {
         _animator?.SetFloat(_moveVectorXHash, input.x, 0.1f, Time.deltaTime);
         _animator?.SetFloat(_moveVectorYHash, input.y, 0.1f, Time.deltaTime);
     }
 
+    /// <summary>
+    /// 指定トリガーを発火する。未設定名は無視する。
+    /// </summary>
     public void PlayTrriger(string animationName)
     {
         _animator?.SetTrigger(animationName);
     }
 
+    /// <summary>
+    /// 指定 Bool パラメーターを更新する。
+    /// </summary>
     public void PlayBool(string animationName, bool value)
     {
         _animator?.SetBool(animationName, value);
     }
 
+    /// <summary>
+    /// 整数パラメーター（例: ComboStep）を設定する。空文字は無視。
+    /// </summary>
+    public void SetInteger(string parameterName, int value)
+    {
+        if (string.IsNullOrEmpty(parameterName))
+        {
+            return;
+        }
+
+        _animator?.SetInteger(parameterName, value);
+    }
+
+    /// <summary>
+    /// Animator 参照を取得する。
+    /// </summary>
     private void Start()
     {
         _animator = GetComponent<Animator>();
     }
 
+    /// <summary>
+    /// インスペクター更新時にハッシュ値を再計算しておく。
+    /// </summary>
     private void OnValidate()
     {
         _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);
