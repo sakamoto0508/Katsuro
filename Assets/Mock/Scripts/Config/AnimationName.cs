@@ -11,6 +11,7 @@ public class AnimationName : ScriptableObject
     public string LightAttack => _lightAttack;
     public string StrongAttack => _strongAttack;
     public string JustAvoidAttack => _justAvoidAttack;
+    public string ComboStep => _comboStep;
 
     [SerializeField] private string _moveVelocity = "MoveVelocity";
     [SerializeField] private string _moveVectorX = "MoveVectorX";
@@ -20,4 +21,5 @@ public class AnimationName : ScriptableObject
     [SerializeField] private string _lightAttack = "";
     [SerializeField] private string _strongAttack = "";
     [SerializeField] private string _justAvoidAttack = "";
+    [SerializeField] private string _comboStep = "ComboStep";
 }
