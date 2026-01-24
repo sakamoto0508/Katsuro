@@ -42,7 +42,7 @@ public class PlayerAttacker
 
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
         {
-            _animController?.PlayTrriger(_animName.IsDrawingSword);
+            _animController?.PlayTrigger(_animName.IsDrawingSword);
         }
     }
 
@@ -99,7 +99,7 @@ public class PlayerAttacker
         }
 
         ApplyComboStep(comboStep);
-        _animController?.PlayTrriger(triggerName);
+        _animController?.PlayTrigger(triggerName);
     }
 
     /// <summary>

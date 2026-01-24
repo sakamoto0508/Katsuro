@@ -32,7 +32,7 @@ public class PlayerAnimationController : MonoBehaviour
     /// <summary>
     /// 指定トリガーを発火する。未設定名は無視する。
     /// </summary>
-    public void PlayTrriger(string animationName)
+    public void PlayTrigger(string animationName)
     {
         _animator?.SetTrigger(animationName);
     }
