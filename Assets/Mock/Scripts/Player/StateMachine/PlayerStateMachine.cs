@@ -77,4 +77,13 @@ public sealed class PlayerStateMachine
 
     /// <summary>強攻撃入力を現在ステートへ転送する。</summary>
     public void HandleStrongAttack() => _currentState?.OnStrongAttack();
+
+    /// <summary>アニメーションイベント経由でコンボ受付開始を通知する。</summary>
+    public void HandleComboWindowOpened() => _currentState?.OnComboWindowOpened();
+
+    /// <summary>アニメーションイベント経由でコンボ受付終了を通知する。</summary>
+    public void HandleComboWindowClosed() => _currentState?.OnComboWindowClosed();
+
+    /// <summary>攻撃アニメーション終了イベントを現在ステートへ通知する。</summary>
+    public void HandleAttackAnimationFinished() => _currentState?.OnAttackAnimationFinished();
 }

@@ -176,6 +176,10 @@ public class PlayerController : MonoBehaviour
     }
 
     //＝＝＝＝＝＝＝＝ アニメーションイベント＝＝＝＝＝＝＝＝＝＝＝
+
+    /// <summary>
+    /// 肉体攻撃アニメのヒット判定開始イベント。ゴースト中は無効化のみ行う。
+    /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
         if (_stateContext != null && _stateContext.IsGhostMode)
@@ -187,11 +191,41 @@ public class PlayerController : MonoBehaviour
         _playerWeapon?.EnableHitbox();
     }
 
+    /// <summary>
+    /// 攻撃アニメの該当フレームでヒットボックスを無効化するイベント。
+    /// </summary>
     public void AnimEvent_DisableWeaponHitbox()
     {
         _playerWeapon?.DisableHitbox();
     }
 
+    /// <summary>
+    /// コンボ受付開始フレームで呼ばれ、現在ステートへ受付可能を通知する。
+    /// </summary>
+    public void AnimEvent_OnComboWindowOpened()
+    {
+        _stateMachine?.HandleComboWindowOpened();
+    }
+
+    /// <summary>
+    /// コンボ受付終了フレームで呼ばれ、ステートへ受付終了を通知する。
+    /// </summary>
+    public void AnimEvent_OnComboWindowClosed()
+    {
+        _stateMachine?.HandleComboWindowClosed();
+    }
+
+    /// <summary>
+    /// 攻撃アニメの最後で呼び出し、ステート側の攻撃完了処理をトリガーする。
+    /// </summary>
+    public void AnimEvent_OnAttackFinished()
+    {
+        _stateMachine?.HandleAttackAnimationFinished();
+    }
+
+    /// <summary>
+    /// 抜刀アニメの完了イベント。攻撃準備完了としてフラグを更新する。
+    /// </summary>
     public void AnimEvent_OnSwordDrawCompleted()
     {
         _playerAttacker?.CompleteDrawSword();

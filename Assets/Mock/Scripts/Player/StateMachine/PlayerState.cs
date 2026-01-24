@@ -50,4 +50,13 @@ public abstract class PlayerState
 
     /// <summary>強攻撃のフック。</summary>
     public virtual void OnStrongAttack() { }
+
+    /// <summary>アニメーションのコンボ受付開始イベント。</summary>
+    public virtual void OnComboWindowOpened() { }
+
+    /// <summary>アニメーションのコンボ受付終了イベント。</summary>
+    public virtual void OnComboWindowClosed() { }
+
+    /// <summary>攻撃アニメーションが完了した際のフック。</summary>
+    public virtual void OnAttackAnimationFinished() { }
 }
