@@ -61,10 +61,17 @@ public class PlayerAttacker
     }
 
     /// <summary>ライト攻撃（0 段目）を再生するショートカット。</summary>
-    public void PlayLightAttack() => PlayLightAttack(0);
+    public void PlayLightAttack() => PlayLightAttack(0, false);
 
     /// <summary>指定段のライト攻撃アニメーションを再生する。</summary>
-    public void PlayLightAttack(int comboStep) => PlayAttackTrigger(_animName?.LightAttack, comboStep);
+    public void PlayLightAttack(int comboStep) => PlayLightAttack(comboStep, false);
+
+    /// <summary>ロックオン状態を考慮しつつライト攻撃を再生する。</summary>
+    public void PlayLightAttack(int comboStep, bool isLockOnVariant)
+    {
+        ApplyLockOnFlag(isLockOnVariant);
+        PlayAttackTrigger(_animName?.LightAttack, comboStep);
+    }
 
     /// <summary>強攻撃（0 段目）を再生するショートカット。</summary>
     public void PlayStrongAttack() => PlayStrongAttack(0);
@@ -106,5 +113,18 @@ public class PlayerAttacker
         }
 
         _animController?.SetInteger(_animName.ComboStep, comboStep);
+    }
+
+    /// <summary>
+    /// ロックオン状態フラグを Animator に伝える。
+    /// </summary>
+    private void ApplyLockOnFlag(bool isLockOn)
+    {
+        if (string.IsNullOrEmpty(_animName?.IsLockOn))
+        {
+            return;
+        }
+
+        _animController?.PlayBool(_animName.IsLockOn, isLockOn);
     }
 }
