@@ -6,7 +6,7 @@ public sealed class PlayerStateContext
 {
     public PlayerStateContext(PlayerController controller, PlayerStatus status,
         PlayerMover mover, PlayerSprint sprint, LockOnCamera lockOnCamera,
-        PlayerStateConfig stateConfig, PlayerAttacker attacker)
+        PlayerStateConfig stateConfig, PlayerAttacker attacker, IAnimationEventStream animationEvents)
     {
         Controller = controller;
         Status = status;
@@ -15,6 +15,7 @@ public sealed class PlayerStateContext
         LockOnCamera = lockOnCamera;
         StateConfig = stateConfig;
         Attacker = attacker;
+        AnimationEvents = animationEvents;
     }
 
     /// <summary>プレイヤー本体のコントローラー。</summary>
@@ -37,6 +38,9 @@ public sealed class PlayerStateContext
 
     /// <summary>プレイヤーの攻撃関連の操作を行うコンポーネント。</summary>
     public PlayerAttacker Attacker { get; }
+
+    /// <summary>アニメーションイベントの配信ストリーム。</summary>
+    public IAnimationEventStream AnimationEvents { get; }
 
     /// <summary>ゴーストモードかどうか。</summary>
     public bool IsGhostMode { get; set; }

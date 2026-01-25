@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 /// <summary>
 /// プレイヤーの状態遷移と更新処理を管理するステートマシン。
 /// 登録済みステートを ID で切り替え、各種入力を現在ステートへ委譲する。
 /// </summary>
-public sealed class PlayerStateMachine
+public sealed class PlayerStateMachine : IDisposable
 {
     private readonly Dictionary<PlayerStateId, PlayerState> _states;
+    private readonly CompositeDisposable _animationEventSubscriptions = new();
     private PlayerState _currentState;
 
     public PlayerStateMachine(PlayerStateContext context)
@@ -22,11 +25,41 @@ public sealed class PlayerStateMachine
             { PlayerStateId.StrongAttack, new PlayerStrongAttackState(context, this) },
         };
 
+        SubscribeAnimationEvents();
         ChangeState(PlayerStateId.Locomotion);
     }
 
     /// <summary>ステート間で共有される依存情報。</summary>
     public PlayerStateContext Context { get; }
+
+    private void SubscribeAnimationEvents()
+    {
+        var stream = Context?.AnimationEvents;
+        if (stream == null)
+        {
+            return;
+        }
+
+        stream.OnEvent
+            .Where(evt => evt == AnimationEventType.ComboWindowOpened)
+            .Subscribe(_ => HandleComboWindowOpened())
+            .AddTo(_animationEventSubscriptions);
+
+        stream.OnEvent
+            .Where(evt => evt == AnimationEventType.ComboWindowClosed)
+            .Subscribe(_ => HandleComboWindowClosed())
+            .AddTo(_animationEventSubscriptions);
+
+        stream.OnEvent
+            .Where(evt => evt == AnimationEventType.AttackFinished)
+            .Subscribe(_ => HandleAttackAnimationFinished())
+            .AddTo(_animationEventSubscriptions);
+    }
+
+    public void Dispose()
+    {
+        _animationEventSubscriptions.Dispose();
+    }
 
     /// <summary>
     /// 指定 ID のステートへ遷移する。

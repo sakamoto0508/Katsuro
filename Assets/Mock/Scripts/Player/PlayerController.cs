@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private PlayerAttacker _playerAttacker;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
-
+    private AnimationEventStream _animationEventStream;
 
     /// <summary>
     /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
@@ -44,8 +44,9 @@ public class PlayerController : MonoBehaviour
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
         _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon);
+        _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint,
-            _lookOnCamera, _playerStateConfig, _playerAttacker);
+            _lookOnCamera, _playerStateConfig, _playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
     }
 
@@ -55,8 +56,13 @@ public class PlayerController : MonoBehaviour
         {
             InputEventUnRegistry(_inputBuffer);
         }
+
+        _stateMachine?.Dispose();
         _stateMachine = null;
         _stateContext = null;
+
+        _animationEventStream?.Dispose();
+        _animationEventStream = null;
     }
 
     private void Update()
@@ -185,10 +191,12 @@ public class PlayerController : MonoBehaviour
         if (_stateContext != null && _stateContext.IsGhostMode)
         {
             _playerWeapon?.DisableHitbox();
+            _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
             return;
         }
 
         _playerWeapon?.EnableHitbox();
+        _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }
 
     /// <summary>
@@ -197,6 +205,7 @@ public class PlayerController : MonoBehaviour
     public void AnimEvent_DisableWeaponHitbox()
     {
         _playerWeapon?.DisableHitbox();
+        _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
     }
 
     /// <summary>
@@ -204,7 +213,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void AnimEvent_OnComboWindowOpened()
     {
-        _stateMachine?.HandleComboWindowOpened();
+        _animationEventStream?.Publish(AnimationEventType.ComboWindowOpened);
     }
 
     /// <summary>
@@ -212,7 +221,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void AnimEvent_OnComboWindowClosed()
     {
-        _stateMachine?.HandleComboWindowClosed();
+        _animationEventStream?.Publish(AnimationEventType.ComboWindowClosed);
     }
 
     /// <summary>
@@ -220,7 +229,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-        _stateMachine?.HandleAttackAnimationFinished();
+        _animationEventStream?.Publish(AnimationEventType.AttackFinished);
     }
 
     /// <summary>
@@ -229,5 +238,6 @@ public class PlayerController : MonoBehaviour
     public void AnimEvent_OnSwordDrawCompleted()
     {
         _playerAttacker?.CompleteDrawSword();
+        _animationEventStream?.Publish(AnimationEventType.SwordDrawCompleted);
     }
 }
