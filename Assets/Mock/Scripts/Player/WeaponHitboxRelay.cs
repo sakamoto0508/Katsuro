@@ -8,9 +8,13 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public sealed class WeaponHitboxRelay : MonoBehaviour
 {
+    /// <summary>衝突を購読者へ通知するイベント。</summary>
     private event Action<Collider> _onHit;
+
+    /// <summary>自分自身に付与されているコライダー参照。</summary>
     private Collider _ownerCollider;
 
+    /// <summary>ヒットイベントの購読者を登録する。</summary>
     public void Subscribe(Action<Collider> handler)
     {
         if (handler == null)
@@ -22,6 +26,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         _onHit += handler;
     }
 
+    /// <summary>ヒットイベントの購読者登録を解除する。</summary>
     public void Unsubscribe(Action<Collider> handler)
     {
         if (handler == null)
@@ -34,14 +39,16 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
 
     private void Awake()
     {
-        _ownerCollider = GetComponent<Collider>();
-        if (_ownerCollider != null)
-        {
-            _ownerCollider.isTrigger = true;
-        }
+        AssignColliderAndForceTrigger();
     }
 
     private void Reset()
+    {
+        AssignColliderAndForceTrigger();
+    }
+
+    /// <summary>所有コライダーを取得して isTrigger を強制的に true にする。</summary>
+    private void AssignColliderAndForceTrigger()
     {
         _ownerCollider = GetComponent<Collider>();
         if (_ownerCollider != null)
@@ -49,7 +56,6 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
             _ownerCollider.isTrigger = true;
         }
     }
-
 
     private void OnTriggerEnter(Collider other)
     {
