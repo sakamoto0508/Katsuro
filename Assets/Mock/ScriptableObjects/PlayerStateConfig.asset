@@ -17,11 +17,10 @@ MonoBehaviour:
   _skillGaugeRecoveryPerSecond: 10
   _lightAttackClips:
     _clips:
-    - {fileID: 7400000, guid: 2d19188b19f6d89428703ea161d74ca8, type: 2}
-    - {fileID: 7400000, guid: c4276096b33ddde41a2c4bd2d22bca74, type: 2}
-    - {fileID: 7400000, guid: 3a20d993c2073e345aa785c1ee9721ef, type: 2}
-    - {fileID: 7400000, guid: 3a20d993c2073e345aa785c1ee9721ef, type: 2}
-    - {fileID: 7400000, guid: 3a20d993c2073e345aa785c1ee9721ef, type: 2}
+    - {fileID: 7400000, guid: 1d51e6c804c6fdf4a858eb75053806c6, type: 2}
+    - {fileID: 7400000, guid: aaf9d0158ed08de4292c0edda2e5b35a, type: 2}
+    - {fileID: 7400000, guid: 584acc98c5f6d6949b8b6997f02f28c8, type: 2}
+    - {fileID: 7400000, guid: e3a9c885862184849917677177ec16d0, type: 2}
   _lockOnLightAttackClips:
     _clips:
     - {fileID: 7400000, guid: 698f11a879b74ff45a027cdbd52aef2d, type: 2}
@@ -31,10 +30,7 @@ MonoBehaviour:
     - {fileID: 7400000, guid: 9c8231dc4d0800b4a9a85b731cbdb620, type: 2}
   _strongAttackClips:
     _clips:
-    - {fileID: 7400000, guid: 1d51e6c804c6fdf4a858eb75053806c6, type: 2}
-    - {fileID: 7400000, guid: aaf9d0158ed08de4292c0edda2e5b35a, type: 2}
-    - {fileID: 7400000, guid: 584acc98c5f6d6949b8b6997f02f28c8, type: 2}
-    - {fileID: 7400000, guid: e3a9c885862184849917677177ec16d0, type: 2}
-    - {fileID: 7400000, guid: e3a9c885862184849917677177ec16d0, type: 2}
+    - {fileID: 7400000, guid: f2b3aa49c017ca64e99a95884ba7ca5f, type: 2}
+    - {fileID: 7400000, guid: a60387158dce5d441a4e701f68411d73, type: 2}
   _justAvoidAttackClips:
     _clips: []
