@@ -8,6 +8,21 @@ public class PlayerPassiveBuffSet : ScriptableObject
 {
     public IReadOnlyList<PassiveBuffEntry> Buffs => _buffs; 
     [SerializeField] private List<PassiveBuffEntry> _buffs = new();
+
+    /// <summary>登録済みパッシブを積算した乗算ダメージ係数。</summary>
+    public float EvaluatoDamageMultiplier()
+    {
+        if(_buffs==null||_buffs.Count==0)
+            return 1f;
+
+        float multiplier = 1f;
+        foreach (var entry in _buffs)
+        {
+            if(entry==null) continue;
+            multiplier *= entry.AttackPowerMultiplier;
+        }
+        return multiplier;
+    }
 }
 
 [Serializable]
