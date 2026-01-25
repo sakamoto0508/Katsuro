@@ -44,9 +44,16 @@ public class PlayerPassiveBuffSet : ScriptableObject
 [Serializable]
 public sealed class PassiveBuffEntry
 {
+    /// <summary>インスペクター表示用のラベル。</summary>
     public string Label => _label;
+
+    /// <summary>装備がもたらす攻撃力の乗算倍率。</summary>
     public float AttackPowerMultiplier => _attackPowerMultiplier;
+
+    /// <summary>装備がもたらす攻撃力の加算値。</summary>
     public float FlatAttackBonus => _flatAttackBonus;
+
+    /// <summary>ヒット時に再生するエフェクトのプレハブ（任意）。</summary>
     public GameObject OnHitEffectPrefab => _onHitEffectPrefab;
 
     [SerializeField] private string _label = "PassiveBuff";
