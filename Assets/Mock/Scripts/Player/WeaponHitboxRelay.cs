@@ -1,16 +1,63 @@
+using System;
 using UnityEngine;
 
-public class WeaponHitboxRelay : MonoBehaviour
+/// <summary>
+/// 武器コライダーの OnTriggerEnter を外部へ多播する補助コンポーネント。
+/// </summary>
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Collider))]
+public sealed class WeaponHitboxRelay : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private event Action<Collider> _onHit;
+    private Collider _ownerCollider;
+
+    public void Subscribe(Action<Collider> handler)
     {
-        
+        if (handler == null)
+        {
+            return;
+        }
+
+        _onHit -= handler;
+        _onHit += handler;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Unsubscribe(Action<Collider> handler)
     {
-        
+        if (handler == null)
+        {
+            return;
+        }
+
+        _onHit -= handler;
+    }
+
+    private void Awake()
+    {
+        _ownerCollider = GetComponent<Collider>();
+        if (_ownerCollider != null)
+        {
+            _ownerCollider.isTrigger = true;
+        }
+    }
+
+    private void Reset()
+    {
+        _ownerCollider = GetComponent<Collider>();
+        if (_ownerCollider != null)
+        {
+            _ownerCollider.isTrigger = true;
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!enabled || !gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        _onHit?.Invoke(other);
     }
 }
