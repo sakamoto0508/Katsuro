@@ -14,12 +14,21 @@ public enum AnimationEventType
     SwordDrawCompleted,
 }
 
+/// <summary>
+/// アニメーションイベントを購読・発行するためのインターフェース。
+/// </summary>
 public interface IAnimationEventStream : IDisposable
 {
+    /// <summary>発生したアニメーションイベントを購読するための IObservable。</summary>
     IObservable<AnimationEventType> OnEvent { get; }
+
+    /// <summary>イベントを発行して全購読者へ通知する。</summary>
     void Publish(AnimationEventType eventType);
 }
 
+/// <summary>
+/// UniRx を用いてアニメーションイベントを多播する実装。
+/// </summary>
 public sealed class AnimationEventStream : IAnimationEventStream
 {
     private readonly Subject<AnimationEventType> _subject = new();
