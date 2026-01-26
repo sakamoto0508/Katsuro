@@ -5,12 +5,12 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerLightAttackState : PlayerAttackState
 {
-    private bool _isLockOnCombo;
-
     public PlayerLightAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
         : base(context, stateMachine, context?.StateConfig?.GetLightAttackDuration() ?? 0.8f)
     {
     }
+
+    private bool _isLockOnCombo;
 
     public override PlayerStateId Id => PlayerStateId.LightAttack;
 
@@ -49,6 +49,20 @@ public sealed class PlayerLightAttackState : PlayerAttackState
         }
 
         return config.GetLightAttackDuration(_isLockOnCombo, comboStep);
+    }
+
+    /// <summary>
+    /// 段数に応じたコンボ受付ディレイを設定する（ロックオン別）。
+    /// </summary>
+    protected override float ResolveComboWindowDelay(int comboStep)
+    {
+        var config = Context?.StateConfig;
+        if (config == null)
+        {
+            return base.ResolveComboWindowDelay(comboStep);
+        }
+
+        return config.GetLightAttackComboWindowDelay(_isLockOnCombo, comboStep);
     }
 
     /// <summary>

@@ -39,6 +39,19 @@ public sealed class PlayerStrongAttackState : PlayerAttackState
     }
 
     /// <summary>
+    /// 段数に応じたコンボ受付ディレイを設定する。
+    /// </summary>
+    protected override float ResolveComboWindowDelay(int comboStep)
+    {
+        if (Context?.StateConfig == null)
+        {
+            return base.ResolveComboWindowDelay(comboStep);
+        }
+
+        return Context.StateConfig.GetStrongAttackComboWindowDelay(comboStep);
+    }
+
+    /// <summary>
     /// 段数に応じた強攻撃アニメーションを再生する。
     /// </summary>
     protected override void TriggerAttack(int comboStep)
