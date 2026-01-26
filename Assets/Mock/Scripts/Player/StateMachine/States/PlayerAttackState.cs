@@ -30,7 +30,7 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>現行攻撃の継続秒数。</summary>
     private float _currentAttackDuration;
 
-    /// <summary>受付開始直後に即発火しないよう待機させるタイムスタンプ。</summary>
+    /// <summary>コンボ入力を消費できる最短時刻（受付ディレイを吸収する）。</summary>
     private float _comboConsumeUnlockTime;
 
     /// <summary>最大コンボ段数。派生クラスでクリップ数に応じて上書きする。</summary>
@@ -100,7 +100,7 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>強攻撃入力でも同様に予約する。</summary>
     public override void OnStrongAttack() => QueueComboRequest();
 
-    /// <summary>アニメーションイベントで受付開始を通知されたときの処理。</summary>
+    /// <summary>アニメーションイベントで受付開始が通知されたら、遅延解除時刻をセットしてから消費を試みる。</summary>
     public override void OnComboWindowOpened()
     {
         _comboWindowOpen = true;
@@ -128,7 +128,7 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>comboStep に応じて具体的な攻撃アニメーションを再生する。</summary>
     protected abstract void TriggerAttack(int comboStep);
 
-    /// <summary>現在の段の攻撃を開始し、タイマーをリセットする。</summary>
+    /// <summary>現在の段の攻撃を開始し、タイマーと受付状態をリセットする。</summary>
     private void BeginCurrentAttack()
     {
         _elapsedTime = 0f;
@@ -138,7 +138,7 @@ public abstract class PlayerAttackState : PlayerState
         TriggerAttack(_comboStepIndex);
     }
 
-    /// <summary>次段予約が可能ならキューへ登録する。</summary>
+    /// <summary>次段予約が可能ならキューへ登録し、即消費できるか判定する。</summary>
     private void QueueComboRequest()
     {
         if (!CanQueueNextCombo())
@@ -155,7 +155,8 @@ public abstract class PlayerAttackState : PlayerState
     /// </summary>
     private bool TryConsumeComboRequest()
     {
-        if (!_comboQueued || !_comboWindowOpen || _elapsedTime < _comboConsumeUnlockTime || !CanQueueNextCombo())
+        if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo() 
+            || _elapsedTime < _comboConsumeUnlockTime)
         {
             return false;
         }
