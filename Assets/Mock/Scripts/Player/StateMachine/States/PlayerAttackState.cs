@@ -6,6 +6,12 @@ using UnityEngine;
 /// </summary>
 public abstract class PlayerAttackState : PlayerState
 {
+    protected PlayerAttackState(PlayerStateContext context, PlayerStateMachine stateMachine, float attackDuration)
+        : base(context, stateMachine)
+    {
+        _fallbackAttackDuration = Mathf.Max(0.1f, attackDuration);
+    }
+
     /// <summary>ステップ情報が無いときに使うフォールバック継続秒数。</summary>
     private readonly float _fallbackAttackDuration;
 
@@ -24,17 +30,17 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>現行攻撃の継続秒数。</summary>
     private float _currentAttackDuration;
 
-    protected PlayerAttackState(PlayerStateContext context, PlayerStateMachine stateMachine, float attackDuration)
-        : base(context, stateMachine)
-    {
-        _fallbackAttackDuration = Mathf.Max(0.1f, attackDuration);
-    }
+    /// <summary>受付開始直後に即発火しないよう待機させるタイムスタンプ。</summary>
+    private float _comboConsumeUnlockTime;
 
     /// <summary>最大コンボ段数。派生クラスでクリップ数に応じて上書きする。</summary>
     protected virtual int MaxComboSteps => 1;
 
     /// <summary>段数に応じた攻撃継続秒数を返す。未設定ならフォールバックを使用。</summary>
     protected virtual float ResolveAttackDuration(int comboStep) => _fallbackAttackDuration;
+
+    /// <summary>段数ごとのコンボ受付遅延（秒）。既定では遅延なし。</summary>
+    protected virtual float ResolveComboWindowDelay(int comboStep) => 0f;
 
     /// <summary>
     /// 攻撃開始時に段数とタイマーを初期化し、1 段目を再生する。
@@ -53,6 +59,7 @@ public abstract class PlayerAttackState : PlayerState
         _comboStepIndex = 0;
         _comboQueued = false;
         _comboWindowOpen = false;
+        _comboConsumeUnlockTime = float.PositiveInfinity;
         BeginCurrentAttack();
     }
 
@@ -97,6 +104,7 @@ public abstract class PlayerAttackState : PlayerState
     public override void OnComboWindowOpened()
     {
         _comboWindowOpen = true;
+        _comboConsumeUnlockTime = _elapsedTime + Mathf.Max(0f, ResolveComboWindowDelay(_comboStepIndex));
         TryConsumeComboRequest();
     }
 
@@ -124,6 +132,8 @@ public abstract class PlayerAttackState : PlayerState
     private void BeginCurrentAttack()
     {
         _elapsedTime = 0f;
+        _comboWindowOpen = false;
+        _comboConsumeUnlockTime = float.PositiveInfinity;
         _currentAttackDuration = Mathf.Max(0.1f, ResolveAttackDuration(_comboStepIndex));
         TriggerAttack(_comboStepIndex);
     }
@@ -140,10 +150,12 @@ public abstract class PlayerAttackState : PlayerState
         TryConsumeComboRequest();
     }
 
-    /// <summary>受付中かつ予約済みなら次段を即時開始する。</summary>
+    /// <summary>
+    /// 受付中かつ予約済みで、遅延解除時刻を過ぎていれば次段を開始する。
+    /// </summary>
     private bool TryConsumeComboRequest()
     {
-        if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo())
+        if (!_comboQueued || !_comboWindowOpen || _elapsedTime < _comboConsumeUnlockTime || !CanQueueNextCombo())
         {
             return false;
         }
