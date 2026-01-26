@@ -5,6 +5,7 @@ using UnityEngine;
 public class AttackClipList
 {
     [SerializeField] private List<AnimationClip> _clips = new();
+    [SerializeField] private List<float> _comboWindowDelaySeconds = new();
 
     public IReadOnlyList<AnimationClip> Clips => _clips;
 
@@ -29,6 +30,18 @@ public class AttackClipList
 
         return Mathf.Max(0.1f, clip.length);
     }
+
+    public float GetComboWindowDelay(int index, float fallbackSeconds)
+    {
+        if (_comboWindowDelaySeconds == null || _comboWindowDelaySeconds.Count == 0)
+        {
+            return Mathf.Max(0f, fallbackSeconds);
+        }
+
+        index = Mathf.Clamp(index, 0, _comboWindowDelaySeconds.Count - 1);
+        float value = _comboWindowDelaySeconds[index];
+        return value >= 0f ? value : Mathf.Max(0f, fallbackSeconds);
+    }
 }
 
 [CreateAssetMenu(fileName = "PlayerStateConfig", menuName = "ScriptableObjects/Player/PlayerStateConfig")]
@@ -48,6 +61,9 @@ public class PlayerStateConfig : ScriptableObject
     public float GetLightAttackDuration(bool isLockOn, int comboIndex = 0)
         => SelectLightAttackList(isLockOn).GetDuration(comboIndex, 0.8f);
 
+    public float GetLightAttackComboWindowDelay(bool isLockOn, int comboIndex = 0)
+        => SelectLightAttackList(isLockOn).GetComboWindowDelay(comboIndex, _defaultLightComboWindowDelay);
+
     public int GetLightAttackComboCount(bool isLockOn)
     {
         var clips = SelectLightAttackList(isLockOn).Clips;
@@ -58,6 +74,10 @@ public class PlayerStateConfig : ScriptableObject
         => SelectLightAttackList(isLockOn).Clips;
 
     public float GetStrongAttackDuration(int comboIndex = 0) => _strongAttackClips.GetDuration(comboIndex, 1.0f);
+
+    public float GetStrongAttackComboWindowDelay(int comboIndex = 0)
+        => _strongAttackClips.GetComboWindowDelay(comboIndex, _defaultStrongComboWindowDelay);
+
     public float GetJustAvoidAttackDuration(int comboIndex = 0) => _justAvoidAttackClips.GetDuration(comboIndex, 0.9f);
 
     [SerializeField, Min(1f)] private float _maxSkillGauge = 100f;
@@ -65,6 +85,10 @@ public class PlayerStateConfig : ScriptableObject
     [Header("Dash")]
     [SerializeField, Min(0.01f)] private float _dashGaugeCostPerSecond = 25f;
     [SerializeField, Min(0f)] private float _skillGaugeRecoveryPerSecond = 10f;
+
+    [Header("Combo Window Timing")]
+    [SerializeField, Min(0f)] private float _defaultLightComboWindowDelay = 0.05f;
+    [SerializeField, Min(0f)] private float _defaultStrongComboWindowDelay = 0.1f;
 
     [Header("Attack Clips")]
     [SerializeField] private AttackClipList _lightAttackClips = new();
