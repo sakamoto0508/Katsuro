@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// プレイヤー入力の受け口となり、各種コンポーネント・ステートマシンを初期化および更新する中枢クラス。
+/// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
@@ -9,8 +12,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
+    [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
 
-    //テスト用フラグ
+    // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
 
     private InputBuffer _inputBuffer;
@@ -25,9 +29,8 @@ public class PlayerController : MonoBehaviour
     private AnimationEventStream _animationEventStream;
 
     /// <summary>
-    /// ゲームマネージャーで呼ばれるAwakeの代替メソッド
+    /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
-    /// <param name="inputBuffer"></param>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition
         , Camera camera, CameraManager cameraManager
         , LockOnCamera lockOnCamera)
@@ -37,13 +40,14 @@ public class PlayerController : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
 
-        //クラス生成
+        // クラス生成
         _playerWeapon = new PlayerWeapon(_weaponColliders);
         _playerSprint = new PlayerSprint(_playerStateConfig);
         _playerMover = new PlayerMover(_playerStatus, rb, this.transform
             , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
-        _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon);
+        _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon,
+            _playerStatus, _passiveBuffSet, transform);
         _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint,
             _lookOnCamera, _playerStateConfig, _playerAttacker, _animationEventStream);
@@ -61,6 +65,9 @@ public class PlayerController : MonoBehaviour
         _stateMachine = null;
         _stateContext = null;
 
+        _playerAttacker?.Dispose();
+        _playerAttacker = null;
+
         _animationEventStream?.Dispose();
         _animationEventStream = null;
     }
@@ -69,6 +76,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_playerMover != null && _lookOnCamera != null)
         {
+            // ロックオン方向を都度更新し、移動計算へ反映。
             _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         }
         _stateMachine?.Update(Time.deltaTime);
@@ -79,6 +87,7 @@ public class PlayerController : MonoBehaviour
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
 
+    /// <summary>必要な InputAction を購読する。</summary>
     private void InputEventRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed += OnMove;
@@ -94,6 +103,7 @@ public class PlayerController : MonoBehaviour
         inputBuffer.SprintAction.canceled += OnSprint;
     }
 
+    /// <summary>購読していた InputAction を解除する。</summary>
     private void InputEventUnRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed -= OnMove;
@@ -168,6 +178,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>抜刀状態でなければ抜刀アニメを開始する。</summary>
     private void TryDrawSword()
     {
         if (_playerAttacker == null)
@@ -184,57 +195,47 @@ public class PlayerController : MonoBehaviour
     //＝＝＝＝＝＝＝＝ アニメーションイベント＝＝＝＝＝＝＝＝＝＝＝
 
     /// <summary>
-    /// 肉体攻撃アニメのヒット判定開始イベント。ゴースト中は無効化のみ行う。
+    /// アニメーションイベント（ヒットボックス有効化）から呼ばれ、ゴースト中なら無効化を維持、それ以外は武器ヒットボックスを有効化する。
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
         if (_stateContext != null && _stateContext.IsGhostMode)
         {
-            _playerWeapon?.DisableHitbox();
+            _playerAttacker?.DisableWeaponHitbox();
             _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
             return;
         }
 
-        _playerWeapon?.EnableHitbox();
+        _playerAttacker?.EnableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }
 
-    /// <summary>
-    /// 攻撃アニメの該当フレームでヒットボックスを無効化するイベント。
-    /// </summary>
+    /// <summary>アニメーションイベント（ヒットボックス無効化）で呼ばれ、武器ヒットボックスを強制的にオフにする。</summary>
     public void AnimEvent_DisableWeaponHitbox()
     {
-        _playerWeapon?.DisableHitbox();
+        _playerAttacker?.DisableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
     }
 
-    /// <summary>
-    /// コンボ受付開始フレームで呼ばれ、現在ステートへ受付可能を通知する。
-    /// </summary>
+    /// <summary>アニメーションイベントでコンボ受付が開いたタイミングを通知する。</summary>
     public void AnimEvent_OnComboWindowOpened()
     {
         _animationEventStream?.Publish(AnimationEventType.ComboWindowOpened);
     }
 
-    /// <summary>
-    /// コンボ受付終了フレームで呼ばれ、ステートへ受付終了を通知する。
-    /// </summary>
+    /// <summary>アニメーションイベントでコンボ受付が閉じたタイミングを通知する。</summary>
     public void AnimEvent_OnComboWindowClosed()
     {
         _animationEventStream?.Publish(AnimationEventType.ComboWindowClosed);
     }
 
-    /// <summary>
-    /// 攻撃アニメの最後で呼び出し、ステート側の攻撃完了処理をトリガーする。
-    /// </summary>
+    /// <summary>攻撃アニメーション完了を現在ステートへ伝える。</summary>
     public void AnimEvent_OnAttackFinished()
     {
         _animationEventStream?.Publish(AnimationEventType.AttackFinished);
     }
 
-    /// <summary>
-    /// 抜刀アニメの完了イベント。攻撃準備完了としてフラグを更新する。
-    /// </summary>
+    /// <summary>抜刀アニメ完了を攻撃モジュールへ伝え、抜刀フラグを更新する。</summary>
     public void AnimEvent_OnSwordDrawCompleted()
     {
         _playerAttacker?.CompleteDrawSword();

@@ -10,7 +10,7 @@ public class PlayerPassiveBuffSet : ScriptableObject
     [SerializeField] private List<PassiveBuffEntry> _buffs = new();
 
     /// <summary>登録済みパッシブを積算した乗算ダメージ係数。</summary>
-    public float EvaluatoDamageMultiplier()
+    public float EvaluateDamageMultiplier()
     {
         if (_buffs == null || _buffs.Count == 0)
             return 1f;
@@ -19,25 +19,24 @@ public class PlayerPassiveBuffSet : ScriptableObject
         foreach (var entry in _buffs)
         {
             if (entry == null) continue;
-            multiplier *= entry.AttackPowerMultiplier;
+            multiplier *= Mathf.Max(0f, entry.AttackPowerMultiplier);
         }
         return multiplier;
     }
 
     /// <summary>登録済みパッシブを合算した加算ダメージ値。</summary>
-    public float EvaluateFlatDamageBouns()
+    public float EvaluateFlatDamageBonus()
     {
         if (_buffs == null || _buffs.Count == 0)
             return 0f;
 
-        float bouns = 0f;
+        float bonus = 0f;
         foreach (var entry in _buffs)
         {
             if (entry == null) continue;
-            bouns += entry.FlatAttackBonus;
-
+            bonus += entry.FlatAttackBonus;
         }
-        return bouns;
+        return bonus;
     }
 }
 
