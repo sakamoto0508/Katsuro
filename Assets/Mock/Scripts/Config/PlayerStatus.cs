@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PlayerStatus", menuName = "ScriptableObjects/Player/PlayerStatus", order = 1)]
 public class PlayerStatus : ScriptableObject
 {
+    public int Life => _life;
     public int MaxHealth => _maxHealth;
     public float AttackPower => _attackPower;
     public float NoWeaponMoveSpeed => _noWeaponMoveSpeed;
@@ -15,6 +16,8 @@ public class PlayerStatus : ScriptableObject
     public float Acceleration => _acceleration;
     public float BreakForce => _breakForce;
 
+    [Header("Basic Status")]
+    [SerializeField] private int _life = 3;
     [SerializeField] private int _maxHealth = 100;
     [SerializeField] private float _attackPower = 10f;
 
