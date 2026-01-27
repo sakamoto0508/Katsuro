@@ -27,7 +27,7 @@ public sealed class PlayerDashState : PlayerState
     {
         Context.Mover.Update();
 
-        if (!Context.Sprint.IsDashing)
+        if (!Context.Sprint.IsSprint)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }

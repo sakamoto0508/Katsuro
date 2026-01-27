@@ -20,10 +20,6 @@ public class PlayerController : MonoBehaviour
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
     private LockOnCamera _lookOnCamera;
-    private PlayerWeapon _playerWeapon;
-    private PlayerMover _playerMover;
-    private PlayerSprint _playerSprint;
-    private PlayerAttacker _playerAttacker;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
     private AnimationEventStream _animationEventStream;
@@ -39,18 +35,28 @@ public class PlayerController : MonoBehaviour
         InputEventRegistry(_inputBuffer);
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
-
-        // クラス生成
-        _playerWeapon = new PlayerWeapon(_weaponColliders);
-        _playerSprint = new PlayerSprint(_playerStateConfig);
-        _playerMover = new PlayerMover(_playerStatus, rb, this.transform
-            , camera.transform, _animationController);
         _lookOnCamera = lockOnCamera;
-        _playerAttacker = new PlayerAttacker(_animationController, _animationName, _playerWeapon,
-            _playerStatus, _passiveBuffSet, transform);
+
+        // --- 設定値（SkillGauge などの生成に使う）
+        float maxGauge = _playerStatus != null ? _playerStatus.MaxSkillGauge
+            : _playerStateConfig?.MaxSkillGauge ?? 100f;
+        float passiveRecovery = _playerStatus != null ? _playerStatus.SkillGaugePassiveRecoveryPerSecond
+            : _playerStateConfig?.SkillGaugeRecoveryPerSecond ?? 0f;
+
+        // --- 各種コンポーネントを生成
+        var playerWeapon = new PlayerWeapon(_weaponColliders);
+        var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
+        float dashCost = _playerStatus != null ? (_playerStatus.SkillGaugeCost?.DashPerSecond ?? _playerStateConfig?.DashGaugeCostPerSecond ?? 25f)
+            : _playerStateConfig?.DashGaugeCostPerSecond ?? 25f;
+        var playerSprint = new PlayerSprint(skillGauge, dashCost);
+        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
+        var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon, _playerStatus, _passiveBuffSet, transform);
+
+        // アニメーションイベントストリーム（State/モジュール間の通知に使う）
         _animationEventStream = new AnimationEventStream();
-        _stateContext = new PlayerStateContext(this, _playerStatus, _playerMover, _playerSprint,
-            _lookOnCamera, _playerStateConfig, _playerAttacker, _animationEventStream);
+        // StateContext にすべて注入（PlayerController は最小限のフィールドのみ保持）
+        _stateContext = new PlayerStateContext(this, _playerStatus, playerMover, playerSprint,
+            _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
     }
 
@@ -61,23 +67,21 @@ public class PlayerController : MonoBehaviour
             InputEventUnRegistry(_inputBuffer);
         }
 
+        // 各コンポーネントの Dispose は Context 経由で行う（存在すれば）
+        _stateContext?.Attacker?.Dispose();
         _stateMachine?.Dispose();
         _stateMachine = null;
         _stateContext = null;
-
-        _playerAttacker?.Dispose();
-        _playerAttacker = null;
-
         _animationEventStream?.Dispose();
         _animationEventStream = null;
     }
 
     private void Update()
     {
-        if (_playerMover != null && _lookOnCamera != null)
+        if (_stateContext?.Mover != null && _lookOnCamera != null)
         {
             // ロックオン方向を都度更新し、移動計算へ反映。
-            _playerMover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
+            _stateContext.Mover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         }
         _stateMachine?.Update(Time.deltaTime);
     }
@@ -138,7 +142,7 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
-        if (!_playerAttacker.IsSwordReady) return;
+        if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
         _stateMachine?.HandleLightAttack();
     }
 
@@ -150,7 +154,7 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
-        if (!_playerAttacker.IsSwordReady) return;
+        if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
         _stateMachine?.HandleStrongAttack();
     }
 
@@ -162,7 +166,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-                
+
         }
     }
 
@@ -205,14 +209,12 @@ public class PlayerController : MonoBehaviour
     /// <summary>抜刀状態でなければ抜刀アニメを開始する。</summary>
     private void TryDrawSword()
     {
-        if (_playerAttacker == null)
-        {
-            return;
-        }
+        var attacker = _stateContext?.Attacker;
+        if (attacker == null) return;
 
-        if (!_playerAttacker.IsSwordReady && !_playerAttacker.IsDrawingSword)
+        if (!attacker.IsSwordReady && !attacker.IsDrawingSword)
         {
-            _playerAttacker.DrawSword();
+            attacker.DrawSword();
         }
     }
 
@@ -225,19 +227,19 @@ public class PlayerController : MonoBehaviour
     {
         if (_stateContext != null && _stateContext.IsGhostMode)
         {
-            _playerAttacker?.DisableWeaponHitbox();
+            _stateContext.Attacker?.DisableWeaponHitbox();
             _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
             return;
         }
 
-        _playerAttacker?.EnableWeaponHitbox();
+        _stateContext?.Attacker?.EnableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }
 
     /// <summary>アニメーションイベント（ヒットボックス無効化）で呼ばれ、武器ヒットボックスを強制的にオフにする。</summary>
     public void AnimEvent_DisableWeaponHitbox()
     {
-        _playerAttacker?.DisableWeaponHitbox();
+        _stateContext?.Attacker?.DisableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
     }
 
@@ -262,7 +264,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>抜刀アニメ完了を攻撃モジュールへ伝え、抜刀フラグを更新する。</summary>
     public void AnimEvent_OnSwordDrawCompleted()
     {
-        _playerAttacker?.CompleteDrawSword();
+        _stateContext?.Attacker?.CompleteDrawSword();
         _animationEventStream?.Publish(AnimationEventType.SwordDrawCompleted);
     }
 }
