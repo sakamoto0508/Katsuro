@@ -156,14 +156,38 @@ public class PlayerController : MonoBehaviour
 
     private void OnEvasionAction(InputAction.CallbackContext context)
     {
+        if (context.started)
+        {
+
+        }
+        else
+        {
+                
+        }
     }
 
     private void OnBuffAction(InputAction.CallbackContext context)
     {
+        if (context.started)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     private void OnHeal(InputAction.CallbackContext context)
     {
+        if(context.started)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     private void OnSprint(InputAction.CallbackContext context)

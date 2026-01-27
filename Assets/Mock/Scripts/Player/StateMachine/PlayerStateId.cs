@@ -4,4 +4,7 @@ public enum PlayerStateId
     Dash,
     LightAttack,
     StrongAttack,
+    Ghost,
+    SelfSacrifice,
+    Heal,
 }
