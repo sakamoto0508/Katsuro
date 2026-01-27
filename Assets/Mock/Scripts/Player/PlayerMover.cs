@@ -130,7 +130,7 @@ public class PlayerMover
         {
             Quaternion targetRotation = Quaternion.LookRotation(_lookDirection);
             _playerPosition.rotation = Quaternion.Slerp(_playerPosition.rotation
-                , targetRotation, _playerStatus.RoationSmoothness);
+                , targetRotation, _playerStatus.RotationSmoothness);
         }
     }
 
