@@ -13,13 +13,20 @@ public sealed class PlayerDashState : PlayerState
 
     public override void Enter()
     {
+        // スプリント開始要求（内部でゲージチェックを行う）
         Context.Sprint.BeginDash();
         Context.Mover.SetSprint(true);
+
+        // 開始に失敗（ゲージ不足など）している場合は状態を戻す
+        if (!Context.Sprint.IsDashing)
+        {
+            StateMachine.ChangeState(PlayerStateId.Locomotion);
+        }
     }
 
     public override void Exit()
     {
-        Context.Sprint.EndDash();
+        Context.Sprint.End();
         Context.Mover.SetSprint(false);
     }
 
@@ -27,7 +34,8 @@ public sealed class PlayerDashState : PlayerState
     {
         Context.Mover.Update();
 
-        if (!Context.Sprint.IsSprint)
+        // ダッシュ継続フラグ（ゲージ枯渇で自動停止）を確認して戻す
+        if (!Context.Sprint.IsDashing)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
@@ -40,6 +48,8 @@ public sealed class PlayerDashState : PlayerState
 
     public override void OnSprintCanceled()
     {
+        // 入力で解除された場合は即座にダッシュ停止して戻る
+        Context.Sprint.End();
         StateMachine.ChangeState(PlayerStateId.Locomotion);
     }
 
