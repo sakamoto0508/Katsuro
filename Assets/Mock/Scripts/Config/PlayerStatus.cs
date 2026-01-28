@@ -3,23 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// HPが一定割合以下になったときに適用されるバフ定義
-/// </summary>
-[Serializable]
-public struct LowHpBuffTier
-{
-    [Range(0f, 1f)]
-    [Tooltip("現在HP割合がこの値以下のときに適用される")]
-    public float HpBelowRatio;
-
-    [Tooltip("最終ダメージ倍率（1.10 = +10%）")]
-    public float DamageMultiplier;
-
-    [Tooltip("スキルゲージ回復量への加算割合（0.05 = +5%）")]
-    public float SkillGaugeRegenBonus;
-}
-
-/// <summary>
 /// スキルゲージ消費設定
 /// </summary>
 [Serializable]
@@ -124,6 +107,11 @@ public sealed class PlayerStatus : ScriptableObject
     /// <summary>スキルゲージ消費に関する細かい設定（ダッシュ・幽霊化・自傷など）。</summary>
     public SkillGaugeCostConfig SkillGaugeCost => _skillGaugeCost;
 
+    /// <summary>
+    /// 低HP時のバフテーブル（ScriptableObject）。null なら未設定。
+    /// </summary>
+    public LowHpBuffTable LowHpBuffTable => _lowHpBuffTable;
+
     [Header("Basic Status")]
     [SerializeField] private int _life = 3;
     [SerializeField] private int _maxHealth = 100;
@@ -149,31 +137,6 @@ public sealed class PlayerStatus : ScriptableObject
     [SerializeField, Min(0f)] private float _skillGaugeOnJustAvoidBonus = 10f;
     [SerializeField] private SkillGaugeCostConfig _skillGaugeCost;
 
-    [Header("Low HP Buff Table (HPが低い順に並べる)")]
-    [SerializeField]　private List<LowHpBuffTier> _lowHpBuffTiers = new()
-    {
-        new LowHpBuffTier { HpBelowRatio = 0.10f, DamageMultiplier = 1.25f, SkillGaugeRegenBonus = 0.10f },
-        new LowHpBuffTier { HpBelowRatio = 0.30f, DamageMultiplier = 1.15f, SkillGaugeRegenBonus = 0.10f },
-        new LowHpBuffTier { HpBelowRatio = 0.50f, DamageMultiplier = 1.10f, SkillGaugeRegenBonus = 0.05f },
-        new LowHpBuffTier { HpBelowRatio = 0.75f, DamageMultiplier = 1.05f, SkillGaugeRegenBonus = 0.00f },
-        new LowHpBuffTier { HpBelowRatio = 1.00f, DamageMultiplier = 1.00f, SkillGaugeRegenBonus = 0.00f },
-    };
-
-    /// <summary>低HP時バフテーブル（HP割合が低い順に並べること）。UIやダメージ計算で参照する。</summary>
-    public IReadOnlyList<LowHpBuffTier> LowHpBuffTiers => _lowHpBuffTiers;
-
-    /// <summary>
-    /// 現在HP割合に応じたバフを取得
-    /// </summary>
-    public LowHpBuffTier GetLowHpBuff(float currentHpRatio)
-    {
-        foreach (var tier in _lowHpBuffTiers)
-        {
-            if (currentHpRatio <= tier.HpBelowRatio)
-                return tier;
-        }
-
-        // 念のため（通常ここには来ない）
-        return _lowHpBuffTiers[^1];
-    }
+    [Header("Low HP Buff")]
+    [SerializeField] private LowHpBuffTable _lowHpBuffTable;   
 }

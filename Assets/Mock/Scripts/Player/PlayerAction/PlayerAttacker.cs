@@ -8,16 +8,19 @@ using UnityEngine;
 public sealed class PlayerAttacker : IDisposable
 {
     public PlayerAttacker(PlayerAnimationController animController, AnimationName animName,
-        PlayerWeapon playerWeapon, PlayerStatus status, PlayerPassiveBuffSet passiveBuffSet, Transform ownerTransform)
+        PlayerWeapon playerWeapon, PlayerStatus status, PlayerPassiveBuffSet passiveBuffSet,
+        Transform ownerTransform, PlayerResource playerResource = null)
     {
         _animController = animController;
         _animName = animName;
         _weapon = playerWeapon;
         _status = status;
         _ownerTransform = ownerTransform;
+        _playerResource = playerResource;
 
         ApplyPassiveBuffSet(passiveBuffSet);
         _weapon?.RegisterHitObserver(HandleWeaponHit);
+
     }
 
     /// <summary>抜刀済みで攻撃に移行できる状態か。</summary>
@@ -31,6 +34,7 @@ public sealed class PlayerAttacker : IDisposable
     private readonly PlayerWeapon _weapon;
     private readonly PlayerStatus _status;
     private readonly Transform _ownerTransform;
+    private readonly PlayerResource _playerResource;
     private PlayerPassiveBuffSet _passiveBuffSet;
     private bool _isSwordReady;
     private bool _isDrawingSword;
@@ -105,7 +109,7 @@ public sealed class PlayerAttacker : IDisposable
         _passiveBuffSet = passiveBuffSet;
     }
 
-    public void Dispose()   
+    public void Dispose()
     {
         _weapon?.UnregisterHitObserver(HandleWeaponHit);
         _hitTargets.Clear();
@@ -188,7 +192,9 @@ public sealed class PlayerAttacker : IDisposable
         SpawnPassiveEffects(in damageInfo);
     }
 
-    /// <summary>基礎攻撃力にパッシブセットの補正を組み合わせて最終値を算出。</summary>
+    /// <summary>
+    /// 基礎ダメージを解決する。低HPバフが設定されており PlayerResource が渡されていれば適用する。
+    /// </summary>
     private float ResolveDamageAmount()
     {
         float damage = _status?.AttackPower ?? 0f;
@@ -197,6 +203,14 @@ public sealed class PlayerAttacker : IDisposable
         {
             damage *= _passiveBuffSet.EvaluateDamageMultiplier();
             damage += _passiveBuffSet.EvaluateFlatDamageBonus();
+        }
+
+        // 低HPバフが設定され、ランタイムHP情報が利用可能な場合は倍率を適用
+        if (_status?.LowHpBuffTable != null && _playerResource != null && _playerResource.MaxHp > 0f)
+        {
+            float currentHpRatio = Mathf.Clamp01(_playerResource.CurrentHp / _playerResource.MaxHp);
+            float lowHpMultiplier = _status.LowHpBuffTable.EvaluateDamageMultiplier(currentHpRatio);
+            damage *= lowHpMultiplier;
         }
 
         return Mathf.Max(0f, damage);
