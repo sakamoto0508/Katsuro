@@ -35,6 +35,7 @@ public class SkillGauge
 
     /// <summary>ゲージの最大値。</summary>
     public float Max => _max;
+
     private float _value;
     private readonly float _passiveRecoveryPerSecond;
     private readonly float _max;

@@ -18,6 +18,11 @@ public class PlayerChost
     /// <summary>現在ゴースト中か。</summary>
     public bool IsGhosting => _isActive && _skillGauge.Value > Mathf.Epsilon;
 
+    private readonly SkillGauge _skillGauge;
+    private readonly SkillGaugeCostConfig _costConfig;
+    private readonly PlayerStateConfig _fallbackStateConfig;
+    private bool _isActive;
+
     /// <summary>ゴースト起動コスト（ワンタイム）。</summary>
     public float GetActivationCost()
         => _costConfig != null ? Mathf.Max(0f, _costConfig.GhostActivationCost) : 20f;
@@ -25,11 +30,6 @@ public class PlayerChost
     /// <summary>ゴーストの継続コスト（1秒あたり）。</summary>
     public float GetPerSecondCost()
         => _costConfig != null ? Mathf.Max(0f, _costConfig.GhostPerSecondCost) : 5f;
-
-    private readonly SkillGauge _skillGauge;
-    private readonly SkillGaugeCostConfig _costConfig;
-    private readonly PlayerStateConfig _fallbackStateConfig;
-    private bool _isActive;
 
     /// <summary>
     /// ゴースト化を試行します。起動コストを即時消費できれば開始して true を返します。
