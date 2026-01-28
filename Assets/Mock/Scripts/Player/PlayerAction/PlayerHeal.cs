@@ -1,61 +1,73 @@
+using System;
 using UnityEngine;
 
-public class PlayerHeal
+/// <summary>
+/// チャネリング回復ハンドラ（秒あたりの回復率を指定して開始／継続消費を行う）。
+/// PublishConsumed で「このフレームで回復した割合（%）」を通知します。実際の HP 増加は購読側で行ってください。
+/// </summary>
+public sealed class PlayerHeal : AbilityBase
 {
-    public PlayerHeal(SkillGauge skillGauge, SkillGaugeCostConfig costConfig)
+    public PlayerHeal(SkillGauge gauge, SkillGaugeCostConfig costConfig = null, PlayerStateConfig fallbackStateConfig = null)
+        : base(gauge, costConfig, fallbackStateConfig)
     {
-        _skillGauge = skillGauge ?? throw new System.ArgumentNullException(nameof(skillGauge));
-        _costConfig = costConfig;
     }
 
-    /// <summary>
-    /// 現在回復中か。
-    /// </summary>
-    public bool IsHealing => _isActive && _skillGauge.Value > Mathf.Epsilon;
-
-    private readonly SkillGauge _skillGauge;
-    private readonly SkillGaugeCostConfig _costConfig;
-    private float _healPercentPerSecond;
-    private bool _isActive = false;
-
-    /// <summary>1% 回復あたりのゲージ消費量。</summary>
-    public float GetHealGaugePerPercent()
-        => _costConfig != null ? Mathf.Max(0f, _costConfig.HealGaugePerPercent) : 2f;
+    /// <summary>現在チャネリング回復中か。</summary>
+    public bool IsHealing => IsActive && _skillGauge.Value > Mathf.Epsilon;
 
     /// <summary>
-    /// 回復を開始する。
+    /// チャネリング回復を開始する。percentPerSecond は「秒あたりの回復率(%)」。
+    /// 0 以下だと開始に失敗します。
     /// </summary>
-    /// <returns></returns>
     public bool TryBegin(float percentPerSecond)
     {
-        if (percentPerSecond <= 0f)
-            return false;
-
-        // 最低1フレーム分のコストを支払えるか（任意チェック）
-        float oneSecondCost = percentPerSecond * GetHealGaugePerPercent();
-        if (_skillGauge.Value + Mathf.Epsilon <= 0f)
-            return false;
+        if (percentPerSecond <= 0f) return false;
+        if (_skillGauge.Value <= Mathf.Epsilon) return false;
 
         _healPercentPerSecond = percentPerSecond;
-        _isActive = true;
+        SetActive(true);
         return true;
     }
 
-    /// <summary>回復を終了する。</summary>
-    public void End() => _isActive = false;
+    /// <summary>回復チャネリングを終了する。</summary>
+    public override void End()
+    {
+        base.End();
+    }
 
     /// <summary>
-    /// 指定パーセント分の回復に必要なゲージを消費する（percent は 0..100）。
-    /// 成功したら true を返す。呼び出し側で実際に HP を増やしてください。
+    /// Tick: このフレームで回復する割合(%) を計算し、必要ゲージを消費できれば PublishConsumed(percent) を呼ぶ。
+    /// 不足時は可能な分だけ回復してチャネリングを終了する。
     /// </summary>
-    public void Tick(float deltaTime)
+    public override void Tick(float deltaTime)
     {
-        if (deltaTime <= 0f) return;
+        if (!IsActive || deltaTime <= 0f) return;
 
-        float cost = GetHealGaugePerPercent() * deltaTime;
-        if (!_skillGauge.TryConsume(cost))
+        float percentToHeal = _healPercentPerSecond * deltaTime; // このフレームで回復する%（0..100）
+        if (percentToHeal <= 0f) return;
+
+        float costPerPercent = GetHealGaugePerPercent(); // ゲージ / 1%
+        float requiredCost = percentToHeal * costPerPercent;
+
+        if (_skillGauge.TryConsume(requiredCost))
         {
-            _isActive = false;
+            PublishConsumed(percentToHeal);
+            return;
         }
+
+        // 足りない分だけ回復して終了
+        float available = _skillGauge.Value;
+        if (available > Mathf.Epsilon)
+        {
+            float affordablePercent = available / costPerPercent;
+            if (_skillGauge.TryConsume(available))
+            {
+                PublishConsumed(affordablePercent);
+            }
+        }
+
+        SetActive(false);
     }
+
+    private float _healPercentPerSecond;
 }
