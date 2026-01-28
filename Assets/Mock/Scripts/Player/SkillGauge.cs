@@ -5,7 +5,7 @@ using UniRx;
 /// <summary>
 /// 汎用スキルゲージ管理（現在値／最大値／パッシブ回復）。
 /// </summary>
-public class SkillGauge
+public class SkillGauge : IDisposable
 {
     /// <summary>
     /// コンストラクタ。初期値は最大値で開始します。
@@ -17,6 +17,7 @@ public class SkillGauge
         _max = Mathf.Max(1f, max);
         _passiveRecoveryPerSecond = Mathf.Max(0f, passiveRecoveryPerSecond);
         _value = _max;
+
         _valueRx = new ReactiveProperty<float>(_value);
         _normalizedRx = new ReactiveProperty<float>(Normalized);
     }
@@ -39,6 +40,7 @@ public class SkillGauge
     private float _value;
     private readonly float _passiveRecoveryPerSecond;
     private readonly float _max;
+
     // 内部 ReactiveProperty（外部へは IReadOnlyReactiveProperty として公開）
     private readonly ReactiveProperty<float> _valueRx;
     private readonly ReactiveProperty<float> _normalizedRx;
@@ -109,5 +111,14 @@ public class SkillGauge
         var norm = Normalized;
         if (!Mathf.Approximately(_normalizedRx.Value, norm))
             _normalizedRx.Value = norm;
+    }
+
+    /// <summary>
+    /// ReactiveProperty を解放します。外部から明示的に呼んでください。
+    /// </summary>
+    public void Dispose()
+    {
+        _valueRx?.Dispose();
+        _normalizedRx?.Dispose();
     }
 }

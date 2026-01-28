@@ -80,15 +80,19 @@ public class PlayerController : MonoBehaviour
             InputEventUnRegistry(_inputBuffer);
         }
 
-        // 各コンポーネントの Dispose は Context 経由で行う（存在すれば）
+        // Ability と SkillGauge / PlayerResource の Dispose
+        _stateContext?.Sprint?.Dispose();
+        _stateContext?.Ghost?.Dispose();
+        _stateContext?.SelfSacrifice?.Dispose();
+        _stateContext?.Healer?.Dispose();
+        _stateContext?.SkillGauge?.Dispose();
         _stateContext?.Attacker?.Dispose();
         _stateMachine?.Dispose();
-        _stateMachine = null;
-
-        // ランタイムリソース解放
         _playerResource?.Dispose();
 
+        _stateMachine = null;
         _stateContext = null;
+
         _animationEventStream?.Dispose();
         _animationEventStream = null;
     }
