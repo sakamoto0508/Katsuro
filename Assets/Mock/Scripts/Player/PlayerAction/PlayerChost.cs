@@ -2,67 +2,55 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// ゴースト（幽霊化）処理：起動コスト／継続コストのチェックとゲージ消費を担当します。
-/// 実際の当たり判定無効化や演出は呼び出し側（PlayerController / ステート）が行う。
+/// ゴースト（幽霊化）能力。起動ワンタイムコストと継続消費を管理する。
+/// 実際の演出／当たり判定切替はステート側で行ってください。
 /// </summary>
-public class PlayerChost
+public sealed class PlayerGhost : AbilityBase
 {
-    public PlayerChost(SkillGauge skillGauge, SkillGaugeCostConfig costConfig
-        , PlayerStateConfig fallbackStateConfig = null)
+    public PlayerGhost(SkillGauge gauge, SkillGaugeCostConfig costConfig = null, PlayerStateConfig fallbackStateConfig = null)
+        : base(gauge, costConfig, fallbackStateConfig)
     {
-        _skillGauge = skillGauge ?? throw new ArgumentNullException(nameof(skillGauge));
-        _costConfig = costConfig;
-        _fallbackStateConfig = fallbackStateConfig;
     }
 
-    /// <summary>現在ゴースト中か。</summary>
-    public bool IsGhosting => _isActive && _skillGauge.Value > Mathf.Epsilon;
-
-    private readonly SkillGauge _skillGauge;
-    private readonly SkillGaugeCostConfig _costConfig;
-    private readonly PlayerStateConfig _fallbackStateConfig;
-    private bool _isActive;
-
-    /// <summary>ゴースト起動コスト（ワンタイム）。</summary>
-    public float GetActivationCost()
-        => _costConfig != null ? Mathf.Max(0f, _costConfig.GhostActivationCost) : 20f;
-
-    /// <summary>ゴーストの継続コスト（1秒あたり）。</summary>
-    public float GetPerSecondCost()
-        => _costConfig != null ? Mathf.Max(0f, _costConfig.GhostPerSecondCost) : 5f;
+    /// <summary>現在ゴースト中か（ゲージが枯渇していないことも確認）。</summary>
+    public bool IsGhosting => IsActive && _skillGauge.Value > Mathf.Epsilon;
 
     /// <summary>
     /// ゴースト化を試行します。起動コストを即時消費できれば開始して true を返します。
     /// </summary>
     public bool TryBegin()
     {
-        float cost = GetActivationCost();
-        if (_skillGauge.TryConsume(cost))
+        float activation = GetGhostActivationCost();
+        if (_skillGauge.TryConsume(activation))
         {
-            _isActive = true;
+            SetActive(true);
             return true;
         }
         return false;
     }
 
-    /// <summary>ゴーストを終了する（継続消費を止める）。</summary>
-    public void End()=>_isActive = false;
+    /// <summary>ゴースト状態を終了する（継続消費を停止）。</summary>
+    public override void End()
+    {
+        base.End();
+    }
 
     /// <summary>
-    /// 毎フレームの進行処理。継続コストを消費し、ゲージ不足であれば自動終了します。
+    /// 継続消費を行う。消費に成功すれば PublishConsumed(消費量) を呼ぶ。
+    /// ゲージ不足なら自動終了する。
     /// </summary>
-    public void Tick(float deltaTime)
+    public override void Tick(float deltaTime)
     {
-        if (deltaTime <= 0f) return;
+        if (!IsActive || deltaTime <= 0f) return;
 
-        if (_isActive)
+        float cost = GetGhostPerSecondCost() * deltaTime;
+        if (_skillGauge.TryConsume(cost))
         {
-            float cost = GetPerSecondCost() * deltaTime;
-            if (!_skillGauge.TryConsume(cost))
-            {
-                // ゲージ枯渇でゴースト解除
-                _isActive = false;
-            }
+            PublishConsumed(cost); // 通知: 消費したゲージ量
+            return;
         }
+
+        // 枯渇により自動終了
+        SetActive(false);
     }
 }
