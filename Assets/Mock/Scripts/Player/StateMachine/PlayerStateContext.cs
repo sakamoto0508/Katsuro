@@ -4,14 +4,19 @@
 /// </summary>
 public sealed class PlayerStateContext
 {
-    public PlayerStateContext(PlayerController controller, PlayerStatus status,
-        PlayerMover mover, PlayerSprint sprint, LockOnCamera lockOnCamera,
-        PlayerStateConfig stateConfig, PlayerAttacker attacker, IAnimationEventStream animationEvents)
+    public PlayerStateContext(PlayerController controller,SkillGauge skillGauge ,PlayerStatus status
+        ,PlayerMover mover, PlayerSprint sprint,PlayerGhost playerGhost,PlayerSelfSacrifice selfSacrifice
+        ,PlayerHeal healer, LockOnCamera lockOnCamera,PlayerStateConfig stateConfig, PlayerAttacker attacker
+        , IAnimationEventStream animationEvents)
     {
         Controller = controller;
+        SkillGauge = skillGauge;
         Status = status;
         Mover = mover;
         Sprint = sprint;
+        Ghost = playerGhost;
+        SelfSacrifice = selfSacrifice;
+        Healer = healer;
         LockOnCamera = lockOnCamera;
         StateConfig = stateConfig;
         Attacker = attacker;
@@ -21,6 +26,9 @@ public sealed class PlayerStateContext
     /// <summary>プレイヤー本体のコントローラー。</summary>
     public PlayerController Controller { get; }
 
+    /// <summary>SkillGauge（実行時のゲージ）。UI や Ability が直接購読可能にするため Context に載せる。</summary>
+    public SkillGauge SkillGauge { get; }
+
     /// <summary>プレイヤーのステータス（移動速度や加速度など）。</summary>
     public PlayerStatus Status { get; }
 
@@ -29,6 +37,15 @@ public sealed class PlayerStateContext
 
     /// <summary>スキルゲージを消費・管理するスプリント制御。</summary>
     public PlayerSprint Sprint { get; }
+
+    /// <summary>ゴースト（幽霊化）を管理するコンポーネント。</summary>
+    public PlayerGhost Ghost { get; }
+
+    /// <summary>自傷（Self Sacrifice）を管理するコンポーネント。</summary>
+    public PlayerSelfSacrifice SelfSacrifice { get; }
+
+    /// <summary>回復（Heal）を管理するコンポーネント。</summary>
+    public PlayerHeal Healer { get; }
 
     /// <summary>ロックオン状態の参照先。</summary>
     public LockOnCamera LockOnCamera { get; }
@@ -47,4 +64,11 @@ public sealed class PlayerStateContext
 
     /// <summary>現在ロックオン中かどうかを示すショートカット。</summary>
     public bool IsLockOn => LockOnCamera != null && LockOnCamera.IsLockOn;
+
+    /// <summary>Ability のいずれかがアクティブかを返すユーティリティ。</summary>
+    public bool AnyAbilityActive =>
+        (Sprint?.IsActive ?? false)
+        || (Ghost?.IsActive ?? false)
+        || (SelfSacrifice?.IsActive ?? false)
+        || (Healer?.IsActive ?? false);
 }

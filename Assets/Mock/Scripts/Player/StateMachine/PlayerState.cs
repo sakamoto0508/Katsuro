@@ -45,6 +45,24 @@ public abstract class PlayerState
     /// <summary>スプリント入力終了時のフック。</summary>
     public virtual void OnSprintCanceled() { }
 
+    /// <summary>ゴースト化開始時のフック。</summary>
+    public virtual void OnGhostStarted() { }
+
+    /// <summary>ゴースト化解除時のフック。</summary>
+    public virtual void OnGhostCanceled() { }
+
+    /// <summary>自傷開始時のフック。</summary>
+    public virtual void OnSelfSacrificeStarted() { }
+
+    /// <summary>自傷解除時のフック。</summary>
+    public virtual void OnSelfSacrificeCanceled() { }
+
+    /// <summary>回復開始時のフック。</summary>
+    public virtual void OnHealStarted() { }
+
+    /// <summary>回復解除時のフック。</summary>
+    public virtual void OnHealCanceled() { }
+
     /// <summary>通常攻撃のフック。</summary>
     public virtual void OnLightAttack() { }
 

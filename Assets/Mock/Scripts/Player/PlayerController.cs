@@ -1,3 +1,4 @@
+using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,12 +18,16 @@ public class PlayerController : MonoBehaviour
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
 
+    [Header("Self Sacrifice")]
+    [SerializeField, Min(0f)] private float _selfSacrificeDamagePercentPerSecond = 1f;
+
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
     private LockOnCamera _lookOnCamera;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
     private AnimationEventStream _animationEventStream;
+    private PlayerResource _playerResource;
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
@@ -46,19 +51,26 @@ public class PlayerController : MonoBehaviour
         // --- 各種コンポーネントを生成
         var playerWeapon = new PlayerWeapon(_weaponColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
-        var skillGaugeCostConfig = new SkillGaugeCostConfig();
+        var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
         var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig, _playerStateConfig);
         var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig, _playerStateConfig);
         var playerHeal = new PlayerHeal(skillGauge, skillGaugeCostConfig, _playerStateConfig);
+        var playerBuff = new PlayerSelfSacrifice(skillGauge, skillGaugeCostConfig, _playerStateConfig);
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
         var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon, _playerStatus, _passiveBuffSet, transform);
-
-        // アニメーションイベントストリーム（State/モジュール間の通知に使う）
+        _playerResource = new PlayerResource(_playerStatus);
         _animationEventStream = new AnimationEventStream();
-        // StateContext にすべて注入（PlayerController は最小限のフィールドのみ保持）
-        _stateContext = new PlayerStateContext(this, _playerStatus, playerMover, playerSprint,
-            _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
+        _stateContext = new PlayerStateContext(this, skillGauge, _playerStatus, playerMover, playerSprint,
+            playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
+
+        // 定期処理の購読登録（Ability の通知を受けて PlayerResource を操作する）
+        _stateContext.SelfSacrifice.OnConsumed
+            .Subscribe(deltaSeconds => HandleSelfSacrificeTick(deltaSeconds))
+            .AddTo(this);
+        _stateContext.Healer.OnConsumed
+            .Subscribe(percent => HandleHealTick(percent))
+            .AddTo(this);
     }
 
     private void OnDestroy()
@@ -72,6 +84,10 @@ public class PlayerController : MonoBehaviour
         _stateContext?.Attacker?.Dispose();
         _stateMachine?.Dispose();
         _stateMachine = null;
+
+        // ランタイムリソース解放
+        _playerResource?.Dispose();
+
         _stateContext = null;
         _animationEventStream?.Dispose();
         _animationEventStream = null;
@@ -90,6 +106,21 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
+    }
+
+    private void HandleSelfSacrificeTick(float deltaSeconds)
+    {
+        // deltaSeconds：このフレームの経過秒（Ability が通知）
+        // _selfSacrificeDamagePercentPerSecond は秒あたりの MaxHP に対する割合 (%)
+        float percent = _selfSacrificeDamagePercentPerSecond * deltaSeconds; // % of MaxHP
+        float damage = _playerResource.MaxHp * (percent / 100f);
+        _playerResource.ApplyDamage(damage);
+    }
+
+    private void HandleHealTick(float healedPercent)
+    {
+        // healedPercent は "このフレームで回復した割合 (%)"（Ability が通知）
+        _playerResource.HealByPercent(healedPercent);
     }
 
     /// <summary>必要な InputAction を購読する。</summary>

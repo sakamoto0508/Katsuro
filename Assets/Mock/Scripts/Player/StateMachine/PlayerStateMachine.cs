@@ -87,6 +87,10 @@ public sealed class PlayerStateMachine : IDisposable
     public void Update(float deltaTime)
     {
         Context?.Sprint?.Tick(deltaTime);
+        Context?.Ghost?.Tick(deltaTime);
+        Context?.SelfSacrifice?.Tick(deltaTime);
+        Context?.Healer?.Tick(deltaTime);
+        Context?.SkillGauge?.TickPassive(deltaTime);
         _currentState?.Update(deltaTime);
     }
 
@@ -104,6 +108,24 @@ public sealed class PlayerStateMachine : IDisposable
 
     /// <summary>スプリント解除入力を現在ステートへ転送する。</summary>
     public void HandleSprintCanceled() => _currentState?.OnSprintCanceled();
+
+    /// <summary>ゴースト開始入力を現在ステートへ転送する。</summary>
+    public void HandleGhostStarted() => _currentState?.OnGhostStarted();
+
+    /// <summary>ゴースト解除入力を現在ステートへ転送する。</summary>
+    public void HandleGhostCanceled() => _currentState?.OnGhostCanceled();
+
+    /// <summary>自傷開始入力を現在ステートへ転送する。</summary>
+    public void HandleSelfSacrificeStarted() => _currentState?.OnSelfSacrificeStarted();
+
+    /// <summary>自傷解除入力を現在ステートへ転送する。</summary>
+    public void HandleSelfSacrificeCanceled() => _currentState?.OnSelfSacrificeCanceled();
+
+    /// <summary>ヒール開始入力を現在ステートへ転送する。</summary>
+    public void HandleHealStarted() => _currentState?.OnHealStarted();
+
+    /// <summary>ヒール解除入力を現在ステートへ転送する。</summary>
+    public void HandleHealCanceled() => _currentState?.OnHealCanceled();
 
     /// <summary>ライト攻撃入力を現在ステートへ転送する。</summary>
     public void HandleLightAttack() => _currentState?.OnLightAttack();
