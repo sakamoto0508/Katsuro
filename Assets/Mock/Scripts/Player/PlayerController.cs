@@ -46,9 +46,10 @@ public class PlayerController : MonoBehaviour
         // --- 各種コンポーネントを生成
         var playerWeapon = new PlayerWeapon(_weaponColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
-        float dashCost = _playerStatus != null ? (_playerStatus.SkillGaugeCost?.DashPerSecond ?? _playerStateConfig?.DashGaugeCostPerSecond ?? 25f)
-            : _playerStateConfig?.DashGaugeCostPerSecond ?? 25f;
-        var playerSprint = new PlayerSprint(skillGauge, dashCost);
+        var skillGaugeCostConfig = new SkillGaugeCostConfig();
+        var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig, _playerStateConfig);
+        var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig, _playerStateConfig);
+        var playerHeal = new PlayerHeal(skillGauge, skillGaugeCostConfig, _playerStateConfig);
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
         var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon, _playerStatus, _passiveBuffSet, transform);
 
@@ -184,7 +185,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnHeal(InputAction.CallbackContext context)
     {
-        if(context.started)
+        if (context.started)
         {
 
         }
