@@ -134,9 +134,9 @@ public class PlayerController : MonoBehaviour
         inputBuffer.MoveAction.canceled += OnMove;
         inputBuffer.LightAttackAction.started += OnLightAttackAction;
         inputBuffer.StrongAttackAction.started += OnStrongAttackAction;
-        inputBuffer.EvasionAction.started += OnEvasionAction;
-        inputBuffer.EvasionAction.canceled += OnEvasionAction;
-        inputBuffer.BuffAction.started += OnBuffAction;
+        inputBuffer.EvasionAction.started += OnGhostAction;
+        inputBuffer.EvasionAction.canceled += OnGhostAction;
+        inputBuffer.BuffAction.started += OnSelfSacrificeAction;
         inputBuffer.HealAction.started += OnHeal;
         inputBuffer.HealAction.canceled += OnHeal;
         inputBuffer.SprintAction.started += OnSprint;
@@ -150,9 +150,9 @@ public class PlayerController : MonoBehaviour
         inputBuffer.MoveAction.canceled -= OnMove;
         inputBuffer.LightAttackAction.started -= OnLightAttackAction;
         inputBuffer.StrongAttackAction.started -= OnStrongAttackAction;
-        inputBuffer.EvasionAction.started -= OnEvasionAction;
-        inputBuffer.EvasionAction.canceled -= OnEvasionAction;
-        inputBuffer.BuffAction.started -= OnBuffAction;
+        inputBuffer.EvasionAction.started -= OnGhostAction;
+        inputBuffer.EvasionAction.canceled -= OnGhostAction;
+        inputBuffer.BuffAction.started -= OnSelfSacrificeAction;
         inputBuffer.HealAction.started -= OnHeal;
         inputBuffer.HealAction.canceled -= OnHeal;
         inputBuffer.SprintAction.started -= OnSprint;
@@ -194,27 +194,27 @@ public class PlayerController : MonoBehaviour
         _stateMachine?.HandleStrongAttack();
     }
 
-    private void OnEvasionAction(InputAction.CallbackContext context)
+    private void OnGhostAction(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-
+            _stateMachine?.HandleGhostStarted();
         }
         else
         {
-
+            _stateMachine?.HandleGhostCanceled();
         }
     }
 
-    private void OnBuffAction(InputAction.CallbackContext context)
+    private void OnSelfSacrificeAction(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-
+            _stateMachine?.HandleSelfSacrificeStarted();
         }
         else
         {
-
+            _stateMachine?.HandleSelfSacrificeCanceled();
         }
     }
 
@@ -222,11 +222,11 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-
+            _stateMachine?.HandleHealStarted();
         }
         else
         {
-
+            _stateMachine?.HandleHealCanceled();
         }
     }
 
