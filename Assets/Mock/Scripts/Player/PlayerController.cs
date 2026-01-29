@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("PlayerStatus")]
     [SerializeField] private Collider[] _weaponColliders;
+    [SerializeField] private Collider[] _enemyWeaponColliders;
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;

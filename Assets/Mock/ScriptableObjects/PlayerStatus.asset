@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c7f222cf1458c46b2305598a7ec758, type: 3}
   m_Name: PlayerStatus
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus
+  _life: 3
   _maxHealth: 100
   _attackPower: 10
   _noWeaponMoveSpeed: 5
@@ -20,6 +21,21 @@ MonoBehaviour:
   _unLockSprintSpeed: 8
   _lockOnWalkSpeed: 4
   _lockOnSprintSpeed: 8
-  _roationSmoothness: 0.25
+  _rotationSmoothness: 0.25
   _acceleration: 5
   _breakForce: 4
+  _maxSkillGauge: 100
+  _skillGaugeLockoutThresholdNormalized: 0.25
+  _skillGaugePassiveRecoveryPerSecond: 10
+  _skillGaugeOnAttackGain: 5
+  _skillGaugeOnAvoidGain: 5
+  _skillGaugeOnJustAvoidBonus: 10
+  _skillGaugeCost:
+    _dashPerSecond: 25
+    _ghostActivationCost: 20
+    _ghostPerSecondCost: 5
+    _selfSacrificeGaugePerSecond: 10
+    _selfSacrificeMinHpRatio: 0.1
+    _healGaugePerPercent: 2
+    _buffGaugePerSecond: 8
+  _lowHpBuffTable: {fileID: 11400000, guid: 1ca2d78ba7a0b8249b3fbc3b7a41df6a, type: 2}

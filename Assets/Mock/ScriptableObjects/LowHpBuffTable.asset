@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3204fe96b15437f45a149e3602e4c4a2, type: 3}
   m_Name: LowHpBuffTable
   m_EditorClassIdentifier: Assembly-CSharp::LowHpBuffTable
-  _tiers: []
+  _tiers:
+  - HpBelowRatio: 0
+    DamageMultiplier: 0
+    SkillGaugeRegenBonus: 0
+    Label: 
