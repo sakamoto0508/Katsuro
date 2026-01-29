@@ -7,9 +7,8 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerSprint : AbilityBase
 {
-    public PlayerSprint(SkillGauge gauge, SkillGaugeCostConfig costConfig = null
-        , PlayerStateConfig fallbackStateConfig = null)
-        : base(gauge, costConfig, fallbackStateConfig)
+    public PlayerSprint(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+        : base(gauge, costConfig)
     {
     }
 

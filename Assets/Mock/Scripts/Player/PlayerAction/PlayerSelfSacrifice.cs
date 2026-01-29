@@ -6,9 +6,8 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerSelfSacrifice : AbilityBase
 {
-    public PlayerSelfSacrifice(SkillGauge gauge, SkillGaugeCostConfig costConfig = null
-        , PlayerStateConfig fallbackStateConfig = null)
-        : base(gauge, costConfig, fallbackStateConfig)
+    public PlayerSelfSacrifice(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+        : base(gauge, costConfig)
     {
     }
 

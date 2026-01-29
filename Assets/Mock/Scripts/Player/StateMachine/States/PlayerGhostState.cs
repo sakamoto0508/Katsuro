@@ -1,11 +1,12 @@
+using System;
 using UnityEngine;
 
-public class PlayerGhostState :PlayerState
+public class PlayerGhostState : PlayerState
 {
-    public PlayerGhostState(PlayerStateContext context,PlayerStateMachine staeMachine)
+    public PlayerGhostState(PlayerStateContext context, PlayerStateMachine staeMachine)
         : base(context, staeMachine)
     {
-        
+
     }
 
     public override PlayerStateId Id => PlayerStateId.Ghost;

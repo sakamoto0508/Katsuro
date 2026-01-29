@@ -13,17 +13,14 @@ public class AbilityBase : IDisposable
 
     private protected readonly SkillGauge _skillGauge;
     private protected readonly SkillGaugeCostConfig _costConfig;
-    private protected readonly PlayerStateConfig _fallbackStateConfig;
     private readonly CompositeDisposable _disposables = new CompositeDisposable();
     private readonly ReactiveProperty<bool> _isActiveRx = new ReactiveProperty<bool>(false);
     private readonly Subject<float> _consumedSubject = new Subject<float>();
 
-    private protected AbilityBase(SkillGauge gauge, SkillGaugeCostConfig costConfig = null,
-        PlayerStateConfig fallbackStateConfig = null)
+    private protected AbilityBase(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
     {
         _skillGauge = gauge ?? throw new ArgumentNullException(nameof(gauge));
         _costConfig = costConfig;
-        _fallbackStateConfig = fallbackStateConfig;
     }
 
     private protected void SetActive(bool active)
@@ -55,8 +52,7 @@ public class AbilityBase : IDisposable
     /// 両方未設定の場合はデフォルト値 25f を使用し、返値は最小 0.01f にクランプされます。
     /// </summary>
     private protected float GetDashCostPerSecond()
-        => _costConfig != null ? Mathf.Max(0.01f, _costConfig.DashPerSecond)
-            : Mathf.Max(0.01f, _fallbackStateConfig?.DashGaugeCostPerSecond ?? 25f);
+        => _costConfig != null ? Mathf.Max(0.01f, _costConfig.DashPerSecond) : 25f;
 
     /// <summary>
     /// ゴースト（幽霊化）の起動時ワンタイムコストを取得します。

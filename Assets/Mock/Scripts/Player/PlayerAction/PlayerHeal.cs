@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerHeal : AbilityBase
 {
-    public PlayerHeal(SkillGauge gauge, SkillGaugeCostConfig costConfig = null, PlayerStateConfig fallbackStateConfig = null)
-        : base(gauge, costConfig, fallbackStateConfig)
+    public PlayerHeal(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+        : base(gauge, costConfig)
     {
     }
 

@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerGhost : AbilityBase
 {
-    public PlayerGhost(SkillGauge gauge, SkillGaugeCostConfig costConfig = null, PlayerStateConfig fallbackStateConfig = null)
-        : base(gauge, costConfig, fallbackStateConfig)
+    public PlayerGhost(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+        : base(gauge, costConfig)
     {
     }
 
