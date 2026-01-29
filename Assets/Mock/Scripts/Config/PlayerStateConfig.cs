@@ -50,6 +50,13 @@ public class PlayerStateConfig : ScriptableObject
     public float MaxSkillGauge => _maxSkillGauge;
     public float DashGaugeCostPerSecond => _dashGaugeCostPerSecond;
     public float SkillGaugeRecoveryPerSecond => _skillGaugeRecoveryPerSecond;
+    public float GhostCost => _ghostCost;
+    public float GhostCostPerSecond => _ghostCostPerSecond;
+    public float HealCost => _healCost;
+    public float HealCostPerSecond => _healCostPerSecond;
+    public float SelfSacrificeCost => _selfSacrificeCost;
+    public float SelfSacrificeCostPerSecond => _selfSacrificeCostPerSecond;
+    public float JustAvoidTime => _justAvoidTime;
 
     public IReadOnlyList<AnimationClip> LightAttackClips => _lightAttackClips.Clips;
     public IReadOnlyList<AnimationClip> LockOnLightAttackClips => _lockOnLightAttackClips.Clips;
@@ -85,6 +92,21 @@ public class PlayerStateConfig : ScriptableObject
     [Header("Dash")]
     [SerializeField, Min(0.01f)] private float _dashGaugeCostPerSecond = 25f;
     [SerializeField, Min(0f)] private float _skillGaugeRecoveryPerSecond = 10f;
+
+    [Header("Ghost")]
+    [SerializeField, Min(0.1f)] private float _ghostCost = 10f;
+    [SerializeField, Min(0f)] private float _ghostCostPerSecond = 5f;
+
+    [Header("Heal")]
+    [SerializeField, Min(0.1f)] private float _healCost = 10f;
+    [SerializeField, Min(0f)] private float _healCostPerSecond = 5f;
+
+    [Header("SelfSacrifice")]
+    [SerializeField, Min(0.1f)] private float _selfSacrificeCost = 10f;
+    [SerializeField, Min(0f)] private float _selfSacrificeCostPerSecond = 5f;
+
+    [Header("Avoid")]
+    [SerializeField, Min(0.01f)] private float _justAvoidTime = 0.2f;
 
     [Header("Combo Window Timing")]
     [SerializeField, Min(0f)] private float _defaultLightComboWindowDelay = 0.05f;
