@@ -135,8 +135,7 @@ public class PlayerController : MonoBehaviour
         inputBuffer.MoveAction.canceled += OnMove;
         inputBuffer.LightAttackAction.started += OnLightAttackAction;
         inputBuffer.StrongAttackAction.started += OnStrongAttackAction;
-        inputBuffer.EvasionAction.started += OnGhostAction;
-        inputBuffer.EvasionAction.canceled += OnGhostAction;
+        inputBuffer.GhostAction.started += OnGhostAction;
         inputBuffer.BuffAction.started += OnSelfSacrificeAction;
         inputBuffer.HealAction.started += OnHeal;
         inputBuffer.HealAction.canceled += OnHeal;
@@ -151,8 +150,8 @@ public class PlayerController : MonoBehaviour
         inputBuffer.MoveAction.canceled -= OnMove;
         inputBuffer.LightAttackAction.started -= OnLightAttackAction;
         inputBuffer.StrongAttackAction.started -= OnStrongAttackAction;
-        inputBuffer.EvasionAction.started -= OnGhostAction;
-        inputBuffer.EvasionAction.canceled -= OnGhostAction;
+        inputBuffer.GhostAction.started -= OnGhostAction;
+        inputBuffer.GhostAction.canceled -= OnGhostAction;
         inputBuffer.BuffAction.started -= OnSelfSacrificeAction;
         inputBuffer.HealAction.started -= OnHeal;
         inputBuffer.HealAction.canceled -= OnHeal;
@@ -199,11 +198,13 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
+            if(_stateMachine.Context.IsGhostMode)
+            {
+                // ゴースト中に再度ゴースト入力があった場合、キャンセル扱いにする。
+                _stateMachine?.HandleGhostCanceled();
+                return;
+            }
             _stateMachine?.HandleGhostStarted();
-        }
-        else
-        {
-            _stateMachine?.HandleGhostCanceled();
         }
     }
 
