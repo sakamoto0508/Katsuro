@@ -22,6 +22,8 @@ public class SkillGaugeCostConfig
 
     /// <summary>自傷を行うときに許容される最小HP割合（この値以下のときは自傷を許可しないなどの判定に使用）。</summary>
     public float SelfSacrificeMinHpRatio => _selfSacrificeMinHpRatio;
+    /// <summary>自傷（Self Sacrifice）時の HP% 減少量（秒あたり、1 = 1%/秒）。 /// </summary>
+    public float SelfSacrificeDamagePercentPerSecond => _selfSacrificeDamagePercentPerSecond;
 
     /// <summary>回復（Heal）時に、HPの1%あたり何ポイントのゲージを消費するか。</summary>
     public float HealGaugePerPercent => _healGaugePerPercent;
@@ -39,6 +41,7 @@ public class SkillGaugeCostConfig
     [Header("Self Sacrifice")]
     [SerializeField, Min(0f)] private float _selfSacrificeGaugePerSecond = 10f;
     [SerializeField, Range(0f, 1f)] private float _selfSacrificeMinHpRatio = 0.1f;
+    [SerializeField, Min(0f)] private float _selfSacrificeDamagePercentPerSecond = 1f;
 
     [Header("Heal")]
     [SerializeField, Min(0f)] private float _healGaugePerPercent = 2f;

@@ -15,12 +15,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
+    [SerializeField] private string _enemyWeaponTag = "EnemyWeapon";
 
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
-
-    [Header("Self Sacrifice")]
-    [SerializeField, Min(0f)] private float _selfSacrificeDamagePercentPerSecond = 1f;
 
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
@@ -74,6 +72,27 @@ public class PlayerController : MonoBehaviour
             .AddTo(this);
     }
 
+    /// <summary>ダメージを適用する。</summary>
+    public void ApplyDamage(DamageInfo info)
+    {
+        if (_stateContext?.IsInJustAvoidWindow ?? false)
+        {
+            // ジャスト回避成功によるバフ加算。
+            _stateContext.AddJustAvoidStack(1);
+            // PlayerStatus に設定されているゲージボーナスを即時付与（存在すれば）
+            float bonus = _playerStatus?.SkillGaugeOnJustAvoidBonus ?? 0f;
+            if (bonus > 0f)
+            {
+                _stateContext?.SkillGauge?.Add(bonus);
+            }
+        }
+        if (_stateContext?.IsGhostMode ?? false)
+        {
+            return;
+        }
+        _playerResource?.ApplyDamage(info.DamageAmount);
+    }
+
     private void OnDestroy()
     {
         if (_inputBuffer != null)
@@ -116,8 +135,8 @@ public class PlayerController : MonoBehaviour
     private void HandleSelfSacrificeTick(float deltaSeconds)
     {
         // deltaSeconds：このフレームの経過秒（Ability が通知）
-        // _selfSacrificeDamagePercentPerSecond は秒あたりの MaxHP に対する割合 (%)
-        float percent = _selfSacrificeDamagePercentPerSecond * deltaSeconds; // % of MaxHP
+        float percent = _playerStatus.SkillGaugeCost
+            .SelfSacrificeDamagePercentPerSecond * deltaSeconds; // % of MaxHP
         float damage = _playerResource.MaxHp * (percent / 100f);
         _playerResource.ApplyDamage(damage);
     }
@@ -258,17 +277,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("EnemyWeapon"))
+        // 敵武器（isTrigger = true、attack 時に enabled = true）に接触した場合の受け口
+        if (other.CompareTag(_enemyWeaponTag))
         {
-            foreach (var enemyWeaponCollider in _enemyWeaponColliders)
-            {
-                if(other == enemyWeaponCollider)
-                {
-                    float damage = enemyWeaponCollider.GetComponent<EnemyWeapon>().Damage();
-                    _playerResource.ApplyDamage(damage);
-                    break;
-                }
-            }
+            var enemyWeapon = other.GetComponent<EnemyWeapon>();
+            if (enemyWeapon == null) return;
+
+            // ヒット情報を組み立てて統一エントリへ渡す（ApplyDamage 内でジャスト回避 / ゴースト判定をする）
+            Vector3 origin = transform.position;
+            Vector3 hitPoint = other.ClosestPoint(origin);
+            Vector3 hitNormal = (hitPoint - origin).sqrMagnitude > 0.0001f ? (hitPoint - origin).normalized : Vector3.forward;
+
+            float damage = enemyWeapon.Damage();
+            var info = new DamageInfo(damage, hitPoint, hitNormal, enemyWeapon.gameObject, other);
+            ApplyDamage(info);
         }
     }
 
@@ -279,13 +301,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
-        if (_stateContext != null && _stateContext.IsGhostMode)
-        {
-            _stateContext.Attacker?.DisableWeaponHitbox();
-            _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
-            return;
-        }
-
         _stateContext?.Attacker?.EnableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }

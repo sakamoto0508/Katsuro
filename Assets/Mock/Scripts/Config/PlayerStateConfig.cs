@@ -47,8 +47,11 @@ public class AttackClipList
 [CreateAssetMenu(fileName = "PlayerStateConfig", menuName = "ScriptableObjects/Player/PlayerStateConfig")]
 public class PlayerStateConfig : ScriptableObject
 {
+    /// <summary>スキルゲージの最大値。</summary>
     public float MaxSkillGauge => _maxSkillGauge;
+    /// <summary>スキルゲージの秒あたり回復量。</summary>
     public float SkillGaugeRecoveryPerSecond => _skillGaugeRecoveryPerSecond;
+    /// <summary>ジャスト回避（Just Avoid）成功時間。</summary>
     public float JustAvoidTime => _justAvoidTime;
 
     public IReadOnlyList<AnimationClip> LightAttackClips => _lightAttackClips.Clips;

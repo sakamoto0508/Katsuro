@@ -10,6 +10,7 @@ public class PlayerGhostState : PlayerState
     }
 
     public override PlayerStateId Id => PlayerStateId.Ghost;
+    private float _startJustAvoidRemaining = 0f;
 
     public override void Enter()
     {
@@ -23,8 +24,8 @@ public class PlayerGhostState : PlayerState
         if (Context.Ghost.TryBegin())
         {
             Context.IsGhostMode = true;
-            // 即時にヒットボックスを無効化（アニメイベント待ちではなく明示的に）
-            Context.Attacker?.DisableWeaponHitbox();
+            Context.SetJustAvoidWindow(true);
+            _startJustAvoidRemaining = Context.StateConfig.JustAvoidTime;
         }
         else
         {
@@ -38,6 +39,13 @@ public class PlayerGhostState : PlayerState
     {
         base.Exit();
         Context.Ghost?.End();
+        // ジャスト回避ウィンドウが残っていれば解除
+        if (Context.IsInJustAvoidWindow)
+        {
+            Context.SetJustAvoidWindow(false);
+            _startJustAvoidRemaining = 0f;
+        }
+        Context.IsGhostMode = false;
     }
 
     public override void Update(float deltaTime)
@@ -50,6 +58,18 @@ public class PlayerGhostState : PlayerState
         }
 
         Context.Mover.Update();
+
+        // ジャスト回避ウィンドウの経過処理
+        if (_startJustAvoidRemaining > 0f)
+        {
+            _startJustAvoidRemaining -= deltaTime;
+            if (_startJustAvoidRemaining <= 0f)
+            {
+                _startJustAvoidRemaining = 0f;
+                if (Context.IsInJustAvoidWindow)
+                    Context.SetJustAvoidWindow(false);
+            }
+        }
 
         // Ability 側が枯渇・終了していれば戻す
         if (!Context.Ghost.IsGhosting)
@@ -65,9 +85,14 @@ public class PlayerGhostState : PlayerState
 
     public override void OnGhostCanceled()
     {
-        // 入力等で解除が来たときは Ability を終了してクールダウンへ
         Context.Ghost?.End();
         Context.IsGhostMode = false;
+        // ジャスト回避ウィンドウが残っていれば解除。
+        if (Context.IsInJustAvoidWindow)
+        {
+            Context.SetJustAvoidWindow(false);
+            _startJustAvoidRemaining = 0f;
+        }
     }
 
     public override void OnGhostStarted()
@@ -75,10 +100,12 @@ public class PlayerGhostState : PlayerState
         if (Context.Ghost == null) return;
         if (Context.Ghost.IsActive) return;
 
-        // 再度試行（成功すればゴーストに復帰）
+        // 再度試行（成功すればゴーストに復帰）。
         if (Context.Ghost.TryBegin())
         {
             Context.IsGhostMode = true;
+            Context.SetJustAvoidWindow(true);
+            _startJustAvoidRemaining = Context.StateConfig.JustAvoidTime;
         }
     }
 }

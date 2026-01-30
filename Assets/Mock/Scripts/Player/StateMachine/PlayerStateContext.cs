@@ -1,12 +1,15 @@
+using System;
+using UniRx;
+
 /// <summary>
 /// プレイヤーステート間で共有する依存オブジェクトや状態をまとめたコンテキスト。
 /// 各ステートはこのコンテキスト経由でコントローラーや移動系コンポーネントへアクセスする。
 /// </summary>
 public sealed class PlayerStateContext
 {
-    public PlayerStateContext(PlayerController controller,SkillGauge skillGauge ,PlayerStatus status
-        ,PlayerMover mover, PlayerSprint sprint,PlayerGhost playerGhost,PlayerSelfSacrifice selfSacrifice
-        ,PlayerHeal healer, LockOnCamera lockOnCamera,PlayerStateConfig stateConfig, PlayerAttacker attacker
+    public PlayerStateContext(PlayerController controller, SkillGauge skillGauge, PlayerStatus status
+        , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
+        , PlayerHeal healer, LockOnCamera lockOnCamera, PlayerStateConfig stateConfig, PlayerAttacker attacker
         , IAnimationEventStream animationEvents)
     {
         Controller = controller;
@@ -67,8 +70,47 @@ public sealed class PlayerStateContext
 
     /// <summary>Ability のいずれかがアクティブかを返すユーティリティ。</summary>
     public bool AnyAbilityActive =>
-        (Sprint?.IsActive ?? false)
-        || (Ghost?.IsActive ?? false)
-        || (SelfSacrifice?.IsActive ?? false)
-        || (Healer?.IsActive ?? false);
+            (Sprint?.IsActive ?? false)
+         || (Ghost?.IsActive ?? false)
+         || (SelfSacrifice?.IsActive ?? false)
+         || (Healer?.IsActive ?? false);
+
+    /// <summary>
+    /// 回避（ジャスト回避）無敵ウィンドウ中かを通知するリアクティブプロパティ。
+    /// </summary>
+    public IReadOnlyReactiveProperty<bool> IsInJustAvoidWindowReactive => _isInJustAvoidWindow;
+
+    /// <summary>
+    /// 現在ジャスト回避の無敵ウィンドウ中か（即時参照用）。
+    /// </summary>
+    public bool IsInJustAvoidWindow => _isInJustAvoidWindow.Value;
+
+    /// <summary>
+    /// プレイヤーに付与されたジャスト回避スタック数（UI などは Reactive を購読してください）。
+    /// </summary>
+    public IReadOnlyReactiveProperty<int> JustAvoidStacksReactive => _justAvoidStacks;
+
+    /// <summary>
+    /// 現在のジャスト回避スタック数（即時参照用）。
+    /// </summary>
+    public int JustAvoidStacks => _justAvoidStacks.Value;
+
+    /// <summary>
+    /// 回避ウィンドウを設定します（ステートが開始・終了で呼びます）。
+    /// </summary>
+    public void SetJustAvoidWindow(bool enabled) => _isInJustAvoidWindow.Value = enabled;
+
+    /// <summary>
+    /// ジャスト回避スタックを加算します（amount は正の値）。UI は <see cref="JustAvoidStacksReactive"/> を購読してください。
+    /// </summary>
+    public void AddJustAvoidStack(int amount = 1) => _justAvoidStacks.Value = Math.Max(0, _justAvoidStacks.Value + amount);
+
+    /// <summary>
+    /// ジャスト回避スタックをクリアします。
+    /// </summary>
+    public void ClearJustAvoidStacks() => _justAvoidStacks.Value = 0;
+
+    private readonly ReactiveProperty<bool> _isInJustAvoidWindow = new UniRx.ReactiveProperty<bool>(false);
+    private readonly ReactiveProperty<int> _justAvoidStacks=new ReactiveProperty<int>(0);
+
 }
