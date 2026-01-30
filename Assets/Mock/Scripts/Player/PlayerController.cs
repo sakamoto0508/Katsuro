@@ -255,6 +255,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("EnemyWeapon"))
+        {
+            foreach (var enemyWeaponCollider in _enemyWeaponColliders)
+            {
+                if(other == enemyWeaponCollider)
+                {
+                    float damage = enemyWeaponCollider.GetComponent<EnemyWeapon>().Damage();
+                    _playerResource.ApplyDamage(damage);
+                    break;
+                }
+            }
+        }
+    }
+
     //＝＝＝＝＝＝＝＝ アニメーションイベント＝＝＝＝＝＝＝＝＝＝＝
 
     /// <summary>
