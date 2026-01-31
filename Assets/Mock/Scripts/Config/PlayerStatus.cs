@@ -115,6 +115,11 @@ public sealed class PlayerStatus : ScriptableObject
     /// </summary>
     public LowHpBuffTable LowHpBuffTable => _lowHpBuffTable;
 
+    /// <summary>
+    /// ジャスト回避スタックの効果設定（ScriptableObject）。null ならスタック効果は無効。
+    /// </summary>
+    public JustAvoidBuffConfig JustAvoidBuffConfig => _justAvoidBuffConfig;
+
     [Header("Basic Status")]
     [SerializeField] private int _life = 3;
     [SerializeField] private int _maxHealth = 100;
@@ -141,5 +146,8 @@ public sealed class PlayerStatus : ScriptableObject
     [SerializeField] private SkillGaugeCostConfig _skillGaugeCost;
 
     [Header("Low HP Buff")]
-    [SerializeField] private LowHpBuffTable _lowHpBuffTable;   
+    [SerializeField] private LowHpBuffTable _lowHpBuffTable;
+
+    [Header("Just-Avoid / Buffs")]
+    [SerializeField] private JustAvoidBuffConfig _justAvoidBuffConfig;
 }

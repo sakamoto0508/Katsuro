@@ -5,7 +5,7 @@ using UniRx;
 /// プレイヤーステート間で共有する依存オブジェクトや状態をまとめたコンテキスト。
 /// 各ステートはこのコンテキスト経由でコントローラーや移動系コンポーネントへアクセスする。
 /// </summary>
-public sealed class PlayerStateContext
+public sealed class PlayerStateContext　: IDisposable
 {
     public PlayerStateContext(PlayerController controller, SkillGauge skillGauge, PlayerStatus status
         , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
@@ -112,5 +112,16 @@ public sealed class PlayerStateContext
 
     private readonly ReactiveProperty<bool> _isInJustAvoidWindow = new UniRx.ReactiveProperty<bool>(false);
     private readonly ReactiveProperty<int> _justAvoidStacks=new ReactiveProperty<int>(0);
+    private bool _disposed;
 
+    /// <summary>
+    /// ReactiveProperty を解放します。PlayerStateContext のライフサイクル終了時に呼んでください。
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _isInJustAvoidWindow?.Dispose();
+        _justAvoidStacks?.Dispose();
+        _disposed = true;
+    }
 }

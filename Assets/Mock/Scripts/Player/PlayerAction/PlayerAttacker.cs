@@ -20,8 +20,10 @@ public sealed class PlayerAttacker : IDisposable
 
         ApplyPassiveBuffSet(passiveBuffSet);
         _weapon?.RegisterHitObserver(HandleWeaponHit);
-
     }
+
+    /// <summary>ステートコンテキストを後から注入する（ResolveDamageAmount で JustAvoidStacks を参照するため）。</summary>
+    public void SetContext(PlayerStateContext context) => _context = context;
 
     /// <summary>抜刀済みで攻撃に移行できる状態か。</summary>
     public bool IsSwordReady => _isSwordReady;
@@ -40,6 +42,9 @@ public sealed class PlayerAttacker : IDisposable
     private bool _isDrawingSword;
     private bool _isHitboxActive;
     private readonly HashSet<int> _hitTargets = new();
+
+    // 後からセットされるコンテキスト（null でも動く）
+    private PlayerStateContext _context;
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
     public void DrawSword()
@@ -194,6 +199,7 @@ public sealed class PlayerAttacker : IDisposable
 
     /// <summary>
     /// 基礎ダメージを解決する。低HPバフが設定されており PlayerResource が渡されていれば適用する。
+    /// さらに PlayerStateContext の Just-Avoid スタックが設定されている場合、そのスタック分の攻撃ボーナスを適用します。
     /// </summary>
     private float ResolveDamageAmount()
     {
@@ -211,6 +217,18 @@ public sealed class PlayerAttacker : IDisposable
             float currentHpRatio = Mathf.Clamp01(_playerResource.CurrentHp / _playerResource.MaxHp);
             float lowHpMultiplier = _status.LowHpBuffTable.EvaluateDamageMultiplier(currentHpRatio);
             damage *= lowHpMultiplier;
+        }
+
+        // ジャスト回避スタックがある場合はスタック効果を適用（設定があれば）
+        if (_context != null && _status?.JustAvoidBuffConfig != null)
+        {
+            int stacks = Mathf.Clamp(_context.JustAvoidStacks, 0, _status.JustAvoidBuffConfig.MaxStacks);
+            if (stacks > 0)
+            {
+                float perStack = _status.JustAvoidBuffConfig.DamageMultiplierPerStack;
+                float justMultiplier = 1f + perStack * stacks; // 例: perStack=0.05 -> 1stack = +5%
+                damage *= justMultiplier;
+            }
         }
 
         return Mathf.Max(0f, damage);
