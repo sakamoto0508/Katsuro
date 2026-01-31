@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Unity UI (Image) を使ったシンプルなプレイヤー HUD の実装。
-/// </summary>
-public class PlayerHUDView : MonoBehaviour, IPlayerHUDView
+namespace Mock.UI
 {
+    /// <summary>
+    /// Unity UI (Image) を使ったシンプルなプレイヤー HUD の実装。
+    /// </summary>
+    public class PlayerHUDView : MonoBehaviour, IKatsuroPlayerHUDView
+    {
     [SerializeField] private Image _hpFill;
     [SerializeField] private Image _skillFill;
 
@@ -28,4 +30,6 @@ public class PlayerHUDView : MonoBehaviour, IPlayerHUDView
         if (_skillFill != null)
             _skillFill.fillAmount = Mathf.Clamp01(normalized);
     }
+    }
+
 }

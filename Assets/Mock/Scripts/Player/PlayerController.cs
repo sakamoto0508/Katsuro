@@ -1,6 +1,7 @@
 using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Mock.UI;
 
 /// <summary>
 /// プレイヤー入力の受け口となり、各種コンポーネント・ステートマシンを初期化および更新する中枢クラス。
@@ -19,6 +20,10 @@ public class PlayerController : MonoBehaviour
 
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
+    // MVP HUD
+    [Header("UI")]
+    [SerializeField] private PlayerHUDView _playerHudView;
+    private PlayerHUDPresenter _playerHudPresenter;
 
     private InputBuffer _inputBuffer;
     private PlayerAnimationController _animationController;
@@ -27,6 +32,7 @@ public class PlayerController : MonoBehaviour
     private PlayerStateMachine _stateMachine;
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
+    
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
@@ -64,6 +70,16 @@ public class PlayerController : MonoBehaviour
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
+
+        // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
+        if (_playerHudView != null)
+        {
+            _playerHudPresenter = new PlayerHUDPresenter(
+                _playerHudView,
+                _playerResource.CurrentHpReactive,
+                _playerResource.MaxHp,
+                skillGauge.NormalizedReactive);
+        }
 
         // 定期処理の購読登録（Ability の通知を受けて PlayerResource を操作する）
         _stateContext.SelfSacrifice.OnConsumed
