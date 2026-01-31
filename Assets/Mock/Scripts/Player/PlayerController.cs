@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviour
         _stateContext = new PlayerStateContext(this, skillGauge, _playerStatus, playerMover, playerSprint,
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
+        playerAttacker.SetContext(_stateContext);
 
         // ’èŠúˆ—‚Ìw“Ç“o˜^iAbility ‚Ì’Ê’m‚ğó‚¯‚Ä PlayerResource ‚ğ‘€ì‚·‚éj
         _stateContext.SelfSacrifice.OnConsumed
