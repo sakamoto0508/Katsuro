@@ -38,13 +38,11 @@ public sealed class PlayerAttacker : IDisposable
     private readonly Transform _ownerTransform;
     private readonly PlayerResource _playerResource;
     private PlayerPassiveBuffSet _passiveBuffSet;
+    private PlayerStateContext _context;
     private bool _isSwordReady;
     private bool _isDrawingSword;
     private bool _isHitboxActive;
     private readonly HashSet<int> _hitTargets = new();
-
-    // 後からセットされるコンテキスト（null でも動く）
-    private PlayerStateContext _context;
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
     public void DrawSword()
