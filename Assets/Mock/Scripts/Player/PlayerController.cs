@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
             : _playerStateConfig?.SkillGaugeRecoveryPerSecond ?? 0f;
 
         // --- 各種コンポーネントを生成
+        _playerResource = new PlayerResource(_playerStatus);
         var playerWeapon = new PlayerWeapon(_weaponColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
@@ -56,8 +57,8 @@ public class PlayerController : MonoBehaviour
         var playerHeal = new PlayerHeal(skillGauge, skillGaugeCostConfig);
         var playerBuff = new PlayerSelfSacrifice(skillGauge, skillGaugeCostConfig);
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
-        var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon, _playerStatus, _passiveBuffSet, transform);
-        _playerResource = new PlayerResource(_playerStatus);
+        var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon
+            , _playerStatus, _passiveBuffSet, transform,_playerResource);
         _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, skillGauge, _playerStatus, playerMover, playerSprint,
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
@@ -85,6 +86,7 @@ public class PlayerController : MonoBehaviour
             {
                 _stateContext?.SkillGauge?.Add(bonus);
             }
+            return;
         }
         if (_stateContext?.IsGhostMode ?? false)
         {
@@ -109,6 +111,7 @@ public class PlayerController : MonoBehaviour
         _stateContext?.Attacker?.Dispose();
         _stateMachine?.Dispose();
         _playerResource?.Dispose();
+        _stateContext?.Dispose();
 
         _stateMachine = null;
         _stateContext = null;
@@ -135,10 +138,34 @@ public class PlayerController : MonoBehaviour
     private void HandleSelfSacrificeTick(float deltaSeconds)
     {
         // deltaSeconds：このフレームの経過秒（Ability が通知）
-        float percent = _playerStatus.SkillGaugeCost
-            .SelfSacrificeDamagePercentPerSecond * deltaSeconds; // % of MaxHP
+        // SelfSacrifice の秒あたり%値は SkillGaugeCost 側で管理（未設定時は 1%/s をフォールバック）
+        float percentPerSecond = _playerStatus?.SkillGaugeCost?.SelfSacrificeDamagePercentPerSecond ?? 1f;
+        float percent = percentPerSecond * deltaSeconds; // % of MaxHP
         float damage = _playerResource.MaxHp * (percent / 100f);
-        _playerResource.ApplyDamage(damage);
+
+        // 最小HP保護: SelfSacrificeMinHpRatio を超えないように分割適用または自動停止
+        float currentHp = _playerResource?.CurrentHp ?? 0f;
+        float minHpRatio = _playerStatus?.SkillGaugeCost?.SelfSacrificeMinHpRatio ?? 0.1f;
+        float minHp = _playerResource != null ? _playerResource.MaxHp * minHpRatio : 0f;
+
+        // 適用可能な最大ダメージ（現HP を minHp までしか減らさない）
+        float maxAllowedDamage = Mathf.Max(0f, currentHp - minHp);
+
+        if (maxAllowedDamage <= Mathf.Epsilon)
+        {
+            // 最低HPに到達しているのでチャネリングを停止する
+            _stateContext?.SelfSacrifice?.End();
+            return;
+        }
+
+        float applied = Mathf.Min(damage, maxAllowedDamage);
+        _playerResource?.ApplyDamage(applied);
+
+        // もし要求ダメージが大きく、残量が不足している場合は自動停止
+        if (applied < damage)
+        {
+            _stateContext?.SelfSacrifice?.End();
+        }
     }
 
     private void HandleHealTick(float healedPercent)
