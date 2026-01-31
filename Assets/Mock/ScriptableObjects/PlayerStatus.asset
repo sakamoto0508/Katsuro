@@ -36,6 +36,8 @@ MonoBehaviour:
     _ghostPerSecondCost: 5
     _selfSacrificeGaugePerSecond: 10
     _selfSacrificeMinHpRatio: 0.1
+    _selfSacrificeDamagePercentPerSecond: 1
     _healGaugePerPercent: 2
     _buffGaugePerSecond: 8
   _lowHpBuffTable: {fileID: 11400000, guid: 1ca2d78ba7a0b8249b3fbc3b7a41df6a, type: 2}
+  _justAvoidBuffConfig: {fileID: 0}

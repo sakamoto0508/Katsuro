@@ -19,4 +19,5 @@ MonoBehaviour:
   _isLockOn: IsLockOn
   _lightAttack: LightAttack
   _strongAttack: StrongAttack
-  _justAvoidAttack: 
+  _justAvoidAttack: JustAvoidAttack
+  _comboStep: ComboStep
