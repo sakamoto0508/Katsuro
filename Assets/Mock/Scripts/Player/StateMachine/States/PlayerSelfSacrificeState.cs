@@ -53,6 +53,17 @@ public class PlayerSelfSacrificeState : PlayerState
         Context.SelfSacrifice?.End();
     }
 
+    public override void OnLightAttack()
+    {
+        // 攻撃は SelfSacrifice 中でも可能にする（SelfSacrifice は Exit で自動的に End される）
+        StateMachine.ChangeState(PlayerStateId.LightAttack);
+    }
+
+    public override void OnStrongAttack()
+    {
+        StateMachine.ChangeState(PlayerStateId.StrongAttack);
+    }
+
     public override void FixedUpdate(float deltaTime)
     {
         // 物理更新は Mover 側で行う（移動を有効にするため必須）
