@@ -30,11 +30,8 @@ public class PlayerController : MonoBehaviour
     private LockOnCamera _lookOnCamera;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
-    // AbilityManager は Context 側で生成しているためローカル参照は不要
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
-
-    // AbilityManager は外部クラスに実装（Assets/Mock/Scripts/Player/AbilityManager.cs）
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
@@ -245,6 +242,13 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
+        // SelfSacrifice 中は攻撃を即時遷移させる（抜刀が未完でもステートを切り替え、攻撃中に抜刀完了を待つ）
+        if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
+        {
+            _stateMachine?.HandleLightAttack();
+            return;
+        }
+
         if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
         _stateMachine?.HandleLightAttack();
     }
@@ -257,6 +261,12 @@ public class PlayerController : MonoBehaviour
         }
 
         TryDrawSword();
+        if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
+        {
+            _stateMachine?.HandleStrongAttack();
+            return;
+        }
+
         if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
         _stateMachine?.HandleStrongAttack();
     }
@@ -265,7 +275,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            AbilityManager.GhostToggleResult? result = _stateContext != null ? _stateContext.AbilityManager.ToggleGhost() : (AbilityManager.GhostToggleResult?)null;
+            var result = _stateContext?.AbilityManager?.ToggleGhost();
             if (result == null)
             {
                 Debug.Log("Ghost: AbilityManager not available on context");

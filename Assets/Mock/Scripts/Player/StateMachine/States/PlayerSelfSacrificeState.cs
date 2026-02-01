@@ -35,7 +35,9 @@ public class PlayerSelfSacrificeState : PlayerState
 
     public override void Exit()
     {
-        Context.SelfSacrifice?.End();
+        // SelfSacrifice は AbilityManager 側で管理しているため、
+        // ステート離脱時に自動で End しない（攻撃中も継続したい）。
+        // 終了は入力キャンセルやゲージ枯渇など Ability 側の判定で行う。
     }
 
     public override void Update(float deltaTime)

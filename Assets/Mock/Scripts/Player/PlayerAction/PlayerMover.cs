@@ -11,6 +11,7 @@ public class PlayerMover
         _cameraPosition = cameraPosition;
         _animationController = animationController;
     }
+
     private PlayerStatus _playerStatus;
     private PlayerAnimationController _animationController;
     private Rigidbody _rb;

@@ -6,6 +6,16 @@ using UnityEngine;
 /// </summary>
 public sealed class AbilityManager
 {
+    public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
+    {
+        _context = context;
+        _ghost = ghost;
+        _selfSacrifice = selfSacrifice;
+        _healer = healer;
+        _playerResource = playerResource;
+        _stateConfig = stateConfig;
+    }
+
     public enum GhostToggleResult
     {
         Began,
@@ -19,18 +29,7 @@ public sealed class AbilityManager
     private readonly PlayerHeal _healer;
     private readonly PlayerResource _playerResource;
     private readonly PlayerStateConfig _stateConfig;
-
     private float _justAvoidRemaining = 0f;
-
-    public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
-    {
-        _context = context;
-        _ghost = ghost;
-        _selfSacrifice = selfSacrifice;
-        _healer = healer;
-        _playerResource = playerResource;
-        _stateConfig = stateConfig;
-    }
 
     /// <summary>毎フレーム呼ぶ Tick。ゴーストの継続消費とジャスト回避ウィンドウの管理を行う。</summary>
     public void Tick(float deltaTime)
