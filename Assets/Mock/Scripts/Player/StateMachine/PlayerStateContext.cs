@@ -25,7 +25,12 @@ public sealed class PlayerStateContext : IDisposable
         StateConfig = stateConfig;
         Attacker = attacker;
         AnimationEvents = animationEvents;
+        // 段階移行用 AbilityManager を Context 側で持たせる（常に利用可能にする）
+        AbilityManager = new AbilityManager(this);
     }
+
+    /// <summary>段階移行で導入した AbilityManager（まずは Ghost を管理）。</summary>
+    public AbilityManager AbilityManager { get; }
 
     /// <summary>プレイヤー本体のコントローラー。</summary>
     public PlayerController Controller { get; }

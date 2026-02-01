@@ -30,8 +30,12 @@ public class PlayerController : MonoBehaviour
     private LockOnCamera _lookOnCamera;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
+    // 段階移行：ゴーストのみを扱う簡易 AbilityManager をこのクラス内に保持
+    private AbilityManager _abilityManager;
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
+
+    // AbilityManager は外部クラスに実装（Assets/Mock/Scripts/Player/AbilityManager.cs）
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
@@ -69,6 +73,8 @@ public class PlayerController : MonoBehaviour
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
+        // 段階移行：外部 AbilityManager を生成してまずは Ghost を移行する
+        _abilityManager = new AbilityManager(_stateContext);
 
         // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
         if (_playerHudView != null)
@@ -143,6 +149,8 @@ public class PlayerController : MonoBehaviour
             // ロックオン方向を都度更新し、移動計算へ反映。
             _stateContext.Mover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         }
+        // Ability レイヤを先に Tick（Ghost の継続処理）
+        _abilityManager?.Tick(Time.deltaTime);
         _stateMachine?.Update(Time.deltaTime);
     }
 
@@ -259,15 +267,24 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if(_stateMachine.Context.IsGhostMode)
+            var result = _abilityManager?.ToggleGhost();
+            if (result == null)
             {
-                // ゴースト中に再度ゴースト入力があった場合、キャンセル扱いにする。
-                _stateMachine?.HandleGhostCanceled();
-                Debug.Log("Ghost Canceled");
+                Debug.Log("Ghost: AbilityManager not initialized");
                 return;
             }
-            _stateMachine?.HandleGhostStarted();
-            Debug.Log("Ghost Started");
+            switch (result.Value)
+            {
+                case AbilityManager.GhostToggleResult.Began:
+                    Debug.Log("Ghost Started (via AbilityManager)");
+                    break;
+                case AbilityManager.GhostToggleResult.Ended:
+                    Debug.Log("Ghost Ended (via AbilityManager)");
+                    break;
+                default:
+                    Debug.Log("Ghost Failed to start");
+                    break;
+            }
         }
     }
 

@@ -21,7 +21,9 @@ public class PlayerGhostState : PlayerState
             return;
         }
 
-        if (Context.Ghost.TryBegin())
+        // ゴーストの起動は AbilityManager 側で行う（段階移行）。
+        // 既にアクティブになっているか確認し、そうでなければ戻る。
+        if (Context.Ghost.IsActive)
         {
             Context.IsGhostMode = true;
             Context.SetJustAvoidWindow(true);
@@ -29,7 +31,7 @@ public class PlayerGhostState : PlayerState
         }
         else
         {
-            // 起動失敗（ゲージ不足等）は即座に戻す
+            // ゴースト未起動なら通常移行に戻す
             Context.IsGhostMode = false;
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
@@ -97,15 +99,12 @@ public class PlayerGhostState : PlayerState
 
     public override void OnGhostStarted()
     {
+        // Ghost の開始は AbilityManager 側で処理されるため、ここでは
+        // アクティブになっているかを見て状態を更新するのみ。
         if (Context.Ghost == null) return;
-        if (Context.Ghost.IsActive) return;
-
-        // 再度試行（成功すればゴーストに復帰）。
-        if (Context.Ghost.TryBegin())
-        {
-            Context.IsGhostMode = true;
-            Context.SetJustAvoidWindow(true);
-            _startJustAvoidRemaining = Context.StateConfig.JustAvoidTime;
-        }
+        if (!Context.Ghost.IsActive) return;
+        Context.IsGhostMode = true;
+        Context.SetJustAvoidWindow(true);
+        _startJustAvoidRemaining = Context.StateConfig.JustAvoidTime;
     }
 }
