@@ -25,6 +25,10 @@ public class PlayerResource : IDisposable
     /// 現在 HP の生値（最新の値を返す）。Reactive を購読できない場所での即時参照に使う。
     /// </summary>
     public float CurrentHp => _hpRx.Value;
+    /// <summary>
+    /// 現在 HP の割合（0..1）。モデル側で正規化値を持っておくと便利なため提供します。
+    /// </summary>
+    public float CurrentHpRatio => _maxHp > 0f ? _hpRx.Value / _maxHp : 0f;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
 

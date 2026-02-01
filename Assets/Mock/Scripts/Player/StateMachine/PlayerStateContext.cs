@@ -5,15 +5,16 @@ using UniRx;
 /// プレイヤーステート間で共有する依存オブジェクトや状態をまとめたコンテキスト。
 /// 各ステートはこのコンテキスト経由でコントローラーや移動系コンポーネントへアクセスする。
 /// </summary>
-public sealed class PlayerStateContext　: IDisposable
+public sealed class PlayerStateContext : IDisposable
 {
-    public PlayerStateContext(PlayerController controller, SkillGauge skillGauge, PlayerStatus status
+    public PlayerStateContext(PlayerController controller, PlayerResource playerResource, SkillGauge skillGauge, PlayerStatus status
         , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
         , PlayerHeal healer, LockOnCamera lockOnCamera, PlayerStateConfig stateConfig, PlayerAttacker attacker
         , IAnimationEventStream animationEvents)
     {
-        Controller = controller;
-        SkillGauge = skillGauge;
+        Controller = controller; // Assigning controller
+        PlayerResource = playerResource; // Assigning player resource
+        SkillGauge = skillGauge; // Assigning skill gauge
         Status = status;
         Mover = mover;
         Sprint = sprint;
@@ -31,6 +32,9 @@ public sealed class PlayerStateContext　: IDisposable
 
     /// <summary>SkillGauge（実行時のゲージ）。UI や Ability が直接購読可能にするため Context に載せる。</summary>
     public SkillGauge SkillGauge { get; }
+
+    /// <summary>ランタイムで管理されるプレイヤーのリソース（HP 等）。</summary>
+    public PlayerResource PlayerResource { get; }
 
     /// <summary>プレイヤーのステータス（移動速度や加速度など）。</summary>
     public PlayerStatus Status { get; }

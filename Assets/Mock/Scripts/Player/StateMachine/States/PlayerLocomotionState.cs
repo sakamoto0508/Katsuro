@@ -34,6 +34,21 @@ public sealed class PlayerLocomotionState : PlayerState
         }
     }
 
+    public override void OnGhostStarted()
+    {
+        StateMachine.ChangeState(PlayerStateId.Ghost);
+    }
+
+    public override void OnSelfSacrificeStarted()
+    {
+        StateMachine.ChangeState(PlayerStateId.SelfSacrifice);
+    }
+
+    public override void OnHealStarted()
+    {
+        StateMachine.ChangeState(PlayerStateId.Heal);
+    }
+
     public override void OnLightAttack()
     {
         if (CanAttack)

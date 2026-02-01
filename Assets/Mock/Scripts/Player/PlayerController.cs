@@ -32,7 +32,6 @@ public class PlayerController : MonoBehaviour
     private PlayerStateMachine _stateMachine;
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
-    
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
@@ -66,7 +65,7 @@ public class PlayerController : MonoBehaviour
         var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon
             , _playerStatus, _passiveBuffSet, transform,_playerResource);
         _animationEventStream = new AnimationEventStream();
-        _stateContext = new PlayerStateContext(this, skillGauge, _playerStatus, playerMover, playerSprint,
+        _stateContext = new PlayerStateContext(this, _playerResource, skillGauge, _playerStatus, playerMover, playerSprint,
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
@@ -214,7 +213,6 @@ public class PlayerController : MonoBehaviour
         inputBuffer.LightAttackAction.started -= OnLightAttackAction;
         inputBuffer.StrongAttackAction.started -= OnStrongAttackAction;
         inputBuffer.GhostAction.started -= OnGhostAction;
-        inputBuffer.GhostAction.canceled -= OnGhostAction;
         inputBuffer.BuffAction.started -= OnSelfSacrificeAction;
         inputBuffer.HealAction.started -= OnHeal;
         inputBuffer.HealAction.canceled -= OnHeal;
@@ -265,9 +263,11 @@ public class PlayerController : MonoBehaviour
             {
                 // ゴースト中に再度ゴースト入力があった場合、キャンセル扱いにする。
                 _stateMachine?.HandleGhostCanceled();
+                Debug.Log("Ghost Canceled");
                 return;
             }
             _stateMachine?.HandleGhostStarted();
+            Debug.Log("Ghost Started");
         }
     }
 
@@ -275,11 +275,14 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
+            if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
+            {
+                _stateMachine?.HandleSelfSacrificeCanceled();
+                Debug.Log("SelfSacrifice Canceled");
+                return;
+            }
             _stateMachine?.HandleSelfSacrificeStarted();
-        }
-        else
-        {
-            _stateMachine?.HandleSelfSacrificeCanceled();
+            Debug.Log("SelfSacrifice Started");
         }
     }
 
@@ -288,10 +291,12 @@ public class PlayerController : MonoBehaviour
         if (context.started)
         {
             _stateMachine?.HandleHealStarted();
+            Debug.Log("Heal Started");
         }
-        else
+        else if (context.canceled)
         {
             _stateMachine?.HandleHealCanceled();
+            Debug.Log("Heal Canceled");
         }
     }
 
