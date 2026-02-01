@@ -1,16 +1,17 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class EnemyController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [Header("Enemy Status")]
+    [SerializeField] private EnemyStuts _enemyStuts;
 
-    // Update is called once per frame
-    void Update()
+    [Header("Weapon")]
+    [SerializeField] private Collider[] _enemyWeaponColliders;
+    [SerializeField] private Collider[] _playerWeaponColliders;
+
+    public void Init()
     {
-        
+
     }
 }
