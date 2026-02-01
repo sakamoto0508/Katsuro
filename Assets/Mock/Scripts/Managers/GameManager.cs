@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Enemy")]
     [SerializeField] private Transform _enemyPosition;
+    [SerializeField] private EnemyController _enemyController;
 
     [Header("Camera")]
     [SerializeField] private CameraManager _cameraManager;
