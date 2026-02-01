@@ -15,6 +15,6 @@ public class EnemyController : MonoBehaviour
     {
         var rb = GetComponent<Rigidbody>();
 
-        var mover = new EnemyMover(rb);
+        var mover = new EnemyMover(rb,_enemyStuts);
     }
 }
