@@ -90,10 +90,15 @@ public sealed class PlayerStateMachine : IDisposable
     public void Update(float deltaTime)
     {
         Context?.Sprint?.Tick(deltaTime);
-        Context?.Ghost?.Tick(deltaTime);
-        Context?.SelfSacrifice?.Tick(deltaTime);
-        Context?.Healer?.Tick(deltaTime);
-        Context?.SkillGauge?.TickPassive(deltaTime);
+
+        // 簡易設定：ゴースト中またはヒール中はパッシブ回復をスキップする
+        bool isGhosting = Context?.Ghost?.IsActive ?? false;
+        bool isHealing = Context?.Healer?.IsActive ?? false;
+        if (!(isGhosting || isHealing))
+        {
+            Context?.SkillGauge?.TickPassive(deltaTime);
+        }
+
         _currentState?.Update(deltaTime);
     }
 
