@@ -30,8 +30,7 @@ public class PlayerController : MonoBehaviour
     private LockOnCamera _lookOnCamera;
     private PlayerStateContext _stateContext;
     private PlayerStateMachine _stateMachine;
-    // 段階移行：ゴーストのみを扱う簡易 AbilityManager をこのクラス内に保持
-    private AbilityManager _abilityManager;
+    // AbilityManager は Context 側で生成しているためローカル参照は不要
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
 
@@ -73,8 +72,7 @@ public class PlayerController : MonoBehaviour
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
-        // 段階移行：外部 AbilityManager を生成してまずは Ghost を移行する
-        _abilityManager = new AbilityManager(_stateContext);
+        // 段階移行：AbilityManager は Context により生成済み（Context.AbilityManager を使用）
 
         // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
         if (_playerHudView != null)
@@ -149,8 +147,8 @@ public class PlayerController : MonoBehaviour
             // ロックオン方向を都度更新し、移動計算へ反映。
             _stateContext.Mover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         }
-        // Ability レイヤを先に Tick（Ghost の継続処理）
-        _abilityManager?.Tick(Time.deltaTime);
+        // Ability レイヤを先に Tick（Ghost / SelfSacrifice の継続処理）
+        _stateContext?.AbilityManager?.Tick(Time.deltaTime);
         _stateMachine?.Update(Time.deltaTime);
     }
 
@@ -267,10 +265,10 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            var result = _abilityManager?.ToggleGhost();
+            AbilityManager.GhostToggleResult? result = _stateContext != null ? _stateContext.AbilityManager.ToggleGhost() : (AbilityManager.GhostToggleResult?)null;
             if (result == null)
             {
-                Debug.Log("Ghost: AbilityManager not initialized");
+                Debug.Log("Ghost: AbilityManager not available on context");
                 return;
             }
             switch (result.Value)
@@ -292,14 +290,18 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
+            var started = _stateContext?.AbilityManager?.ToggleSelfSacrifice() ?? false;
+            if (started)
             {
-                _stateMachine?.HandleSelfSacrificeCanceled();
-                Debug.Log("SelfSacrifice Canceled");
-                return;
+                _stateMachine?.HandleSelfSacrificeStarted();
+                Debug.Log("SelfSacrifice Started (via AbilityManager)");
             }
-            _stateMachine?.HandleSelfSacrificeStarted();
-            Debug.Log("SelfSacrifice Started");
+            else
+            {
+                // Toggle returned false -> either ended or failed to start
+                _stateMachine?.HandleSelfSacrificeCanceled();
+                Debug.Log("SelfSacrifice Canceled/Failed (via AbilityManager)");
+            }
         }
     }
 
@@ -307,11 +309,20 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            _stateMachine?.HandleHealStarted();
-            Debug.Log("Heal Started");
+            var started = _stateContext?.AbilityManager?.ToggleHeal() ?? false;
+            if (started)
+            {
+                _stateMachine?.HandleHealStarted();
+                Debug.Log("Heal Started (via AbilityManager)");
+            }
+            else
+            {
+                Debug.Log("Heal Failed to start (via AbilityManager)");
+            }
         }
         else if (context.canceled)
         {
+            // 解除入力は常にステートへ伝える
             _stateMachine?.HandleHealCanceled();
             Debug.Log("Heal Canceled");
         }

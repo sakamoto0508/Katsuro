@@ -14,11 +14,22 @@ public sealed class AbilityManager
     }
 
     private readonly PlayerStateContext _context;
+    private readonly PlayerGhost _ghost;
+    private readonly PlayerSelfSacrifice _selfSacrifice;
+    private readonly PlayerHeal _healer;
+    private readonly PlayerResource _playerResource;
+    private readonly PlayerStateConfig _stateConfig;
+
     private float _justAvoidRemaining = 0f;
 
-    public AbilityManager(PlayerStateContext context)
+    public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
     {
         _context = context;
+        _ghost = ghost;
+        _selfSacrifice = selfSacrifice;
+        _healer = healer;
+        _playerResource = playerResource;
+        _stateConfig = stateConfig;
     }
 
     /// <summary>毎フレーム呼ぶ Tick。ゴーストの継続消費とジャスト回避ウィンドウの管理を行う。</summary>
@@ -26,8 +37,10 @@ public sealed class AbilityManager
     {
         if (deltaTime <= 0f) return;
 
-        // Ghost の継続消費を行う
-        _context?.Ghost?.Tick(deltaTime);
+        // 継続処理を直接各 Ability に委譲
+        _ghost?.Tick(deltaTime);
+        _selfSacrifice?.Tick(deltaTime);
+        _healer?.Tick(deltaTime);
 
         // ジャスト回避ウィンドウの経過管理
         if (_justAvoidRemaining > 0f)
@@ -42,7 +55,7 @@ public sealed class AbilityManager
         }
 
         // ゴーストが自動終了（ゲージ枯渇など）していたらフラグを解除
-        if (!(_context?.Ghost?.IsGhosting ?? false))
+        if (!(_ghost?.IsGhosting ?? false))
         {
             if (_context.IsGhostMode)
             {
@@ -59,12 +72,11 @@ public sealed class AbilityManager
     /// <summary>ゴーストのトグル（開始 / 終了）を行う。結果を返す。</summary>
     public GhostToggleResult ToggleGhost()
     {
-        if (_context?.Ghost == null) return GhostToggleResult.Failed;
+        if (_ghost == null) return GhostToggleResult.Failed;
 
-        if (_context.Ghost.IsActive)
+        if (_ghost.IsActive)
         {
-            // アクティブなら終了
-            _context.Ghost.End();
+            _ghost.End();
             _context.IsGhostMode = false;
             if (_context.IsInJustAvoidWindow)
             {
@@ -74,17 +86,57 @@ public sealed class AbilityManager
             return GhostToggleResult.Ended;
         }
 
-        // 起動を試みる
-        if (_context.Ghost.TryBegin())
+        if (_ghost.TryBegin())
         {
             _context.IsGhostMode = true;
-            // ジャスト回避ウィンドウをセット
             _context.SetJustAvoidWindow(true);
-            _justAvoidRemaining = _context.StateConfig?.JustAvoidTime ?? 0f;
+            _justAvoidRemaining = _stateConfig?.JustAvoidTime ?? 0f;
             return GhostToggleResult.Began;
         }
 
         return GhostToggleResult.Failed;
+    }
+
+    /// <summary>
+    /// SelfSacrifice のトグル（開始 / 終了）。開始は現在HP比で許可されるかを確認してから行う。
+    /// </summary>
+    public bool ToggleSelfSacrifice()
+    {
+        var s = _selfSacrifice;
+        if (s == null) return false;
+
+        if (s.IsActive)
+        {
+            s.End();
+            return false;
+        }
+
+        float currentHpRatio = _playerResource != null ? _playerResource.CurrentHpRatio : 1f;
+        if (s.CanBegin(currentHpRatio))
+        {
+            s.Begin();
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Heal のトグル（開始 / 終了）。開始時はデフォルトの回復速度を使用します。
+    /// </summary>
+    public bool ToggleHeal()
+    {
+        var h = _healer;
+        if (h == null) return false;
+
+        if (h.IsHealing)
+        {
+            h.End();
+            return false;
+        }
+
+        // デフォルト回復速度（%/s）を PlayerHealState と合わせる
+        float defaultPercentPerSecond = 5f;
+        return h.TryBegin(defaultPercentPerSecond);
     }
 }
 

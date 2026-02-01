@@ -26,10 +26,10 @@ public sealed class PlayerStateContext : IDisposable
         Attacker = attacker;
         AnimationEvents = animationEvents;
         // 段階移行用 AbilityManager を Context 側で持たせる（常に利用可能にする）
-        AbilityManager = new AbilityManager(this);
+        AbilityManager = new global::AbilityManager(this, Ghost, SelfSacrifice, Healer, PlayerResource, StateConfig);
     }
 
-    /// <summary>段階移行で導入した AbilityManager（まずは Ghost を管理）。</summary>
+    /// <summary>段階移行で導入した AbilityManager（まずは Ghost/SelfSacrifice を管理）。</summary>
     public AbilityManager AbilityManager { get; }
 
     /// <summary>プレイヤー本体のコントローラー。</summary>
