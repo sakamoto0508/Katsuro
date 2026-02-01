@@ -24,10 +24,8 @@ public sealed class PlayerGhost : AbilityBase
         if (_skillGauge.TryConsume(activation))
         {
             SetActive(true);
-            Debug.Log($"PlayerGhost: TryBegin succeeded, activation cost={activation}");
             return true;
         }
-        Debug.Log($"PlayerGhost: TryBegin failed, need={activation}, have={_skillGauge.Value}");
         return false;
     }
 
@@ -49,12 +47,10 @@ public sealed class PlayerGhost : AbilityBase
         if (_skillGauge.TryConsume(cost))
         {
             PublishConsumed(cost); // 通知: 消費したゲージ量
-            Debug.Log($"PlayerGhost: Tick consumed {cost} (remaining {_skillGauge.Value})");
             return;
         }
 
         // 枯渇により自動終了
-        Debug.Log("PlayerGhost: Tick failed to consume, ending ghost");
         SetActive(false);
     }
 }

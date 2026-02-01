@@ -89,9 +89,6 @@ public sealed class PlayerStateMachine : IDisposable
     /// <summary>MonoBehaviour.Update 相当の処理を現在ステートへ委譲する。</summary>
     public void Update(float deltaTime)
     {
-        // Debug: show current state and tick
-        // Note: keep lightweight in release
-        // Debug.Log($"PlayerStateMachine.Update: current={_currentState?.Id}, dt={deltaTime}");
         Context?.Sprint?.Tick(deltaTime);
         Context?.Ghost?.Tick(deltaTime);
         Context?.SelfSacrifice?.Tick(deltaTime);
