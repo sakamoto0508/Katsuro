@@ -21,6 +21,7 @@ public class PlayerMover
     private Vector3 _moveDirection;
     private Vector3 _lookDirection;
     private Vector3 _lockOnDirection;
+    private Vector3 _velXZ;
     private bool _isLockOn;
     private bool _isSprinting;
 
@@ -56,6 +57,20 @@ public class PlayerMover
         _lockOnDirection = lockOnDirection.sqrMagnitude > 0.001f
             ? lockOnDirection.normalized
             : Vector3.zero;
+    }
+
+    public void MoveStop()
+    {
+        _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+        if (_velXZ.sqrMagnitude > 0.01f)
+        {
+            Vector3 brakeForce = -_velXZ.normalized * _playerStatus.BreakForce;
+            _rb.AddForce(brakeForce, ForceMode.Acceleration);
+        }
+        else
+        {
+            _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
+        }
     }
 
     private float ReturnVelocity()
@@ -138,28 +153,19 @@ public class PlayerMover
 
     private void SpeedControll()
     {
-        Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+        _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         float maxSpeed = ResolveTargetSpeed();
 
         // 速度上限を超えていたら水平方向のみ制限。
-        if (velXZ.magnitude >= maxSpeed)
+        if (_velXZ.magnitude >= maxSpeed)
         {
-            Vector3 limited = velXZ.normalized * maxSpeed;
+            Vector3 limited = _velXZ.normalized * maxSpeed;
             _rb.linearVelocity = new Vector3(limited.x, _rb.linearVelocity.y, limited.z);
         }
-
         // 入力が無いときは減速力を与えるか完全停止させる。
         if (_currentInput.sqrMagnitude < 0.01f)
         {
-            if (velXZ.sqrMagnitude > 0.01f)
-            {
-                Vector3 brakeForce = -velXZ.normalized * _playerStatus.BreakForce;
-                _rb.AddForce(brakeForce, ForceMode.Acceleration);
-            }
-            else
-            {
-                _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
-            }
+            MoveStop();
         }
     }
 

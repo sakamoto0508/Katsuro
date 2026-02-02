@@ -57,13 +57,13 @@ public class PlayerController : MonoBehaviour
         var playerWeapon = new PlayerWeapon(_weaponColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
+        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
         var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig);
         var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig);
-        var playerHeal = new PlayerHeal(skillGauge, skillGaugeCostConfig);
+        var playerHeal = new PlayerHeal(skillGauge, playerMover, skillGaugeCostConfig);
         var playerBuff = new PlayerSelfSacrifice(skillGauge, skillGaugeCostConfig);
-        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
         var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon
-            , _playerStatus, _passiveBuffSet, transform,_playerResource);
+            , _playerStatus, _passiveBuffSet, transform, _playerResource);
         _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, _playerResource, skillGauge, _playerStatus, playerMover, playerSprint,
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);

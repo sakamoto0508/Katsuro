@@ -23,7 +23,7 @@ MonoBehaviour:
   _lockOnSprintSpeed: 8
   _rotationSmoothness: 0.25
   _acceleration: 5
-  _breakForce: 4
+  _breakForce: 6
   _maxSkillGauge: 100
   _skillGaugeLockoutThresholdNormalized: 0.25
   _skillGaugePassiveRecoveryPerSecond: 10
@@ -40,4 +40,4 @@ MonoBehaviour:
     _healGaugePerPercent: 2
     _buffGaugePerSecond: 8
   _lowHpBuffTable: {fileID: 11400000, guid: 1ca2d78ba7a0b8249b3fbc3b7a41df6a, type: 2}
-  _justAvoidBuffConfig: {fileID: 0}
+  _justAvoidBuffConfig: {fileID: 11400000, guid: b26e957d5c09a4a48a603951d6205f0f, type: 2}
