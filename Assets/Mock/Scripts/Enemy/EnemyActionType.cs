@@ -1,16 +1,13 @@
-using UnityEngine;
-
-public class EnemyActionType : MonoBehaviour
+public enum EnemyActionType
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    //移動系
+    Approach,
+    StepBack,
+    //攻撃系
+    Slash,
+    HeavySlash,
+    Thrust,
+    WarpAttack,
+    //様子見
+    Wait,
 }
