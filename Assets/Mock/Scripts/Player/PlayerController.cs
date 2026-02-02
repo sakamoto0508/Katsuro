@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
+
+    [Header("Tags")]
     [SerializeField] private string _enemyWeaponTag = "EnemyWeapon";
 
     // デバッグ用：入力を通して攻撃が可能かを制御。
@@ -359,25 +361,6 @@ public class PlayerController : MonoBehaviour
         if (!attacker.IsSwordReady && !attacker.IsDrawingSword)
         {
             attacker.DrawSword();
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // 敵武器（isTrigger = true、attack 時に enabled = true）に接触した場合の受け口
-        if (other.CompareTag(_enemyWeaponTag))
-        {
-            var enemyWeapon = other.GetComponent<EnemyWeapon>();
-            if (enemyWeapon == null) return;
-
-            // ヒット情報を組み立てて統一エントリへ渡す（ApplyDamage 内でジャスト回避 / ゴースト判定をする）
-            Vector3 origin = transform.position;
-            Vector3 hitPoint = other.ClosestPoint(origin);
-            Vector3 hitNormal = (hitPoint - origin).sqrMagnitude > 0.0001f ? (hitPoint - origin).normalized : Vector3.forward;
-
-            float damage = enemyWeapon.Damage();
-            var info = new DamageInfo(damage, hitPoint, hitNormal, enemyWeapon.gameObject, other);
-            ApplyDamage(info);
         }
     }
 

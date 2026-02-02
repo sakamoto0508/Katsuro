@@ -1,42 +1,140 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 敵の武器コンポーネント：Collider を isTrigger=true に固定し、
-/// 攻撃時のみ有効化（enabled=true）／終了時に無効化する API を提供します。
+/// 非 MonoBehaviour の EnemyWeapon ラッパー（PlayerWeapon に合わせた API）
 /// </summary>
-[RequireComponent(typeof(Collider))]
-public class EnemyWeapon : MonoBehaviour
+public sealed class EnemyWeapon
 {
-    [SerializeField] private EnemyStuts _enemyStuts;
-    private Collider _collider;
-
-    /// <summary>攻撃開始：ヒット判定を有効にする。</summary>
-    public void StartAttack()
+    public EnemyWeapon(Collider[] weaponColliders, float fallbackPower)
     {
-        if (_collider != null)
-            _collider.enabled = true;
+        _weaponColliders = weaponColliders;
+        _fallbackPower = fallbackPower;
+        SetHitboxActive(false);
     }
 
-    /// <summary>攻撃終了：ヒット判定を無効にする。</summary>
-    public void EndAttack()
+    private readonly Collider[] _weaponColliders;
+    // ステータス参照を使わず、フォールバックの攻撃力を保持する（型依存を避けるため）
+    private readonly float _fallbackPower;
+    private readonly Dictionary<Collider, Component> _relayCache = new Dictionary<Collider, Component>();
+    private float _currentAttackDamage = 0f;
+
+    /// <summary>
+    /// 一時的に設定される攻撃ダメージ。0 以下ならステータス由来のダメージを返す。
+    /// </summary>
+    public float CurrentAttackDamage
     {
-        if (_collider != null)
-            _collider.enabled = false;
+        get => _currentAttackDamage;
+        set => _currentAttackDamage = value;
+    }
+
+    /// <summary>ヒットボックスを有効化する。</summary>
+    public void EnableHitbox() => SetHitboxActive(true);
+
+    /// <summary>ヒットボックスを無効化する。</summary>
+    public void DisableHitbox() => SetHitboxActive(false);
+
+    /// <summary>武器がヒットした際の通知先を登録する。</summary>
+    public void RegisterHitObserver(Action<Collider> handler)
+    {
+        if (handler == null)
+        {
+            return;
+        }
+
+        foreach (var relay in EnumerateRelays())
+        {
+            // reflection で Subscribe を呼ぶ（WeaponHitboxRelay 型に直接依存しない）
+            var method = relay.GetType().GetMethod("Subscribe");
+            method?.Invoke(relay, new object[] { handler });
+        }
+    }
+
+    /// <summary>ヒット通知の購読を解除する。</summary>
+    public void UnregisterHitObserver(Action<Collider> handler)
+    {
+        if (handler == null)
+        {
+            return;
+        }
+
+        foreach (var relay in EnumerateRelays())
+        {
+            var method = relay.GetType().GetMethod("Unsubscribe");
+            method?.Invoke(relay, new object[] { handler });
+        }
+    }
+
+    private IEnumerable<Component> EnumerateRelays()
+    {
+        if (_weaponColliders == null)
+        {
+            yield break;
+        }
+
+        // WeaponHitboxRelay 型は Player 側に定義されているため、リフレクションで取得する
+        Type relayType = null;
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            relayType = asm.GetType("WeaponHitboxRelay");
+            if (relayType != null) break;
+        }
+
+        foreach (var weaponCollider in _weaponColliders)
+        {
+            if (weaponCollider == null)
+            {
+                continue;
+            }
+
+            weaponCollider.isTrigger = true;
+
+            if (!_relayCache.TryGetValue(weaponCollider, out var relay) || relay == null)
+            {
+                if (relayType != null)
+                {
+                    relay = weaponCollider.GetComponent(relayType) as Component;
+                    if (relay == null)
+                    {
+                        relay = weaponCollider.gameObject.AddComponent(relayType) as Component;
+                    }
+                }
+                _relayCache[weaponCollider] = relay;
+            }
+
+            if (relay != null) yield return relay;
+        }
+    }
+
+    private void SetHitboxActive(bool isActive)
+    {
+        if (_weaponColliders == null)
+        {
+            return;
+        }
+
+        foreach (var weaponCollider in _weaponColliders)
+        {
+            if (weaponCollider == null)
+            {
+                continue;
+            }
+
+            weaponCollider.enabled = isActive;
+        }
+
+        if (!isActive)
+        {
+            // 無効化時に一時ダメージはリセット
+            _currentAttackDamage = 0f;
+        }
     }
 
     /// <summary>この武器のダメージ量（ステータス参照）。</summary>
     public float Damage()
     {
-        return _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
-    }
-
-    private void Awake()
-    {
-        _collider = GetComponent<Collider>();
-        if (_collider != null)
-        {
-            _collider.isTrigger = true; // 常にトリガーとして扱う
-            _collider.enabled = false;  // 通常は無効（攻撃時に有効化）
-        }
+        if (_currentAttackDamage > 0f) return _currentAttackDamage;
+        return _fallbackPower;
     }
 }
