@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 063ba30cebeb8c945bc90e85283edfe5, type: 3}
-  m_Name: EnemyAttackData
+  m_Name: EnemyAttackData 1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackData
   _actionType: 0
   _animatorTrigger: LightAttack
-  _variant: 1
+  _variant: 2
   _damage: 0
   _range: 0
   _hitboxIndex: 0

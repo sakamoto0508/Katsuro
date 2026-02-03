@@ -8,14 +8,13 @@ using UnityEngine;
 public class EnemyAttacker : IDisposable
 {
     public EnemyAttacker(Animator animator, EnemyAttackData[] attackData
-        , EnemyWeapon[] weapons, EnemyStuts status, Transform owner,AnimationName animName)
+        , EnemyWeapon[] weapons, EnemyStuts status, Transform owner)
     {
         _animator = animator;
         _attackData = attackData;
         _weapons = weapons;
         _status = status;
         _ownerTransform = owner;
-        _animName = animName;
 
         // 各武器のリレーを購読してヒット通知を受ける
         if (_weapons != null)
@@ -33,7 +32,6 @@ public class EnemyAttacker : IDisposable
     private EnemyAttackData[] _attackData;
     private Animator _animator;
     private EnemyWeapon[] _weapons;
-    private AnimationName _animName;
     private HashSet<int> _hitTargets = new();
     private bool _isHitboxActive;
     private readonly Transform _ownerTransform;
@@ -43,6 +41,7 @@ public class EnemyAttacker : IDisposable
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
     public void PerformAttack(EnemyActionType attackType)
     {
+        Debug.Log($"EnemyAttacker: PerformAttack {attackType}");
         var data = FindData(attackType);
         if (data == null)
         {
@@ -50,21 +49,21 @@ public class EnemyAttacker : IDisposable
             return;
         }
 
-        // Animator のバリアント（例: コンボ段数）をセットしてからトリガーを発火する
+
         if (_animator != null)
         {
-            _animator.SetInteger(_animName.AttackNumber, data.variant);
-
-            if (!string.IsNullOrEmpty(data.animatorTrigger))
+            _animator.SetInteger(data.AnimatorTrigger, data.Variant);
+            Debug.Log(data.AnimatorTrigger + (" ") + data.Variant);
+            if (!string.IsNullOrEmpty(data.AnimatorTrigger))
             {
-                _animator.SetTrigger(data.animatorTrigger);
+                _animator.SetTrigger(data.AnimatorTrigger);
             }
         }
 
         // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
-        if (_weapons != null && data.hitboxIndex >= 0 && data.hitboxIndex < _weapons.Length)
+        if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
         {
-            _weapons[data.hitboxIndex].CurrentAttackDamage = data.damage;
+            _weapons[data.HitboxIndex].CurrentAttackDamage = data.Damage;
         }
     }
 
@@ -73,7 +72,7 @@ public class EnemyAttacker : IDisposable
         if (_attackData == null) return null;
         foreach (var d in _attackData)
         {
-            if (d != null && d.actionType == action) return d;
+            if (d != null && d.ActionType == action) return d;
         }
         return null;
     }

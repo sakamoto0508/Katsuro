@@ -22,9 +22,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
     [SerializeField] private float _stepBackDistance = 2f;
 
-    [Header("Animation")]
-    [SerializeField] private AnimationName _animName;
-
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
     private EnemyMover _mover;
@@ -36,6 +33,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void Init(Transform playerPosition)
     {
+        Debug.Log("EnemyController.Init");
         var navMeshAgent = GetComponent<NavMeshAgent>();
         var rb = GetComponent<Rigidbody>();
         var animController = GetComponent<EnemyAnimationController>();
@@ -44,7 +42,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
-        _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform, _animName);
+        _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
     }
 
     /// <summary>
@@ -52,6 +50,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void EnqueueAction(EnemyActionType action)
     {
+        Debug.Log($"Enqueue {action}");
         _pendingAction = action;
     }
 
@@ -105,6 +104,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_pendingAction != null)
         {
             var action = _pendingAction.Value;
+            Debug.Log($"Execute pending {action}");
             _pendingAction = null;
             switch (action)
             {
@@ -160,6 +160,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
         var data = _attackData[attackIndex];
         if (data == null) return;
-        _attacker?.PerformAttack(data.actionType);
+        _attacker?.PerformAttack(data.ActionType);
     }
 }
