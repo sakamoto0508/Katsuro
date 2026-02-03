@@ -71,4 +71,38 @@ public class EnemyController : MonoBehaviour, IDamageable
         _attacker?.Dispose();
         _health?.Dispose();
     }
+
+    // ---------- Animation Events (Enemy) ----------
+    /// <summary>
+    /// アニメーションイベント用: ヒットボックスを有効化する（攻撃有効フレームで呼ぶ）。
+    /// </summary>
+    public void AnimEvent_EnableWeaponHitbox()
+    {
+        _attacker?.EnableWeaponHitbox();
+    }
+
+    /// <summary>
+    /// アニメーションイベント用: ヒットボックスを無効化する（攻撃終了フレームで呼ぶ）。
+    /// </summary>
+    public void AnimEvent_DisableWeaponHitbox()
+    {
+        _attacker?.DisableWeaponHitbox();
+    }
+
+    /// <summary>
+    /// アニメーションイベント用: アニメから攻撃種別を指定して PerformAttack を呼ぶ（optional）。
+    /// アニメ上で攻撃トリガーを開始したい場合に使用します。
+    /// </summary>
+    /// <param name="attackIndex">_attackData の配列インデックス</param>
+    public void AnimEvent_PerformAttack(int attackIndex)
+    {
+        if (_attackData == null || attackIndex < 0 || attackIndex >= _attackData.Length)
+        {
+            Debug.LogWarning("AnimEvent_PerformAttack: invalid attackIndex");
+            return;
+        }
+        var data = _attackData[attackIndex];
+        if (data == null) return;
+        _attacker?.PerformAttack(data.actionType);
+    }
 }
