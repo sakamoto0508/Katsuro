@@ -17,15 +17,18 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Attack")]
     [SerializeField] private Animator _animator;
     [SerializeField] private EnemyAttackData[] _attackData;
+
     [Header("AI")]
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
     [SerializeField] private float _stepBackDistance = 2f;
+
+    [Header("Animation")]
+    [SerializeField] private AnimationName _animName;
 
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
     private EnemyMover _mover;
     private EnemyAI _ai;
-    // pending action set by AI; executed in Update()
     private EnemyActionType? _pendingAction;
 
     /// <summary>
@@ -34,14 +37,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void Init(Transform playerPosition)
     {
         var navMeshAgent = GetComponent<NavMeshAgent>();
+        var rb = GetComponent<Rigidbody>();
+        var animController = GetComponent<EnemyAnimationController>();
         //クラスの初期化
-        _mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition);
+        _mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition, animController, rb);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
-        _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
-
-        
+        _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform, _animName);
     }
 
     /// <summary>

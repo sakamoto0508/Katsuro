@@ -7,13 +7,15 @@ using UnityEngine;
 /// </summary>
 public class EnemyAttacker : IDisposable
 {
-    public EnemyAttacker(Animator animator, EnemyAttackData[] attackData, EnemyWeapon[] weapons, EnemyStuts status, Transform owner)
+    public EnemyAttacker(Animator animator, EnemyAttackData[] attackData
+        , EnemyWeapon[] weapons, EnemyStuts status, Transform owner,AnimationName animName)
     {
         _animator = animator;
         _attackData = attackData;
         _weapons = weapons;
         _status = status;
         _ownerTransform = owner;
+        _animName = animName;
 
         // 各武器のリレーを購読してヒット通知を受ける
         if (_weapons != null)
@@ -28,21 +30,14 @@ public class EnemyAttacker : IDisposable
         }
     }
 
-    [Header("Attack Data")]
-    [SerializeField] private EnemyAttackData[] _attackData;
-
-    [Header("References")]
-    [SerializeField] private Animator _animator;
-    [SerializeField] private EnemyWeapon[] _weapons;
-
+    private EnemyAttackData[] _attackData;
+    private Animator _animator;
+    private EnemyWeapon[] _weapons;
+    private AnimationName _animName;
+    private HashSet<int> _hitTargets = new();
+    private bool _isHitboxActive;
     private readonly Transform _ownerTransform;
     private readonly EnemyStuts _status;
-
-    // ヒット管理
-    private bool _isHitboxActive;
-    private HashSet<int> _hitTargets = new();
-
-    // 登録したハンドラを保持して解除できるようにする
     private readonly Dictionary<EnemyWeapon, Action<Collider>> _handlerMap = new();
 
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
@@ -55,10 +50,15 @@ public class EnemyAttacker : IDisposable
             return;
         }
 
-        // Animator トリガー
-        if (_animator != null && !string.IsNullOrEmpty(data.animatorTrigger))
+        // Animator のバリアント（例: コンボ段数）をセットしてからトリガーを発火する
+        if (_animator != null)
         {
-            _animator.SetTrigger(data.animatorTrigger);
+            _animator.SetInteger(_animName.AttackNumber, data.variant);
+
+            if (!string.IsNullOrEmpty(data.animatorTrigger))
+            {
+                _animator.SetTrigger(data.animatorTrigger);
+            }
         }
 
         // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
