@@ -20,4 +20,16 @@ public class EnemyStuts : ScriptableObject
     [SerializeField] private float _chaseStartDistance = 10f;   // 追跡開始距離
     [SerializeField] private float _stopDistance = 2.0f;        // 攻撃想定距離
     [SerializeField] private float _destinationUpdateInterval = 0.2f;
+
+    [Header("Decision Weights")]
+    [SerializeField] public float FarDistance = 12f;
+    [SerializeField] public float NearDistance = 3f;
+    [SerializeField] public float ObserveSeconds = 1.5f;
+
+    [SerializeField] public float WeightWarpBehind = 10f;
+    [SerializeField] public float WeightApproach = 30f;
+    [SerializeField] public float WeightRush = 30f;
+    [SerializeField] public float WeightObserve = 20f;
+    [SerializeField] public float WeightMelee = 50f;
+    [SerializeField] public float WeightBackstep = 20f;
 }

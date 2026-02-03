@@ -23,15 +23,23 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// <summary>
     /// 初期化処理：必要なランタイムコンポーネントを生成して接続します。
     /// </summary>
-    public void Init()
+    public void Init(Transform playerPosition)
     {
-        var rb = GetComponent<Rigidbody>();
+        _plaeyrPosition = playerPosition;
+        var navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         //クラスの初期化
-        var mover = new EnemyMover(rb, _enemyStuts);
+        var mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
         _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+
+        // EnemyAIController を接続して初期化
+        var ai = GetComponent<EnemyAIController>();
+        if (ai != null)
+        {
+            ai.Init(playerPosition, navMeshAgent, null);
+        }
     }
 
     /// <summary>
