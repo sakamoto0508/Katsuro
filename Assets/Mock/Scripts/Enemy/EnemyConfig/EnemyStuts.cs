@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "EnemyStuts", menuName = "ScriptableObjects/Enemy/EnemyStuts", order = 1)]
 public class EnemyStuts : ScriptableObject
 {
     /// <summary> エネミーの基礎攻撃力 /// </summary>

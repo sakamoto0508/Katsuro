@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
             , _cinemachineCamera, _cinemachineLockOncamera, _playerAnimationController,_animationName);
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
             , _cameraManager, _lockOnCamera);
+        _enemyController?.Init(_playerPosition);
         _cameraManager?.Init(_inputBuffer, _playerPosition
             , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineLockOncamera);
     }

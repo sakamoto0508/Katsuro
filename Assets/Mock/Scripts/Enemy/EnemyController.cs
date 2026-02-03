@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyController : MonoBehaviour, IDamageable
@@ -16,30 +17,39 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Attack")]
     [SerializeField] private Animator _animator;
     [SerializeField] private EnemyAttackData[] _attackData;
+    [Header("AI")]
+    [SerializeField] private EnemyDecisionConfig _decisionConfig;
+    [SerializeField] private float _stepBackDistance = 2f;
 
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
+    private EnemyMover _mover;
+    private EnemyAI _ai;
+    // pending action set by AI; executed in Update()
+    private EnemyActionType? _pendingAction;
 
     /// <summary>
     /// 初期化処理：必要なランタイムコンポーネントを生成して接続します。
     /// </summary>
     public void Init(Transform playerPosition)
     {
-        _plaeyrPosition = playerPosition;
-        var navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        var navMeshAgent = GetComponent<NavMeshAgent>();
         //クラスの初期化
-        var mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition);
+        _mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
         _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
 
-        // EnemyAIController を接続して初期化
-        var ai = GetComponent<EnemyAIController>();
-        if (ai != null)
-        {
-            ai.Init(playerPosition, navMeshAgent, null);
-        }
+        
+    }
+
+    /// <summary>
+    /// Called by AI to enqueue an action to be executed on the next Update.
+    /// </summary>
+    public void EnqueueAction(EnemyActionType action)
+    {
+        _pendingAction = action;
     }
 
     /// <summary>
@@ -78,6 +88,42 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         _attacker?.Dispose();
         _health?.Dispose();
+    }
+
+    private void Update()
+    {
+        // AI の Tick を先に呼び、意思決定を行わせる
+        _ai?.Tick(Time.deltaTime);
+
+        // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
+        _mover?.Update();
+
+        // AI が設定したペンディングの行動を実行する（ここで実際の制御を呼び出す）
+        if (_pendingAction != null)
+        {
+            var action = _pendingAction.Value;
+            _pendingAction = null;
+            switch (action)
+            {
+                case EnemyActionType.Approach:
+                    _mover?.Approach();
+                    break;
+                case EnemyActionType.Slash:
+                case EnemyActionType.Thrust:
+                case EnemyActionType.HeavySlash:
+                case EnemyActionType.WarpAttack:
+                    // 攻撃は EnemyAttacker 経由で実行（Animator のトリガなどはそこが担当）
+                    _attacker?.PerformAttack(action);
+                    break;
+                case EnemyActionType.StepBack:
+                    _mover?.StepBack(_stepBackDistance);
+                    break;
+                case EnemyActionType.Wait:
+                    // Observe 相当: 停止して何もしない（AI のタイマーで再抽選される）
+                    _mover?.StopMove();
+                    break;
+            }
+        }
     }
 
     // ---------- Animation Events (Enemy) ----------
