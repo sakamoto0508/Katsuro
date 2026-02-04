@@ -17,9 +17,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStateConfig _playerStateConfig;
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
 
-    [Header("Tags")]
-    [SerializeField] private string _enemyWeaponTag = "EnemyWeapon";
-
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
     // MVP HUD

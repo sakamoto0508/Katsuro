@@ -41,7 +41,6 @@ public class EnemyAttacker : IDisposable
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
     public void PerformAttack(EnemyActionType attackType)
     {
-        Debug.Log($"EnemyAttacker: PerformAttack {attackType}"); // This line is unchanged
         var data = FindData(attackType);
         if (data == null)
         {

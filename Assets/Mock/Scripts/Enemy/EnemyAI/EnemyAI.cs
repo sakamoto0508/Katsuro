@@ -75,6 +75,7 @@ public class EnemyAI
     /// </summary>
     public void OnAttackFinished()
     {
+        Debug.Log("EnemyAI: OnAttackFinished called - clearing busy flag and re-triggering decision");
         _isBusy = false;
         TriggerDecision();
     }
@@ -85,8 +86,16 @@ public class EnemyAI
     private void TriggerDecision()
     {
         // 行動中、またはプレイヤー不在なら何もしない
-        if (_isBusy || _player == null)
+        if (_isBusy)
+        {
+            Debug.Log("EnemyAI: TriggerDecision skipped - isBusy=true");
             return;
+        }
+        if (_player == null)
+        {
+            Debug.Log("EnemyAI: TriggerDecision skipped - player == null");
+            return;
+        }
 
         // プレイヤーとの距離を計算
         float distance = Vector3.Distance(
@@ -110,7 +119,6 @@ public class EnemyAI
     /// </summary>
     private void ExecuteAction(EnemyActionType action)
     {
-        Debug.Log($"AI execute {action}");
         switch (action)
         {
             case EnemyActionType.WarpAttack:

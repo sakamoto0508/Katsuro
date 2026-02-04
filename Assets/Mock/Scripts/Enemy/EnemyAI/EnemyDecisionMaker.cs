@@ -21,13 +21,38 @@ public sealed class EnemyDecisionMaker
     {
         if (config == null) return EnemyActionType.Wait;
 
+        // 小さな改善: 直前と同じ行動が連続して選ばれにくくするため、重みにペナルティを与える
+        const float repeatPenalty = 0.25f; // 直前と同じ行動は 25% に減らす
+
         if (distance > config.FarDistance)
         {
-            return Sample(new[] { (EnemyActionType.WarpAttack, config.WeightWarpAttack), (EnemyActionType.Approach, config.WeightApproach) });
+            var candidates = new (EnemyActionType action, float weight)[]
+            {
+                (EnemyActionType.WarpAttack, config.WeightWarpAttack),
+                (EnemyActionType.Approach, config.WeightApproach)
+            };
+
+            // 直前と同じ行動は候補から除外して連続選択を防ぐ（重みを 0 にする）
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                if (candidates[i].action == lastAction) candidates[i] = (candidates[i].action, 0f);
+            }
+            return Sample(candidates);
         }
         else if (distance > config.NearDistance)
         {
-            return Sample(new[] { (EnemyActionType.Thrust, config.WeightRush), (EnemyActionType.Approach, config.WeightApproach), (EnemyActionType.Wait, config.WeightObserve) });
+            var candidates = new (EnemyActionType action, float weight)[]
+            {
+                (EnemyActionType.Thrust, config.WeightRush),
+                (EnemyActionType.Approach, config.WeightApproach),
+                (EnemyActionType.Wait, config.WeightObserve)
+            };
+
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                if (candidates[i].action == lastAction) candidates[i] = (candidates[i].action, 0f);
+            }
+            return Sample(candidates);
         }
         else
         {

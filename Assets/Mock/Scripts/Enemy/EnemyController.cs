@@ -7,9 +7,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("Enemy Status")]
     [SerializeField] private EnemyStuts _enemyStuts;
 
-    [Header("Tags")]
-    [SerializeField] private string _playerWeaponTag = "PlayerWeapon";
-
     [Header("Weapon")]
     [SerializeField] private Collider[] _enemyWeaponColliders;
     [SerializeField] private Collider[] _playerWeaponColliders;
@@ -50,7 +47,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void EnqueueAction(EnemyActionType action)
     {
-        Debug.Log($"Enqueue {action}");
         _pendingAction = action;
     }
 
@@ -104,7 +100,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_pendingAction != null)
         {
             var action = _pendingAction.Value;
-            Debug.Log($"Execute pending {action}");
             _pendingAction = null;
             switch (action)
             {
@@ -135,6 +130,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
+        Debug.Log("AnimEvent_EnableWeaponHitbox called");
         _attacker?.EnableWeaponHitbox();
     }
 
@@ -143,6 +139,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_DisableWeaponHitbox()
     {
+        Debug.Log("AnimEvent_DisableWeaponHitbox called");
         _attacker?.DisableWeaponHitbox();
     }
 
@@ -160,5 +157,28 @@ public class EnemyController : MonoBehaviour, IDamageable
         var data = _attackData[attackIndex];
         if (data == null) return;
         _attacker?.PerformAttack(data.ActionType);
+    }
+
+    /// <summary>
+    /// アニメーションイベント用: 攻撃アニメ終了を通知して AI の再抽選を可能にする。
+    /// アニメの終端にこのイベントを配置してください。
+    /// </summary>
+    public void AnimEvent_OnAttackFinished()
+    {
+        Debug.Log("AnimEvent_OnAttackFinished called");
+        if (_ai == null)
+        {
+            Debug.LogWarning("AnimEvent_OnAttackFinished: _ai is null — EnemyAI not initialized or was cleared");
+            return;
+        }
+        try
+        {
+            _ai.OnAttackFinished();
+            Debug.Log("AnimEvent_OnAttackFinished: OnAttackFinished invoked on AI");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"AnimEvent_OnAttackFinished: exception when calling OnAttackFinished: {ex}");
+        }
     }
 }

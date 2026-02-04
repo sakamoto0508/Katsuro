@@ -72,4 +72,22 @@ public class EnemyAnimationController : MonoBehaviour
         _moveVectorXHash = Animator.StringToHash(_animName.MoveVectorX);
         _moveVectorYHash = Animator.StringToHash(_animName.MoveVectorY);
     }
+
+    /// <summary>
+    /// アニメーションイベント受け口（Animator がアタッチされた GameObject 上でイベントを呼ぶ場合用）。
+    /// EnemyController の同名メソッドへ転送し、ログを出力します。
+    /// </summary>
+    public void AnimEvent_OnAttackFinished()
+    {
+        Debug.Log("EnemyAnimationController: AnimEvent_OnAttackFinished received, forwarding to EnemyController");
+        var enemy = GetComponentInParent<EnemyController>();
+        if (enemy != null)
+        {
+            enemy.AnimEvent_OnAttackFinished();
+        }
+        else
+        {
+            Debug.LogWarning("EnemyAnimationController: EnemyController not found in parents to forward AnimEvent_OnAttackFinished");
+        }
+    }
 }
