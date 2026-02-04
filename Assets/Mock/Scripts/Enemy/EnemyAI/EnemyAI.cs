@@ -42,6 +42,8 @@ public class EnemyAI
     private bool _isObserving;
     /// <summary>観察タイマ</summary>
     private float _observeTimer;
+    // 再評価タイマ: Chase 中に定期的に意思決定を再評価するため
+    private float _reconsiderTimer = 0f;
 
     /// <summary>
     /// 毎フレームの更新処理。AI の状態タイマや追従行動を処理します。
@@ -65,7 +67,19 @@ public class EnemyAI
 
         if (_state == EnemyState.Chase && _controller != null)
         {
+            // 毎フレームは移動コマンドを出す（追跡継続）
             _controller.EnqueueAction(EnemyActionType.Approach);
+
+            // 定期的に再評価して攻撃に遷移できるか確認する
+            _reconsiderTimer -= deltaTime;
+            if (_reconsiderTimer <= 0f)
+            {
+                _reconsiderTimer =  _config.ReconsiderInterval;
+                if (!_isBusy)
+                {
+                    TriggerDecision();
+                }
+            }
         }
     }
 

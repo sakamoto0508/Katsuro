@@ -33,6 +33,7 @@ public class EnemyMover
     private float _destinationUpdateTimer = 0f;
     private bool _usingRootMotionStepBack;
     private bool _isStepBack;
+    float _speed = 0f;
 
     public void Update()
     {
@@ -44,16 +45,16 @@ public class EnemyMover
         }
         // アニメ用の速度は NavMeshAgent の速度を優先して使う。
         // Rigidbody 側の速度を参照していると Transform/Warp 等の影響で値が不安定になるため。
-        float speed = 0f;
+        
         if (_agent != null)
         {
-            speed = _agent.velocity.magnitude;
+            _speed = _agent.velocity.magnitude;
         }
         else if (_rb != null)
         {
-            speed = _rb.linearVelocity.magnitude;
+            _speed = _rb.linearVelocity.magnitude;
         }
-        _animationController?.MoveVelocity(speed);
+        _animationController?.MoveVelocity(_speed);
         float distanceToPlayer =
             Vector3.Distance(_ownerTransform.position, _playerPosition.position);
 
@@ -77,6 +78,20 @@ public class EnemyMover
         {
             _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
             _agent.SetDestination(_playerPosition.position);
+        }
+
+        // 安定した到達判定: pathPending が false でかつ remainingDistance が stoppingDistance を下回ったら到達とみなす
+        if (_agent != null && _agent.hasPath && !_agent.pathPending)
+        {
+            float remaining = _agent.remainingDistance;
+            float stopDist = _agent.stoppingDistance;
+            if (remaining <= stopDist + 0.1f)
+            {
+                // 到達処理: 移動停止してパスをクリア
+                _agent.isStopped = true;
+                _agent.ResetPath();
+                _destinationUpdateTimer = 0f;
+            }
         }
     }
 

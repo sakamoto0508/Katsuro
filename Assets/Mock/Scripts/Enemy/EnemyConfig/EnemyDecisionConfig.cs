@@ -7,6 +7,7 @@ public class EnemyDecisionConfig : ScriptableObject
     public float FarDistance = 12f;
     public float NearDistance = 3f;
     public float ObserveSeconds = 1.5f;
+    public float ReconsiderInterval = 0.5f;
 
     [Header("Weights")]
     public float WeightWarpAttack = 10f;
