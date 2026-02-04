@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -36,7 +37,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         var animController = GetComponent<EnemyAnimationController>();
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, animController, rb
-            , navMeshAgent, _animator, _animName);
+            , navMeshAgent, _animator, _animName, this.GetCancellationTokenOnDestroy());
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
@@ -116,7 +117,7 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
-                    _mover?.StartStepBack();
+                    _mover?.StepBackSequence().Forget();
                     break;
                 case EnemyActionType.Wait:
                     // Observe 相当: 停止して何もしない（AI のタイマーで再抽選される）

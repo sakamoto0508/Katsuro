@@ -1,3 +1,6 @@
+using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,7 +8,7 @@ public class EnemyMover
 {
     public EnemyMover(EnemyStuts enemyStuts, Transform owner, Transform playerPosition
         , EnemyAnimationController animationController, Rigidbody rb, NavMeshAgent agent
-        , Animator animator, AnimationName animName)
+        , Animator animator, AnimationName animName, CancellationToken destroyToken)
     {
         _enemyStuts = enemyStuts;
         _ownerTransform = owner;
@@ -15,6 +18,7 @@ public class EnemyMover
         _agent = agent;
         _animator = animator;
         _animName = animName;
+        _destroyToken = destroyToken;
     }
 
     private EnemyStuts _enemyStuts;
@@ -25,12 +29,19 @@ public class EnemyMover
     private NavMeshAgent _agent;
     private Animator _animator;
     private AnimationName _animName;
+    private CancellationToken _destroyToken;
     private float _destinationUpdateTimer = 0f;
     private bool _usingRootMotionStepBack;
+    private bool _isStepBack;
 
     public void Update()
     {
         if (_playerPosition == null) return;
+        if (_isStepBack)
+        {
+            StopMove();
+            return;
+        }
         // アニメ用の速度は NavMeshAgent の速度を優先して使う。
         // Rigidbody 側の速度を参照していると Transform/Warp 等の影響で値が不安定になるため。
         float speed = 0f;
@@ -110,46 +121,95 @@ public class EnemyMover
             dir = -_ownerTransform.forward;
         }
         Vector3 target = _ownerTransform.position + dir.normalized * distance;
-        _agent.Warp(target);
+        // Warp caused unstable agent corrections when combined with root-motion.
+        // Instead, move the transform directly as a fallback and keep agent in sync via nextPosition.
+        _ownerTransform.position = target;
+        if (_agent != null)
+        {
+            _agent.nextPosition = target;
+            Debug.Log($"EnemyMover.StepBack: moved owner to {target}, agent.nextPosition set");
+        }
     }
 
     public void StartStepBack()
     {
         if (_animator == null || _agent == null) return;
-        Debug.Log("EnemyMover: StartStepBack");
-        _agent.updatePosition = false;      // Agent に位置更新させない
+        _agent.updatePosition = false;
         _agent.isStopped = true;
         _usingRootMotionStepBack = true;
-        // Disable rigidbody physics while applying root motion to avoid physics interfering with transform
-        if (_rb != null) _rb.isKinematic = true;
-        _animator.applyRootMotion = true;   // Animator が root motion を反映するようにする
-        _animator.SetTrigger(_animName.BackStep);   // アニメ再生
+        _animator.applyRootMotion = true;
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = true;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+
+        _animator.SetTrigger(_animName.BackStep);
+        _isStepBack = true;
     }
 
     public void EndStepBack()
     {
-        Debug.Log("EnemyMover: EndStepBack");
-        _animator.applyRootMotion = false;
         _usingRootMotionStepBack = false;
-        // restore rigidbody and sync agent to transform
-        if (_rb != null) _rb.isKinematic = false;
-        //_agent.Warp(_ownerTransform.position);
-        _agent.updatePosition = true;
-        _agent.isStopped = false;
+        if (_animator != null) _animator.applyRootMotion = false;
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = false;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+
+        if (_agent != null)
+        {
+            _agent.velocity = Vector3.zero;
+            _agent.updatePosition = true;
+            _agent.updateRotation = true;
+        }
+
+        _isStepBack = false;
     }
 
     public void OnAnimatorMove()
     {
         if (!_usingRootMotionStepBack) return;
         // Animator.deltaPosition/Rotation を transform に適用
-        var deltaPos = _animator.deltaPosition;
-        var deltaRot = _animator.deltaRotation;
-        _ownerTransform.position += deltaPos;
-        _ownerTransform.rotation *= deltaRot;
+        _ownerTransform.position += _animator.deltaPosition;
+        _ownerTransform.rotation *= _animator.deltaRotation;
         // NavMeshAgent と位置同期
         if (_agent != null)
         {
             _agent.nextPosition = _ownerTransform.position;
         }
+    }
+
+    /// <summary>
+    /// バックステップ終了時の現在の所有者位置を返します。
+    /// </summary>
+    public Vector3 GetOwnerPosition()
+    {
+        return _ownerTransform != null ? _ownerTransform.position : Vector3.zero;
+    }
+
+    public async UniTaskVoid StepBackSequence()
+    {
+        StartStepBack();
+
+        try
+        {
+            await UniTask.Delay(
+                300,
+                cancellationToken: _destroyToken
+            );
+        }
+        catch (OperationCanceledException)
+        {
+            // 破壊されたので何もしない
+            return;
+        }
+
+        EndStepBack();
     }
 }
