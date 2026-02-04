@@ -99,6 +99,8 @@ public class EnemyAI
             _lastAction,
             _config);
 
+        Debug.Log($"AI decide {action}");
+
         _lastAction = action;
         ExecuteAction(action);
     }
@@ -108,6 +110,7 @@ public class EnemyAI
     /// </summary>
     private void ExecuteAction(EnemyActionType action)
     {
+        Debug.Log($"AI execute {action}");
         switch (action)
         {
             case EnemyActionType.WarpAttack:

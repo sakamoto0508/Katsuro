@@ -15,7 +15,7 @@ MonoBehaviour:
   _enemyPower: 10
   _enemyMaxHealth: 100
   _chaseStartDistance: 10
-  _stopDistance: 2
+  _stopDistance: 1.6
   _destinationUpdateInterval: 0.2
   FarDistance: 12
   NearDistance: 3

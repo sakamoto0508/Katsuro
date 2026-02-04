@@ -5,7 +5,6 @@ public class EnemyAttackData : ScriptableObject
 {
     public EnemyActionType ActionType => _actionType;
     public string AnimatorTrigger => _animatorTrigger;
-    public int Variant => _variant;
     public float Damage => _damage;
     public float Range => _range;
     public int HitboxIndex => _hitboxIndex;
@@ -14,7 +13,6 @@ public class EnemyAttackData : ScriptableObject
 
     [SerializeField] private EnemyActionType _actionType;
     [SerializeField] private string _animatorTrigger;
-    [SerializeField] private int _variant;
     [SerializeField] private float _damage;
     [SerializeField] private float _range;
     [SerializeField] private int _hitboxIndex;

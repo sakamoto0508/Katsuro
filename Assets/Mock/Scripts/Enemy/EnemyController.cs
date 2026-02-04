@@ -33,7 +33,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void Init(Transform playerPosition)
     {
-        Debug.Log("EnemyController.Init");
         var navMeshAgent = GetComponent<NavMeshAgent>();
         var rb = GetComponent<Rigidbody>();
         var animController = GetComponent<EnemyAnimationController>();
@@ -42,7 +41,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
-        _attacker = new EnemyAttacker(_animator, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+        _attacker = new EnemyAttacker(animController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+        _ai = new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
     }
 
     /// <summary>
@@ -155,7 +155,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (_attackData == null || attackIndex < 0 || attackIndex >= _attackData.Length)
         {
-            Debug.LogWarning("AnimEvent_PerformAttack: invalid attackIndex");
             return;
         }
         var data = _attackData[attackIndex];

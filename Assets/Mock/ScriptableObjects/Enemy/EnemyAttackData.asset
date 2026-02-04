@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 063ba30cebeb8c945bc90e85283edfe5, type: 3}
   m_Name: EnemyAttackData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackData
-  _actionType: 0
+  _actionType: 2
   _animatorTrigger: LightAttack
-  _variant: 1
   _damage: 0
-  _range: 0
+  _range: 1.6
   _hitboxIndex: 0
   _hitboxEnableDelay: 0
   _hitboxDisableDelay: 0

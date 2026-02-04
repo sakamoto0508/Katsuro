@@ -2185,10 +2185,13 @@ MonoBehaviour:
   - {fileID: 265719850}
   - {fileID: 1460756911}
   _animator: {fileID: 1286366707}
-  _attackData: []
+  _attackData:
+  - {fileID: 11400000, guid: 4ca001fdc8b671941b6dda62d3dddcbf, type: 2}
+  - {fileID: 11400000, guid: c958f190ac9187f4c8e5be61256b8980, type: 2}
+  - {fileID: 11400000, guid: e46e2a1b9049f844f91a86e40bc32f09, type: 2}
+  - {fileID: 11400000, guid: e2802607a4a07bd4f96a53e5bca36b48, type: 2}
   _decisionConfig: {fileID: 11400000, guid: b61fd1409f926c347bdd63f1f5f324ee, type: 2}
   _stepBackDistance: 2
-  _animName: {fileID: 0}
 --- !u!195 &1286366704
 NavMeshAgent:
   m_ObjectHideFlags: 0

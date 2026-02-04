@@ -7,10 +7,10 @@ using UnityEngine;
 /// </summary>
 public class EnemyAttacker : IDisposable
 {
-    public EnemyAttacker(Animator animator, EnemyAttackData[] attackData
+    public EnemyAttacker(EnemyAnimationController aniController, EnemyAttackData[] attackData
         , EnemyWeapon[] weapons, EnemyStuts status, Transform owner)
     {
-        _animator = animator;
+        _animController = aniController;
         _attackData = attackData;
         _weapons = weapons;
         _status = status;
@@ -30,7 +30,7 @@ public class EnemyAttacker : IDisposable
     }
 
     private EnemyAttackData[] _attackData;
-    private Animator _animator;
+    private EnemyAnimationController _animController;
     private EnemyWeapon[] _weapons;
     private HashSet<int> _hitTargets = new();
     private bool _isHitboxActive;
@@ -41,7 +41,7 @@ public class EnemyAttacker : IDisposable
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
     public void PerformAttack(EnemyActionType attackType)
     {
-        Debug.Log($"EnemyAttacker: PerformAttack {attackType}");
+        Debug.Log($"EnemyAttacker: PerformAttack {attackType}"); // This line is unchanged
         var data = FindData(attackType);
         if (data == null)
         {
@@ -50,13 +50,13 @@ public class EnemyAttacker : IDisposable
         }
 
 
-        if (_animator != null)
+        if (_animController != null)
         {
-            _animator.SetInteger(data.AnimatorTrigger, data.Variant);
-            Debug.Log(data.AnimatorTrigger + (" ") + data.Variant);
+            // Animator トリガー名をそのまま使ってトリガーを発火する
+
             if (!string.IsNullOrEmpty(data.AnimatorTrigger))
             {
-                _animator.SetTrigger(data.AnimatorTrigger);
+                _animController.PlayTrigger(data.AnimatorTrigger);
             }
         }
 
