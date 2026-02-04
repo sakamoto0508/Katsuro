@@ -79,7 +79,6 @@ public class EnemyAnimationController : MonoBehaviour
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-        Debug.Log("EnemyAnimationController: AnimEvent_OnAttackFinished received, forwarding to EnemyController");
         var enemy = GetComponentInParent<EnemyController>();
         if (enemy != null)
         {

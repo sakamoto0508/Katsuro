@@ -117,7 +117,7 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
-                    _mover?.StepBackSequence().Forget();
+                    _mover?.StartStepBack();
                     break;
                 case EnemyActionType.Wait:
                     // Observe 相当: 停止して何もしない（AI のタイマーで再抽選される）
@@ -138,7 +138,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
-        Debug.Log("AnimEvent_EnableWeaponHitbox called");
         _attacker?.EnableWeaponHitbox();
     }
 
@@ -147,7 +146,6 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_DisableWeaponHitbox()
     {
-        Debug.Log("AnimEvent_DisableWeaponHitbox called");
         _attacker?.DisableWeaponHitbox();
     }
 
@@ -173,21 +171,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-        Debug.Log("AnimEvent_OnAttackFinished called");
-        if (_ai == null)
-        {
-            Debug.LogWarning("AnimEvent_OnAttackFinished: _ai is null — EnemyAI not initialized or was cleared");
-            return;
-        }
-        try
-        {
-            _ai.OnAttackFinished();
-            Debug.Log("AnimEvent_OnAttackFinished: OnAttackFinished invoked on AI");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"AnimEvent_OnAttackFinished: exception when calling OnAttackFinished: {ex}");
-        }
+       _ai.OnAttackFinished();
     }
 
     public void AnimEvent_OnStepBackFinished()

@@ -108,33 +108,11 @@ public class EnemyMover
         _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
     }
 
-    /// <summary>
-    /// クイックバック（テレポート的な後退）を行う。簡易実装は Warp を利用します。
-    /// </summary>
-    public void StepBack(float distance)
-    {
-        if (_agent == null || _playerPosition == null) return;
-        Vector3 dir = (_ownerTransform.position - _playerPosition.position);
-        dir.y = 0f;
-        if (dir.sqrMagnitude <= 0.001f)
-        {
-            dir = -_ownerTransform.forward;
-        }
-        Vector3 target = _ownerTransform.position + dir.normalized * distance;
-        // Warp caused unstable agent corrections when combined with root-motion.
-        // Instead, move the transform directly as a fallback and keep agent in sync via nextPosition.
-        _ownerTransform.position = target;
-        if (_agent != null)
-        {
-            _agent.nextPosition = target;
-            Debug.Log($"EnemyMover.StepBack: moved owner to {target}, agent.nextPosition set");
-        }
-    }
-
     public void StartStepBack()
     {
         if (_animator == null || _agent == null) return;
         _agent.updatePosition = false;
+        _agent.updateRotation = false;
         _agent.isStopped = true;
         _usingRootMotionStepBack = true;
         _animator.applyRootMotion = true;
@@ -164,11 +142,13 @@ public class EnemyMover
 
         if (_agent != null)
         {
+            _agent.Warp(_ownerTransform.position); // ★最重要
             _agent.velocity = Vector3.zero;
+            _agent.isStopped = false;
             _agent.updatePosition = true;
             _agent.updateRotation = true;
+            _agent.ResetPath();
         }
-
         _isStepBack = false;
     }
 
@@ -183,33 +163,5 @@ public class EnemyMover
         {
             _agent.nextPosition = _ownerTransform.position;
         }
-    }
-
-    /// <summary>
-    /// バックステップ終了時の現在の所有者位置を返します。
-    /// </summary>
-    public Vector3 GetOwnerPosition()
-    {
-        return _ownerTransform != null ? _ownerTransform.position : Vector3.zero;
-    }
-
-    public async UniTaskVoid StepBackSequence()
-    {
-        StartStepBack();
-
-        try
-        {
-            await UniTask.Delay(
-                300,
-                cancellationToken: _destroyToken
-            );
-        }
-        catch (OperationCanceledException)
-        {
-            // 破壊されたので何もしない
-            return;
-        }
-
-        EndStepBack();
     }
 }

@@ -6,6 +6,7 @@ public class AttackClipList
 {
     [SerializeField] private List<AnimationClip> _clips = new();
     [SerializeField] private List<float> _comboWindowDelaySeconds = new();
+    [SerializeField] private List<float> _clipFlatDamage = new();
 
     public IReadOnlyList<AnimationClip> Clips => _clips;
 
@@ -42,6 +43,18 @@ public class AttackClipList
         float value = _comboWindowDelaySeconds[index];
         return value >= 0f ? value : Mathf.Max(0f, fallbackSeconds);
     }
+
+    public float GetClipDamage(int index, float fallback = 0f)
+    {
+        if (_clipFlatDamage == null || _clipFlatDamage.Count == 0)
+        {
+            return Mathf.Max(0f, fallback);
+        }
+
+        index = Mathf.Clamp(index, 0, _clipFlatDamage.Count - 1);
+        float value = _clipFlatDamage[index];
+        return value; // allow negative/zero as configured
+    }
 }
 
 [CreateAssetMenu(fileName = "PlayerStateConfig", menuName = "ScriptableObjects/Player/PlayerStateConfig")]
@@ -64,6 +77,9 @@ public class PlayerStateConfig : ScriptableObject
     public float GetLightAttackDuration(bool isLockOn, int comboIndex = 0)
         => SelectLightAttackList(isLockOn).GetDuration(comboIndex, 0.8f);
 
+    public float GetLightAttackClipDamage(bool isLockOn, int comboIndex = 0)
+        => SelectLightAttackList(isLockOn).GetClipDamage(comboIndex, 0f);
+
     public float GetLightAttackComboWindowDelay(bool isLockOn, int comboIndex = 0)
         => SelectLightAttackList(isLockOn).GetComboWindowDelay(comboIndex, _defaultLightComboWindowDelay);
 
@@ -77,6 +93,8 @@ public class PlayerStateConfig : ScriptableObject
         => SelectLightAttackList(isLockOn).Clips;
 
     public float GetStrongAttackDuration(int comboIndex = 0) => _strongAttackClips.GetDuration(comboIndex, 1.0f);
+
+    public float GetStrongAttackClipDamage(int comboIndex = 0) => _strongAttackClips.GetClipDamage(comboIndex, 0f);
 
     public float GetStrongAttackComboWindowDelay(int comboIndex = 0)
         => _strongAttackClips.GetComboWindowDelay(comboIndex, _defaultStrongComboWindowDelay);

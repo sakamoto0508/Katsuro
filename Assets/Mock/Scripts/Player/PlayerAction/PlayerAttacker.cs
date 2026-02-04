@@ -39,6 +39,9 @@ public sealed class PlayerAttacker : IDisposable
     private readonly PlayerResource _playerResource;
     private PlayerPassiveBuffSet _passiveBuffSet;
     private PlayerStateContext _context;
+    private int _currentComboStep;
+    private bool _currentIsLockOnVariant;
+    private bool _currentIsStrongAttack;
     private bool _isSwordReady;
     private bool _isDrawingSword;
     private bool _isHitboxActive;
@@ -78,12 +81,29 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>ロックオン有無に応じたライト攻撃アニメを再生する。</summary>
     public void PlayLightAttack(int comboStep, bool isLockOnVariant)
     {
+        _currentIsStrongAttack = false;
+        _currentComboStep = comboStep;
+        _currentIsLockOnVariant = isLockOnVariant;
         ApplyLockOnFlag(isLockOnVariant);
         PlayAttackTrigger(_animName?.LightAttack, comboStep);
     }
 
     public void PlayStrongAttack() => PlayStrongAttack(0);
-    public void PlayStrongAttack(int comboStep) => PlayAttackTrigger(_animName?.StrongAttack, comboStep);
+    public void PlayStrongAttack(int comboStep)
+    {
+        _currentIsStrongAttack = true;
+        _currentComboStep = comboStep;
+        _currentIsLockOnVariant = false;
+        PlayAttackTrigger(_animName?.StrongAttack, comboStep);
+    }
+
+    public void PlayStrongAttackInternal(int comboStep)
+    {
+        _currentIsStrongAttack = true;
+        _currentComboStep = comboStep;
+        _currentIsLockOnVariant = false;
+        PlayAttackTrigger(_animName?.StrongAttack, comboStep);
+    }
 
     /// <summary>攻撃終了時にヒットボックスを確実にオフにする。</summary>
     public void EndAttack()
