@@ -6,6 +6,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 {
     [Header("Enemy Status")]
     [SerializeField] private EnemyStuts _enemyStuts;
+    [SerializeField] private AnimationName _animName;
 
     [Header("Weapon")]
     [SerializeField] private Collider[] _enemyWeaponColliders;
@@ -34,7 +35,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         var rb = GetComponent<Rigidbody>();
         var animController = GetComponent<EnemyAnimationController>();
         //クラスの初期化
-        _mover = new EnemyMover(_enemyStuts, navMeshAgent, playerPosition, animController, rb);
+        _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, animController, rb
+            , navMeshAgent, _animator, _animName);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
@@ -114,7 +116,7 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
-                    _mover?.StepBack(_stepBackDistance);
+                    _mover?.StartStepBack();
                     break;
                 case EnemyActionType.Wait:
                     // Observe 相当: 停止して何もしない（AI のタイマーで再抽選される）
@@ -122,6 +124,11 @@ public class EnemyController : MonoBehaviour, IDamageable
                     break;
             }
         }
+    }
+
+    private void OnAnimatorMove()
+    {
+        _mover?.OnAnimatorMove();
     }
 
     // ---------- Animation Events (Enemy) ----------
@@ -180,5 +187,11 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             Debug.LogError($"AnimEvent_OnAttackFinished: exception when calling OnAttackFinished: {ex}");
         }
+    }
+
+    public void AnimEvent_OnStepBackFinished()
+    {
+        _mover?.EndStepBack();
+        _ai?.OnAttackFinished(); // または専用の完了処理
     }
 }
