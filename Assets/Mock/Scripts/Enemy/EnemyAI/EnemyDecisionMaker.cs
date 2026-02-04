@@ -87,13 +87,13 @@ public sealed class EnemyDecisionMaker
         float total = 0f;
         foreach (var c in candidates) total += Math.Max(0f, c.weight);
         if (total <= 0f) return EnemyActionType.Wait;
-        double r = _rand.NextDouble() * total;
+        double r = _rand.NextDouble() * total; // Random value based on total weight
         double acc = 0;
         foreach (var c in candidates)
         {
             acc += Math.Max(0f, c.weight);
             if (r <= acc) return c.action;
         }
-        return candidates[candidates.Length - 1].action;
+        return candidates[candidates.Length - 1].action; // Return last candidate if no action selected
     }
 }

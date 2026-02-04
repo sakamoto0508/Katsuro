@@ -44,7 +44,6 @@ public class EnemyAttacker : IDisposable
         var data = FindData(attackType);
         if (data == null)
         {
-            Debug.LogWarning($"EnemyAttacker: no attack data for {attackType}");
             return;
         }
 
@@ -52,7 +51,6 @@ public class EnemyAttacker : IDisposable
         if (_animController != null)
         {
             // Animator トリガー名をそのまま使ってトリガーを発火する
-
             if (!string.IsNullOrEmpty(data.AnimatorTrigger))
             {
                 _animController.PlayTrigger(data.AnimatorTrigger);
@@ -69,11 +67,15 @@ public class EnemyAttacker : IDisposable
     private EnemyAttackData FindData(EnemyActionType action)
     {
         if (_attackData == null) return null;
+        var matches = new System.Collections.Generic.List<EnemyAttackData>();
         foreach (var d in _attackData)
         {
-            if (d != null && d.ActionType == action) return d;
+            if (d != null && d.ActionType == action) matches.Add(d);
         }
-        return null;
+        if (matches.Count == 0) return null;
+        // if multiple attack data entries exist for the same action type (variants), pick one at random
+        int idx = UnityEngine.Random.Range(0, matches.Count);
+        return matches[idx];
     }
 
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>

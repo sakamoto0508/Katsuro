@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PlayerStateConfig
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStateConfig
   _maxSkillGauge: 200
-  _dashGaugeCostPerSecond: 25
   _skillGaugeRecoveryPerSecond: 10
+  _justAvoidTime: 0.2
   _defaultLightComboWindowDelay: 0.05
   _defaultStrongComboWindowDelay: 0.1
   _lightAttackClips:
@@ -28,6 +28,11 @@ MonoBehaviour:
     - 0.12
     - 0.2
     - 0.2
+    _clipFlatDamage:
+    - 10
+    - 10
+    - 10
+    - 10
   _lockOnLightAttackClips:
     _clips:
     - {fileID: 7400000, guid: 698f11a879b74ff45a027cdbd52aef2d, type: 2}
@@ -41,6 +46,12 @@ MonoBehaviour:
     - 0.2
     - 0.2
     - 0.25
+    _clipFlatDamage:
+    - 10
+    - 10
+    - 10
+    - 10
+    - 10
   _strongAttackClips:
     _clips:
     - {fileID: 7400000, guid: f2b3aa49c017ca64e99a95884ba7ca5f, type: 2}
@@ -48,6 +59,10 @@ MonoBehaviour:
     _comboWindowDelaySeconds:
     - 0.3
     - 0.3
+    _clipFlatDamage:
+    - 50
+    - 50
   _justAvoidAttackClips:
     _clips: []
     _comboWindowDelaySeconds: []
+    _clipFlatDamage: []

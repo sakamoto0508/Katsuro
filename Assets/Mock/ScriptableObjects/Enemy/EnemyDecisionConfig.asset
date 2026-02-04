@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c8281621f51e584e805354391e86623, type: 3}
   m_Name: EnemyDecisionConfig
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDecisionConfig
-  FarDistance: 8
+  FarDistance: 12
   NearDistance: 3
   ObserveSeconds: 0.5
+  ReconsiderInterval: 0.5
   WeightWarpAttack: 0
-  WeightApproach: 1
-  WeightRush: 0.6
+  WeightApproach: 0.2
+  WeightRush: 0
   WeightObserve: 0.2
-  WeightSlash: 10
-  WeightBackstep: 0.3
+  WeightSlash: 0.5
+  WeightBackstep: 0.15

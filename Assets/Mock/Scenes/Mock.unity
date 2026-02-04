@@ -2171,7 +2171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   _enemyStuts: {fileID: 11400000, guid: 6b35578619d44d043838aaf2d11e6a1c, type: 2}
-  _playerWeaponTag: PlayerWeapon
+  _animName: {fileID: 11400000, guid: 644e59fbcdac44b4a9a4764d1fd92687, type: 2}
   _enemyWeaponColliders:
   - {fileID: 461421442}
   - {fileID: 1746167165}
