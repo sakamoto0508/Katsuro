@@ -3,6 +3,7 @@ public enum EnemyActionType
     //移動系
     Approach,
     StepBack,
+    WaitWalk,
     //攻撃系
     Slash,
     Slash2,

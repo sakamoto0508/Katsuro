@@ -14,11 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDecisionConfig
   FarDistance: 12
   NearDistance: 3
-  ObserveSeconds: 0.5
+  ObserveSeconds: 3
   ReconsiderInterval: 0.5
   WeightWarpAttack: 0
   WeightApproach: 0.2
   WeightRush: 0
   WeightObserve: 0.2
   WeightSlash: 0.5
-  WeightBackstep: 0.15
+  WeightBackstep: 0.1
+  RepeatPenalty: 0.25
+  FarCandidates:
+  - Action: 0
+    Weight: 30
+  MidCandidates:
+  - Action: 0
+    Weight: 30
+  - Action: 9
+    Weight: 20
+  - Action: 2
+    Weight: 20
+  NearCandidates:
+  - Action: 3
+    Weight: 50
+  - Action: 9
+    Weight: 20
+  - Action: 1
+    Weight: 20

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 敵の行動決定ロジックを保持するクラス（MonoBehaviour ではないため単体でテスト可能）。
@@ -21,59 +22,45 @@ public sealed class EnemyDecisionMaker
     {
         if (config == null) return EnemyActionType.Wait;
 
-        // 小さな改善: 直前と同じ行動が連続して選ばれにくくするため、重みにペナルティを与える
-        const float repeatPenalty = 0.25f; // 直前と同じ行動は 25% に減らす
+        // 直前と同じ行動が連続して選ばれにくくするため、重みにペナルティを与える
+        // 設定は EnemyDecisionConfig.RepeatPenalty で制御される
+        float repeatPenalty = config != null ? Mathf.Clamp01(config.RepeatPenalty) : 0.25f;
+
+        (EnemyActionType action, float weight)[] candidates;
 
         if (distance > config.FarDistance)
         {
-            var candidates = new (EnemyActionType action, float weight)[]
-            {
-                (EnemyActionType.WarpAttack, config.WeightWarpAttack),
-                (EnemyActionType.Approach, config.WeightApproach)
-            };
-
-            // 直前と同じ行動は候補から除外して連続選択を防ぐ（重みを 0 にする）
-            for (int i = 0; i < candidates.Length; i++)
-            {
-                if (candidates[i].action == lastAction) candidates[i] = (candidates[i].action, 0f);
-            }
-            return Sample(candidates);
+            candidates = ConvertConfigCandidates(config.FarCandidates);
         }
         else if (distance > config.NearDistance)
         {
-            var candidates = new (EnemyActionType action, float weight)[]
-            {
-                (EnemyActionType.Thrust, config.WeightRush),
-                (EnemyActionType.Approach, config.WeightApproach),
-                (EnemyActionType.Wait, config.WeightObserve)
-            };
-
-            for (int i = 0; i < candidates.Length; i++)
-            {
-                if (candidates[i].action == lastAction) candidates[i] = (candidates[i].action, 0f);
-            }
-            return Sample(candidates);
+            candidates = ConvertConfigCandidates(config.MidCandidates);
         }
         else
         {
-            var candidates = new List<(EnemyActionType action, float weight)>()
-            {
-                (EnemyActionType.Slash, config.WeightSlash),
-                (EnemyActionType.Wait, config.WeightObserve),
-                (EnemyActionType.StepBack, config.WeightBackstep)
-            };
-
-            if (lastAction == EnemyActionType.Wait)
-            {
-                for (int i = 0; i < candidates.Count; i++)
-                {
-                    if (candidates[i].action == EnemyActionType.Wait)
-                        candidates[i] = (candidates[i].action, 0f);
-                }
-            }
-
-            return Sample(candidates.ToArray());
+            candidates = ConvertConfigCandidates(config.NearCandidates);
         }
+
+        // 直前と同じ行動は候補から除外して連続選択を防ぐ（重みを 0 にする）
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            if (candidates[i].action == lastAction) candidates[i] = (candidates[i].action, 0f);
+        }
+
+        return Sample(candidates);
+    }
+
+    private (EnemyActionType action, float weight)[] ConvertConfigCandidates(EnemyDecisionConfig.ActionWeight[] list)
+    {
+        if (list == null || list.Length == 0)
+            return new (EnemyActionType action, float weight)[0];
+
+        var arr = new (EnemyActionType action, float weight)[list.Length];
+        for (int i = 0; i < list.Length; i++)
+        {
+            arr[i] = (list[i].Action, list[i].Weight);
+        }
+        return arr;
     }
 
     /// <summary>

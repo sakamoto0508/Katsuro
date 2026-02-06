@@ -96,10 +96,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         // AI の Tick を先に呼び、意思決定を行わせる
         _ai?.Tick(Time.deltaTime);
 
-        // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
-        _mover?.Update();
-
-        // AI が設定したペンディングの行動を実行する（ここで実際の制御を呼び出す）
+        // AI が設定したペンディングの行動を先に実行してから移動更新を行う。
+        // これにより WaitWalk 等が選択されたフレームで即座に振る舞いを反映できます。
         if (_pendingAction != null)
         {
             var action = _pendingAction.Value;
@@ -108,6 +106,9 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 case EnemyActionType.Approach:
                     _mover?.Approach();
+                    break;
+                case EnemyActionType.WaitWalk:
+                    _mover?.StartPatrolWalk();
                     break;
                 case EnemyActionType.Slash:
                 case EnemyActionType.Thrust:
@@ -125,6 +126,9 @@ public class EnemyController : MonoBehaviour, IDamageable
                     break;
             }
         }
+
+        // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
+        _mover?.Update();
     }
 
     private void OnAnimatorMove()

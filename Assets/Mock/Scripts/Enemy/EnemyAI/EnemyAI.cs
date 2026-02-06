@@ -65,6 +65,12 @@ public class EnemyAI
             }
         }
 
+        // 様子見中は追跡などの通常行動を行わせない（安全策）
+        if (_isObserving)
+        {
+            return;
+        }
+
         if (_state == EnemyState.Chase && _controller != null)
         {
             // 毎フレームは移動コマンドを出す（追跡継続）
@@ -143,6 +149,13 @@ public class EnemyAI
                 _isBusy = true;
                 break;
             case EnemyActionType.Wait:
+                _state = EnemyState.Recovery;
+                _isObserving = true;
+                _observeTimer = _config != null ? _config.ObserveSeconds : 1.0f;
+                break;
+            case EnemyActionType.WaitWalk:
+                // 歩きで様子見: その間は追跡しないが、EnemyController に移動指示を出す
+                _controller.EnqueueAction(EnemyActionType.WaitWalk);
                 _state = EnemyState.Recovery;
                 _isObserving = true;
                 _observeTimer = _config != null ? _config.ObserveSeconds : 1.0f;

@@ -44,6 +44,7 @@ public class EnemyAttacker : IDisposable
         var data = FindData(attackType);
         if (data == null)
         {
+            Debug.LogWarning($"EnemyAttacker: no attack data found for action={attackType}");
             return;
         }
 
@@ -55,12 +56,21 @@ public class EnemyAttacker : IDisposable
             {
                 _animController.PlayTrigger(data.AnimatorTrigger);
             }
+            else
+            {
+                Debug.LogWarning($"EnemyAttacker: attack data for {attackType} has no AnimatorTrigger assigned.");
+            }
         }
 
         // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
         if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
         {
             _weapons[data.HitboxIndex].CurrentAttackDamage = data.Damage;
+            Debug.Log($"EnemyAttacker: perform {attackType} damage={data.Damage} hitboxIndex={data.HitboxIndex}");
+        }
+        else
+        {
+            Debug.Log($"EnemyAttacker: perform {attackType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
         }
     }
 

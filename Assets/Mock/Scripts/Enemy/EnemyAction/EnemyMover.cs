@@ -33,6 +33,7 @@ public class EnemyMover
     private float _destinationUpdateTimer = 0f;
     private bool _usingRootMotionStepBack;
     private bool _isStepBack;
+    private bool _isPatrolWalking;
     float _speed = 0f;
 
     public void Update()
@@ -41,6 +42,28 @@ public class EnemyMover
         if (_isStepBack)
         {
             StopMove();
+            return;
+        }
+        // パトロール歩行モード中は追跡向けの目的地上書きをしない
+        if (_isPatrolWalking)
+        {
+            // アニメ向け速度更新
+            _animationController?.MoveVelocity(_agent != null ? _agent.velocity.magnitude : 0f);
+
+            // 到達判定は通常の到達判定と同じにする
+            if (_agent != null && _agent.hasPath && !_agent.pathPending)
+            {
+                float remaining = _agent.remainingDistance;
+                float stopDist = _agent.stoppingDistance;
+                if (remaining <= stopDist + 0.1f)
+                {
+                    _agent.isStopped = true;
+                    _agent.ResetPath();
+                    _destinationUpdateTimer = 0f;
+                    _isPatrolWalking = false;
+                }
+            }
+
             return;
         }
         // アニメ用の速度は NavMeshAgent の速度を優先して使う。
@@ -121,6 +144,42 @@ public class EnemyMover
         _agent.isStopped = false;
         _agent.SetDestination(_playerPosition.position);
         _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
+    }
+
+    public void StartPatrolWalk()
+    {
+        if (_agent == null || _playerPosition == null || _ownerTransform == null) return;
+
+        // ランダムで左右どちらかに移動する（プレイヤーを基準）
+        int choice = UnityEngine.Random.Range(0, 2); // 0 or 1
+
+        // プレイヤー基準の正面方向
+        Vector3 toPlayer = (_playerPosition.position - _ownerTransform.position);
+        if (toPlayer.sqrMagnitude < 0.001f)
+        {
+            // プレイヤーとほぼ同位置なら敵の正面を基準にする
+            toPlayer = _ownerTransform.forward;
+        }
+        Vector3 forward = toPlayer.normalized;
+
+        // 横方向ベクトル（右方向）を作る
+        Vector3 right = Quaternion.LookRotation(forward) * Vector3.right;
+
+        // オフセット距離は追跡開始距離と停止距離から計算（最低1m、最大4m）
+        float offset = Mathf.Clamp(_enemyStuts.ChaseStartDistance - _enemyStuts.StopDistance, 1f, 4f);
+        float sign = choice == 0 ? 1f : -1f;
+
+        Vector3 target = _playerPosition.position + right * sign * offset;
+
+        // NavMesh 上の到達可能な位置へスナップ
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(target, out hit, 2.0f, NavMesh.AllAreas))
+        {
+            _agent.isStopped = false;
+            _agent.SetDestination(hit.position);
+            _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
+            _isPatrolWalking = true;
+        }
     }
 
     public void StartStepBack()
