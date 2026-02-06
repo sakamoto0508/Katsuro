@@ -33,4 +33,16 @@ public class EnemyStuts : ScriptableObject
     [SerializeField] public float WeightObserve = 20f;
     [SerializeField] public float WeightMelee = 50f;
     [SerializeField] public float WeightBackstep = 20f;
+
+    public enum RotationControlMode
+    {
+        Agent,      // NavMeshAgent に回転を任せる
+        Snap,       // 即時でプレイヤー方向へスナップ
+        Smooth      // XZ 平面で滑らかに回転する（TurnSpeed を使用）
+    }
+
+    [Header("Rotation")]
+    public RotationControlMode RotationMode = RotationControlMode.Smooth;
+    [Tooltip("回転の速度（Smooth モード時の最大角速度、度/秒）")]
+    public float TurnSpeed = 360f;
 }

@@ -7,7 +7,7 @@ using Mock.UI;
 /// プレイヤー入力の受け口となり、各種コンポーネント・ステートマシンを初期化および更新する中枢クラス。
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     [Header("PlayerStatus")]
     [SerializeField] private Collider[] _weaponColliders;

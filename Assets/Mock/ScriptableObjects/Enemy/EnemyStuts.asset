@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStuts
   _enemyPower: 10
   _enemyMaxHealth: 100
-  _chaseStartDistance: 10
+  _chaseStartDistance: 100
   _stopDistance: 1.6
   _destinationUpdateInterval: 0.2
   FarDistance: 12
@@ -26,3 +26,5 @@ MonoBehaviour:
   WeightObserve: 20
   WeightMelee: 50
   WeightBackstep: 20
+  RotationMode: 2
+  TurnSpeed: 180

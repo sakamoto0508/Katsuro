@@ -1,41 +1,59 @@
-using Cysharp.Threading.Tasks;
-using System;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>
+/// 敵の移動制御を担うユーティリティクラス。
+/// </summary>
 public class EnemyMover
 {
-    public EnemyMover(EnemyStuts enemyStuts, Transform owner, Transform playerPosition
+    /// <summary>
+    /// コンストラクタ。必要な参照を受け取り内部状態を初期化します。
+    /// </summary>
+    /// <param name="enemyStuts">敵の設定データ（ScriptableObject）</param>
+    /// <param name="enemyPosition">この敵の Transform（所有者）</param>
+    /// <param name="playerPosition">追跡対象プレイヤーの Transform</param>
+    /// <param name="animationController">Enemy 用のアニメーションラッパー</param>
+    /// <param name="rb">Rigidbody（存在する場合）</param>
+    /// <param name="agent">NavMeshAgent（経路探索用）</param>
+    /// <param name="animator">Animator（root motion 用など）</param>
+    /// <param name="animName">アニメーションパラメータ名集</param>
+    public EnemyMover(EnemyStuts enemyStuts, Transform enemyPosition, Transform playerPosition
         , EnemyAnimationController animationController, Rigidbody rb, NavMeshAgent agent
-        , Animator animator, AnimationName animName, CancellationToken destroyToken)
+        , Animator animator, AnimationName animName)
     {
         _enemyStuts = enemyStuts;
-        _ownerTransform = owner;
+        _enemyTransform = enemyPosition;
         _playerPosition = playerPosition;
         _animationController = animationController;
         _rb = rb;
         _agent = agent;
         _animator = animator;
         _animName = animName;
-        _destroyToken = destroyToken;
+        // 初期化時に RotationMode に応じた設定を反映しておく
+        ApplyRotationMode();
     }
 
     private EnemyStuts _enemyStuts;
     private Transform _playerPosition;
-    private Transform _ownerTransform;
+    private Transform _enemyTransform;
     private EnemyAnimationController _animationController;
     private Rigidbody _rb;
     private NavMeshAgent _agent;
     private Animator _animator;
     private AnimationName _animName;
-    private CancellationToken _destroyToken;
     private float _destinationUpdateTimer = 0f;
     private bool _usingRootMotionStepBack;
     private bool _isStepBack;
     private bool _isPatrolWalking;
+    private bool _manualRotationDisabledByAgent = false;
     float _speed = 0f;
 
+    /// <summary>
+    /// 毎フレーム呼び出す更新処理。
+    /// - パトロール歩行中は目的地更新を抑止しつつ移動アニメを更新する
+    /// - 通常はプレイヤー方向へ NavMeshAgent に目的地をセットして追跡を行う
+    /// - Smooth モードでは手動回転を適用する
+    /// </summary>
     public void Update()
     {
         if (_playerPosition == null) return;
@@ -49,7 +67,25 @@ public class EnemyMover
         {
             // アニメ向け速度更新
             _animationController?.MoveVelocity(_agent != null ? _agent.velocity.magnitude : 0f);
-
+            _animationController?.MoveVector(_agent != null ?
+                new Vector2(_agent.velocity.x, _agent.velocity.z) : Vector2.zero);
+            // パトロール中も回転制御を適用する
+            if (_enemyStuts != null)
+            {
+                switch (_enemyStuts.RotationMode)
+                {
+                    case EnemyStuts.RotationControlMode.Agent:
+                        if (_agent != null) _agent.updateRotation = true;
+                        break;
+                    case EnemyStuts.RotationControlMode.Snap:
+                        SnapRotateToPlayer();
+                        break;
+                    case EnemyStuts.RotationControlMode.Smooth:
+                        if (!_manualRotationDisabledByAgent)
+                            ManualSmoothRotateTowardsPlayer(Time.deltaTime);
+                        break;
+                }
+            }
             // 到達判定は通常の到達判定と同じにする
             if (_agent != null && _agent.hasPath && !_agent.pathPending)
             {
@@ -78,8 +114,10 @@ public class EnemyMover
             _speed = _rb.linearVelocity.magnitude;
         }
         _animationController?.MoveVelocity(_speed);
+        _animationController?.MoveVector(_agent != null ?
+                new Vector2(_agent.velocity.x, _agent.velocity.z) : Vector2.zero);
         float distanceToPlayer =
-            Vector3.Distance(_ownerTransform.position, _playerPosition.position);
+            Vector3.Distance(_enemyTransform.position, _playerPosition.position);
 
         // 追跡開始距離外なら何もしない
         if (distanceToPlayer > _enemyStuts.ChaseStartDistance)
@@ -103,6 +141,12 @@ public class EnemyMover
             _agent.SetDestination(_playerPosition.position);
         }
 
+        // Smooth モードであれば手動で回転更新
+        if (_enemyStuts != null && _enemyStuts.RotationMode == EnemyStuts.RotationControlMode.Smooth && !_manualRotationDisabledByAgent)
+        {
+            ManualSmoothRotateTowardsPlayer(Time.deltaTime);
+        }
+
         // 安定した到達判定: pathPending が false でかつ remainingDistance が stoppingDistance を下回ったら到達とみなす
         if (_agent != null && _agent.hasPath && !_agent.pathPending)
         {
@@ -118,6 +162,9 @@ public class EnemyMover
         }
     }
 
+    /// <summary>
+    /// 移動を停止し NavMeshAgent のパスをクリアします。
+    /// </summary>
     public void StopMove()
     {
         if (!_agent.isStopped)
@@ -127,8 +174,14 @@ public class EnemyMover
         }
     }
 
+    /// <summary>
+    /// NavMeshAgent が停止中かどうかを返します。
+    /// </summary>
     public bool IsStopped => _agent.isStopped;
 
+    /// <summary>
+    /// 停止状態を解除し移動処理を再開します。
+    /// </summary>
     public void ResumeMove()
     {
         _agent.isStopped = false;
@@ -138,27 +191,35 @@ public class EnemyMover
     /// <summary>
     /// 即時にプレイヤー方向へ目的地を更新して追跡を開始します。
     /// </summary>
+    /// <summary>
+    /// 即座にプレイヤー方向へ目的地を更新して追跡を開始します。
+    /// </summary>
     public void Approach()
     {
         if (_playerPosition == null || _agent == null) return;
         _agent.isStopped = false;
         _agent.SetDestination(_playerPosition.position);
         _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
+        ApplyRotationMode();
     }
 
+    /// <summary>
+    /// プレイヤー基準で左右どちらかへ離れる目標点を決めて移動を開始します。
+    /// 主に WaitWalk（様子見の歩行）で使用します。
+    /// </summary>
     public void StartPatrolWalk()
     {
-        if (_agent == null || _playerPosition == null || _ownerTransform == null) return;
-
+        if (_agent == null || _playerPosition == null || _enemyTransform == null) return;
+        ApplyRotationMode();
         // ランダムで左右どちらかに移動する（プレイヤーを基準）
         int choice = UnityEngine.Random.Range(0, 2); // 0 or 1
 
         // プレイヤー基準の正面方向
-        Vector3 toPlayer = (_playerPosition.position - _ownerTransform.position);
+        Vector3 toPlayer = (_playerPosition.position - _enemyTransform.position);
         if (toPlayer.sqrMagnitude < 0.001f)
         {
             // プレイヤーとほぼ同位置なら敵の正面を基準にする
-            toPlayer = _ownerTransform.forward;
+            toPlayer = _enemyTransform.forward;
         }
         Vector3 forward = toPlayer.normalized;
 
@@ -182,6 +243,10 @@ public class EnemyMover
         }
     }
 
+    /// <summary>
+    /// 後退アニメ（root motion）によるステップバックを開始します。
+    /// NavMeshAgent の位置更新・回転更新を無効化し、アニメ側の root motion を適用します。
+    /// </summary>
     public void StartStepBack()
     {
         if (_animator == null || _agent == null) return;
@@ -202,6 +267,9 @@ public class EnemyMover
         _isStepBack = true;
     }
 
+    /// <summary>
+    /// ステップバック（root motion）を終了し NavMeshAgent を復帰させます。
+    /// </summary>
     public void EndStepBack()
     {
         _usingRootMotionStepBack = false;
@@ -216,26 +284,88 @@ public class EnemyMover
 
         if (_agent != null)
         {
-            _agent.Warp(_ownerTransform.position); // ★最重要
+            _agent.Warp(_enemyTransform.position); 
             _agent.velocity = Vector3.zero;
             _agent.isStopped = false;
             _agent.updatePosition = true;
-            _agent.updateRotation = true;
+            // ステータスの RotationMode に応じて updateRotation を復帰させる
+            ApplyRotationMode();
             _agent.ResetPath();
         }
         _isStepBack = false;
     }
 
+    /// <summary>
+    /// Animator の OnAnimatorMove イベントから呼ばれる想定のハンドラ。
+    /// root motion で移動中は Animator.deltaPosition/Rotation を transform に適用し NavMeshAgent と同期します。
+    /// </summary>
     public void OnAnimatorMove()
     {
         if (!_usingRootMotionStepBack) return;
         // Animator.deltaPosition/Rotation を transform に適用
-        _ownerTransform.position += _animator.deltaPosition;
-        _ownerTransform.rotation *= _animator.deltaRotation;
+        _enemyTransform.position += _animator.deltaPosition;
+        _enemyTransform.rotation *= _animator.deltaRotation;
         // NavMeshAgent と位置同期
         if (_agent != null)
         {
-            _agent.nextPosition = _ownerTransform.position;
+            _agent.nextPosition = _enemyTransform.position;
         }
     }
+
+    /// <summary>
+    /// EnemyStuts の RotationMode に従って NavMeshAgent.updateRotation の切り替えや
+    /// スナップ回転の実行などを行います。
+    /// </summary>
+    private void ApplyRotationMode()
+    {
+        if (_agent == null) return;
+
+        switch (_enemyStuts.RotationMode)
+        {
+            case EnemyStuts.RotationControlMode.Agent:
+                // Agent に回転を任せる
+                _agent.updateRotation = true;
+                _manualRotationDisabledByAgent = true;
+                break;
+            case EnemyStuts.RotationControlMode.Snap:
+                // 即時で向く
+                _agent.updateRotation = false;
+                _manualRotationDisabledByAgent = false;
+                SnapRotateToPlayer();
+                break;
+            case EnemyStuts.RotationControlMode.Smooth:
+            default:
+                // 滑らかに回転する（Agent の回転制御は無効にする）
+                _agent.updateRotation = false;
+                _manualRotationDisabledByAgent = false;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// プレイヤー方向へ瞬時に敵を向けます（Y 軸は無視）。
+    /// </summary>
+    private void SnapRotateToPlayer()
+    {
+        Vector3 dir = (_playerPosition.position - _enemyTransform.position);
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) return;
+        _enemyTransform.rotation = Quaternion.LookRotation(dir.normalized);
+    }
+
+    /// <summary>
+    /// プレイヤー方向へ滑らかに回転します（Smooth モード用）。
+    /// <paramref name="deltaTime"/> を使ってフレームレートに依存しない回転量を計算します。
+    /// </summary>
+    /// <param name="deltaTime">前フレームからの経過時間（秒）</param>
+    public void ManualSmoothRotateTowardsPlayer(float deltaTime)
+    {
+        if (_enemyTransform == null || _playerPosition == null) return;
+        Vector3 dir = (_playerPosition.position - _enemyTransform.position);
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) return;
+        Quaternion target = Quaternion.LookRotation(dir.normalized);
+        float maxDeg = _enemyStuts.TurnSpeed * Mathf.Clamp01(deltaTime);
+        _enemyTransform.rotation = Quaternion.RotateTowards(_enemyTransform.rotation, target, maxDeg);
+    }   
 }

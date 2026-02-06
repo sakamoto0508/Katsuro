@@ -123,6 +123,7 @@ public class EnemyAttacker : IDisposable
         if (!_hitTargets.Add(instanceId)) return;
 
         var damageable = other.GetComponentInParent<IDamageable>();
+
         if (damageable == null) return;
 
         Vector3 origin = _ownerTransform != null ? _ownerTransform.position : other.bounds.center;
