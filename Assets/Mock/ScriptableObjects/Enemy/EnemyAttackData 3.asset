@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackData
   _actionType: 3
   _animatorTrigger: HeavyAttack2
-  _damage: 10
+  _damage: 20
   _range: 1.6
   _hitboxIndex: 0
   _hitboxEnableDelay: 0
