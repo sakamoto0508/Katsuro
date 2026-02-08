@@ -76,7 +76,6 @@ public sealed class PlayerAttacker : IDisposable
 
         _isDrawingSword = false;
         _isSwordReady = true;
-        // clear mover drawing flag and animator bool
         _context?.Mover.SetDrawingSword(false);
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
         {
