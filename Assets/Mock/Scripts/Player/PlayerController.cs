@@ -10,6 +10,8 @@ using Mock.UI;
 public class PlayerController : MonoBehaviour, IDamageable
 {
     [Header("PlayerStatus")]
+    [SerializeField] private MeshRenderer _playerWeapon;
+    [SerializeField] private GameObject _playerStartWeapon;
     [SerializeField] private Collider[] _weaponColliders;
     [SerializeField] private Collider[] _enemyWeaponColliders;
     [SerializeField] private PlayerStatus _playerStatus;
@@ -85,6 +87,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateContext.Healer.OnConsumed
             .Subscribe(percent => HandleHealTick(percent))
             .AddTo(this);
+
+        //武器の見た目を最初は非表示にする。
+        _playerWeapon.enabled = false;
+        _playerStartWeapon.SetActive(true);
     }
 
     /// <summary>ダメージを適用する。</summary>
@@ -400,5 +406,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         _stateContext?.Attacker?.CompleteDrawSword();
         _animationEventStream?.Publish(AnimationEventType.SwordDrawCompleted);
+    }
+
+    public void AnimaEvent_OnSordDrawWeapon()
+    {
+        //武器の見た目を表示する。
+        _playerWeapon.enabled = true;
+        _playerStartWeapon.SetActive(false);
     }
 }
