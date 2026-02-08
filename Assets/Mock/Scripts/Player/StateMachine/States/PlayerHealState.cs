@@ -37,6 +37,7 @@ public class PlayerHealState : PlayerState
     public override void Update(float deltaTime)
     {
         Context.Mover.Update();
+        // 回復が停止していたらロコモーションへ遷移。
         if (!(Context.Healer?.IsHealing ?? false))
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);

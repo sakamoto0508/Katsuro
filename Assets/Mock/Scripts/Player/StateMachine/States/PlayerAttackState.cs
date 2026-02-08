@@ -49,6 +49,7 @@ public abstract class PlayerAttackState : PlayerState
     {
         base.Enter();
 
+        Context?.Mover?.MoveStop();
         if (Context.Attacker == null)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
@@ -91,7 +92,7 @@ public abstract class PlayerAttackState : PlayerState
     /// </summary>
     public override void FixedUpdate(float deltaTime)
     {
-        Context.Mover?.FixedUpdate();
+        //Context.Mover?.FixedUpdate();
     }
 
     /// <summary>ライト攻撃入力を受けたら次段予約する。</summary>
