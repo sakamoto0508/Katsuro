@@ -68,7 +68,6 @@ public class PlayerController : MonoBehaviour, IDamageable
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
-        // 段階移行：AbilityManager は Context により生成済み（Context.AbilityManager を使用）
 
         // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
         if (_playerHudView != null)

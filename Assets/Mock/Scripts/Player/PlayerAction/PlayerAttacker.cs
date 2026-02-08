@@ -42,6 +42,7 @@ public sealed class PlayerAttacker : IDisposable
     private int _currentComboStep;
     private bool _currentIsLockOnVariant;
     private bool _currentIsStrongAttack;
+    private bool _hasDrawnSword;
     private bool _isSwordReady;
     private bool _isDrawingSword;
     private bool _isHitboxActive;
@@ -56,10 +57,12 @@ public sealed class PlayerAttacker : IDisposable
         }
 
         _isDrawingSword = true;
-
+        _hasDrawnSword = true;
+        _context?.Mover.SetDrawingSword(true);
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
         {
-            _animController?.PlayTrigger(_animName.IsDrawingSword);
+            _animController?.PlayBool(_animName.IsDrawingSword, true);
+            Debug.Log("PlayerAttacker: Playing draw sword animation (bool=true).");
         }
     }
 
@@ -73,6 +76,12 @@ public sealed class PlayerAttacker : IDisposable
 
         _isDrawingSword = false;
         _isSwordReady = true;
+        // clear mover drawing flag and animator bool
+        _context?.Mover.SetDrawingSword(false);
+        if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
+        {
+            _animController?.PlayBool(_animName.IsDrawingSword, false);
+        }
     }
 
     public void PlayLightAttack() => PlayLightAttack(0, false);

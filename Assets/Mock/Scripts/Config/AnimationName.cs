@@ -13,6 +13,7 @@ public class AnimationName : ScriptableObject
     public string JustAvoidAttack => _justAvoidAttack;
     public string ComboStep => _comboStep;
     public string BackStep => _backStep;
+    public string IsSwordDrawn => _isSwordDrawn;
 
     [SerializeField] private string _moveVelocity = "MoveVelocity";
     [SerializeField] private string _moveVectorX = "MoveVectorX";
@@ -23,5 +24,6 @@ public class AnimationName : ScriptableObject
     [SerializeField] private string _strongAttack = "";
     [SerializeField] private string _justAvoidAttack = "";
     [SerializeField] private string _comboStep = "ComboStep";
-    [SerializeField] private string _backStep = "BackStep"; 
+    [SerializeField] private string _backStep = "BackStep";
+    [SerializeField] private string _isSwordDrawn = "IsSwordDrawn";
 }

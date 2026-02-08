@@ -11,7 +11,8 @@ public class PlayerMover
         _cameraPosition = cameraPosition;
         _animationController = animationController;
     }
-
+    /// <summary>î≤ìÅÇµÇƒÇ¢ÇÈÇ©Ç«Ç§Ç©ÅB</summary>
+    public bool IsDrawnSword { get; private set; }
     private PlayerStatus _playerStatus;
     private PlayerAnimationController _animationController;
     private Rigidbody _rb;
@@ -28,6 +29,7 @@ public class PlayerMover
     public void Update()
     {
         UpdateDirection();
+        _animationController?.PlayBool(_animationController.AnimName.IsDrawingSword, IsDrawnSword);
         _animationController?.MoveVelocity(ReturnVelocity());
         _animationController?.MoveVector(ReturnVector());
     }
@@ -72,6 +74,8 @@ public class PlayerMover
             _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
         }
     }
+
+    public void SetDrawingSword(bool value)=> IsDrawnSword = value;
 
     private float ReturnVelocity()
     {

@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
 {
+    public AnimationName AnimName => _animName;
     [SerializeField] private AnimationName _animName;
     private Animator _animator;
     private int _moveVelocityHash;
