@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 /// <summary>
@@ -36,6 +38,9 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>最大コンボ段数。派生クラスでクリップ数に応じて上書きする。</summary>
     protected virtual int MaxComboSteps => 1;
 
+    /// <summary>ターゲットを注視し続けるためのキャンセルトークンソース。</summary>
+    private CancellationTokenSource _lookCts;
+
     /// <summary>段数に応じた攻撃継続秒数を返す。未設定ならフォールバックを使用。</summary>
     protected virtual float ResolveAttackDuration(int comboStep) => _fallbackAttackDuration;
 
@@ -50,6 +55,10 @@ public abstract class PlayerAttackState : PlayerState
         base.Enter();
 
         Context?.Mover?.MoveStop();
+        _lookCts?.Cancel();
+        _lookCts = new CancellationTokenSource();
+        Context.Mover?.LookTargetSmooth(0.2f, _lookCts.Token).Forget();
+
         if (Context.Attacker == null)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
@@ -70,6 +79,9 @@ public abstract class PlayerAttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        _lookCts?.Cancel();
+        _lookCts?.Dispose();
+        _lookCts = null;
         Context.Attacker?.EndAttack();
     }
 
@@ -156,7 +168,7 @@ public abstract class PlayerAttackState : PlayerState
     /// </summary>
     private bool TryConsumeComboRequest()
     {
-        if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo() 
+        if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo()
             || _elapsedTime < _comboConsumeUnlockTime)
         {
             return false;

@@ -35,9 +35,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
-    public void Init(InputBuffer inputBuffer, Transform enemyPosition
-        , Camera camera, CameraManager cameraManager
-        , LockOnCamera lockOnCamera)
+    public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
+        , CameraManager cameraManager, LockOnCamera lockOnCamera)
     {
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
@@ -56,7 +55,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         var playerWeapon = new PlayerWeapon(_weaponColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
-        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, camera.transform, _animationController);
+        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController);
         var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig);
         var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig);
         var playerHeal = new PlayerHeal(skillGauge, playerMover, skillGaugeCostConfig);

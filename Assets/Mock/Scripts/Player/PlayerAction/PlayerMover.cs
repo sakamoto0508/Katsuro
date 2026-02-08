@@ -1,13 +1,16 @@
+using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 public class PlayerMover
 {
-    public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition
+    public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
         , Transform cameraPosition, PlayerAnimationController animationController)
     {
         _playerStatus = playerStatus;
         _rb = rb;
         _playerPosition = playerPosition;
+        _enemyPosition = enemy;
         _cameraPosition = cameraPosition;
         _animationController = animationController;
     }
@@ -17,6 +20,7 @@ public class PlayerMover
     private PlayerAnimationController _animationController;
     private Rigidbody _rb;
     private Transform _playerPosition;
+    private Transform _enemyPosition;
     private Transform _cameraPosition;
     private Vector2 _currentInput;
     private Vector3 _moveDirection;
@@ -76,6 +80,34 @@ public class PlayerMover
     }
 
     public void SetDrawingSword(bool value)=> IsDrawnSword = value;
+
+    /// <summary>指定ターゲットの方向を見る。</summary>
+
+    public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
+    {
+        if (_enemyPosition == null || _playerPosition == null) return;
+
+        Vector3 dir = _enemyPosition.position - _playerPosition.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) return;
+
+        Quaternion start = _playerPosition.rotation;
+        Quaternion target = Quaternion.LookRotation(dir.normalized);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            _playerPosition.rotation = Quaternion.Slerp(start, target, t);
+
+            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+        }
+
+        _playerPosition.rotation = target;
+    }
 
     private float ReturnVelocity()
     {
