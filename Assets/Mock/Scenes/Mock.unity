@@ -1723,15 +1723,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 462208, guid: 3118945744c01f441a3f63f25e9fdc05, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.18
+      value: -0.161
       objectReference: {fileID: 0}
     - target: {fileID: 462208, guid: 3118945744c01f441a3f63f25e9fdc05, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.169
+      value: 0.173
       objectReference: {fileID: 0}
     - target: {fileID: 462208, guid: 3118945744c01f441a3f63f25e9fdc05, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.125
+      value: 0.135
       objectReference: {fileID: 0}
     - target: {fileID: 462208, guid: 3118945744c01f441a3f63f25e9fdc05, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3112,6 +3112,10 @@ PrefabInstance:
     - target: {fileID: 2552022812387511766, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_Name
       value: Katana_Mokko
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552022812387511766, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3098167903086615411, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_Enabled
