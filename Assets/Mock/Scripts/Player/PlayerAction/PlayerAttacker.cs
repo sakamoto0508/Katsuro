@@ -47,6 +47,7 @@ public sealed class PlayerAttacker : IDisposable
     private bool _isDrawingSword;
     private bool _isHitboxActive;
     private readonly HashSet<int> _hitTargets = new();
+    private float _currentClipDamage;
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
     public void DrawSword()
@@ -62,7 +63,6 @@ public sealed class PlayerAttacker : IDisposable
         if (!string.IsNullOrEmpty(_animName?.IsDrawingSword))
         {
             _animController?.PlayBool(_animName.IsDrawingSword, true);
-            Debug.Log("PlayerAttacker: Playing draw sword animation (bool=true).");
         }
     }
 
@@ -93,6 +93,8 @@ public sealed class PlayerAttacker : IDisposable
         _currentComboStep = comboStep;
         _currentIsLockOnVariant = isLockOnVariant;
         ApplyLockOnFlag(isLockOnVariant);
+        // set clip-specific flat damage from config
+        _currentClipDamage = _context?.StateConfig?.GetLightAttackClipDamage(isLockOnVariant, comboStep) ?? 0f;
         PlayAttackTrigger(_animName?.LightAttack, comboStep);
     }
 
@@ -102,6 +104,7 @@ public sealed class PlayerAttacker : IDisposable
         _currentIsStrongAttack = true;
         _currentComboStep = comboStep;
         _currentIsLockOnVariant = false;
+        _currentClipDamage = _context?.StateConfig?.GetStrongAttackClipDamage(comboStep) ?? 0f;
         PlayAttackTrigger(_animName?.StrongAttack, comboStep);
     }
 
@@ -184,7 +187,7 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>武器コライダーにヒットした相手へ一度だけダメージを適用する。</summary>
     private void HandleWeaponHit(Collider other)
     {
-        // 無効状態や null なら終了
+        // 無効状態や null なら終了（デバッグログを出す）
         if (!_isHitboxActive || other == null)
         {
             return;
@@ -194,15 +197,17 @@ public sealed class PlayerAttacker : IDisposable
         {
             return;
         }
-        // 既に当たったコライダーなら無視
-        int instanceId = other.GetInstanceID();
-        if (!_hitTargets.Add(instanceId))
-        {
-            return;
-        }
-        // 対象がダメージを受けられない
+        // 対象がダメージを受けられない（環境コライダー等はここで弾く）
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable == null)
+        {
+            Debug.Log($"PlayerAttacker: Hit {other.gameObject.name} but no IDamageable found.");
+            return;
+        }
+
+        // 既に当たったコライダーなら無視（ダメージ対象のみを記録）
+        int instanceId = other.GetInstanceID();
+        if (!_hitTargets.Add(instanceId))
         {
             return;
         }
@@ -216,8 +221,15 @@ public sealed class PlayerAttacker : IDisposable
             hitNormal = _ownerTransform != null ? _ownerTransform.forward : Vector3.forward;
         }
         // ダメージ情報を生成して IDamageable へ通知、続けてパッシブ固有エフェクトを再生。
-        DamageInfo damageInfo = new DamageInfo(ResolveDamageAmount(), hitPoint, hitNormal,
+        float damage = ResolveDamageAmount();
+        DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
             _ownerTransform != null ? _ownerTransform.gameObject : null, other);
+
+        // Debug: ログ出力（ダメージが発生する場合）
+        if (damage > 0f)
+        {
+            Debug.Log($"PlayerAttacker: Hit target={other.gameObject.name} damage={damage}");
+        }
 
         damageable.ApplyDamage(damageInfo);
         SpawnPassiveEffects(in damageInfo);
@@ -229,35 +241,44 @@ public sealed class PlayerAttacker : IDisposable
     /// </summary>
     private float ResolveDamageAmount()
     {
-        float damage = _status?.AttackPower ?? 0f;
+        // 基礎ダメージ
+        float baseDamage = _status?.AttackPower ?? 0f;
 
-        if (_passiveBuffSet != null)
+        // パッシブ乗算・加算
+        float passiveMult = _passiveBuffSet != null ? _passiveBuffSet.EvaluateDamageMultiplier() : 1f;
+        float passiveFlat = _passiveBuffSet != null ? _passiveBuffSet.EvaluateFlatDamageBonus() : 0f;
+        // include clip flat damage as additive component
+        float clipFlat = _currentClipDamage;
+        float additive = baseDamage + passiveFlat + clipFlat; // (base + equip(flat) + clip)
+        float afterPassive = additive * passiveMult; // apply passive multiplier
+
+        // 低HPバフ乗算
+        float lowHpMult = 1f;
+        float currentHpRatio = 1f;
+        if (_playerResource != null && _playerResource.MaxHp > 0f)
         {
-            damage *= _passiveBuffSet.EvaluateDamageMultiplier();
-            damage += _passiveBuffSet.EvaluateFlatDamageBonus();
+            currentHpRatio = Mathf.Clamp01(_playerResource.CurrentHp / _playerResource.MaxHp);
+            if (_status?.LowHpBuffTable != null)
+            {
+                lowHpMult = _status.LowHpBuffTable.EvaluateDamageMultiplier(currentHpRatio);
+            }
         }
+        float afterLowHp = afterPassive * lowHpMult;
 
-        // 低HPバフが設定され、ランタイムHP情報が利用可能な場合は倍率を適用
-        if (_status?.LowHpBuffTable != null && _playerResource != null && _playerResource.MaxHp > 0f)
-        {
-            float currentHpRatio = Mathf.Clamp01(_playerResource.CurrentHp / _playerResource.MaxHp);
-            float lowHpMultiplier = _status.LowHpBuffTable.EvaluateDamageMultiplier(currentHpRatio);
-            damage *= lowHpMultiplier;
-        }
-
-        // ジャスト回避スタックがある場合はスタック効果を適用（設定があれば）
+        // ジャスト回避スタック乗算
+        float justMult = 1f;
         if (_context != null && _status?.JustAvoidBuffConfig != null)
         {
             int stacks = Mathf.Clamp(_context.JustAvoidStacks, 0, _status.JustAvoidBuffConfig.MaxStacks);
             if (stacks > 0)
             {
                 float perStack = _status.JustAvoidBuffConfig.DamageMultiplierPerStack;
-                float justMultiplier = 1f + perStack * stacks; // 例: perStack=0.05 -> 1stack = +5%
-                damage *= justMultiplier;
+                justMult = 1f + perStack * stacks;
             }
         }
 
-        return Mathf.Max(0f, damage);
+        float final = Mathf.Max(0f, afterLowHp * justMult);
+        return final;
     }
 
     /// <summary>ヒット時エフェクトを必要に応じて発生させる。</summary>
