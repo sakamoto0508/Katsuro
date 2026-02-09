@@ -13,7 +13,19 @@ MonoBehaviour:
   m_Name: LowHpBuffTable
   m_EditorClassIdentifier: Assembly-CSharp::LowHpBuffTable
   _tiers:
-  - HpBelowRatio: 0
-    DamageMultiplier: 0
+  - HpBelowRatio: 0.1
+    DamageMultiplier: 1.5
+    SkillGaugeRegenBonus: 0.2
+    Label: 
+  - HpBelowRatio: 0.25
+    DamageMultiplier: 1.25
+    SkillGaugeRegenBonus: 0.1
+    Label: 
+  - HpBelowRatio: 0.5
+    DamageMultiplier: 1.1
+    SkillGaugeRegenBonus: 0.1
+    Label: 
+  - HpBelowRatio: 1
+    DamageMultiplier: 1
     SkillGaugeRegenBonus: 0
     Label: 

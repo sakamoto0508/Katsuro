@@ -54,7 +54,8 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         // --- 各種コンポーネントを生成
         _playerResource = new PlayerResource(_playerStatus);
-        var playerWeapon = new PlayerWeapon(_weaponColliders);
+        var ownerColliders = GetComponentsInChildren<Collider>();
+        var playerWeapon = new PlayerWeapon(_weaponColliders, ownerColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController);

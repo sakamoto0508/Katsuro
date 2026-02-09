@@ -7,14 +7,17 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerWeapon
 {
-    public PlayerWeapon(Collider[] weaponColliders)
+    public PlayerWeapon(Collider[] weaponColliders, Collider[] ignoreColliders = null)
     {
         _weaponColliders = weaponColliders;
+        _ignoreColliders = ignoreColliders;
         SetHitboxActive(false);
+        SetupIgnoreCollisions();
     }
 
     private readonly Collider[] _weaponColliders;
     private readonly Dictionary<Collider, WeaponHitboxRelay> _relayCache = new();
+    private readonly Collider[] _ignoreColliders;
 
     /// <summary>ヒットボックスを有効化する。</summary>
     public void EnableHitbox() => SetHitboxActive(true);
@@ -96,6 +99,22 @@ public sealed class PlayerWeapon
             }
 
             weaponCollider.enabled = isActive;
+        }
+    }
+
+    private void SetupIgnoreCollisions()
+    {
+        if (_weaponColliders == null || _ignoreColliders == null) return;
+
+        foreach (var weaponCollider in _weaponColliders)
+        {
+            if (weaponCollider == null) continue;
+            foreach (var ownerCollider in _ignoreColliders)
+            {
+                if (ownerCollider == null) continue;
+                if (ownerCollider == weaponCollider) continue;
+                Physics.IgnoreCollision(weaponCollider, ownerCollider, true);
+            }
         }
     }
 }

@@ -66,7 +66,6 @@ public class EnemyAttacker : IDisposable
         if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
         {
             _weapons[data.HitboxIndex].CurrentAttackDamage = data.Damage;
-            Debug.Log($"EnemyAttacker: perform {attackType} damage={data.Damage} hitboxIndex={data.HitboxIndex}");
         }
         else
         {

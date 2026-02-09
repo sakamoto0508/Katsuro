@@ -73,10 +73,6 @@ public class PlayerMover
             Vector3 brakeForce = -_velXZ.normalized * _playerStatus.BreakForce;
             _rb.AddForce(brakeForce, ForceMode.Acceleration);
         }
-        else
-        {
-            _rb.linearVelocity = new Vector3(0, _rb.linearVelocity.y, 0);
-        }
     }
 
     public void SetDrawingSword(bool value)=> IsDrawnSword = value;
