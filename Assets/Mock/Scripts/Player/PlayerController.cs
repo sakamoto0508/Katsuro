@@ -2,6 +2,7 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mock.UI;
+using System;
 
 /// <summary>
 /// プレイヤー入力の受け口となり、各種コンポーネント・ステートマシンを初期化および更新する中枢クラス。
@@ -97,6 +98,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>ダメージを適用する。</summary>
     public void ApplyDamage(DamageInfo info)
     {
+        // ジャスト回避ウィンドウ内であればダメージを無効化し、ジャスト回避スタックを加算する。
         if (_stateContext?.IsInJustAvoidWindow ?? false)
         {
             // ジャスト回避成功によるバフ加算。
@@ -107,8 +109,12 @@ public class PlayerController : MonoBehaviour, IDamageable
             {
                 _stateContext?.SkillGauge?.Add(bonus);
             }
+            // デバッグログ: ジャスト回避成功を出力
+            Debug.Log($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
+            _animationController?.PlayTrigger(_animationName?.JustAvoidWindow);
             return;
         }
+        // ゴーストモード中はダメージを無効化する。
         if (_stateContext?.IsGhostMode ?? false)
         {
             return;
@@ -205,6 +211,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         inputBuffer.LightAttackAction.started += OnLightAttackAction;
         inputBuffer.StrongAttackAction.started += OnStrongAttackAction;
         inputBuffer.GhostAction.started += OnGhostAction;
+        inputBuffer.GhostAction.canceled += OnGhostAction;
         inputBuffer.BuffAction.started += OnSelfSacrificeAction;
         inputBuffer.HealAction.started += OnHeal;
         inputBuffer.HealAction.canceled += OnHeal;
@@ -220,6 +227,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         inputBuffer.LightAttackAction.started -= OnLightAttackAction;
         inputBuffer.StrongAttackAction.started -= OnStrongAttackAction;
         inputBuffer.GhostAction.started -= OnGhostAction;
+        inputBuffer.GhostAction.canceled -= OnGhostAction;
         inputBuffer.BuffAction.started -= OnSelfSacrificeAction;
         inputBuffer.HealAction.started -= OnHeal;
         inputBuffer.HealAction.canceled -= OnHeal;
@@ -279,24 +287,21 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         if (context.started)
         {
-            var result = _stateContext?.AbilityManager?.ToggleGhost();
-            if (result == null)
+            bool began = _stateContext?.Ghost?.TryBegin() ?? false;
+            if (began)
             {
-                Debug.Log("Ghost: AbilityManager not available on context");
-                return;
+                _stateMachine?.HandleGhostStarted();
             }
-            switch (result.Value)
+            else
             {
-                case AbilityManager.GhostToggleResult.Began:
-                    Debug.Log("Ghost Started (via AbilityManager)");
-                    break;
-                case AbilityManager.GhostToggleResult.Ended:
-                    Debug.Log("Ghost Ended (via AbilityManager)");
-                    break;
-                default:
-                    Debug.Log("Ghost Failed to start");
-                    break;
+                Debug.Log("Ghost Failed to begin (hold)");
             }
+        }
+        else if (context.canceled)
+        {
+            _stateContext?.Ghost?.End();
+            _stateMachine?.HandleGhostCanceled();
+            Debug.Log("Ghost Ended (release)");
         }
     }
 
@@ -414,5 +419,27 @@ public class PlayerController : MonoBehaviour, IDamageable
         //武器の見た目を表示する。
         _playerWeapon.enabled = true;
         _playerStartWeapon.SetActive(false);
+    }
+
+    //アニメーションイベント：ジャスト回避アニメーション開始時。
+    public void AnimEvent_OnJustAvoidStarted()
+    {
+        if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+        string justAvoidBool = _animationName?.JustAvoid;
+        if (!string.IsNullOrEmpty(justAvoidBool))
+        {
+            _animationController?.PlayBool(justAvoidBool, true);
+        }
+    }
+
+    //アニメーションイベント：ジャスト回避アニメーション終了時
+    public void AnimEvent_OnJustAvoidFinished()
+    {
+        if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+        string justAvoidBool = _animationName?.JustAvoid;
+        if (!string.IsNullOrEmpty(justAvoidBool))
+        {
+            _animationController?.PlayBool(justAvoidBool, false);
+        }
     }
 }

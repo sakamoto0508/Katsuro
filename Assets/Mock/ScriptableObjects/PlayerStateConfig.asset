@@ -63,6 +63,12 @@ MonoBehaviour:
     - 50
     - 50
   _justAvoidAttackClips:
-    _clips: []
-    _comboWindowDelaySeconds: []
-    _clipFlatDamage: []
+    _clips:
+    - {fileID: 7400000, guid: 8b81d7cbedc48684fa6a7cce9ba34c58, type: 2}
+    - {fileID: 7400000, guid: aee5eebb62844144fa0026d389ae5c35, type: 2}
+    _comboWindowDelaySeconds:
+    - 0.5
+    - 0.3
+    _clipFlatDamage:
+    - 50
+    - 50
