@@ -3188,6 +3188,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 8e89c99ac39304c4ea418772b376eb46, type: 2}
     - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: _justAvoidSlowDef
+      value: 
+      objectReference: {fileID: 11400000, guid: 3024c41d599e8d84ba8aa0e94a81a6c6, type: 2}
+    - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
       propertyPath: _playerStartWeapon
       value: 
       objectReference: {fileID: 1492280301}

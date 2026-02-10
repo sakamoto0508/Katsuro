@@ -74,6 +74,13 @@ public sealed class PlayerAttacker : IDisposable
             return;
         }
 
+        // まずアニメータ側に "抜刀済み" フラグを立ててから描画フラグをクリアする。
+        // これによりアニメータ内の遷移条件が先に満たされ、抜刀済みの Idle へ遷移しやすくなる。
+        if (!string.IsNullOrEmpty(_animName?.IsSwordDrawn))
+        {
+            _animController?.PlayBool(_animName.IsSwordDrawn, true);
+        }
+
         _isDrawingSword = false;
         _isSwordReady = true;
         _context?.Mover.SetDrawingSword(false);
@@ -81,6 +88,7 @@ public sealed class PlayerAttacker : IDisposable
         {
             _animController?.PlayBool(_animName.IsDrawingSword, false);
         }
+        Debug.Log($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
     }
 
     public void PlayLightAttack() => PlayLightAttack(0, false);
@@ -201,7 +209,6 @@ public sealed class PlayerAttacker : IDisposable
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable == null)
         {
-            Debug.Log($"PlayerAttacker: Hit {other.gameObject.name} but no IDamageable found.");
             return;
         }
 
