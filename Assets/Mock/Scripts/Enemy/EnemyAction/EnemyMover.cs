@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -57,54 +58,66 @@ public class EnemyMover
     public void Update()
     {
         if (_playerPosition == null) return;
+
         if (_isStepBack)
         {
+            // root motion ステップバック中は常に停止扱い
             StopMove();
             return;
         }
-        // パトロール歩行モード中は追跡向けの目的地上書きをしない
+
         if (_isPatrolWalking)
         {
-            // アニメ向け速度更新
-            _animationController?.MoveVelocity(_agent != null ? _agent.velocity.magnitude : 0f);
-            _animationController?.MoveVector(_agent != null ?
-                new Vector2(_agent.velocity.x, _agent.velocity.z) : Vector2.zero);
-            // パトロール中も回転制御を適用する
-            if (_enemyStuts != null)
-            {
-                switch (_enemyStuts.RotationMode)
-                {
-                    case EnemyStuts.RotationControlMode.Agent:
-                        if (_agent != null) _agent.updateRotation = true;
-                        break;
-                    case EnemyStuts.RotationControlMode.Snap:
-                        SnapRotateToPlayer();
-                        break;
-                    case EnemyStuts.RotationControlMode.Smooth:
-                        if (!_manualRotationDisabledByAgent)
-                            ManualSmoothRotateTowardsPlayer(Time.deltaTime);
-                        break;
-                }
-            }
-            // 到達判定は通常の到達判定と同じにする
-            if (_agent != null && _agent.hasPath && !_agent.pathPending)
-            {
-                float remaining = _agent.remainingDistance;
-                float stopDist = _agent.stoppingDistance;
-                if (remaining <= stopDist + 0.1f)
-                {
-                    _agent.isStopped = true;
-                    _agent.ResetPath();
-                    _destinationUpdateTimer = 0f;
-                    _isPatrolWalking = false;
-                }
-            }
-
+            UpdatePatrolWalking();
             return;
         }
-        // アニメ用の速度は NavMeshAgent の速度を優先して使う。
-        // Rigidbody 側の速度を参照していると Transform/Warp 等の影響で値が不安定になるため。
-        
+
+        // 通常追跡／追跡待機時の更新
+        UpdateAnimatorValues();
+        UpdateTrackingAndDestination();
+    }
+
+    // パトロール中のアニメ／回転／到達判定の更新
+    private void UpdatePatrolWalking()
+    {
+        _animationController?.MoveVelocity(_agent != null ? _agent.velocity.magnitude : 0f);
+        _animationController?.MoveVector(_agent != null ? TargetVector() : Vector2.zero);
+
+        if (_enemyStuts != null)
+        {
+            switch (_enemyStuts.RotationMode)
+            {
+                case EnemyStuts.RotationControlMode.Agent:
+                    if (_agent != null) _agent.updateRotation = true;
+                    break;
+                case EnemyStuts.RotationControlMode.Snap:
+                    SnapRotateToPlayer();
+                    break;
+                case EnemyStuts.RotationControlMode.Smooth:
+                    if (!_manualRotationDisabledByAgent)
+                        ManualSmoothRotateTowardsPlayer(Time.deltaTime);
+                    break;
+            }
+        }
+
+        // 到達判定（パトロール時は通常の到達判定と同じ）
+        if (_agent != null && _agent.hasPath && !_agent.pathPending)
+        {
+            float remaining = _agent.remainingDistance;
+            float stopDist = _agent.stoppingDistance;
+            if (remaining <= stopDist + 0.1f)
+            {
+                _agent.isStopped = true;
+                _agent.ResetPath();
+                _destinationUpdateTimer = 0f;
+                _isPatrolWalking = false;
+            }
+        }
+    }
+
+    // Animator に渡す速度・方向値の更新
+    private void UpdateAnimatorValues()
+    {
         if (_agent != null)
         {
             _speed = _agent.velocity.magnitude;
@@ -113,13 +126,17 @@ public class EnemyMover
         {
             _speed = _rb.linearVelocity.magnitude;
         }
-        _animationController?.MoveVelocity(_speed);
-        _animationController?.MoveVector(_agent != null ?
-                new Vector2(_agent.velocity.x, _agent.velocity.z) : Vector2.zero);
-        float distanceToPlayer =
-            Vector3.Distance(_enemyTransform.position, _playerPosition.position);
 
-        // 追跡開始距離外なら何もしない
+        _animationController?.MoveVelocity(_speed);
+        _animationController?.MoveVector(_agent != null ? TargetVector() : Vector2.zero);
+    }
+
+    // 追跡の有効判定、目的地更新、回転の更新をまとめた処理
+    private void UpdateTrackingAndDestination()
+    {
+        float distanceToPlayer = Vector3.Distance(_enemyTransform.position, _playerPosition.position);
+
+        // 追跡開始距離外なら停止
         if (distanceToPlayer > _enemyStuts.ChaseStartDistance)
         {
             StopMove();
@@ -141,20 +158,19 @@ public class EnemyMover
             _agent.SetDestination(_playerPosition.position);
         }
 
-        // Smooth モードであれば手動で回転更新
+        // Smooth 回転モードなら手動回転を適用
         if (_enemyStuts != null && _enemyStuts.RotationMode == EnemyStuts.RotationControlMode.Smooth && !_manualRotationDisabledByAgent)
         {
             ManualSmoothRotateTowardsPlayer(Time.deltaTime);
         }
 
-        // 安定した到達判定: pathPending が false でかつ remainingDistance が stoppingDistance を下回ったら到達とみなす
+        // 到達判定: 安定した判定（pathPending が false かつ remainingDistance <= stoppingDistance）
         if (_agent != null && _agent.hasPath && !_agent.pathPending)
         {
             float remaining = _agent.remainingDistance;
             float stopDist = _agent.stoppingDistance;
             if (remaining <= stopDist + 0.1f)
             {
-                // 到達処理: 移動停止してパスをクリア
                 _agent.isStopped = true;
                 _agent.ResetPath();
                 _destinationUpdateTimer = 0f;
@@ -186,6 +202,15 @@ public class EnemyMover
     {
         _agent.isStopped = false;
         _destinationUpdateTimer = 0f;
+    }
+
+    public Vector2 TargetVector()
+    {
+        if (_agent == null) return Vector2.zero;
+        Vector3 toTarget = _playerPosition.position - _enemyTransform.position;
+        Vector3 localDir = _enemyTransform.InverseTransformDirection(toTarget.normalized);
+        return new Vector2(localDir.x, localDir.z).normalized;
+
     }
 
     /// <summary>
@@ -284,7 +309,7 @@ public class EnemyMover
 
         if (_agent != null)
         {
-            _agent.Warp(_enemyTransform.position); 
+            _agent.Warp(_enemyTransform.position);
             _agent.velocity = Vector3.zero;
             _agent.isStopped = false;
             _agent.updatePosition = true;
@@ -367,5 +392,5 @@ public class EnemyMover
         Quaternion target = Quaternion.LookRotation(dir.normalized);
         float maxDeg = _enemyStuts.TurnSpeed * Mathf.Clamp01(deltaTime);
         _enemyTransform.rotation = Quaternion.RotateTowards(_enemyTransform.rotation, target, maxDeg);
-    }   
+    }
 }
