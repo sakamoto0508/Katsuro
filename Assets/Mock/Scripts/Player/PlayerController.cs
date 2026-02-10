@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Mock.UI;
 using System;
+using INab.VFXAssets;
 
 /// <summary>
 /// プレイヤー入力の受け口となり、各種コンポーネント・ステートマシンを初期化および更新する中枢クラス。
@@ -15,10 +16,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private GameObject _playerStartWeapon;
     [SerializeField] private Collider[] _weaponColliders;
     [SerializeField] private Collider[] _enemyWeaponColliders;
+
+    [Header("ScriptableObject")]
     [SerializeField] private PlayerStatus _playerStatus;
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
+    [SerializeField] private VFXConfig _vfxConfig;
+
     [Header("Status Effects")]
     [SerializeField] private StatusEffectDef _justAvoidSlowDef;
 
@@ -48,6 +53,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
         _lookOnCamera = lockOnCamera;
+        CharacterEffect characterEffect = GetComponent<CharacterEffect>();
 
         // --- 設定値（SkillGauge などの生成に使う）
         float maxGauge = _playerStatus != null ? _playerStatus.MaxSkillGauge
@@ -70,7 +76,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             , _playerStatus, _passiveBuffSet, transform, _playerResource);
         _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, _playerResource, skillGauge, _playerStatus, playerMover, playerSprint,
-            playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker, _animationEventStream);
+            playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker
+            , _animationEventStream, _vfxConfig, characterEffect);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
 

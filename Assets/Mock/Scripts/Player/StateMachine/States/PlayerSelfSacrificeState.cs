@@ -31,6 +31,7 @@ public class PlayerSelfSacrificeState : PlayerState
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
+        Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectBuff);
     }
 
     public override void Exit()
@@ -38,6 +39,7 @@ public class PlayerSelfSacrificeState : PlayerState
         // SelfSacrifice は AbilityManager 側で管理しているため、
         // ステート離脱時に自動で End しない（攻撃中も継続したい）。
         // 終了は入力キャンセルやゲージ枯渇など Ability 側の判定で行う。
+        Context?.CharacterEffect?.StopEffect_CharacterEffect();
     }
 
     public override void Update(float deltaTime)

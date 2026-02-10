@@ -35,6 +35,8 @@ public class PlayerGhostState : PlayerState
             Context.IsGhostMode = false;
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
+
+        Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectGhost);
     }
 
     public override void Exit()
@@ -48,6 +50,7 @@ public class PlayerGhostState : PlayerState
             _startJustAvoidRemaining = 0f;
         }
         Context.IsGhostMode = false;
+        Context?.CharacterEffect?.StopEffect_CharacterEffect();
     }
 
     public override void Update(float deltaTime)

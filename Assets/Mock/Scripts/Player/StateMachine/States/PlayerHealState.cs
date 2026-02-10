@@ -1,3 +1,4 @@
+using INab.VFXAssets;
 using UnityEngine;
 
 /// <summary>
@@ -27,16 +28,19 @@ public class PlayerHealState : PlayerState
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
+        Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectHeal);
     }
 
     public override void Exit()
     {
         Context.Healer?.End();
+        Context?.CharacterEffect?.StopEffect_CharacterEffect();
     }
 
     public override void Update(float deltaTime)
     {
         Context.Mover.Update();
+
         // 回復が停止していたらロコモーションへ遷移。
         if (!(Context.Healer?.IsHealing ?? false))
         {

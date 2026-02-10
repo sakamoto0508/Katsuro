@@ -1,4 +1,5 @@
 using System;
+using INab.VFXAssets;
 using UniRx;
 
 /// <summary>
@@ -10,11 +11,11 @@ public sealed class PlayerStateContext : IDisposable
     public PlayerStateContext(PlayerController controller, PlayerResource playerResource, SkillGauge skillGauge, PlayerStatus status
         , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
         , PlayerHeal healer, LockOnCamera lockOnCamera, PlayerStateConfig stateConfig, PlayerAttacker attacker
-        , IAnimationEventStream animationEvents)
+        , IAnimationEventStream animationEvents,VFXConfig vfxConfig, CharacterEffect characterEffect)
     {
-        Controller = controller; // Assigning controller
-        PlayerResource = playerResource; // Assigning player resource
-        SkillGauge = skillGauge; // Assigning skill gauge
+        Controller = controller; 
+        PlayerResource = playerResource; 
+        SkillGauge = skillGauge;
         Status = status;
         Mover = mover;
         Sprint = sprint;
@@ -25,9 +26,16 @@ public sealed class PlayerStateContext : IDisposable
         StateConfig = stateConfig;
         Attacker = attacker;
         AnimationEvents = animationEvents;
-        // 段階移行用 AbilityManager を Context 側で持たせる（常に利用可能にする）
+        CharacterEffect = characterEffect;
+        VFXConfig = vfxConfig;
         AbilityManager = new global::AbilityManager(this, Ghost, SelfSacrifice, Healer, PlayerResource, StateConfig);
     }
+
+    /// <summary>キャラクターにアタッチされた CharacterEffect（存在する場合）。</summary>
+    public CharacterEffect CharacterEffect { get; }
+
+    /// <summary>VFX 設定。</summary>
+    public VFXConfig VFXConfig { get; }
 
     /// <summary>段階移行で導入した AbilityManager（まずは Ghost/SelfSacrifice を管理）。</summary>
     public AbilityManager AbilityManager { get; }
