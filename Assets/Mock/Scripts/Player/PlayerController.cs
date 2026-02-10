@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private AnimationName _animationName;
     [SerializeField] private PlayerStateConfig _playerStateConfig;
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
+    [Header("Status Effects")]
+    [SerializeField] private StatusEffectDef _justAvoidSlowDef;
 
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
@@ -112,6 +114,16 @@ public class PlayerController : MonoBehaviour, IDamageable
             // デバッグログ: ジャスト回避成功を出力
             Debug.Log($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
             _animationController?.PlayTrigger(_animationName?.JustAvoidWindow);
+            // ジャスト回避スロウ効果を付与する。
+            var instigator = info.Instigator;
+            if (instigator != null && _justAvoidSlowDef != null)
+            {
+                var receiver = instigator.GetComponentInParent<IStatusEffectReceiver>();
+                if (receiver != null)
+                {
+                    receiver.ApplyStatusEffect(new StatusEffectInstance(_justAvoidSlowDef, this.gameObject));
+                }
+            }
             return;
         }
         // ゴーストモード中はダメージを無効化する。
@@ -262,6 +274,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
 
         if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
+        if (!_stateContext.Attacker.IsSwordReady)
+        {
+            Debug.Log("PlayerController: Attack input ignored, sword not ready.");
+        }
         _stateMachine?.HandleLightAttack();
     }
 

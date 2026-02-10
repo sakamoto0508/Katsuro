@@ -43,6 +43,10 @@ public class EnemyController : MonoBehaviour, IDamageable
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
         _attacker = new EnemyAttacker(animController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
         _ai = new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
+        if (GetComponent<StatusEffectManager>() == null)
+        {
+            gameObject.AddComponent<StatusEffectManager>();
+        }
     }
 
     /// <summary>
