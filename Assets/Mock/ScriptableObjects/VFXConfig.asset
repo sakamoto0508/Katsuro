@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
   m_Name: VFXConfig
   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
-  _playEffectHeal: 
-  _playEffectGhost: 
-  _playEffectBuff: 
+  _playEffectHeal: Heal
+  _playEffectGhost: Ghost
+  _playEffectBuff: Buff
