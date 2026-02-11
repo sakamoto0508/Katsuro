@@ -393,4 +393,14 @@ public class EnemyMover
         float maxDeg = _enemyStuts.TurnSpeed * Mathf.Clamp01(deltaTime);
         _enemyTransform.rotation = Quaternion.RotateTowards(_enemyTransform.rotation, target, maxDeg);
     }
+
+    /// <summary>
+    /// 即座にプレイヤー方向を向かせます（外部から呼び出し可能）。
+    /// 主に攻撃開始時に使用して敵がプレイヤーを向いてから攻撃する用途。
+    /// あとでスムーズにさせる。
+    /// </summary>
+    public void FacePlayerImmediate()
+    {
+        SnapRotateToPlayer();
+    }
 }

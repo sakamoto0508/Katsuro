@@ -115,17 +115,20 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _mover?.StartPatrolWalk();
                     break;
                 case EnemyActionType.Slash:
+                    _mover?.FacePlayerImmediate();
+                    break;  
                 case EnemyActionType.Thrust:
                 case EnemyActionType.HeavySlash:
+                    _mover?.FacePlayerImmediate();
+                    break;
                 case EnemyActionType.WarpAttack:
-                    // 攻撃は EnemyAttacker 経由で実行（Animator のトリガなどはそこが担当）
+                    _mover?.FacePlayerImmediate();
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
                     _mover?.StartStepBack();
                     break;
                 case EnemyActionType.Wait:
-                    // Observe 相当: 停止して何もしない（AI のタイマーで再抽選される）
                     _mover?.StopMove();
                     break;
             }
