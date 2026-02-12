@@ -186,11 +186,37 @@ public class EnemyMover
     /// </summary>
     public void StopMove()
     {
+        if (_agent == null)
+        {
+            return;
+        }
+
+        // 停止フラグを立ててパスをクリア
         if (!_agent.isStopped)
         {
             _agent.isStopped = true;
             _agent.ResetPath();
         }
+
+        // 移動を完全に止めるために速度等もゼロクリア
+        try
+        {
+            _agent.velocity = Vector3.zero;
+            _agent.nextPosition = _enemyTransform.position;
+        }
+        catch
+        {
+        }
+
+        if (_rb != null)
+        {
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+
+        // パトロールフラグを折り、目的地更新までのタイマーをリセットして即再発行を防ぐ
+        _isPatrolWalking = false;
+        _destinationUpdateTimer = _enemyStuts != null ? _enemyStuts.DestinationUpdateInterval : 0.2f;
     }
 
     /// <summary>
