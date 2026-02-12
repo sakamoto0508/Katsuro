@@ -49,6 +49,10 @@ public class EnemyMover
     private bool _isPatrolWalking;
     private bool _manualRotationDisabledByAgent = false;
     float _speed = 0f;
+    private bool _prevAgentUpdatePosition = true;
+    private bool _isMovementHeldForAttack = false;
+    private bool _prevAnimatorApplyRootMotion = false;
+    private bool _prevAgentEnabled = true;
 
     /// <summary>
     /// 毎フレーム呼び出す更新処理。
@@ -64,6 +68,14 @@ public class EnemyMover
         {
             // root motion ステップバック中は常に停止扱い
             StopMove();
+            return;
+        }
+
+        // 攻撃などで移動・回転を一時停止している場合は追跡更新を行わない
+        if (_isMovementHeldForAttack)
+        {
+            // アニメ側の速度更新だけは継続しておく（必要なら）
+            UpdateAnimatorValues();
             return;
         }
 
@@ -217,6 +229,77 @@ public class EnemyMover
         // パトロールフラグを折り、目的地更新までのタイマーをリセットして即再発行を防ぐ
         _isPatrolWalking = false;
         _destinationUpdateTimer = _enemyStuts != null ? _enemyStuts.DestinationUpdateInterval : 0.2f;
+    }
+
+    /// <summary>
+    /// 攻撃中など一時的に NavMeshAgent による移動/同期を完全に止める。
+    /// </summary>
+    public void HoldMovementForAttack()
+    {
+        if (_agent == null) return;
+        if (_isMovementHeldForAttack) return;
+
+        // 保存して無効化
+        _prevAgentUpdatePosition = _agent.updatePosition;
+        _agent.updatePosition = false;
+        _agent.isStopped = true;
+        try { _agent.velocity = Vector3.zero; _agent.nextPosition = _enemyTransform.position; } catch {}
+
+        // 完全に NavMeshAgent の干渉を避けるためコンポーネント自体を無効化しておく
+        _prevAgentEnabled = _agent.enabled;
+        _agent.enabled = false;
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = true;
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+
+        // Animator の root motion を無効化してアニメ由来の移動を止める
+        if (_animator != null)
+        {
+            _prevAnimatorApplyRootMotion = _animator.applyRootMotion;
+            _animator.applyRootMotion = false;
+        }
+
+        _isMovementHeldForAttack = true;
+        Debug.Log($"EnemyMover: HoldMovementForAttack called for {_enemyTransform.name}");
+    }
+
+    /// <summary>
+    /// HoldMovementForAttack で止めた状態を復帰する。
+    /// </summary>
+    public void ReleaseMovementAfterAttack()
+    {
+        if (_agent == null) return;
+        if (!_isMovementHeldForAttack) return;
+
+        // コンポーネントを再有効化して位置を同期
+        _agent.enabled = _prevAgentEnabled;
+        if (_agent.enabled)
+        {
+            // warp して NavMeshAgent の位置を現在の Transform に合わせる
+            _agent.Warp(_enemyTransform.position);
+            _agent.velocity = Vector3.zero;
+            _agent.isStopped = false;
+            _agent.updatePosition = _prevAgentUpdatePosition;
+            _destinationUpdateTimer = 0f;
+        }
+
+        if (_rb != null)
+        {
+            _rb.isKinematic = false;
+        }
+
+        // Animator の root motion の設定を復帰
+        if (_animator != null)
+        {
+            _animator.applyRootMotion = _prevAnimatorApplyRootMotion;
+        }
+
+        _isMovementHeldForAttack = false;
+        Debug.Log($"EnemyMover: ReleaseMovementAfterAttack called for {_enemyTransform.name}");
     }
 
     /// <summary>
@@ -439,6 +522,14 @@ public class EnemyMover
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) return;
         _enemyTransform.rotation = Quaternion.LookRotation(dir.normalized);
+    }
+
+    /// <summary>
+    /// 即時でプレイヤーを向く（外部呼び出し用）。
+    /// </summary>
+    public void FacePlayerInstant()
+    {
+        SnapRotateToPlayer();
     }
 
     /// <summary>

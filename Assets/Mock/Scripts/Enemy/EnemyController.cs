@@ -117,21 +117,19 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _mover?.StartPatrolWalk();
                     break;
                 case EnemyActionType.Slash:
-                    _mover?.StopMove();
-                    _token = this.GetCancellationTokenOnDestroy();
-                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
+                    _mover?.FacePlayerInstant();
+                    _mover?.HoldMovementForAttack();
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.Thrust:
                 case EnemyActionType.HeavySlash:
-                    _mover?.StopMove();
-                    _token = this.GetCancellationTokenOnDestroy();
-                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
+                    _mover?.FacePlayerInstant();
+                    _mover?.HoldMovementForAttack();
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.WarpAttack:
-                    _token = this.GetCancellationTokenOnDestroy();
-                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
+                    _mover?.FacePlayerInstant();
+                    _mover?.HoldMovementForAttack();
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
@@ -191,12 +189,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-        _ai.OnAttackFinished();
+       _ai.OnAttackFinished();
+       // 攻撃終了時に一時停止していた移動制御を復帰させる
+       _mover?.ReleaseMovementAfterAttack();
     }
 
     public void AnimEvent_OnStepBackFinished()
     {
         _mover?.EndStepBack();
         _ai?.OnAttackFinished(); // または専用の完了処理
+        // 攻撃停止後は移動を復帰する
+        _mover?.ReleaseMovementAfterAttack();
     }
 }
