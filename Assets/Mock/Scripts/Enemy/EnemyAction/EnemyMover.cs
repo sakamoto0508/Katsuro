@@ -1,4 +1,5 @@
-using Unity.Cinemachine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -155,7 +156,9 @@ public class EnemyMover
         if (_destinationUpdateTimer <= 0f)
         {
             _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
-            _agent.SetDestination(_playerPosition.position);
+            // プレイヤーのコリジョン半径分だけ目標位置を補正して重なりを避ける
+            var adjusted = GetAdjustedDestination(_playerPosition.position);
+            _agent.SetDestination(adjusted);
         }
 
         // Smooth 回転モードなら手動回転を適用
@@ -211,6 +214,40 @@ public class EnemyMover
         Vector3 localDir = _enemyTransform.InverseTransformDirection(toTarget.normalized);
         return new Vector2(localDir.x, localDir.z).normalized;
 
+    }
+
+    // プレイヤーのコライダー半径を考慮して目的地を少し手前にずらす
+    private Vector3 GetAdjustedDestination(Vector3 playerPos)
+    {
+        if (_playerPosition == null) return playerPos;
+
+        // Try find a collider on the player to determine radius; prefer CapsuleCollider then CharacterController
+        var playerRoot = _playerPosition.gameObject;
+        CapsuleCollider cap = playerRoot.GetComponentInChildren<CapsuleCollider>();
+        float radius = 0f;
+        if (cap != null)
+        {
+            radius = Mathf.Max(cap.radius, 0f);
+        }
+        else
+        {
+            var cc = playerRoot.GetComponentInChildren<UnityEngine.CharacterController>();
+            if (cc != null)
+            {
+                radius = Mathf.Max(cc.radius, 0f);
+            }
+        }
+
+        // fallback: small default if no collider
+        if (radius <= 0f) radius = 0.5f;
+
+        // 目標位置をプレイヤー方向から radius 分だけ手前に引く
+        Vector3 dir = (playerPos - _enemyTransform.position);
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) return playerPos;
+
+        Vector3 adjusted = playerPos - dir.normalized * radius;
+        return adjusted;
     }
 
     /// <summary>
@@ -394,13 +431,50 @@ public class EnemyMover
         _enemyTransform.rotation = Quaternion.RotateTowards(_enemyTransform.rotation, target, maxDeg);
     }
 
-    /// <summary>
-    /// 即座にプレイヤー方向を向かせます（外部から呼び出し可能）。
-    /// 主に攻撃開始時に使用して敵がプレイヤーを向いてから攻撃する用途。
-    /// あとでスムーズにさせる。
-    /// </summary>
-    public void FacePlayerImmediate()
+    /// <summary>指定ターゲットの方向を見る。</summary>
+
+    public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
     {
-        SnapRotateToPlayer();
+        if (_enemyTransform == null || _playerPosition == null) return;
+
+        Vector3 dir = (_playerPosition.position - _enemyTransform.position);
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.0001f) return;
+
+        Quaternion start = _enemyTransform.rotation;
+        Quaternion target = Quaternion.LookRotation(dir.normalized);
+        float elapsed = 0f;
+
+        // 一時的に NavMeshAgent の自動回転を無効化して、回転処理が上書きされないようにする。
+        bool previousAgentUpdateRotation = true;
+        if (_agent != null)
+        {
+            previousAgentUpdateRotation = _agent.updateRotation;
+            _agent.updateRotation = false;
+        }
+
+        try
+        {
+            while (elapsed < duration)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                _enemyTransform.rotation = Quaternion.Slerp(start, target, t);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            }
+
+            _enemyTransform.rotation = target;
+        }
+        finally
+        {
+            // 終了・キャンセル時に必ず以前の updateRotation 設定を復帰する
+            if (_agent != null)
+            {
+                _agent.updateRotation = previousAgentUpdateRotation;
+            }
+        }
     }
 }

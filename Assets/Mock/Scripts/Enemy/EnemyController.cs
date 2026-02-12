@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -26,6 +27,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private EnemyMover _mover;
     private EnemyAI _ai;
     private EnemyActionType? _pendingAction;
+    private CancellationToken _token;
 
     /// <summary>
     /// 初期化処理：必要なランタイムコンポーネントを生成して接続します。
@@ -115,14 +117,21 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _mover?.StartPatrolWalk();
                     break;
                 case EnemyActionType.Slash:
-                    _mover?.FacePlayerImmediate();
-                    break;  
+                    _mover?.StopMove();
+                    _token = this.GetCancellationTokenOnDestroy();
+                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
+                    _attacker?.PerformAttack(action);
+                    break;
                 case EnemyActionType.Thrust:
                 case EnemyActionType.HeavySlash:
-                    _mover?.FacePlayerImmediate();
+                    _mover?.StopMove();
+                    _token = this.GetCancellationTokenOnDestroy();
+                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
+                    _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.WarpAttack:
-                    _mover?.FacePlayerImmediate();
+                    _token = this.GetCancellationTokenOnDestroy();
+                    _mover?.LookTargetSmooth(_enemyStuts.RotateSmoothTime, _token).Forget();
                     _attacker?.PerformAttack(action);
                     break;
                 case EnemyActionType.StepBack:
@@ -182,7 +191,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-       _ai.OnAttackFinished();
+        _ai.OnAttackFinished();
     }
 
     public void AnimEvent_OnStepBackFinished()

@@ -13,6 +13,8 @@ public class EnemyStuts : ScriptableObject
     public float StopDistance => _stopDistance;
     /// <summary> 目的地更新間隔 /// </summary>
     public float DestinationUpdateInterval => _destinationUpdateInterval;
+    /// <summary> 回転の滑らかさ /// </summary>
+    public float RotateSmoothTime => _rotateSmoothTime;
 
     [SerializeField] private float _enemyPower = 10f;
     [SerializeField] private float _enemyMaxHealth = 100f;
@@ -33,6 +35,7 @@ public class EnemyStuts : ScriptableObject
     [SerializeField] public float WeightObserve = 20f;
     [SerializeField] public float WeightMelee = 50f;
     [SerializeField] public float WeightBackstep = 20f;
+    [SerializeField] private float _rotateSmoothTime = 0.1f;
 
     public enum RotationControlMode
     {
