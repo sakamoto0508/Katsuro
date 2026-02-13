@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class EnemyAnimationController : MonoBehaviour
 {
+    public AnimationName AnimName => _animName;
     [SerializeField] private AnimationName _animName;
     private Animator _animator;
     private int _moveVelocityHash;

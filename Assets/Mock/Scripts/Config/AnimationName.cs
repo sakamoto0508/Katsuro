@@ -16,6 +16,7 @@ public class AnimationName : ScriptableObject
     public string IsSwordDrawn => _isSwordDrawn;
     public string JustAvoid => _justAvoid;
     public string JustAvoidWindow => _justAvoidWindow;
+    public string EnemyDead => _enemyDead;
 
     [SerializeField] private string _moveVelocity = "MoveVelocity";
     [SerializeField] private string _moveVectorX = "MoveVectorX";
@@ -30,4 +31,5 @@ public class AnimationName : ScriptableObject
     [SerializeField] private string _isSwordDrawn = "IsSwordDrawn";
     [SerializeField] private string _justAvoid = "JustAvoid";
     [SerializeField] private string _justAvoidWindow = "JustAvoidWindow";
+    [SerializeField] private string _enemyDead = "EnemyDead";
 }

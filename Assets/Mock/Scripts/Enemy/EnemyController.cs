@@ -22,12 +22,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
     [SerializeField] private float _stepBackDistance = 2f;
 
+    private EnemyAnimationController _enemyAnimController;
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
     private EnemyMover _mover;
     private EnemyAI _ai;
     private EnemyActionType? _pendingAction;
     private CancellationToken _token;
+    private bool _dead = false;
 
     /// <summary>
     /// 初期化処理：必要なランタイムコンポーネントを生成して接続します。
@@ -36,14 +38,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         var navMeshAgent = GetComponent<NavMeshAgent>();
         var rb = GetComponent<Rigidbody>();
-        var animController = GetComponent<EnemyAnimationController>();
+        _enemyAnimController = GetComponent<EnemyAnimationController>();
         //クラスの初期化
-        _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, animController, rb
+        _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
-        _attacker = new EnemyAttacker(animController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+        _attacker = new EnemyAttacker(_enemyAnimController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
         _ai = new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
         if (GetComponent<StatusEffectManager>() == null)
         {
@@ -73,6 +75,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void ApplyDamage(DamageInfo info, bool isCritical = false)
     {
+        if (_dead) return;
         if (_health == null)
         {
             // 予防: Health が未割当ての場合は生成してから適用する
@@ -83,11 +86,13 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         Debug.Log($"Enemy took {info.DamageAmount} damage, currentHp={_health.CurrentHp}");
 
-        if (_health.CurrentHp <= 0f)
+        if (_health.CurrentHp <= 0f && !_dead)
         {
             Debug.Log("Enemy dead");
             // とりあえずオブジェクトを破棄する。必要に応じて死亡処理を拡張してください。
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
+            _dead = true;
         }
     }
 
@@ -189,9 +194,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-       _ai.OnAttackFinished();
-       // 攻撃終了時に一時停止していた移動制御を復帰させる
-       _mover?.ReleaseMovementAfterAttack();
+        _ai.OnAttackFinished();
+        // 攻撃終了時に一時停止していた移動制御を復帰させる
+        _mover?.ReleaseMovementAfterAttack();
     }
 
     public void AnimEvent_OnStepBackFinished()
