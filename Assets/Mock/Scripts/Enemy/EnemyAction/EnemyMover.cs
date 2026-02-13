@@ -264,7 +264,6 @@ public class EnemyMover
         }
 
         _isMovementHeldForAttack = true;
-        Debug.Log($"EnemyMover: HoldMovementForAttack called for {_enemyTransform.name}");
     }
 
     /// <summary>
@@ -299,7 +298,6 @@ public class EnemyMover
         }
 
         _isMovementHeldForAttack = false;
-        Debug.Log($"EnemyMover: ReleaseMovementAfterAttack called for {_enemyTransform.name}");
     }
 
     /// <summary>

@@ -67,6 +67,12 @@ public class PlayerStateConfig : ScriptableObject
     /// <summary>ジャスト回避（Just Avoid）成功時間。</summary>
     public float JustAvoidTime => _justAvoidTime;
 
+    /// <summary>ゴースト化時の色。</summary>
+    public Color GhostColor => _ghostColor;
+
+    /// <summary>ゴースト化時の透明度（アルファ値）。</summary>
+    public float GhostAlpha => _alpha;
+
     public IReadOnlyList<AnimationClip> LightAttackClips => _lightAttackClips.Clips;
     public IReadOnlyList<AnimationClip> LockOnLightAttackClips => _lockOnLightAttackClips.Clips;
     public IReadOnlyList<AnimationClip> StrongAttackClips => _strongAttackClips.Clips;
@@ -107,6 +113,8 @@ public class PlayerStateConfig : ScriptableObject
 
     [Header("Avoid")]
     [SerializeField, Min(0.01f)] private float _justAvoidTime = 0.2f;
+    [SerializeField] private Color _ghostColor = Color.gray;
+    [SerializeField, Range(0f, 1f)] private float _alpha = 0.7f;
 
     [Header("Combo Window Timing")]
     [SerializeField, Min(0f)] private float _defaultLightComboWindowDelay = 0.05f;
