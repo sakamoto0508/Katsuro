@@ -39,8 +39,9 @@ public class GameManager : MonoBehaviour
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
             , _cameraManager, _lockOnCamera);
         _enemyController?.Init(_playerPosition);
+        // pass the primary Cinemachine camera to CameraManager (not the lock-on camera)
         _cameraManager?.Init(_inputBuffer, _playerPosition
-            , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineLockOncamera);
+            , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera);
     }
 }
 

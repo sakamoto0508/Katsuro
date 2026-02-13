@@ -1,4 +1,5 @@
 using Unity.Cinemachine;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class LockOnCameraMover
@@ -18,6 +19,7 @@ public class LockOnCameraMover
     private Transform _enemyPosition;
     private CinemachineCamera _camera;
     private CameraConfig _cameraConfig;
+    private RaycastHit hitInfo;
 
     public void LateUpdate()
     {

@@ -45,12 +45,10 @@ public class CameraManager : MonoBehaviour
         if (_lookOnCamera.IsLockOn == false)
         {
             _lookOnCamera?.LockOn();
-            Debug.Log("LockOn");
         }
         else
         {
             _lookOnCamera?.UnLockOn();
-            Debug.Log("UnLockOn");
         }
     }
 }

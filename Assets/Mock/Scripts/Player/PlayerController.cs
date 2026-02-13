@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             : _playerStateConfig?.SkillGaugeRecoveryPerSecond ?? 0f;
 
         // --- 各種コンポーネントを生成
-        _playerResource = new PlayerResource(_playerStatus);
+        _playerResource = new PlayerResource(_playerStatus, _animationController);
         var ownerColliders = GetComponentsInChildren<Collider>();
         var playerWeapon = new PlayerWeapon(_weaponColliders, ownerColliders);
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);

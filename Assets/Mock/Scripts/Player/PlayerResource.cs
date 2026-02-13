@@ -7,10 +7,11 @@ using UnityEngine;
 /// </summary>
 public class PlayerResource : IDisposable
 {
-    public PlayerResource(PlayerStatus status)
+    public PlayerResource(PlayerStatus status,PlayerAnimationController animController)
     {
         _maxHp = status != null ? status.MaxHealth : 100f;
         _hpRx = new ReactiveProperty<float>(_maxHp);
+        _animController = animController;
     }
 
     /// <summary>
@@ -29,6 +30,7 @@ public class PlayerResource : IDisposable
     /// 現在 HP の割合（0..1）。モデル側で正規化値を持っておくと便利なため提供します。
     /// </summary>
     public float CurrentHpRatio => _maxHp > 0f ? _hpRx.Value / _maxHp : 0f;
+    private readonly PlayerAnimationController _animController;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
 
@@ -51,6 +53,15 @@ public class PlayerResource : IDisposable
     {
         if (amount <= 0f) return;
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
+        if(_hpRx.Value <= 0f)
+        {
+            PlayerDeath();
+        }
+    }
+
+    public void PlayerDeath()
+    {
+        _animController?.PlayTrigger(_animController.AnimName.PlayerDead);
     }
 
     public void Dispose()
