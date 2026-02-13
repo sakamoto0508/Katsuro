@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
   m_Name: CameraConfig
   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
-  _cameraDistance: 3.81
-  _cameraHeight: 2.13
-  _positionSmooth: 20
+  _cameraDistance: 2.2
+  _cameraHeight: 2.98
+  _positionSmooth: 6
   _rotationSmooth: 20
-  _lookAtHeight: 2
+  _lookAtHeight: 1.62
+  _cameraCollisionRadius: 0.3
