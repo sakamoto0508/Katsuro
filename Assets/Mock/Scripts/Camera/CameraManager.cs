@@ -15,6 +15,7 @@ public class CameraManager : MonoBehaviour
         _lookOnCamera = lockOnCamera;
         _lockOnCameraMover = new LockOnCameraMover(lockOnCamera, playerPosition
             , enemyPosition, camera, config);
+        Debug.Log($"CameraManager.Init: player={playerPosition?.name ?? "null"}, enemy={enemyPosition?.name ?? "null"}, camera={(camera!=null?camera.name:"null")}");
     }
 
     private void OnDestroy()

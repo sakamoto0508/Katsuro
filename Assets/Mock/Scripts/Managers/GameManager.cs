@@ -42,16 +42,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Camera _camera;
     [SerializeField] private CinemachineCamera _cinemachineCamera;
     [SerializeField] private CinemachineCamera _cinemachineLockOncamera;
-    [SerializeField] private CinemachineInputAxisController _inputCamera;
 
-    [Header("Scene / UI")]
+    [Header("Scene")]
     [SerializeField] private LoadSceneManager _loadSceneManager;
-    [SerializeField] private GameObject _titleUI;
-    [SerializeField] private GameObject _hudUI;
-    [SerializeField] private GameObject _resultUI;
+ 
 
+    [SerializeField] private GameState _state = GameState.Title;
     private LockOnCamera _lockOnCamera;
-    private GameState _state = GameState.Title;
 
     private void Awake()
     {
@@ -70,7 +67,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Init();
-        SetGameState(GameState.Title);
+        SetGameState(_state);
     }
 
     private void Init()
@@ -82,9 +79,6 @@ public class GameManager : MonoBehaviour
         _enemyController?.Init(_playerPosition);
         _cameraManager?.Init(_inputBuffer, _playerPosition
             , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera);
-
-        // UI 初期化（あれば）
-        UpdateUIForState(_state);
     }
 
     /// <summary>
@@ -117,27 +111,18 @@ public class GameManager : MonoBehaviour
         {
             if (newState == GameState.Title)
             {
+                AudioManager.Instance.StopBGM();
                 AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM);
             }
             else if (newState == GameState.InGame)
             {
-                // InGame 時の BGM は別途管理している想定。ここでは停止のみ行う例。
-                // AudioManager.Instance.StopBGM();
+                AudioManager.Instance.StopBGM();
+                AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM);
             }
         }
 
-        // UI 切り替え
-        UpdateUIForState(newState);
-
         // イベント発行
         OnGameStateChanged?.Invoke(newState);
-    }
-
-    private void UpdateUIForState(GameState state)
-    {
-        if (_titleUI != null) _titleUI.SetActive(state == GameState.Title);
-        if (_hudUI != null) _hudUI.SetActive(state == GameState.InGame);
-        if (_resultUI != null) _resultUI.SetActive(state == GameState.Victory || state == GameState.Defeat);
     }
 
     public void StartGame()
@@ -153,18 +138,6 @@ public class GameManager : MonoBehaviour
     public void LoseGame()
     {
         SetGameState(GameState.Defeat);
-    }
-
-    public void TogglePause()
-    {
-        if (_state == GameState.Pause)
-        {
-            SetGameState(GameState.InGame);
-        }
-        else if (_state == GameState.InGame)
-        {
-            SetGameState(GameState.Pause);
-        }
     }
 
     /// <summary>
