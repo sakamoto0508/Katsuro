@@ -1,10 +1,12 @@
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "AudioConfig", menuName = "Config/AudioConfig")]
+
 public class AudioConfig : ScriptableObject
 {
-    public string TitleClickSE => _titleClickSE;
+    public string StartSE => _startSE;
     public string TitleBGM => _titleBGM;
 
-    [SerializeField] private string _titleBGM = "Title";
-    [SerializeField] private string _titleClickSE = "TitleClick";
+    [SerializeField] private string _titleBGM = "TitleBGM";
+    [SerializeField] private string _startSE = "StartSE";
 }
