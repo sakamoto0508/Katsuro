@@ -15,7 +15,6 @@ public class CameraManager : MonoBehaviour
         _lookOnCamera = lockOnCamera;
         _lockOnCameraMover = new LockOnCameraMover(lockOnCamera, playerPosition
             , enemyPosition, camera, config);
-        // init camera manager
     }
 
     private void OnDestroy()
