@@ -12,6 +12,7 @@ public class SoundData
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
+    public AudioConfig AudioConfig => _audioConfig; 
 
     [Header("BGM 用 AudioSource")]
     [SerializeField] private AudioSource bgmSource;
@@ -23,6 +24,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<SoundData> seList = new List<SoundData>();
     [Header("SFX プールサイズ")]
     [SerializeField] private int sfxPoolSize = 10;
+    [Header("オーディオ設定")]
+    [SerializeField] private AudioConfig _audioConfig;
 
     private Dictionary<string, AudioClip> _bgmDict = new Dictionary<string, AudioClip>();
     private Dictionary<string, AudioClip> _seDict = new Dictionary<string, AudioClip>();

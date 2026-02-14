@@ -84,15 +84,9 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         _health.ApplyDamage(info.DamageAmount);
 
-        Debug.Log($"Enemy took {info.DamageAmount} damage, currentHp={_health.CurrentHp}");
-
         if (_health.CurrentHp <= 0f && !_dead)
         {
-            Debug.Log("Enemy dead");
-            // とりあえずオブジェクトを破棄する。必要に応じて死亡処理を拡張してください。
-            //Destroy(gameObject);
-            _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
-            _dead = true;
+            EnemyDead();
         }
     }
 
@@ -148,6 +142,15 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
         _mover?.Update();
+    }
+
+    private void EnemyDead()
+    {
+        _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
+        _dead = true;
+
+        AudioManager.Instance?.PlaySE("EnemyDeath");
+        LoadSceneManager.Instance.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
     }
 
     private void OnAnimatorMove()

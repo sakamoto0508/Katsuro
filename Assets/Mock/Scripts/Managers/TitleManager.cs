@@ -63,7 +63,7 @@ public class TitleManager : MonoBehaviour
         if (LoadSceneManager.Instance != null)
         {
             // 非同期読み込みをトリガー
-            LoadSceneManager.Instance.LoadSceneAsync(sceneName);
+            LoadSceneManager.Instance.LoadScene(sceneName);
         }
         else
         {

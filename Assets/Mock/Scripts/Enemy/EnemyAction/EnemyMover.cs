@@ -222,8 +222,11 @@ public class EnemyMover
 
         if (_rb != null)
         {
-            _rb.linearVelocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
+            if (!_rb.isKinematic)
+            {
+                _rb.linearVelocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
+            }
         }
 
         // パトロールフラグを折り、目的地更新までのタイマーをリセットして即再発行を防ぐ
@@ -251,9 +254,10 @@ public class EnemyMover
 
         if (_rb != null)
         {
-            _rb.isKinematic = true;
+            // Clear velocities before making kinematic. Setting velocity on a kinematic body is not supported.
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = true;
         }
 
         // Animator の root motion を無効化してアニメ由来の移動を止める

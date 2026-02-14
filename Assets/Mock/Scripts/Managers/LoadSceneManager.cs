@@ -1,10 +1,12 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LoadSceneManager : MonoBehaviour
 {
     public static LoadSceneManager Instance { get; private set; }
+
+    public SceneNameConfig SceneNameConfig => _sceneNameConfig;
 
     [SerializeField] private SceneNameConfig _sceneNameConfig;
 
@@ -16,27 +18,10 @@ public class LoadSceneManager : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    /// <summary>
-    /// 非同期でシーンを読み込みます（簡易版）。内部で Coroutine を使ってロードを開始します。
-    /// </summary>
-    public void LoadSceneAsync(string sceneName)
+    public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
     {
-        StartCoroutine(LoadAsyncRoutine(sceneName));
-    }
-
-    private IEnumerator LoadAsyncRoutine(string sceneName)
-    {
-        var op = SceneManager.LoadSceneAsync(sceneName);
-        if (op == null)
-        {
-            Debug.LogError($"Failed to start loading scene '{sceneName}'");
-            yield break;
-        }
-
-        while (!op.isDone)
-        {
-            yield return null;
-        }
+        await UniTask.Delay(waitTime);
+        SceneManager.LoadScene(sceneName);
     }
 
     private void Awake()

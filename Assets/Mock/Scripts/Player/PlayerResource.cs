@@ -62,6 +62,8 @@ public class PlayerResource : IDisposable
     public void PlayerDeath()
     {
         _animController?.PlayTrigger(_animController.AnimName.PlayerDead);
+        AudioManager.Instance?.PlaySE("PlayerDeath");
+        LoadSceneManager.Instance?.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
     }
 
     public void Dispose()
