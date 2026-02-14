@@ -22,9 +22,7 @@ public class LockOnCameraMover
     public void LateUpdate()
     {
         if (_lockOnCamera.IsLockOn == false) return;
-        Debug.Log($"LockOnCameraMover.LateUpdate: isLockOn={_lockOnCamera.IsLockOn}, camera={_camera?.name ?? "null"}, player={_playerPosition?.name ?? "null"}, enemy={_enemyPosition?.name ?? "null"}");
-        UpdateLockOnCamera();
-        //Debug.Log(_camera.transform.position);
+        if (_lockOnCamera.IsLockOn) UpdateLockOnCamera();
     }
 
     private void UpdateLockOnCamera()
