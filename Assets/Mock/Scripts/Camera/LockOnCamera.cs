@@ -31,7 +31,6 @@ public class LockOnCamera
         if (mainCam != null)
         {
             _cinemachineBrain = mainCam.GetComponent<Unity.Cinemachine.CinemachineBrain>();
-            Debug.Log($"LockOnCamera: found CinemachineBrain = {(_cinemachineBrain != null ? "yes" : "no")}");
         }
     }
 

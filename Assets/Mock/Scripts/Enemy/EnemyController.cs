@@ -155,7 +155,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
         _dead = true;
 
-        AudioManager.Instance?.PlaySE("EnemyDeath");
+        FinalBlowManager.Instance?.StartFinalBlow();
+
         LoadSceneManager.Instance.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, _enemyDeadDelay).Forget();
     }
 

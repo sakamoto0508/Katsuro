@@ -11,6 +11,8 @@ using INab.VFXAssets;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour, IDamageable
 {
+    public PlayerAnimationController AnimController => _animationController;
+
     [Header("PlayerStatus")]
     [SerializeField] private MeshRenderer _playerWeapon;
     [SerializeField] private GameObject _playerStartWeapon;
@@ -442,6 +444,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         //武器の見た目を表示する。
         _playerWeapon.enabled = true;
         _playerStartWeapon.SetActive(false);
+    }
+
+    public void AnimEvent_OnSwordSheathing()
+    {
+        //武器の見た目を非表示にする。
+        _playerWeapon.enabled = false;
+        _playerStartWeapon.SetActive(true);
     }
 
     //アニメーションイベント：ジャスト回避アニメーション開始時。

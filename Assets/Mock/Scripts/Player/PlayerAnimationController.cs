@@ -35,7 +35,32 @@ public class PlayerAnimationController : MonoBehaviour
     /// </summary>
     public void PlayTrigger(string animationName)
     {
-        _animator?.SetTrigger(animationName);
+        if (string.IsNullOrEmpty(animationName))
+        {
+            Debug.LogWarning("PlayTrigger called with null or empty parameter name");
+            return;
+        }
+        if (_animator == null)
+        {
+            Debug.LogWarning($"PlayTrigger: Animator is null, cannot set trigger '{animationName}'");
+            return;
+        }
+        // 安全策: Animator に該当パラメータが存在するか確認してから SetTrigger を呼ぶ
+        var found = false;
+        foreach (var p in _animator.parameters)
+        {
+            if (p.name == animationName && p.type == AnimatorControllerParameterType.Trigger)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            Debug.LogWarning($"Animator does not contain Trigger parameter '{animationName}'");
+            return;
+        }
+        _animator.SetTrigger(animationName);
     }
 
     /// <summary>

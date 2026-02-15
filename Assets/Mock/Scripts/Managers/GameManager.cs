@@ -86,24 +86,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetGameState(GameState newState)
     {
-        if (_state == newState) return;
-
         _state = newState;
         // Input
         if (_inputBuffer != null)
         {
             var enabled = newState == GameState.InGame;
             _inputBuffer.enabled = enabled;
-        }
-
-        // Time scale
-        if (newState == GameState.Pause)
-        {
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            Time.timeScale = 1f;
         }
 
         // Audio: タイトル画面ならタイトル BGM を再生
@@ -120,7 +108,6 @@ public class GameManager : MonoBehaviour
                 AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM);
             }
         }
-
         // イベント発行
         OnGameStateChanged?.Invoke(newState);
     }
