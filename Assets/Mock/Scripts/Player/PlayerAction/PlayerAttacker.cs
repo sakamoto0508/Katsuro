@@ -239,6 +239,11 @@ public sealed class PlayerAttacker : IDisposable
         }
 
         damageable.ApplyDamage(damageInfo);
+        if (HitStopManager.Instance != null && other != null)
+        {
+            HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, other.gameObject);
+            Debug.Log($"PlayerAttacker: Played hit stop for target={other.gameObject.name}");
+        }
         SpawnPassiveEffects(in damageInfo);
     }
 

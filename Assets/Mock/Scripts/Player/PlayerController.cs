@@ -465,4 +465,9 @@ public class PlayerController : MonoBehaviour, IDamageable
             _animationController?.PlayBool(justAvoidBool, false);
         }
     }
+
+    public void AnimEvent_OnAttackSound(string soundName)
+    {
+        AudioManager.Instance?.PlaySE(soundName);
+    }
 }

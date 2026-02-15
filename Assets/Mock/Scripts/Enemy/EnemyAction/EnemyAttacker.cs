@@ -135,6 +135,12 @@ public class EnemyAttacker : IDisposable
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
         Debug.Log($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
         damageable.ApplyDamage(damageInfo);
+        var go = other != null ? other.gameObject : null;
+        if (HitStopManager.Instance != null && go != null)
+        {
+            HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, go);
+            Debug.Log($"EnemyAttacker: Played hit stop for {go.name} with duration={HitStopManager.Instance.HitStopTime}");
+        }
     }
 
     public void Dispose()

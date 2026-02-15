@@ -52,6 +52,7 @@ public class PlayerResource : IDisposable
     public void ApplyDamage(float amount)
     {
         if (amount <= 0f) return;
+        //todo:ダメージSEとヒットストップの追加
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
         if(_hpRx.Value <= 0f)
         {

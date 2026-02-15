@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using INab.VFXAssets;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
@@ -22,6 +23,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
     [SerializeField] private float _stepBackDistance = 2f;
 
+    [SerializeField] private int _enemyDeadDelay = 2000;
+
     private EnemyAnimationController _enemyAnimController;
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
@@ -39,6 +42,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         var navMeshAgent = GetComponent<NavMeshAgent>();
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
+        var enemyEffect = GetComponent<CharacterEffect>();
+        enemyEffect.PlayEffect_CharacterEffect();
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName);
@@ -76,6 +81,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void ApplyDamage(DamageInfo info, bool isCritical = false)
     {
         if (_dead) return;
+        //todo:ダメージSEとヒットストップの追加
         if (_health == null)
         {
             // 予防: Health が未割当ての場合は生成してから適用する
@@ -150,7 +156,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _dead = true;
 
         AudioManager.Instance?.PlaySE("EnemyDeath");
-        LoadSceneManager.Instance.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
+        LoadSceneManager.Instance.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, _enemyDeadDelay).Forget();
     }
 
     private void OnAnimatorMove()
