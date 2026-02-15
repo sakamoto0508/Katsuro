@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TitleManager
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}
   _sceneNameConfig: {fileID: 11400000, guid: 87b2238071d20874fa9ba88e53dea151, type: 2}
-  _transitionDelay: 1000
+  _transitionDelay: 500
 --- !u!4 &215336948 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9030141369754616398, guid: 45577a2ace402ca4cb4446be944d6667, type: 3}

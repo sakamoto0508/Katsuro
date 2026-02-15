@@ -62,9 +62,18 @@ public class PlayerResource : IDisposable
 
     public void PlayerDeath()
     {
-        _animController?.PlayTrigger(_animController.AnimName.PlayerDead);
         AudioManager.Instance?.PlaySE("PlayerDeath");
-        LoadSceneManager.Instance?.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
+
+        // PlayerDeadManager があればそちらで演出（ヴィネット／ローパス／スロー等）を実行し、
+        // 最終的にタイトル遷移まで行う。無ければ既存の即時遷移をフォールバックとして実行する。
+        if (PlayerDeadManager.Instance != null)
+        {
+            PlayerDeadManager.Instance.StartDefeatSequence(_animController != null ? _animController.gameObject : null);
+        }
+        else
+        {
+            LoadSceneManager.Instance?.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
+        }
     }
 
     public void Dispose()

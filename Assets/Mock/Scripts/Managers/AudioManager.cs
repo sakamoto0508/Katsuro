@@ -26,6 +26,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private int sfxPoolSize = 10;
     [Header("オーディオ設定")]
     [SerializeField] private AudioConfig _audioConfig;
+    [SerializeField] private AudioListener _audioListener;
 
     private Dictionary<string, AudioClip> _bgmDict = new Dictionary<string, AudioClip>();
     private Dictionary<string, AudioClip> _seDict = new Dictionary<string, AudioClip>();
@@ -240,6 +241,43 @@ public class AudioManager : MonoBehaviour
             if (s != null)
             {
                 s.volume = Mathf.Clamp01(volume);
+            }
+        }
+    }
+
+    /// <summary>
+    /// AudioListener に対してローパスフィルタを適用します（cutoff に Hz を指定）。
+    /// </summary>
+    public void ApplyLowPassToListener(float cutoffFrequency)
+    {
+        if (_audioListener == null) return;
+        var filter = _audioListener.GetComponent<AudioLowPassFilter>();
+        if (filter == null) filter = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
+        filter.cutoffFrequency = cutoffFrequency;
+    }
+
+    /// <summary>
+    /// AudioListener のローパスフィルタを削除します。
+    /// </summary>
+    public void RemoveLowPassFromListener()
+    {
+        if (_audioListener == null) return;
+        var filter = _audioListener.GetComponent<AudioLowPassFilter>();
+        if (filter != null) Destroy(filter);
+    }
+
+    /// <summary>
+    /// 即座に全てのオーディオを停止します（BGM と SFX）。
+    /// </summary>
+    public void StopAllAudioImmediate()
+    {
+        StopBGM();
+        foreach (var s in _sfxPool)
+        {
+            if (s != null)
+            {
+                s.Stop();
+                s.clip = null;
             }
         }
     }
