@@ -49,10 +49,16 @@ MonoBehaviour:
   bgmList:
   - name: TitleBGM
     clip: {fileID: 8300000, guid: 2dc35d9da56105f4c9c619a062569fc4, type: 3}
-  - name: MainBGM
+  - name: InGameBGM
     clip: {fileID: 8300000, guid: a1c15d862d4d56b459a8a309dfb16c52, type: 3}
   seList:
   - name: StartSE
     clip: {fileID: 8300000, guid: 1f807c5eb909a884f86c2f0f912cf6bc, type: 3}
+  - name: Sheathing
+    clip: {fileID: 8300000, guid: 9a6f886439a99b34baf051631463c47c, type: 3}
+  - name: Drawing
+    clip: {fileID: 8300000, guid: 33dcd419d6c88494781cddbc09e9b0b7, type: 3}
+  - name: LockOn
+    clip: {fileID: 8300000, guid: 165e1c8be425c2848a40ff627d338332, type: 3}
   sfxPoolSize: 10
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}

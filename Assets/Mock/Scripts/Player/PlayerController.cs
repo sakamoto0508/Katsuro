@@ -475,7 +475,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    public void AnimEvent_OnAttackSound(string soundName)
+    public void AnimEvent_OnSoundEffect(string soundName)
     {
         AudioManager.Instance?.PlaySE(soundName);
     }
