@@ -64,6 +64,9 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        // Permanently lock and hide the cursor for the game (do not release)
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Start()

@@ -1,4 +1,6 @@
 using UnityEngine;
+using UniRx;
+using System;
 
 /// <summary>
 /// 自傷（Self Sacrifice）ステート。
@@ -12,6 +14,8 @@ public class PlayerSelfSacrificeState : PlayerState
     }
 
     public override PlayerStateId Id => PlayerStateId.SelfSacrifice;
+
+    private IDisposable _selfSacrificeActiveDisp;
 
     public override void Enter()
     {
@@ -33,6 +37,25 @@ public class PlayerSelfSacrificeState : PlayerState
         }
         Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectBuff);
         AudioManager.Instance.PlayBGM("BuffBGM", 2, 1f);
+
+        // Subscribe to ability active state so we stop effects/BGM only when ability actually ends.
+        // Dispose any previous subscription before creating a new one.
+        _selfSacrificeActiveDisp?.Dispose();
+        if (Context.SelfSacrifice != null)
+        {
+            _selfSacrificeActiveDisp = Context.SelfSacrifice.IsActiveRx.Subscribe(active =>
+            {
+                if (!active)
+                {
+                    // Ability ended (gauge depleted or canceled) -> stop visuals and sound
+                    Context?.CharacterEffect?.StopEffect_CharacterEffect();
+                    AudioManager.Instance?.StopBGM(2);
+                    // cleanup subscription since ability has ended
+                    _selfSacrificeActiveDisp?.Dispose();
+                    _selfSacrificeActiveDisp = null;
+                }
+            });
+        }
     }
 
     public override void Exit()
@@ -40,7 +63,8 @@ public class PlayerSelfSacrificeState : PlayerState
         // SelfSacrifice は AbilityManager 側で管理しているため、
         // ステート離脱時に自動で End しない（攻撃中も継続したい）。
         // 終了は入力キャンセルやゲージ枯渇など Ability 側の判定で行う。
-        Context?.CharacterEffect?.StopEffect_CharacterEffect();
+        // Do not stop effect/BGM here; those are stopped when the ability actually ends.
+        // Keep subscription active so we can detect the ability end even if the state exits (e.g. for attacks).
     }
 
     public override void Update(float deltaTime)
@@ -56,7 +80,9 @@ public class PlayerSelfSacrificeState : PlayerState
     public override void OnSelfSacrificeCanceled()
     {
         Context.SelfSacrifice?.End();
-        AudioManager.Instance.StopBGM(2);
+        // Stop immediately on explicit cancel
+        Context?.CharacterEffect?.StopEffect_CharacterEffect();
+        AudioManager.Instance?.StopBGM(2);
     }
 
     public override void OnLightAttack()

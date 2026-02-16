@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary>
 /// プレイヤー敗北時の演出を管理します。
@@ -186,6 +185,11 @@ public class PlayerDeadManager : MonoBehaviour
             _blackMaterialInstance.SetFloat("_Smoothness", 0.7f);
             _blackImage.material = _blackMaterialInstance;
         }
+        else
+        {
+            // Fallback for builds where the custom shader might not be included: use plain black Image and start transparent
+            _blackImage.color = new Color(0f, 0f, 0f, 0f);
+        }
         var blackRect = _blackImage.GetComponent<RectTransform>();
         blackRect.anchorMin = Vector2.zero;
         blackRect.anchorMax = Vector2.one;
@@ -205,7 +209,8 @@ public class PlayerDeadManager : MonoBehaviour
         // Fade both red background image and black vignette material alpha (if available)
         var red = _redImage;
         var blackMat = _blackMaterialInstance;
-        if (red == null && blackMat == null) return;
+        var blackImg = _blackImage;
+        if (red == null && blackMat == null && blackImg == null) return;
         float t = 0f;
         Color redStart = red != null ? red.color : Color.clear;
         float blackStartAlpha = 1f;
@@ -213,6 +218,10 @@ public class PlayerDeadManager : MonoBehaviour
         {
             var c = blackMat.GetColor("_Color");
             blackStartAlpha = c.a;
+        }
+        else if (blackImg != null)
+        {
+            blackStartAlpha = blackImg.color.a;
         }
         while (t < duration)
         {
@@ -229,6 +238,12 @@ public class PlayerDeadManager : MonoBehaviour
                 c.a = Mathf.Lerp(blackStartAlpha, targetAlpha, k);
                 blackMat.SetColor("_Color", c);
             }
+            else if (blackImg != null)
+            {
+                var bc = blackImg.color;
+                bc.a = Mathf.Lerp(blackStartAlpha, targetAlpha, k);
+                blackImg.color = bc;
+            }
             await UniTask.Yield();
         }
         if (red != null) red.color = new Color(redStart.r, redStart.g, redStart.b, targetAlpha);
@@ -237,6 +252,12 @@ public class PlayerDeadManager : MonoBehaviour
             var c = blackMat.GetColor("_Color");
             c.a = targetAlpha;
             blackMat.SetColor("_Color", c);
+        }
+        else if (blackImg != null)
+        {
+            var bc = blackImg.color;
+            bc.a = targetAlpha;
+            blackImg.color = bc;
         }
     }
 
