@@ -33,6 +33,7 @@ public class PlayerResource : IDisposable
     private readonly PlayerAnimationController _animController;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
+    private bool _dead;
 
     /// <summary>
     /// 指定した割合（percent）だけ HP を回復する（percent は 0..100）。
@@ -62,6 +63,8 @@ public class PlayerResource : IDisposable
 
     public void PlayerDeath()
     {
+        if (_dead) return;
+        _dead = true;
         AudioManager.Instance?.PlaySE("PlayerDeath");
 
         // PlayerDeadManager があればそちらで演出（ヴィネット／ローパス／スロー等）を実行し、

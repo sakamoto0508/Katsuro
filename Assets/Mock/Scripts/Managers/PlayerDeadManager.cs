@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UI;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
@@ -30,8 +31,17 @@ public class PlayerDeadManager : MonoBehaviour
     [SerializeField] private float _silenceDuration = 0.5f;
     // ローパスのカットオフ周波数（Hz）: 値を下げるほど音がこもる
     [SerializeField] private float _lowPassCutoff = 800f;
+    [SerializeField] private Volume _volume;
+    [SerializeField] private float _smoothTime = 0.1f;
+    [SerializeField] private float _intensity = 0.45f;
+    [SerializeField, Range(0f, 1f)] private float _smoothness = 0.5f;
 
     private GameObject _overlay;
+    private Vignette _vignette;
+    // UI image refs for better control
+    private UnityEngine.UI.Image _redImage;
+    private UnityEngine.UI.Image _blackImage;
+    private Material _blackMaterialInstance;
 
     private void Awake()
     {
@@ -43,6 +53,19 @@ public class PlayerDeadManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        if (_volume != null)
+        {
+            _volume.profile.TryGet(out _vignette);
+            if (_vignette != null)
+            {
+                _vignette.intensity.value = 0f;
+                _vignette.smoothness.value = 0f;
+            }
         }
     }
 
@@ -66,9 +89,11 @@ public class PlayerDeadManager : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartDefeatSequenceAsync(GameObject playerObject)
     {
-        // フェーズ1: Vignette のフェードイン
+        // フェーズ1: Vignette のフェードイン（オーバーレイと Post-process を同時にフェード）
         CreateVignetteOverlay();
-        await FadeOverlayAlpha(_vignetteMaxAlpha, _vignetteFadeIn);
+        var overlayTask = _overlay != null ? FadeOverlayAlpha(_vignetteMaxAlpha, _vignetteFadeIn) : UniTask.CompletedTask;
+        var vigTask = (_vignette != null) ? FadeVignette(_intensity, _smoothness, _vignetteFadeIn) : UniTask.CompletedTask;
+        await UniTask.WhenAll(overlayTask, vigTask);
 
         // Audio: ローパスを適用して音がこもる
         if (AudioManager.Instance != null)
@@ -99,7 +124,7 @@ public class PlayerDeadManager : MonoBehaviour
 
         // フェーズ2: 崩れ（膝をつく）。無音を作る。
         await UniTask.Delay(System.TimeSpan.FromSeconds(_slowDuration), ignoreTimeScale: true);
-        
+
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.StopAllAudioImmediate();
@@ -121,15 +146,41 @@ public class PlayerDeadManager : MonoBehaviour
         var canvas = _overlay.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 2000;
-        var imgGO = new GameObject("vignette");
-        imgGO.transform.SetParent(_overlay.transform, false);
-        var img = imgGO.AddComponent<Image>();
-        img.color = new Color(_vignetteColor.r, _vignetteColor.g, _vignetteColor.b, 0f);
-        var rect = img.GetComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
+        // 赤のフルスクリーン背景
+        var redGO = new GameObject("vignette_red");
+        redGO.transform.SetParent(_overlay.transform, false);
+        _redImage = redGO.AddComponent<Image>();
+        _redImage.color = new Color(_vignetteColor.r, _vignetteColor.g, _vignetteColor.b, 0f);
+        var redRect = _redImage.GetComponent<RectTransform>();
+        redRect.anchorMin = Vector2.zero;
+        redRect.anchorMax = Vector2.one;
+        redRect.offsetMin = Vector2.zero;
+        redRect.offsetMax = Vector2.zero;
+
+        // その上に黒のビネット（中心を透明にする）を配置する
+        var blackGO = new GameObject("vignette_black");
+        blackGO.transform.SetParent(_overlay.transform, false);
+        _blackImage = blackGO.AddComponent<Image>();
+        // 使用するシェーダーは Assets/Mock/Shaders/UIUnlitVignette.shader
+        var shader = Shader.Find("UI/UnlitVignette");
+        if (shader != null)
+        {
+            _blackMaterialInstance = new Material(shader);
+            // initialize black material parameters
+            _blackMaterialInstance.SetColor("_Color", new Color(0f, 0f, 0f, 1f));
+            _blackMaterialInstance.SetFloat("_InnerRadius", 0.3f);
+            _blackMaterialInstance.SetFloat("_OuterRadius", 0.95f);
+            _blackMaterialInstance.SetFloat("_Smoothness", 0.7f);
+            _blackImage.material = _blackMaterialInstance;
+        }
+        var blackRect = _blackImage.GetComponent<RectTransform>();
+        blackRect.anchorMin = Vector2.zero;
+        blackRect.anchorMax = Vector2.one;
+        blackRect.offsetMin = Vector2.zero;
+        blackRect.offsetMax = Vector2.zero;
+        // ensure black is rendered on top
+        _blackImage.transform.SetAsLastSibling();
+        _blackImage.raycastTarget = false;
     }
 
     /// <summary>
@@ -138,17 +189,60 @@ public class PlayerDeadManager : MonoBehaviour
     private async UniTask FadeOverlayAlpha(float targetAlpha, float duration)
     {
         if (_overlay == null) return;
-        var img = _overlay.GetComponentInChildren<Image>();
-        if (img == null) return;
+        // Fade both red background image and black vignette material alpha (if available)
+        var red = _redImage;
+        var blackMat = _blackMaterialInstance;
+        if (red == null && blackMat == null) return;
         float t = 0f;
-        Color start = img.color;
+        Color redStart = red != null ? red.color : Color.clear;
+        float blackStartAlpha = 1f;
+        if (blackMat != null)
+        {
+            var c = blackMat.GetColor("_Color");
+            blackStartAlpha = c.a;
+        }
         while (t < duration)
         {
             t += Time.unscaledDeltaTime;
             float k = Mathf.Clamp01(t / duration);
-            img.color = new Color(start.r, start.g, start.b, Mathf.Lerp(start.a, targetAlpha, k));
+            float a = Mathf.Lerp(redStart.a, targetAlpha, k);
+            if (red != null)
+            {
+                red.color = new Color(redStart.r, redStart.g, redStart.b, a);
+            }
+            if (blackMat != null)
+            {
+                var c = blackMat.GetColor("_Color");
+                c.a = Mathf.Lerp(blackStartAlpha, targetAlpha, k);
+                blackMat.SetColor("_Color", c);
+            }
             await UniTask.Yield();
         }
-        img.color = new Color(start.r, start.g, start.b, targetAlpha);
+        if (red != null) red.color = new Color(redStart.r, redStart.g, redStart.b, targetAlpha);
+        if (blackMat != null)
+        {
+            var c = blackMat.GetColor("_Color");
+            c.a = targetAlpha;
+            blackMat.SetColor("_Color", c);
+        }
+    }
+
+    private async UniTask FadeVignette(float intensity, float smoothness, float duration)
+    {
+        float start = _vignette.intensity.value;
+        float start2 = _vignette.smoothness.value;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+            _vignette.intensity.value = Mathf.Lerp(start, intensity, t);
+            _vignette.smoothness.value = Mathf.Lerp(start2, smoothness, t);
+            await UniTask.Yield();
+        }
+
+        _vignette.intensity.value = intensity;
+        _vignette.smoothness.value = smoothness;
     }
 }

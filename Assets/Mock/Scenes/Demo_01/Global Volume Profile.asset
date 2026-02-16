@@ -331,6 +331,7 @@ MonoBehaviour:
   components:
   - {fileID: 4664237531450064493}
   - {fileID: -1120247122984880076}
+  - {fileID: 5753398478486915011}
 --- !u!114 &4664237531450064493
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -345,7 +346,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.DepthOfField
   active: 1
   quality:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   focusMode:
     m_OverrideState: 1
@@ -357,44 +358,84 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   nearFocusStart:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   nearFocusEnd:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 4
   farFocusStart:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 10
   farFocusEnd:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 20
   m_NearSampleCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 5
   m_NearMaxBlur:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 4
   m_FarSampleCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 7
   m_FarMaxBlur:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 8
   m_Resolution:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 2
   m_HighQualityFiltering:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   m_PhysicallyBased:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   m_AdaptiveSamplingWeight:
     m_OverrideState: 0
     m_Value: 0.75
   m_LimitManualRangeNearBlur:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   coCStabilization:
+    m_OverrideState: 0
+    m_Value: 1
+--- !u!114 &5753398478486915011
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1be1b6c95cd2e41b27903b9270817f, type: 3}
+  m_Name: Vignette
+  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.Vignette
+  active: 1
+  mode:
+    m_OverrideState: 1
+    m_Value: 0
+  color:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  center:
+    m_OverrideState: 0
+    m_Value: {x: 0.5, y: 0.5}
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.45
+  smoothness:
+    m_OverrideState: 1
+    m_Value: 0.01
+  roundness:
+    m_OverrideState: 0
+    m_Value: 1
+  rounded:
+    m_OverrideState: 1
+    m_Value: 0
+  mask:
+    m_OverrideState: 0
+    m_Value: {fileID: 0}
+  opacity:
     m_OverrideState: 0
     m_Value: 1

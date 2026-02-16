@@ -712,7 +712,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LOLightAttack3
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -6937796060608560462}
@@ -762,7 +762,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ARPG_Samurai_Attack_Combo1
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 8580654011664694396}
@@ -887,7 +887,7 @@ AnimatorStateMachine:
     m_Position: {x: 480, y: 210, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1149382770341953155}
-    m_Position: {x: 800, y: 190, z: 0}
+    m_Position: {x: 800, y: 210, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -934,7 +934,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ARPG_Samurai_Attack_Combo3
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7818801697387242395}
@@ -1043,7 +1043,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: StrongAttackReady
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 8923547865594890160}
@@ -1202,7 +1202,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ARPG_Samurai_Attack_Combo4
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -1192225429750529039}
@@ -1329,7 +1329,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ARPG_Halberd_Attack_Heavy2
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7577089592854813066}
@@ -1966,7 +1966,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ARPG_Samurai_Attack_Combo2
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -677437748983759664}
@@ -2044,7 +2044,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UnLockLightAttack
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5792273058408910685}
@@ -2399,7 +2399,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LockOnLightAttack
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -1236827536948767313}
@@ -2623,7 +2623,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LOLightAttack5
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 3427400789054076471}
@@ -2697,7 +2697,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: StrongAttack
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -6403966727355169644}
@@ -2841,7 +2841,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LOLightAttack2
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -2902810381247533681}
@@ -3220,7 +3220,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LOLightAttack4
-  m_Speed: 0.9
+  m_Speed: 0.8
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 1075503645185772776}
