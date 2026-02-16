@@ -11,7 +11,7 @@ public class TitleManager : MonoBehaviour
 {
     [SerializeField] private AudioConfig _audioConfig;
     [SerializeField] private SceneNameConfig _sceneNameConfig;
-    [SerializeField] private int _transitionDelay = 1000;
+    [SerializeField] private float _transitionDelay = 2f;
 
     private bool _isTransitioning = false;
 
@@ -20,7 +20,7 @@ public class TitleManager : MonoBehaviour
         // タイトルBGM再生（null ガード）
         if (_audioConfig != null && AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM);
+            AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 0.5f);
         }
     }
 
@@ -56,13 +56,19 @@ public class TitleManager : MonoBehaviour
     private async UniTaskVoid LoadGameScene()
     {
         // SE が鳴り終わるまで待機（1秒）
-        await UniTask.Delay(_transitionDelay);
+        await UniTask.Delay((int)(_transitionDelay * 1000));
 
         var sceneName = _sceneNameConfig != null ? _sceneNameConfig.GameScene : "GameScene";
 
-        if (LoadSceneManager.Instance != null)
+        // Ensure GlobalFader exists (create fallback if missing) and use it to fade out/in around the load.
+        GlobalFader.EnsureInstance();
+        if (GlobalFader.Instance != null)
         {
-            // 非同期読み込みをトリガー
+            await GlobalFader.Instance.FadeToScene(sceneName);
+        }
+        else if (LoadSceneManager.Instance != null)
+        {
+            // 非同期読み込みをトリガー (fallback)
             LoadSceneManager.Instance.LoadScene(sceneName);
         }
         else

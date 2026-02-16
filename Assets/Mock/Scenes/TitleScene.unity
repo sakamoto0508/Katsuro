@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TitleManager
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}
   _sceneNameConfig: {fileID: 11400000, guid: 87b2238071d20874fa9ba88e53dea151, type: 2}
-  _transitionDelay: 500
+  _transitionDelay: 2
 --- !u!4 &215336948 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9030141369754616398, guid: 45577a2ace402ca4cb4446be944d6667, type: 3}
@@ -527,6 +527,7 @@ RectTransform:
   - {fileID: 1911657556}
   - {fileID: 2054401847}
   - {fileID: 738920560}
+  - {fileID: 1948004524}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -539,6 +540,52 @@ AudioSource:
   m_CorrespondingSourceObject: {fileID: 3870697559636657454, guid: 4a4ce500626783340893c0ce0069d043, type: 3}
   m_PrefabInstance: {fileID: 6354184850093051731}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1649505481
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1649505483}
+  - component: {fileID: 1649505482}
+  m_Layer: 0
+  m_Name: Fade
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1649505482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1649505481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f340bc7a0c51e944957bc3d8517df1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalFader
+  fadeImage: {fileID: 1948004522}
+  duration: 1
+--- !u!4 &1649505483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1649505481}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1270.0013, y: 0, z: 1714.9532}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1685413313
 GameObject:
   m_ObjectHideFlags: 0
@@ -804,6 +851,7 @@ MonoBehaviour:
   _fadeInDuration: 1
   _fadeOutDuration: 1
   _ease: 6
+  _gameSceneName: GameScene
 --- !u!4 &1765455112
 Transform:
   m_ObjectHideFlags: 0
@@ -894,6 +942,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1911657555}
   m_CullTransparentMesh: 1
+--- !u!1 &1948004521
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1948004524}
+  - component: {fileID: 1948004523}
+  - component: {fileID: 1948004522}
+  m_Layer: 5
+  m_Name: Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1948004522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948004521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1948004523
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948004521}
+  m_CullTransparentMesh: 1
+--- !u!224 &1948004524
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1948004521}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 866026673}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1920, y: 1080}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2054401846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,6 +1197,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3870697559636657454, guid: 4a4ce500626783340893c0ce0069d043, type: 3}
+      propertyPath: m_Volume
+      value: 0.522
+      objectReference: {fileID: 0}
     - target: {fileID: 7621130434886115139, guid: 4a4ce500626783340893c0ce0069d043, type: 3}
       propertyPath: m_Name
       value: AudioSorces
@@ -1140,6 +1267,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 917227319}
     - target: {fileID: 2066489256694400755, guid: 2ce69f1b5d9730746b2cda271320ee81, type: 3}
+      propertyPath: _audioListener
+      value: 
+      objectReference: {fileID: 1685413314}
+    - target: {fileID: 2066489256694400755, guid: 2ce69f1b5d9730746b2cda271320ee81, type: 3}
       propertyPath: sfxSourcePrefab
       value: 
       objectReference: {fileID: 369532405}
@@ -1158,3 +1289,4 @@ SceneRoots:
   - {fileID: 320939593}
   - {fileID: 6354184850093051731}
   - {fileID: 1765455112}
+  - {fileID: 1649505483}

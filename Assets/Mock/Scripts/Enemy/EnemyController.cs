@@ -58,7 +58,6 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         PlayEffectNextFrame("Dark");
         _characterEffect.PlayEffect_CharacterEffect();
-        Debug.Log(_characterEffect != null ? "Dark" : "None");
     }
 
     private async void PlayEffectNextFrame(string key)
