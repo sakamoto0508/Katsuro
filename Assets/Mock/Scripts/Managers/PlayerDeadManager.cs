@@ -122,14 +122,7 @@ public class PlayerDeadManager : MonoBehaviour
             }
         }
 
-        // フェーズ2: 崩れ（膝をつく）。無音を作る。
         await UniTask.Delay(System.TimeSpan.FromSeconds(_slowDuration), ignoreTimeScale: true);
-
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.StopAllAudioImmediate();
-        }
-
         await UniTask.Delay(System.TimeSpan.FromSeconds(_silenceDuration), ignoreTimeScale: true);
 
         // フェーズ3: タイトルへ遷移

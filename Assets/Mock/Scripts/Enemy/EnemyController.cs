@@ -43,7 +43,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
         var enemyEffect = GetComponent<CharacterEffect>();
-        enemyEffect.PlayEffect_CharacterEffect();
+        enemyEffect.PlayEffectByKey("Dark");
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName);
@@ -215,5 +215,11 @@ public class EnemyController : MonoBehaviour, IDamageable
         _ai?.OnAttackFinished(); // または専用の完了処理
         // 攻撃停止後は移動を復帰する
         _mover?.ReleaseMovementAfterAttack();
+    }
+
+    public void AnimEvent_OnSoundEffect(string soundName)
+    {
+        AudioManager.Instance?.PlaySE(soundName);
+        Debug.Log(soundName);
     }
 }

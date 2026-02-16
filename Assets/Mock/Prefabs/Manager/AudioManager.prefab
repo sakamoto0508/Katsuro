@@ -60,5 +60,26 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 33dcd419d6c88494781cddbc09e9b0b7, type: 3}
   - name: LockOn
     clip: {fileID: 8300000, guid: 165e1c8be425c2848a40ff627d338332, type: 3}
-  sfxPoolSize: 10
+  - name: Slash
+    clip: {fileID: 8300000, guid: cf0e5fe19fc14c74f9e1759a780d1d78, type: 3}
+  - name: Damage
+    clip: {fileID: 8300000, guid: 6895fde4b737c86478834953b544b93c, type: 3}
+  - name: Iai
+    clip: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
+  - name: Slash2
+    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+  - name: Poke
+    clip: {fileID: 8300000, guid: b01b146af99981148b388d2c10e3e689, type: 3}
+  - name: BigSlash
+    clip: {fileID: 8300000, guid: d38b7f1a68a1ef841b4bd6fbba47feaa, type: 3}
+  - name: NormalSlash
+    clip: {fileID: 8300000, guid: 34b0e6c3e31350b4abf77717082f83b5, type: 3}
+  - name: SmallSlash
+    clip: {fileID: 8300000, guid: f74925b5042cf104bac84a38124c8a53, type: 3}
+  - name: NormalSlash2
+    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+  - name: NormalSlash2
+    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+  sfxPoolSize: 14
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}
+  _audioListener: {fileID: 0}
