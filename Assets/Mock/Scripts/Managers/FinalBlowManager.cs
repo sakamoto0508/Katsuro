@@ -1,5 +1,7 @@
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using TMPro;
+using DG.Tweening;
 
 /// <summary>
 /// 最後の一撃（フィニッシュ）演出を制御するマネージャー。
@@ -14,6 +16,9 @@ public class FinalBlowManager : MonoBehaviour
     [SerializeField] private float _phase1HitStop = 0.2f;
     [SerializeField] private float _whiteFlashDuration = 0.18f;
     [SerializeField] private float _phase2Duration = 1.6f;
+    [SerializeField] private TextMeshProUGUI _finalBlowText;
+    [SerializeField] private float _finalBlowTextFadeIn = 0.5f;
+    [SerializeField] private Ease _ease = Ease.InQuint;
 
     private void Awake()
     {
@@ -25,6 +30,10 @@ public class FinalBlowManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+        if (_finalBlowText != null)
+        {
+            _finalBlowText.gameObject.SetActive(false);
         }
     }
 
@@ -50,10 +59,26 @@ public class FinalBlowManager : MonoBehaviour
 
         // プレイヤーは完全停止ではなくスローにする（例: 0.3 の速度）
         HitStopManager.Instance.PlayHitStopSlow(0.2f, 0.3f, _player.gameObject);
+
+        if (_finalBlowText != null)
+        {
+            _finalBlowText.gameObject.SetActive(true);
+            // 初期 alpha をゼロにする
+            var col = _finalBlowText.color;
+            col.a = 0f;
+            _finalBlowText.color = col;
+
+            // 既存 Tween を止め、unscaled でフェードイン
+            _finalBlowText.DOKill();
+            _finalBlowText.DOFade(1f, _finalBlowTextFadeIn)
+                .SetEase(_ease)
+                .SetUpdate(true);
+        }
         // UniTask のバージョンに合わせてミリ秒で待機（実時間）
         await UniTask.Delay((int)(_whiteFlashDuration * 1000));
         // player のスローは上のコルーチンが終了すると自動で元に戻るため、ここで再設定はしない
         _player.AnimController.PlayTrigger(_player.AnimController.AnimName.SwordSheathing);
         await UniTask.Delay((int)(_phase2Duration * 1000));
+        LoadSceneManager.Instance.LoadScene(LoadSceneManager.Instance.SceneNameConfig.TitleScene);
     }
 }

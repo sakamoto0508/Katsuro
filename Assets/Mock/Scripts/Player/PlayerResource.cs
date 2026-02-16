@@ -50,13 +50,18 @@ public class PlayerResource : IDisposable
     /// 指定した量のダメージを適用する（0 以下は無視）。
     /// </summary>
     /// <param name="amount">適用するダメージ量（生値）</param>
-    public void ApplyDamage(float amount)
+    public void ApplyDamage(float amount, bool playSfx = true)
     {
-        AudioManager.Instance?.PlaySE("Damage");
         if (amount <= 0f) return;
-        //todo:ダメージSEとヒットストップの追加
+
+        // 再生は呼び出し側の意図に委ねる（SelfSacrifice 等、毎フレーム発生するダメージでは不要な場合がある）
+        if (playSfx)
+        {
+            AudioManager.Instance?.PlaySE("Damage");
+        }
+
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
-        if(_hpRx.Value <= 0f)
+        if (_hpRx.Value <= 0f)
         {
             PlayerDeath();
         }

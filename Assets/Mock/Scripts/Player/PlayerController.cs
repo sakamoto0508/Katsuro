@@ -209,7 +209,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
 
         float applied = Mathf.Min(damage, maxAllowedDamage);
-        _playerResource?.ApplyDamage(applied);
+        // SelfSacrifice による毎フレームのダメージは効果音を鳴らさない
+        _playerResource?.ApplyDamage(applied, false);
 
         // もし要求ダメージが大きく、残量が不足している場合は自動停止
         if (applied < damage)

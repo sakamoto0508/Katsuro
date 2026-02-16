@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
@@ -35,6 +37,9 @@ public class PlayerDeadManager : MonoBehaviour
     [SerializeField] private float _smoothTime = 0.1f;
     [SerializeField] private float _intensity = 0.45f;
     [SerializeField, Range(0f, 1f)] private float _smoothness = 0.5f;
+    [SerializeField] private TextMeshProUGUI _deadText;
+    [SerializeField] private float _deadTextFadeIn = 2f;
+    [SerializeField] private Ease _ease = Ease.InQuint;
 
     private GameObject _overlay;
     private Vignette _vignette;
@@ -67,6 +72,10 @@ public class PlayerDeadManager : MonoBehaviour
                 _vignette.smoothness.value = 0f;
             }
         }
+        if (_deadText != null)
+        {
+            _deadText.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -93,6 +102,17 @@ public class PlayerDeadManager : MonoBehaviour
         CreateVignetteOverlay();
         var overlayTask = _overlay != null ? FadeOverlayAlpha(_vignetteMaxAlpha, _vignetteFadeIn) : UniTask.CompletedTask;
         var vigTask = (_vignette != null) ? FadeVignette(_intensity, _smoothness, _vignetteFadeIn) : UniTask.CompletedTask;
+        if (_deadText != null)
+        {
+            _deadText.gameObject.SetActive(true);
+            // ensure starting alpha is zero so fade-in always plays
+            var c = _deadText.color;
+            c.a = 0f;
+            _deadText.color = c;
+            _deadText.DOKill();
+            // use unscaled update so tween runs during hitstop/slow
+            _deadText.DOFade(1f, _deadTextFadeIn).SetEase(_ease).SetUpdate(true);
+        }
         await UniTask.WhenAll(overlayTask, vigTask);
 
         // Audio: ローパスを適用して音がこもる

@@ -172,8 +172,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         _dead = true;
 
         FinalBlowManager.Instance?.StartFinalBlow();
-
-        LoadSceneManager.Instance.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, _enemyDeadDelay).Forget();
     }
 
     private void OnAnimatorMove()
