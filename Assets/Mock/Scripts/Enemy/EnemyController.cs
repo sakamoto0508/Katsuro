@@ -23,6 +23,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
     [SerializeField] private float _stepBackDistance = 2f;
 
+    [SerializeField] private CharacterEffect _characterEffect;
     [SerializeField] private int _enemyDeadDelay = 2000;
 
     private EnemyAnimationController _enemyAnimController;
@@ -42,8 +43,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         var navMeshAgent = GetComponent<NavMeshAgent>();
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
-        var enemyEffect = GetComponent<CharacterEffect>();
-        enemyEffect.PlayEffectByKey("Dark");
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName);
@@ -56,6 +55,22 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             gameObject.AddComponent<StatusEffectManager>();
         }
+
+        PlayEffectNextFrame("Dark");
+        _characterEffect.PlayEffect_CharacterEffect();
+        Debug.Log(_characterEffect != null ? "Dark" : "None");
+    }
+
+    private async void PlayEffectNextFrame(string key)
+    {
+        // wait one frame so that instantiated prefab / VFX graph can be initialized
+        await Cysharp.Threading.Tasks.UniTask.NextFrame();
+        if (_characterEffect == null)
+        {
+            Debug.LogWarning("CharacterEffect is null when trying to play effect: " + key);
+            return;
+        }
+        _characterEffect.PlayEffectByKey(key);
     }
 
     /// <summary>
