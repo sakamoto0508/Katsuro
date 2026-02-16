@@ -32,6 +32,7 @@ public class PlayerSelfSacrificeState : PlayerState
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
         Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectBuff);
+        AudioManager.Instance.PlayBGM("BuffBGM", 2, 1f);
     }
 
     public override void Exit()
@@ -55,6 +56,7 @@ public class PlayerSelfSacrificeState : PlayerState
     public override void OnSelfSacrificeCanceled()
     {
         Context.SelfSacrifice?.End();
+        AudioManager.Instance.StopBGM(2);
     }
 
     public override void OnLightAttack()

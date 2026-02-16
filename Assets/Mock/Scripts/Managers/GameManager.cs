@@ -45,7 +45,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Scene")]
     [SerializeField] private LoadSceneManager _loadSceneManager;
- 
+
+    [SerializeField] private float _soundVolume = 0.3f;
+
 
     [SerializeField] private GameState _state = GameState.Title;
     private LockOnCamera _lockOnCamera;
@@ -100,12 +102,13 @@ public class GameManager : MonoBehaviour
             if (newState == GameState.Title)
             {
                 AudioManager.Instance.StopBGM();
-                AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM);
+                AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 0.5f);
             }
             else if (newState == GameState.InGame)
             {
                 AudioManager.Instance.StopBGM();
-                AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM);
+                AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM, 0.5f);
+                AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 1, _soundVolume);
             }
         }
         // イベント発行

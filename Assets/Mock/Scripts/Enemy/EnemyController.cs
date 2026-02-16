@@ -80,6 +80,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void ApplyDamage(DamageInfo info, bool isCritical = false)
     {
+        AudioManager.Instance?.PlaySE("Damage");
         if (_dead) return;
         //todo:ダメージSEとヒットストップの追加
         if (_health == null)

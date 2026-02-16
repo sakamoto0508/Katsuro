@@ -16,6 +16,8 @@ public class AudioManager : MonoBehaviour
 
     [Header("BGM 用 AudioSource")]
     [SerializeField] private AudioSource bgmSource;
+    [Header("BGM 用 AudioSources (複数チャンネル対応)")]
+    [SerializeField] private List<AudioSource> bgmSources = new List<AudioSource>();
     [Header("SE 用 AudioSource (Prefab)")]
     [SerializeField] private AudioSource sfxSourcePrefab;
     [Header("BGM リスト")]
@@ -50,8 +52,8 @@ public class AudioManager : MonoBehaviour
 
     private void InitializeAudioManager()
     {
-        // BGM 用 AudioSource を準備する。
-        EnsureBGMSource();
+        // BGM 用 AudioSource を準備する（複数チャンネル対応）。
+        EnsureBGMSources();
 
         // BGM リストを辞書に登録。
         _bgmDict.Clear();
@@ -77,17 +79,47 @@ public class AudioManager : MonoBehaviour
         CreateSFXPool();
     }
 
-    private void EnsureBGMSource()
+    private void EnsureBGMSources()
     {
-        // bgmSource が未設定なら生成して親に配置する。
-        if (bgmSource == null || bgmSource.Equals(null))
+        // bgmSources リストを保証し、既存の単一 bgmSource が割り当てられている場合はそれを利用する。
+        if (bgmSources == null) bgmSources = new List<AudioSource>();
+
+        // 既存の inspector で設定された単一 bgmSource があり、リストが空なら追加する。
+        if ((bgmSource != null && !bgmSource.Equals(null)) && bgmSources.Count == 0)
         {
-            GameObject bgmObj = new GameObject("BGM_Source");
-            bgmObj.transform.SetParent(transform);
-            bgmSource = bgmObj.AddComponent<AudioSource>();
-            bgmSource.loop = true;
-            bgmSource.playOnAwake = false;
+            bgmSources.Add(bgmSource);
         }
+
+        // 少なくとも 1 つの BGM ソースが存在しなければ生成する。
+        if (bgmSources.Count == 0)
+        {
+            GameObject bgmObj = new GameObject("BGM_Source_0");
+            bgmObj.transform.SetParent(transform);
+            var source = bgmObj.AddComponent<AudioSource>();
+            source.loop = true;
+            source.playOnAwake = false;
+            bgmSources.Add(source);
+            // 保守のため古い単一参照にもセットしておく。
+            bgmSource = source;
+        }
+    }
+
+    private AudioSource GetBgmSource(int channel)
+    {
+        EnsureBGMSources();
+        if (channel < 0) channel = 0;
+        // チャンネルがリスト範囲外の場合は必要分のソースを生成する。
+        while (channel >= bgmSources.Count)
+        {
+            int idx = bgmSources.Count;
+            GameObject bgmObj = new GameObject($"BGM_Source_{idx}");
+            bgmObj.transform.SetParent(transform);
+            var source = bgmObj.AddComponent<AudioSource>();
+            source.loop = true;
+            source.playOnAwake = false;
+            bgmSources.Add(source);
+        }
+        return bgmSources[channel];
     }
 
     private void CreateSFXPool()
@@ -117,15 +149,13 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void PlayBGM(AudioClip clip)
+    public void PlayBGM(AudioClip clip, int channel = 0, float volume = 1f)
     {
         if (clip == null) return;
-
-        // BGM 用 AudioSource を用意する。
-        EnsureBGMSource();
-        if (bgmSource == null)
+        var source = GetBgmSource(channel);
+        if (source == null)
         {
-            Debug.LogError("bgmSource が作成されていません。");
+            Debug.LogError("指定チャンネルの BGM ソースが作成されていません。 channel=" + channel);
             return;
         }
 
@@ -139,13 +169,15 @@ public class AudioManager : MonoBehaviour
             }
         }
 
-        // 既に再生中なら処理しない。
-        if (bgmSource.clip == clip && bgmSource.isPlaying) return;
+        // 既に指定チャンネルで同じクリップ・同じ音量で再生中なら処理しない。
+        float clampedVolume = Mathf.Clamp01(volume);
+        if (source.clip == clip && source.isPlaying && Mathf.Approximately(source.volume, clampedVolume)) return;
 
-        bgmSource.Stop();
-        bgmSource.clip = clip;
-        bgmSource.loop = true;
-        bgmSource.Play();
+        source.Stop();
+        source.clip = clip;
+        source.loop = true;
+        source.volume = clampedVolume;
+        source.Play();
     }
 
 
@@ -165,14 +197,63 @@ public class AudioManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 既存互換: 名前とボリューム指定で再生 (チャンネルはデフォルト 0)
+    /// </summary>
+    public void PlayBGM(string bgmName, float volume)
+    {
+        PlayBGM(bgmName, 0, volume);
+    }
+
+    /// <summary>
+    /// 名前で指定して BGM を再生します。チャンネルとボリュームを指定可能（既定は channel=0, volume=1）。
+    /// </summary>
+    public void PlayBGM(string bgmName, int channel = 0, float volume = 1f)
+    {
+        if (_bgmDict.TryGetValue(bgmName, out var clip))
+        {
+            PlayBGM(clip, channel, volume);
+        }
+        else
+        {
+            Debug.LogWarning($"指定された BGM '{bgmName}' が見つかりません。");
+        }
+    }
+
+    /// <summary>
     /// BGM を停止する。
     /// </summary>
     public void StopBGM()
     {
-        if (bgmSource != null && !bgmSource.Equals(null))
+        // 既存呼び出し互換: デフォルトチャンネル 0 を停止
+        StopBGM(0);
+    }
+
+    /// <summary>
+    /// 指定チャンネルの BGM を停止します。
+    /// </summary>
+    public void StopBGM(int channel)
+    {
+        var src = GetBgmSource(channel);
+        if (src != null)
         {
-            bgmSource.Stop();
-            bgmSource.clip = null;
+            src.Stop();
+            src.clip = null;
+        }
+    }
+
+    /// <summary>
+    /// すべての BGM チャンネルを停止します。
+    /// </summary>
+    public void StopAllBGMs()
+    {
+        if (bgmSources == null) return;
+        foreach (var s in bgmSources)
+        {
+            if (s != null)
+            {
+                s.Stop();
+                s.clip = null;
+            }
         }
     }
 
@@ -181,10 +262,29 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void SetBGMVolume(float volume)
     {
-        EnsureBGMSource();
-        if (bgmSource != null)
+        // 既存呼び出し互換: チャンネル 0 を設定
+        SetBGMVolume(volume, 0);
+    }
+
+    /// <summary>
+    /// 指定チャンネルまたは全チャンネルの BGM 音量を設定する。
+    /// channel が -1 の場合は全チャンネルに適用。
+    /// </summary>
+    public void SetBGMVolume(float volume, int channel)
+    {
+        volume = Mathf.Clamp01(volume);
+        if (channel < 0)
         {
-            bgmSource.volume = Mathf.Clamp01(volume);
+            if (bgmSources == null) return;
+            foreach (var s in bgmSources)
+            {
+                if (s != null) s.volume = volume;
+            }
+        }
+        else
+        {
+            var src = GetBgmSource(channel);
+            if (src != null) src.volume = volume;
         }
     }
 
@@ -271,7 +371,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void StopAllAudioImmediate()
     {
-        StopBGM();
+        StopAllBGMs();
         foreach (var s in _sfxPool)
         {
             if (s != null)

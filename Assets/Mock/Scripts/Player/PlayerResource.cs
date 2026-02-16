@@ -52,6 +52,7 @@ public class PlayerResource : IDisposable
     /// <param name="amount">適用するダメージ量（生値）</param>
     public void ApplyDamage(float amount)
     {
+        AudioManager.Instance?.PlaySE("Damage");
         if (amount <= 0f) return;
         //todo:ダメージSEとヒットストップの追加
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
