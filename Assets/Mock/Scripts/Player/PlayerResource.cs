@@ -34,6 +34,9 @@ public class PlayerResource : IDisposable
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
     private bool _dead;
+    public event Action Revived;
+    public bool IsDead => _dead;
+    public float InvulnerableUntil { get; private set; }
 
     /// <summary>
     /// 指定した割合（percent）だけ HP を回復する（percent は 0..100）。
@@ -41,7 +44,7 @@ public class PlayerResource : IDisposable
     /// <param name="percent">回復割合（1 = 1%）</param>
     public void HealByPercent(float percent)
     {
-        if (percent <= 0f) return;
+        if (_dead || percent <= 0f) return;
         float amount = _maxHp * (percent / 100f);
         _hpRx.Value = Mathf.Min(_maxHp, _hpRx.Value + amount);
     }
@@ -52,7 +55,7 @@ public class PlayerResource : IDisposable
     /// <param name="amount">適用するダメージ量（生値）</param>
     public void ApplyDamage(float amount, bool playSfx = true)
     {
-        if (amount <= 0f) return;
+        if (_dead || amount <= 0f) return;
 
         // 再生は呼び出し側の意図に委ねる（SelfSacrifice 等、毎フレーム発生するダメージでは不要な場合がある）
         if (playSfx)
@@ -70,7 +73,15 @@ public class PlayerResource : IDisposable
     public void PlayerDeath()
     {
         if (_dead) return;
+        if (RunSession.ConsumeLife())
+        {
+            _hpRx.Value = _maxHp;
+            InvulnerableUntil = Time.time + GameplayRules.Current.ReviveInvulnerability;
+            Revived?.Invoke();
+            return;
+        }
         _dead = true;
+        GameManager.Instance?.LoseGame();
         AudioManager.Instance?.PlaySE("PlayerDeath");
 
         // PlayerDeadManager があればそちらで演出（ヴィネット／ローパス／スロー等）を実行し、

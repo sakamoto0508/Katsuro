@@ -59,8 +59,11 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>
     /// Animator 参照を取得する。
     /// </summary>
-    private void Start()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         _animator = GetComponent<Animator>();
         // Ensure parameter hashes are initialized at runtime in case OnValidate wasn't called in editor.
         _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);

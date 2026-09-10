@@ -46,21 +46,26 @@ public class PlayerDeadManager : MonoBehaviour
     private UnityEngine.UI.Image _redImage;
     private UnityEngine.UI.Image _blackImage;
     private Material _blackMaterialInstance;
+    private bool _isPlaying;
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            InitPresentation();
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
-    private void Start()
+    private void InitPresentation()
     {
         if (_volume != null)
         {
@@ -83,11 +88,14 @@ public class PlayerDeadManager : MonoBehaviour
     /// </summary>
     public void StartDefeatSequence(GameObject playerObject)
     {
+        if (_isPlaying) return;
         if (playerObject == null)
         {
             Debug.LogWarning("StartDefeatSequence called with null playerObject");
             return;
         }
+        _isPlaying = true;
+        GameManager.Instance?.LoseGame();
         StartDefeatSequenceAsync(playerObject).Forget();
     }
 
@@ -97,6 +105,7 @@ public class PlayerDeadManager : MonoBehaviour
     /// </summary>
     private async UniTaskVoid StartDefeatSequenceAsync(GameObject playerObject)
     {
+        var token = this.GetCancellationTokenOnDestroy();
         // フェーズ1: Vignette のフェードイン（オーバーレイと Post-process を同時にフェード）
         CreateVignetteOverlay();
         var overlayTask = _overlay != null ? FadeOverlayAlpha(_vignetteMaxAlpha, _vignetteFadeIn) : UniTask.CompletedTask;
@@ -121,8 +130,11 @@ public class PlayerDeadManager : MonoBehaviour
         }
 
         // スロー: シーン内の Animator を全体的に遅くする（プレイヤー優先）
-        HitStopManager.Instance.PlayHitStopSlow(0.2f, 0.3f, _playerController.AnimController.gameObject);
-        HitStopManager.Instance.PlayHitStopSlow(0.2f, 0.3f, _enemyController.gameObject);
+        if (HitStopManager.Instance != null)
+        {
+            HitStopManager.Instance.PlayHitStopSlow(_slowDuration, _slowSpeed, playerObject,
+                _enemyController != null ? _enemyController.gameObject : null);
+        }
 
         // プレイヤーが既に破棄されていないか確認してからトリガーを送る
         if (_playerController != null && _playerController.AnimController != null)
@@ -141,11 +153,13 @@ public class PlayerDeadManager : MonoBehaviour
             }
         }
 
-        await UniTask.Delay(System.TimeSpan.FromSeconds(_slowDuration), ignoreTimeScale: true);
-        await UniTask.Delay(System.TimeSpan.FromSeconds(_silenceDuration), ignoreTimeScale: true);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _slowDuration)), ignoreTimeScale: true, cancellationToken: token);
+        AudioManager.Instance?.StopAllAudioImmediate();
+        await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _silenceDuration)), ignoreTimeScale: true, cancellationToken: token);
 
         // フェーズ3: タイトルへ遷移
-        LoadSceneManager.Instance.LoadScene(LoadSceneManager.Instance.SceneNameConfig.TitleScene);
+        var config = LoadSceneManager.Instance != null ? LoadSceneManager.Instance.SceneNameConfig : null;
+        await GlobalFader.EnsureInstance().FadeToScene(config != null ? config.TitleScene : "TitleScene");
     }
 
     /// <summary>
@@ -155,6 +169,7 @@ public class PlayerDeadManager : MonoBehaviour
     {
         if (_overlay != null) return;
         _overlay = new GameObject("VignetteOverlay");
+        _overlay.transform.SetParent(transform, false);
         var canvas = _overlay.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 2000;
@@ -163,6 +178,7 @@ public class PlayerDeadManager : MonoBehaviour
         redGO.transform.SetParent(_overlay.transform, false);
         _redImage = redGO.AddComponent<Image>();
         _redImage.color = new Color(_vignetteColor.r, _vignetteColor.g, _vignetteColor.b, 0f);
+        _redImage.raycastTarget = false;
         var redRect = _redImage.GetComponent<RectTransform>();
         redRect.anchorMin = Vector2.zero;
         redRect.anchorMax = Vector2.one;
@@ -179,7 +195,7 @@ public class PlayerDeadManager : MonoBehaviour
         {
             _blackMaterialInstance = new Material(shader);
             // initialize black material parameters
-            _blackMaterialInstance.SetColor("_Color", new Color(0f, 0f, 0f, 1f));
+            _blackMaterialInstance.SetColor("_Color", new Color(0f, 0f, 0f, 0f));
             _blackMaterialInstance.SetFloat("_InnerRadius", 0.3f);
             _blackMaterialInstance.SetFloat("_OuterRadius", 0.95f);
             _blackMaterialInstance.SetFloat("_Smoothness", 0.7f);
@@ -244,7 +260,7 @@ public class PlayerDeadManager : MonoBehaviour
                 bc.a = Mathf.Lerp(blackStartAlpha, targetAlpha, k);
                 blackImg.color = bc;
             }
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, this.GetCancellationTokenOnDestroy());
         }
         if (red != null) red.color = new Color(redStart.r, redStart.g, redStart.b, targetAlpha);
         if (blackMat != null)
@@ -269,14 +285,23 @@ public class PlayerDeadManager : MonoBehaviour
 
         while (time < duration)
         {
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
             float t = time / duration;
             _vignette.intensity.value = Mathf.Lerp(start, intensity, t);
             _vignette.smoothness.value = Mathf.Lerp(start2, smoothness, t);
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, this.GetCancellationTokenOnDestroy());
         }
 
         _vignette.intensity.value = intensity;
         _vignette.smoothness.value = smoothness;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        Instance = null;
+        if (_deadText != null) _deadText.DOKill();
+        if (_blackMaterialInstance != null) Destroy(_blackMaterialInstance);
+        AudioManager.Instance?.RemoveLowPassFromListener();
     }
 }

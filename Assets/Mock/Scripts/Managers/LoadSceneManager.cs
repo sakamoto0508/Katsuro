@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class LoadSceneManager : MonoBehaviour
 {
@@ -11,21 +10,25 @@ public class LoadSceneManager : MonoBehaviour
     [SerializeField] private SceneNameConfig _sceneNameConfig;
 
     /// <summary>
-    /// 同期的にシーンを読み込みます。sceneName が空ならデフォルトシーンを使用します。
+    /// フェードを伴うシーン遷移を開始します。
     /// </summary>
     public void LoadScene(string sceneName)
     {
-        SceneManager.LoadScene(sceneName);
+        GlobalFader.EnsureInstance().FadeToScene(sceneName).Forget();
     }
 
     public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
     {
-        await UniTask.Delay(waitTime);
-        SceneManager.LoadScene(sceneName);
+        await UniTask.Delay(Mathf.Max(0, waitTime), ignoreTimeScale: true,
+            cancellationToken: this.GetCancellationTokenOnDestroy());
+        await GlobalFader.EnsureInstance().FadeToScene(sceneName);
     }
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         if (Instance == null)
         {
             Instance = this;

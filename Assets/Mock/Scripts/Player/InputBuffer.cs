@@ -31,8 +31,33 @@ public class InputBuffer : MonoBehaviour
     private InputAction _healAction;
     private InputAction _sprintAction;
 
-    private void Awake()
+    private void OnEnable() => SetActionsEnabled(true);
+    private void OnDisable() => SetActionsEnabled(false);
+
+    private void SetActionsEnabled(bool value)
     {
+        SetActionEnabled(_moveAction, value);
+        SetActionEnabled(_lightAttackAction, value);
+        SetActionEnabled(_strongAttackAction, value);
+        SetActionEnabled(_ghostAction, value);
+        SetActionEnabled(_buffAction, value);
+        SetActionEnabled(_lookOnAction, value);
+        SetActionEnabled(_healAction, value);
+        SetActionEnabled(_sprintAction, value);
+    }
+
+    private static void SetActionEnabled(InputAction action, bool value)
+    {
+        if (action == null) return;
+        if (value) action.Enable();
+        else action.Disable();
+    }
+
+    private bool _initialized;
+    public void Init()
+    {
+        if (_initialized) return;
+        _initialized = true;
         if(TryGetComponent<PlayerInput>(out var playerInput))
         {
             _moveAction = playerInput.actions[MOVE_ACTION];
@@ -43,6 +68,7 @@ public class InputBuffer : MonoBehaviour
             _lookOnAction = playerInput.actions[LOOKON_ACTION];
             _healAction = playerInput.actions[HEAL_ACTION];
             _sprintAction = playerInput.actions[SPRINT_ACTION];
+            SetActionsEnabled(isActiveAndEnabled);
         }
     }
 }

@@ -38,6 +38,7 @@ public sealed class AbilityManager
 
         // 継続処理を直接各 Ability に委譲
         _ghost?.Tick(deltaTime);
+        if (_selfSacrifice != null) _selfSacrifice.CostMultiplier = GameplayRules.Current.SelfCost(_playerResource.CurrentHpRatio);
         _selfSacrifice?.Tick(deltaTime);
         _healer?.Tick(deltaTime);
 

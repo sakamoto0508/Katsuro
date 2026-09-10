@@ -56,6 +56,7 @@ public abstract class PlayerAttackState : PlayerState
 
         Context?.Mover?.MoveStop();
         _lookCts?.Cancel();
+        _lookCts?.Dispose();
         _lookCts = new CancellationTokenSource();
         Context.Mover?.LookTargetSmooth(0.2f, _lookCts.Token).Forget();
 
@@ -92,8 +93,9 @@ public abstract class PlayerAttackState : PlayerState
     {
         Context.Mover?.Update();
         _elapsedTime += deltaTime;
+        if (TryConsumeComboRequest()) return;
 
-        if (_elapsedTime >= _currentAttackDuration && !_comboWindowOpen && !_comboQueued)
+        if (_elapsedTime >= _currentAttackDuration)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }

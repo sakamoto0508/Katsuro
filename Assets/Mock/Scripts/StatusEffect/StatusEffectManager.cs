@@ -16,17 +16,20 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     private UnityEngine.AI.NavMeshAgent _agent;
     // 効果適用時に乗算するための基準値（Awake 時にキャッシュ）
     private float _baseAgentSpeed = 0f;
-    private float _baseAnimatorSpeed = 1f;
+    private AnimationSpeedController _speed;
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         // コンポーネント参照を取得し、現在の速度値を基準値としてキャッシュする。
         // これによりエフェクトのオン/オフで正しく乗算できる。
         _animator = GetComponent<Animator>();
         _agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         // 乗算の基準となる速度を保存
         if (_agent != null) _baseAgentSpeed = _agent.speed;
-        if (_animator != null) _baseAnimatorSpeed = _animator.speed;
+        if (_animator != null) { _speed = AnimationSpeedController.For(_animator); _speed.Init(); }
     }
 
     private void Update()
@@ -87,6 +90,10 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         RecalculateModifiers();
     }
 
+    /// <summary>
+    ///     指定した ID のステータス効果を解除する。存在しない場合は何もしない。
+    /// </summary>
+    /// <param name="id"></param>
     public void RemoveStatusEffect(string id)
     {
         for (int i = _effects.Count - 1; i >= 0; --i)
@@ -100,11 +107,27 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         RecalculateModifiers();
     }
 
+    /// <summary>
+    ///   指定した ID のステータス効果が現在適用中かどうかを返す。
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public bool HasStatusEffect(string id)
     {
         return _effects.Exists(e => e.Def.Id == id);
     }
 
+    private void OnDisable()
+    {
+        foreach (var effect in _effects) if (effect.Vfx != null) Destroy(effect.Vfx);
+        _effects.Clear();
+        if (_speed != null) _speed.SetStatus(1f);
+        if (_agent != null) _agent.speed = _baseAgentSpeed;
+    }
+
+    /// <summary>
+    ///   現在適用中の全ステータス効果を合成して、NavMeshAgent と Animator に反映する。
+    /// </summary>
     private void RecalculateModifiers()
     {
         // 全エフェクトを乗算で合成して最終倍率を算出する
@@ -127,7 +150,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
 
         if (_animator != null)
         {
-            _animator.speed = _baseAnimatorSpeed * animMul;
+            _speed.SetStatus(animMul);
         }
     }
 }

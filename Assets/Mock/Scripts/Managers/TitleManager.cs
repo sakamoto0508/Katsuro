@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
+
 
 
 /// <summary>
@@ -14,9 +14,16 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private float _transitionDelay = 2f;
 
     private bool _isTransitioning = false;
+    [SerializeField] private RunSetupUI _setup;
 
-    private void Start()
+    private void Start() => Init();
+
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
+        SceneInitialization.Init();
         // タイトルBGM再生（null ガード）
         if (_audioConfig != null && AudioManager.Instance != null)
         {
@@ -26,7 +33,7 @@ public class TitleManager : MonoBehaviour
 
     private void Update()
     {
-        if (_isTransitioning) return;
+        if (_isTransitioning || (_setup != null && _setup.IsOpen)) return;
         if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
         {
             OnPressStart();
@@ -40,8 +47,23 @@ public class TitleManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// タイトル画面でスタートボタンが押されたときの処理。
+    /// </summary>
     public void OnPressStart()
     {
+        if (_isTransitioning || (GlobalFader.Instance != null && GlobalFader.Instance.IsTransitioning)) return;
+        if (_setup != null && _setup.IsOpen) return;
+        if (_setup == null) { Debug.LogError("Assign the scene RunSetupUI to TitleManager.", this); return; }
+        _setup.Open(this);
+    }
+
+    /// <summary>
+    /// ゲームシーンへの遷移を開始する。
+    /// </summary>
+    public void BeginConfiguredGame()
+    {
+        if (_isTransitioning) return;
         _isTransitioning = true;
 
         // SE再生
@@ -53,28 +75,25 @@ public class TitleManager : MonoBehaviour
         LoadGameScene().Forget();
     }
 
-    private async UniTaskVoid LoadGameScene()
+    /// <summary>
+    /// ゲームシーンへの遷移を行う。
+    /// </summary>
+    /// <returns></returns>
+    private async UniTask LoadGameScene()
     {
-        // SE が鳴り終わるまで待機（1秒）
-        await UniTask.Delay((int)(_transitionDelay * 1000));
-
-        var sceneName = _sceneNameConfig != null ? _sceneNameConfig.GameScene : "GameScene";
-
-        // Ensure GlobalFader exists (create fallback if missing) and use it to fade out/in around the load.
-        GlobalFader.EnsureInstance();
-        if (GlobalFader.Instance != null)
+        try
         {
-            await GlobalFader.Instance.FadeToScene(sceneName);
+            await UniTask.Delay((int)(Mathf.Max(0f, _transitionDelay) * 1000), ignoreTimeScale: true,
+                cancellationToken: this.GetCancellationTokenOnDestroy());
+            var sceneName = _sceneNameConfig != null ? _sceneNameConfig.GameScene : "GameScene";
+            await GlobalFader.EnsureInstance().FadeToScene(sceneName);
         }
-        else if (LoadSceneManager.Instance != null)
+        catch (System.OperationCanceledException) { }
+        catch (System.Exception error)
         {
-            // 非同期読み込みをトリガー (fallback)
-            LoadSceneManager.Instance.LoadScene(sceneName);
+            Debug.LogException(error);
+            if (this != null && _setup != null) _setup.Open(this);
         }
-        else
-        {
-            // フォールバック
-            SceneManager.LoadScene(sceneName);
-        }
+        finally { _isTransitioning = false; }
     }
 }

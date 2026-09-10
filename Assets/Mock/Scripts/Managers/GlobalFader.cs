@@ -1,158 +1,130 @@
+using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using DG.Tweening;
 using Cysharp.Threading.Tasks;
 
+/// <summary>Owns the persistent overlay and the complete fade/load/fade transition.</summary>
 public class GlobalFader : MonoBehaviour
 {
-    public static GlobalFader Instance;
+    public static GlobalFader Instance { get; private set; }
+    public bool IsTransitioning { get; private set; }
 
-    /// <summary>
-    /// Ensure a GlobalFader exists in the scene (creates one if missing) and return the instance.
-    /// </summary>
+    [SerializeField] private Image fadeImage;
+    [SerializeField, Min(0f)] private float duration = 1f;
+
     public static GlobalFader EnsureInstance()
     {
-        if (Instance != null) return Instance;
-        var go = new GameObject("GlobalFader");
-        DontDestroyOnLoad(go);
-        Instance = go.AddComponent<GlobalFader>();
+        if (Instance == null)
+            new GameObject("GlobalFader").AddComponent<GlobalFader>().Init();
         return Instance;
     }
 
-    [SerializeField] private Image fadeImage;
-    [SerializeField] private float duration = 1f;
-
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
-        if (Instance == null)
+        if (_initialized) return;
+        _initialized = true;
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
+            if (fadeImage != null && fadeImage != Instance.fadeImage)
+                fadeImage.gameObject.SetActive(false);
             Destroy(gameObject);
+            return;
         }
-        // Ensure overlay exists on this persistent object so fadeImage won't be null after scene load
+        Instance = this;
+        transform.SetParent(null, true);
+        DontDestroyOnLoad(gameObject);
         EnsureOverlay();
-        // Keep overlay state clean when scenes load
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SetAlpha(0f);
+        fadeImage.gameObject.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // When a new scene is loaded, ensure overlay is hidden and alpha reset so title isn't blocked
-        if (fadeImage != null)
-        {
-            var c = fadeImage.color;
-            c.a = 0f;
-            fadeImage.color = c;
-            fadeImage.gameObject.SetActive(false);
-            var canvas = fadeImage.GetComponentInParent<Canvas>();
-            if (canvas != null) canvas.overrideSorting = false;
-        }
-    }
-
-    private void Start()
-    {
-        if (fadeImage != null)
-        {
-            var c = fadeImage.color;
-            c.a = 0f;
-            fadeImage.color = c; // 初期透明
-        }
-
+        if (Instance == this) Instance = null;
     }
 
     private void EnsureOverlay()
     {
-        if (fadeImage != null) return;
-
-        // create Canvas under this object
-        var canvasGO = new GameObject("GlobalFader_Canvas");
-        canvasGO.transform.SetParent(this.transform, false);
-        var canvas = canvasGO.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 10000;
-        canvasGO.AddComponent<UnityEngine.UI.CanvasScaler>();
-        canvasGO.AddComponent<UnityEngine.UI.GraphicRaycaster>();
-
-        var imageGO = new GameObject("FadeImage");
-        imageGO.transform.SetParent(canvasGO.transform, false);
-        var img = imageGO.AddComponent<Image>();
-        img.color = new Color(0f, 0f, 0f, 0f);
-        img.raycastTarget = false;
-        var rect = img.GetComponent<RectTransform>();
+        // A scene-owned image would be destroyed halfway through the transition.
+        if (fadeImage == null || !fadeImage.transform.IsChildOf(transform))
+        {
+            if (fadeImage != null) fadeImage.gameObject.SetActive(false);
+            var canvasObject = new GameObject("GlobalFader_Canvas", typeof(Canvas));
+            canvasObject.transform.SetParent(transform, false);
+            var canvas = canvasObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvasObject.AddComponent<GraphicRaycaster>();
+            var imageObject = new GameObject("FadeImage", typeof(RectTransform), typeof(Image));
+            imageObject.transform.SetParent(canvasObject.transform, false);
+            fadeImage = imageObject.GetComponent<Image>();
+            fadeImage.color = Color.clear;
+        }
+        var overlayCanvas = fadeImage.GetComponentInParent<Canvas>();
+        if (overlayCanvas != null)
+        {
+            overlayCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            overlayCanvas.overrideSorting = true;
+            overlayCanvas.sortingOrder = short.MaxValue;
+        }
+        var rect = fadeImage.rectTransform;
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
-
-        fadeImage = img;
+        fadeImage.raycastTarget = true;
     }
 
     public async UniTask FadeToScene(string sceneName)
     {
-        // ensure overlay/images are present and on top
-        EnsureOverlay();
-        if (fadeImage == null)
+        if (IsTransitioning) return;
+        if (string.IsNullOrWhiteSpace(sceneName) || !Application.CanStreamedLevelBeLoaded(sceneName))
+            throw new ArgumentException($"Scene is not available in Build Settings: {sceneName}", nameof(sceneName));
+        IsTransitioning = true;
+        var token = this.GetCancellationTokenOnDestroy();
+        try
         {
-            var opF = SceneManager.LoadSceneAsync(sceneName);
-            var tcsF = new UniTaskCompletionSource<bool>();
-            opF.completed += _ => tcsF.TrySetResult(true);
-            await tcsF.Task;
-            return;
+            EnsureOverlay();
+            fadeImage.gameObject.SetActive(true);
+            await FadeAlpha(1f, token);
+            // Stay opaque while sceneLoaded and Start initialize the new scene.
+            var operation = SceneManager.LoadSceneAsync(sceneName);
+            if (operation == null) throw new InvalidOperationException($"Could not load scene: {sceneName}");
+            await operation.ToUniTask(cancellationToken: token);
+            await UniTask.NextFrame(cancellationToken: token);
+            await FadeAlpha(0f, token);
         }
-
-        // bring canvas to top and prepare image
-        var canvas = fadeImage.GetComponentInParent<Canvas>();
-        if (canvas != null)
+        finally
         {
-            canvas.overrideSorting = true;
-            canvas.sortingOrder = 32767;
+            if (fadeImage != null)
+            {
+                SetAlpha(0f);
+                fadeImage.gameObject.SetActive(false);
+            }
+            IsTransitioning = false;
         }
-        fadeImage.gameObject.SetActive(true);
-        // ensure starting alpha is 0 so fade-out anim is visible
-        var colStart = fadeImage.color;
-        colStart.a = 0f;
-        fadeImage.color = colStart;
+    }
 
-        // Fade out (unscaled) using DOTween and await completion via UniTaskCompletionSource
-        // Kill any existing tweens on this target and ensure image is active and visible start at 0
-        DOTween.Kill(fadeImage);
-        fadeImage.gameObject.SetActive(true);
-        var startCol = fadeImage.color;
-        startCol.a = 0f;
-        fadeImage.color = startCol;
+    private async UniTask FadeAlpha(float target, CancellationToken token)
+    {
+        float start = fadeImage.color.a;
+        float seconds = Mathf.Max(0f, duration);
+        float elapsed = 0f;
+        while (elapsed < seconds)
+        {
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / seconds);
+            float eased = (1f - Mathf.Cos(progress * Mathf.PI)) * 0.5f;
+            SetAlpha(Mathf.Lerp(start, target, eased));
+        }
+        SetAlpha(target);
+    }
 
-        var tcsOut = new UniTaskCompletionSource<bool>();
-        var tweenOut = fadeImage.DOFade(1f, duration).SetEase(Ease.InOutSine).SetUpdate(true);
-        tweenOut.OnComplete(() => tcsOut.TrySetResult(true));
-        await tcsOut.Task;
-
-        // Load scene and await completion
-        var op = SceneManager.LoadSceneAsync(sceneName);
-        var tcs = new UniTaskCompletionSource<bool>();
-        op.completed += _ => tcs.TrySetResult(true);
-        await tcs.Task;
-
-        // Fade in
-        DOTween.Kill(fadeImage);
-        var tcsIn = new UniTaskCompletionSource<bool>();
-        var tweenIn = fadeImage.DOFade(0f, duration).SetEase(Ease.InOutSine).SetUpdate(true);
-        tweenIn.OnComplete(() => tcsIn.TrySetResult(true));
-        await tcsIn.Task;
-
-        // cleanup: hide overlay and restore canvas sorting
-        fadeImage.gameObject.SetActive(false);
-        var canvasAfter = fadeImage.GetComponentInParent<Canvas>();
-        if (canvasAfter != null) canvasAfter.overrideSorting = false;
+    private void SetAlpha(float alpha)
+    {
+        fadeImage.color = new Color(0f, 0f, 0f, alpha);
     }
 }

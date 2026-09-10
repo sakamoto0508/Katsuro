@@ -61,6 +61,8 @@ public sealed class PlayerStateMachine : IDisposable
 
     public void Dispose()
     {
+        _currentState?.Exit();
+        _currentState = null;
         _animationEventSubscriptions.Dispose();
     }
 
@@ -94,9 +96,9 @@ public sealed class PlayerStateMachine : IDisposable
         // 簡易設定：ゴースト中またはヒール中はパッシブ回復をスキップする
         bool isGhosting = Context?.Ghost?.IsActive ?? false;
         bool isHealing = Context?.Healer?.IsActive ?? false;
-        if (!(isGhosting || isHealing))
+        if (!(isGhosting || isHealing || (Context?.SelfSacrifice?.IsActive ?? false)))
         {
-            Context?.SkillGauge?.TickPassive(deltaTime);
+            Context?.SkillGauge?.TickPassive(deltaTime * GameplayRules.Current.Regen(Context.PlayerResource.CurrentHpRatio) * RunSession.RegenMultiplier);
         }
 
         _currentState?.Update(deltaTime);

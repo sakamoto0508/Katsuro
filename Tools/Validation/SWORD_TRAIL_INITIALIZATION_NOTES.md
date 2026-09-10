@@ -1,0 +1,11 @@
+# 剣の事前配置対応（2026-09-11）
+
+- Player.prefabの5つの武器ColliderにSwordTrailとTrailRendererが付いていることを確認。CombatFeedbackもPlayerControllerと同じルートに配置済み。
+- 原因：RequireComponentで配置したTrailRendererに加え、旧Awakeが子のTrailRendererを生成。配置側はEmitting=true、Time=5で、攻撃制御の対象になっていなかった。
+- SwordTrailは配置済みTrailRendererをGetComponentで取得する方式へ変更。SwordTrail自体の実行時AddComponentも廃止。
+- 初期化はpublic bool Init()へ変更。PlayerController→PlayerWeaponのコンストラクター→InitSwordTrails→SwordTrail.Init、EnemyController→EnemyWeaponのコンストラクター→InitSwordTrails→SwordTrail.Initの順で呼ぶ。
+- Awakeでの自動初期化は廃止。SetActiveは表示切り替えのみを行い、Init前は何もしない。Initは複数回呼んでもマテリアル再生成や表示状態のリセットをしない。
+- Player.prefabのTrailRenderer初期Emittingをfalseへ変更。ユーザーの幽体化設定値は維持。
+- Tip未指定なら同じオブジェクトのTrailRendererを使用。別の位置を使う場合はその位置へTrailRendererを事前配置し、TipにそのTransformを指定。Collider自体の位置は変更しない。
+- Enemy.prefabにはSwordTrailの事前配置を確認できていない。未配置の武器では軌跡を出さず、動的追加もしない。敵にも表示する場合は武器Colliderへ事前配置が必要。
+- 検証用SwordTrailRunnerを明示的Init方式に更新。実戦の見え方は未確認。

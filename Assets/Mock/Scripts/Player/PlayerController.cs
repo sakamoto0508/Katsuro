@@ -43,17 +43,49 @@ public class PlayerController : MonoBehaviour, IDamageable
     private PlayerStateMachine _stateMachine;
     private AnimationEventStream _animationEventStream;
     private PlayerResource _playerResource;
+    private float _justBuffRemaining;
+    public int JustStacks => _stateContext != null ? _stateContext.JustAvoidStacks : 0;
+    public float JustSeconds => Mathf.Max(0f, _justBuffRemaining);
+    public float Hp => _playerResource != null ? _playerResource.CurrentHp : 0f;
+    public float Gauge => _stateContext != null ? _stateContext.SkillGauge.Value : 0f;
+    public float JustBonus => JustStacks * (_playerStatus != null && _playerStatus.JustAvoidBuffConfig != null ? _playerStatus.JustAvoidBuffConfig.DamageMultiplierPerStack : 0f);
+    public bool IsInvulnerable => (_stateContext?.IsGhostMode ?? false) || (_playerResource != null && Time.time < _playerResource.InvulnerableUntil);
+    private bool CanFight => _playerResource != null && !_playerResource.IsDead
+        && (GameManager.Instance == null || GameManager.Instance.IsCombatActive);
+    private void OnRevived()
+    {
+        _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        _stateContext.Sprint.End();
+        _stateContext.Ghost.End();
+        _stateContext.Healer.End();
+        _stateContext.SelfSacrifice.End();
+        _stateContext.ClearJustAvoidStacks();
+        _stateContext.SetJustAvoidWindow(false);
+        _stateContext.IsGhostMode = false;
+        _stateContext.Attacker.EndAttack();
+        _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
+        _justBuffRemaining = 0f;
+        AudioManager.Instance?.StopBGM(2);
+    }
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
+    private bool _initialized;
     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
         , CameraManager cameraManager, LockOnCamera lockOnCamera)
     {
+        if (_initialized) return;
+        _initialized = true;
+        CombatFeedback.For(gameObject).Init();
+        DamageNumbers.Prepare(camera);
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
+        _animationController.Init();
+        foreach (var animator in GetComponentsInChildren<Animator>(true)) AnimationSpeedController.For(animator).Init();
+        GetComponent<StatusEffectManager>()?.Init();
         _lookOnCamera = lockOnCamera;
         CharacterEffect characterEffect = GetComponent<CharacterEffect>();
 
@@ -82,6 +114,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             , _animationEventStream, _vfxConfig, characterEffect);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
+        _playerResource.Revived += OnRevived;
 
         // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
         if (_playerHudView != null)
@@ -109,11 +142,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>ダメージを適用する。</summary>
     public void ApplyDamage(DamageInfo info)
     {
+        if (!CanFight || info.DamageAmount <= 0f || Time.time < _playerResource.InvulnerableUntil) return;
         // ジャスト回避ウィンドウ内であればダメージを無効化し、ジャスト回避スタックを加算する。
         if (_stateContext?.IsInJustAvoidWindow ?? false)
         {
             // ジャスト回避成功によるバフ加算。
             _stateContext.AddJustAvoidStack(1);
+            _stateContext.SetJustAvoidWindow(false);
+            _justBuffRemaining = Mathf.Max(0.01f, GameplayRules.Current.JustBuffDuration);
             // PlayerStatus に設定されているゲージボーナスを即時付与（存在すれば）
             float bonus = _playerStatus?.SkillGaugeOnJustAvoidBonus ?? 0f;
             if (bonus > 0f)
@@ -121,7 +157,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _stateContext?.SkillGauge?.Add(bonus);
             }
             // デバッグログ: ジャスト回避成功を出力
-            Debug.Log($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
+            CombatLog.Trace($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
             _animationController?.PlayTrigger(_animationName?.JustAvoidWindow);
             // ジャスト回避スロウ効果を付与する。
             var instigator = info.Instigator;
@@ -138,9 +174,11 @@ public class PlayerController : MonoBehaviour, IDamageable
         // ゴーストモード中はダメージを無効化する。
         if (_stateContext?.IsGhostMode ?? false)
         {
+            _stateContext.SkillGauge.Add(_playerStatus != null ? _playerStatus.SkillGaugeOnAvoidGain : 5f);
             return;
         }
-        _playerResource?.ApplyDamage(info.DamageAmount);
+        CombatFeedback.For(gameObject).Hit();
+        _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier);
     }
 
     private void OnDestroy()
@@ -151,17 +189,18 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
 
         // Ability と SkillGauge / PlayerResource の Dispose
+        _playerHudPresenter?.Dispose();
+        _stateMachine?.Dispose();
+        _stateMachine = null;
         _stateContext?.Sprint?.Dispose();
         _stateContext?.Ghost?.Dispose();
         _stateContext?.SelfSacrifice?.Dispose();
         _stateContext?.Healer?.Dispose();
         _stateContext?.SkillGauge?.Dispose();
         _stateContext?.Attacker?.Dispose();
-        _stateMachine?.Dispose();
         _playerResource?.Dispose();
         _stateContext?.Dispose();
 
-        _stateMachine = null;
         _stateContext = null;
 
         _animationEventStream?.Dispose();
@@ -170,6 +209,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        if (!CanFight) return;
+        if (_justBuffRemaining > 0f)
+        {
+            _justBuffRemaining -= Time.deltaTime;
+            if (_justBuffRemaining <= 0f) _stateContext.ClearJustAvoidStacks();
+        }
         if (_stateContext?.Mover != null && _lookOnCamera != null)
         {
             // ロックオン方向を都度更新し、移動計算へ反映。
@@ -182,6 +227,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
+        if (!CanFight) return;
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
 
@@ -275,6 +321,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
+        if (_stateContext != null && _stateContext.IsGhostMode) _stateMachine.ChangeState(PlayerStateId.Locomotion);
         TryDrawSword();
         // SelfSacrifice 中は攻撃を即時遷移させる（抜刀が未完でもステートを切り替え、攻撃中に抜刀完了を待つ）
         if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
@@ -286,7 +333,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
         if (!_stateContext.Attacker.IsSwordReady)
         {
-            Debug.Log("PlayerController: Attack input ignored, sword not ready.");
+            CombatLog.Trace("PlayerController: Attack input ignored, sword not ready.");
         }
         _stateMachine?.HandleLightAttack();
     }
@@ -298,6 +345,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
+        if (_stateContext != null && _stateContext.IsGhostMode) _stateMachine.ChangeState(PlayerStateId.Locomotion);
         TryDrawSword();
         if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
         {
@@ -320,14 +368,14 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
             else
             {
-                Debug.Log("Ghost Failed to begin (hold)");
+                CombatLog.Trace("Ghost Failed to begin (hold)");
             }
         }
         else if (context.canceled)
         {
             _stateContext?.Ghost?.End();
             _stateMachine?.HandleGhostCanceled();
-            Debug.Log("Ghost Ended (release)");
+            CombatLog.Trace("Ghost Ended (release)");
         }
     }
 
@@ -339,13 +387,13 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (started)
             {
                 _stateMachine?.HandleSelfSacrificeStarted();
-                Debug.Log("SelfSacrifice Started (via AbilityManager)");
+                CombatLog.Trace("SelfSacrifice Started (via AbilityManager)");
             }
             else
             {
                 // Toggle returned false -> either ended or failed to start
                 _stateMachine?.HandleSelfSacrificeCanceled();
-                Debug.Log("SelfSacrifice Canceled/Failed (via AbilityManager)");
+                CombatLog.Trace("SelfSacrifice Canceled/Failed (via AbilityManager)");
             }
         }
     }
@@ -358,18 +406,18 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (started)
             {
                 _stateMachine?.HandleHealStarted();
-                Debug.Log("Heal Started (via AbilityManager)");
+                CombatLog.Trace("Heal Started (via AbilityManager)");
             }
             else
             {
-                Debug.Log("Heal Failed to start (via AbilityManager)");
+                CombatLog.Trace("Heal Failed to start (via AbilityManager)");
             }
         }
         else if (context.canceled)
         {
             // 解除入力は常にステートへ伝える
             _stateMachine?.HandleHealCanceled();
-            Debug.Log("Heal Canceled");
+            CombatLog.Trace("Heal Canceled");
         }
     }
 

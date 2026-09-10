@@ -120,7 +120,7 @@ public sealed class PlayerStateContext : IDisposable
     /// <summary>
     /// ジャスト回避スタックを加算します（amount は正の値）。UI は <see cref="JustAvoidStacksReactive"/> を購読してください。
     /// </summary>
-    public void AddJustAvoidStack(int amount = 1) => _justAvoidStacks.Value = Math.Max(0, _justAvoidStacks.Value + amount);
+    public void AddJustAvoidStack(int amount = 1) => _justAvoidStacks.Value = Math.Min(Status != null && Status.JustAvoidBuffConfig != null ? Status.JustAvoidBuffConfig.MaxStacks : 5, Math.Max(0, _justAvoidStacks.Value + amount));
 
     /// <summary>
     /// ジャスト回避スタックをクリアします。

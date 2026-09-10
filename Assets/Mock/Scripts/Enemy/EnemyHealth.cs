@@ -6,7 +6,7 @@ public class EnemyHealth : IDisposable
 {
     public EnemyHealth(EnemyStuts status)
     {
-        _maxHp = status != null ? status.EnemyMaxHealth : 100f;
+        _maxHp = status != null ? status.EnemyMaxHealth * RunSession.EnemyHealth : 100f * RunSession.EnemyHealth;
         _hpRx = new ReactiveProperty<float>(_maxHp);
     }
 

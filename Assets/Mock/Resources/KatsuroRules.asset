@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa03368a6844008bf6ac32708d15f17, type: 3}
+  m_Name: KatsuroRules
+  m_EditorClassIdentifier:
+  StartingLives: 2
+  ReviveInvulnerability: 2
+  ShortGhostDuration: 0.08
+  GhostCooldown: 0.35
+  JustBuffDuration: 8
+  FullHpRegenMultiplier: 1.5
+  LowHpRegenMultiplier: 0.5
+  FullHpSelfCostMultiplier: 0.5
+  LowHpSelfCostMultiplier: 1
+  FullHpAvoidMultiplier: 1.5
+  LowHpAvoidMultiplier: 0.75
+  PowerAttack: 1.2
+  SoulHitGain: 2
+  DesperationBonus: 0.35
+  GuardDamage: 0.8
+  SpiritCost: 0.7
+  BreathRegen: 1.3
+  SoulBossDamage: 1.1
+  SpiritBossSpeed: 1.1
+  BreathBossHealth: 1.2

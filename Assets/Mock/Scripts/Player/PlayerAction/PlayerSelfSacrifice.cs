@@ -48,11 +48,12 @@ public sealed class PlayerSelfSacrifice : AbilityBase
     /// - 継続コスト (ゲージ) を消費できれば PublishConsumed(deltaTime) で購読者へ経過秒を通知します（購読者側で HP を減らす）。
     /// - ゲージ不足なら自動終了します。
     /// </summary>
+    public float CostMultiplier { get; set; } = 1f;
     public override void Tick(float deltaTime)
     {
         if (!IsActive || deltaTime <= 0f) return;
 
-        float cost = GetSelfSacrificeGaugePerSecond() * deltaTime;
+        float cost = GetSelfSacrificeGaugePerSecond() * Mathf.Max(0f, CostMultiplier) * deltaTime;
         if (_skillGauge.TryConsume(cost))
         {
             // 通知内容: このフレーム分の経過秒。購読者が仕様に沿って HP を減らす。

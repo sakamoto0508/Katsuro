@@ -46,7 +46,7 @@ public abstract class PlayerState
     public virtual void OnSprintCanceled() { }
 
     /// <summary>ゴースト化開始時のフック。</summary>
-    public virtual void OnGhostStarted() { }
+    public virtual void OnGhostStarted() => StateMachine.ChangeState(PlayerStateId.Ghost);
 
     /// <summary>ゴースト化解除時のフック。</summary>
     public virtual void OnGhostCanceled() { }

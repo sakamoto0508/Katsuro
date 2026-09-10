@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -57,7 +58,6 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -72,11 +72,24 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Init();
-        SetGameState(_state);
+        SetGameState(GameState.InGame);
     }
 
-    private void Init()
+    private void OnDestroy()
     {
+        if (Instance == this) Instance = null;
+    }
+
+    public PlayerController Player => _playerController;
+    public bool IsCombatActive => _state == GameState.InGame && RunSession.Active;
+
+    private bool _initialized;
+    public void Init()
+    {
+        if (_initialized) return;
+        _initialized = true;
+        SceneInitialization.Init();
+        RunSession.EnsureRun();
         _lockOnCamera = new LockOnCamera(_playerPosition, _enemyPosition
             , _cinemachineCamera, _cinemachineLockOncamera, _playerAnimationController, _animationName);
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
@@ -104,12 +117,12 @@ public class GameManager : MonoBehaviour
         {
             if (newState == GameState.Title)
             {
-                AudioManager.Instance.StopBGM();
+                AudioManager.Instance.StopAllBGMs();
                 AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 0.5f);
             }
             else if (newState == GameState.InGame)
             {
-                AudioManager.Instance.StopBGM();
+                AudioManager.Instance.StopAllBGMs();
                 AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM, 0.5f);
                 AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 1, _soundVolume);
             }
@@ -125,11 +138,15 @@ public class GameManager : MonoBehaviour
 
     public void WinGame()
     {
+        if (!RunSession.Active) return;
+        RunSession.Complete(true);
         SetGameState(GameState.Victory);
     }
 
     public void LoseGame()
     {
+        if (!RunSession.Active) return;
+        RunSession.Complete(false);
         SetGameState(GameState.Defeat);
     }
 
@@ -144,8 +161,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("LoadSceneManager が設定されていません。直接 SceneManager を使います。");
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            GlobalFader.EnsureInstance().FadeToScene(sceneName).Forget();
         }
     }
 }

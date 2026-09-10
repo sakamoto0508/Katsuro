@@ -62,8 +62,11 @@ public class PlayerAnimationController : MonoBehaviour
     /// <summary>
     /// Animator QÆ‚ğæ“¾‚·‚éB
     /// </summary>
-    private void Start()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         _animator = GetComponent<Animator>();
         // Ensure parameter hashes are initialized at runtime in case OnValidate wasn't called.
         _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);

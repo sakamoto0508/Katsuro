@@ -11,6 +11,7 @@ public sealed class PlayerWeapon
     {
         _weaponColliders = weaponColliders;
         _ignoreColliders = ignoreColliders;
+        InitSwordTrails();
         SetHitboxActive(false);
         SetupIgnoreCollisions();
     }
@@ -18,6 +19,17 @@ public sealed class PlayerWeapon
     private readonly Collider[] _weaponColliders;
     private readonly Dictionary<Collider, WeaponHitboxRelay> _relayCache = new();
     private readonly Collider[] _ignoreColliders;
+
+    private void InitSwordTrails()
+    {
+        if (_weaponColliders == null) return;
+        foreach (var collider in _weaponColliders)
+        {
+            if (collider == null) continue;
+            var effect = collider.GetComponent<SwordTrail>();
+            if (effect != null) effect.Init();
+        }
+    }
 
     /// <summary>ヒットボックスを有効化する。</summary>
     public void EnableHitbox() => SetHitboxActive(true);
@@ -77,6 +89,7 @@ public sealed class PlayerWeapon
                     relay = weaponCollider.gameObject.AddComponent<WeaponHitboxRelay>();
                 }
 
+                relay.Init();
                 _relayCache[weaponCollider] = relay;
             }
 
@@ -99,6 +112,7 @@ public sealed class PlayerWeapon
             }
 
             weaponCollider.enabled = isActive;
+            SwordTrail.SetActive(weaponCollider, isActive);
         }
     }
 

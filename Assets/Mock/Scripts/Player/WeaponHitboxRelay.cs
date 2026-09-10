@@ -37,8 +37,11 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         _onHit -= handler;
     }
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         AssignColliderAndForceTrigger();
     }
 

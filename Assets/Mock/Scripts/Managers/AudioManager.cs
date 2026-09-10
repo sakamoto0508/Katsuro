@@ -26,6 +26,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<SoundData> seList = new List<SoundData>();
     [Header("SFX プールサイズ")]
     [SerializeField] private int sfxPoolSize = 10;
+    [SerializeField, Min(1)] private int maxSfxPoolSize = 32;
     [Header("オーディオ設定")]
     [SerializeField] private AudioConfig _audioConfig;
     [SerializeField] private AudioListener _audioListener;
@@ -34,8 +35,11 @@ public class AudioManager : MonoBehaviour
     private Dictionary<string, AudioClip> _seDict = new Dictionary<string, AudioClip>();
     private List<AudioSource> _sfxPool = new List<AudioSource>();
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         // シングルトン初期化。
         if (Instance == null)
         {
@@ -59,7 +63,7 @@ public class AudioManager : MonoBehaviour
         _bgmDict.Clear();
         foreach (var bgm in bgmList)
         {
-            if (!_bgmDict.ContainsKey(bgm.name) && bgm.clip != null)
+            if (bgm != null && !string.IsNullOrEmpty(bgm.name) && !_bgmDict.ContainsKey(bgm.name) && bgm.clip != null)
             {
                 _bgmDict.Add(bgm.name, bgm.clip);
             }
@@ -69,7 +73,7 @@ public class AudioManager : MonoBehaviour
         _seDict.Clear();
         foreach (var se in seList)
         {
-            if (!_seDict.ContainsKey(se.name) && se.clip != null)
+            if (se != null && !string.IsNullOrEmpty(se.name) && !_seDict.ContainsKey(se.name) && se.clip != null)
             {
                 _seDict.Add(se.name, se.clip);
             }
@@ -129,13 +133,13 @@ public class AudioManager : MonoBehaviour
         {
             if (source != null)
             {
-                DestroyImmediate(source.gameObject);
+                Destroy(source.gameObject);
             }
         }
         _sfxPool.Clear();
 
         // 指定数だけ SFX 用 AudioSource を生成してプールに追加する。
-        for (int i = 0; i < sfxPoolSize; i++)
+        for (int i = 0; i < Mathf.Clamp(sfxPoolSize, 0, Mathf.Max(1, maxSfxPoolSize)); i++)
         {
             if (sfxSourcePrefab != null)
             {
@@ -186,6 +190,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayBGM(string bgmName)
     {
+        if (string.IsNullOrEmpty(bgmName)) return;
         if (_bgmDict.TryGetValue(bgmName, out var clip))
         {
             PlayBGM(clip);
@@ -209,6 +214,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayBGM(string bgmName, int channel = 0, float volume = 1f)
     {
+        if (string.IsNullOrEmpty(bgmName)) return;
         if (_bgmDict.TryGetValue(bgmName, out var clip))
         {
             PlayBGM(clip, channel, volume);
@@ -293,6 +299,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlaySE(string seName, float volume = 1f)
     {
+        if (string.IsNullOrEmpty(seName)) return;
         if (_seDict.TryGetValue(seName, out var clip))
         {
             var src = GetAvailableSfxSource();
@@ -320,10 +327,11 @@ public class AudioManager : MonoBehaviour
         }
 
         // 必要なら予備の SFX ソースを動的に生成する。
-        if (sfxSourcePrefab != null)
+        if (sfxSourcePrefab != null && _sfxPool.Count < Mathf.Max(1, maxSfxPoolSize))
         {
             var extra = Instantiate(sfxSourcePrefab, transform);
             extra.playOnAwake = false;
+            extra.loop = false;
             _sfxPool.Add(extra);
             return extra;
         }
@@ -350,6 +358,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void ApplyLowPassToListener(float cutoffFrequency)
     {
+        if (_audioListener == null) _audioListener = FindFirstObjectByType<AudioListener>();
         if (_audioListener == null) return;
         var filter = _audioListener.GetComponent<AudioLowPassFilter>();
         if (filter == null) filter = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
@@ -380,5 +389,10 @@ public class AudioManager : MonoBehaviour
                 s.clip = null;
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 }

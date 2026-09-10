@@ -53,7 +53,7 @@ public class EnemyAI
     {
         if (_isObserving)
         {
-            if (_observeTimer > 0f)
+            if (deltaTime > 0f)
             {
                 _observeTimer -= deltaTime;
                 // 様子見が終わったら次の行動を決定
@@ -80,7 +80,7 @@ public class EnemyAI
             _reconsiderTimer -= deltaTime;
             if (_reconsiderTimer <= 0f)
             {
-                _reconsiderTimer =  _config.ReconsiderInterval;
+                _reconsiderTimer = Mathf.Max(0.01f, _config != null ? _config.ReconsiderInterval : 0.5f);
                 if (!_isBusy)
                 {
                     TriggerDecision();
@@ -119,7 +119,7 @@ public class EnemyAI
             _lastAction,
             _config);
 
-        Debug.Log($"AI decide {action}");
+        CombatLog.Trace($"AI decide {action}");
 
         _lastAction = action;
         ExecuteAction(action);

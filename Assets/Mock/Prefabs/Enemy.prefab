@@ -180,6 +180,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9100000, guid: 352266d20a3b4d345b8d173bd1f5ff24, type: 2}
     - target: {fileID: 5866666021909216657, guid: a5aef92b275807d428233907cf572452, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'RightArm'\n\tFrom animation clip 'ARPG_Halberd_Attack_Combo4'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: a5aef92b275807d428233907cf572452, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
@@ -209,6 +215,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
       insertIndex: -1
       addedObject: {fileID: 17211850135981662}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5670774338998710203}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8056321405656667840}
   m_SourcePrefab: {fileID: 100100000, guid: a5aef92b275807d428233907cf572452, type: 3}
 --- !u!1 &3671526264821687900 stripped
 GameObject:
@@ -321,6 +333,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e2802607a4a07bd4f96a53e5bca36b48, type: 2}
   _decisionConfig: {fileID: 11400000, guid: b61fd1409f926c347bdd63f1f5f324ee, type: 2}
   _stepBackDistance: 2
+  _characterEffect: {fileID: 0}
+  _enemyDeadDelay: 2000
 --- !u!114 &17211850135981662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -334,6 +348,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationController
   _animName: {fileID: 11400000, guid: 644e59fbcdac44b4a9a4764d1fd92687, type: 2}
+--- !u!114 &5670774338998710203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3671526264821687900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7d707dfbeb462883dfed68a2b7784c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationSpeedController
+--- !u!114 &8056321405656667840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3671526264821687900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb336a4b2229e564dbc9183282e8f6a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectManager
 --- !u!4 &5273032211155335175 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -639763325267172598, guid: a5aef92b275807d428233907cf572452, type: 3}

@@ -147,6 +147,7 @@ public class EnemyMover
     // 追跡の有効判定、目的地更新、回転の更新をまとめた処理
     private void UpdateTrackingAndDestination()
     {
+        if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh || _enemyStuts == null) return;
         float distanceToPlayer = Vector3.Distance(_enemyTransform.position, _playerPosition.position);
 
         // 追跡開始距離外なら停止
@@ -370,9 +371,10 @@ public class EnemyMover
     public void Approach()
     {
         if (_playerPosition == null || _agent == null) return;
+        if (_isMovementHeldForAttack || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh) return;
+        if (_agent.isStopped) _destinationUpdateTimer = 0f;
         _agent.isStopped = false;
-        _agent.SetDestination(_playerPosition.position);
-        _destinationUpdateTimer = _enemyStuts.DestinationUpdateInterval;
+        // UpdateTrackingAndDestination owns the throttled path request.
         ApplyRotationMode();
     }
 

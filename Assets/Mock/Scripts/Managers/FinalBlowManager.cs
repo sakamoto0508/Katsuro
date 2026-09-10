@@ -19,17 +19,21 @@ public class FinalBlowManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _finalBlowText;
     [SerializeField] private float _finalBlowTextFadeIn = 0.5f;
     [SerializeField] private Ease _ease = Ease.InQuint;
+    private bool _isPlaying;
 
-    private void Awake()
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
         if (_finalBlowText != null)
         {
@@ -39,26 +43,28 @@ public class FinalBlowManager : MonoBehaviour
 
     public void StartFinalBlow()
     {
-        if (_enemyController == null) return;
+        if (_isPlaying || _enemyController == null || _player == null) return;
+        _isPlaying = true;
+        GameManager.Instance?.WinGame();
         DoFinalBlow().Forget();
     }
 
     private async UniTaskVoid DoFinalBlow()
     {
+        var token = this.GetCancellationTokenOnDestroy();
         // フェーズ1: ヒットストップ（敵の Animator を一時停止）とプレイヤーの短時間スロー
         // 注意: 呼び出し元が player を null で渡しているとスローが適用されないため、
 
-        HitStopManager.Instance.PlayHitStop(_phase1HitStop, _player.gameObject);
-        HitStopManager.Instance.PlayHitStop(_phase1HitStop, _enemyController.gameObject);
+        HitStopManager.Instance?.PlayHitStop(_phase1HitStop, _enemyController.gameObject);
         // BGM を停止し、敵の死亡SEを再生する
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.StopBGM();
-            AudioManager.Instance.PlaySE(_audioConfig.EnemyDeadSound);
+            AudioManager.Instance.StopAllBGMs();
+            if (_audioConfig != null) AudioManager.Instance.PlaySE(_audioConfig.EnemyDeadSound);
         }
 
         // プレイヤーは完全停止ではなくスローにする（例: 0.3 の速度）
-        HitStopManager.Instance.PlayHitStopSlow(0.2f, 0.3f, _player.gameObject);
+        HitStopManager.Instance?.PlayHitStopSlow(0.2f, 0.3f, _player.gameObject);
 
         if (_finalBlowText != null)
         {
@@ -75,10 +81,18 @@ public class FinalBlowManager : MonoBehaviour
                 .SetUpdate(true);
         }
         // UniTask のバージョンに合わせてミリ秒で待機（実時間）
-        await UniTask.Delay((int)(_whiteFlashDuration * 1000));
+        await UniTask.Delay((int)(Mathf.Max(0f, _whiteFlashDuration) * 1000), ignoreTimeScale: true, cancellationToken: token);
         // player のスローは上のコルーチンが終了すると自動で元に戻るため、ここで再設定はしない
         _player.AnimController.PlayTrigger(_player.AnimController.AnimName.SwordSheathing);
-        await UniTask.Delay((int)(_phase2Duration * 1000));
-        LoadSceneManager.Instance.LoadScene(LoadSceneManager.Instance.SceneNameConfig.TitleScene);
+        await UniTask.Delay((int)(Mathf.Max(0f, _phase2Duration) * 1000), ignoreTimeScale: true, cancellationToken: token);
+        var config = LoadSceneManager.Instance != null ? LoadSceneManager.Instance.SceneNameConfig : null;
+        await GlobalFader.EnsureInstance().FadeToScene(config != null ? config.TitleScene : "TitleScene");
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != this) return;
+        Instance = null;
+        if (_finalBlowText != null) _finalBlowText.DOKill();
     }
 }

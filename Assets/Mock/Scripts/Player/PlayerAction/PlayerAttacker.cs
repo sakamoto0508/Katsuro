@@ -46,7 +46,7 @@ public sealed class PlayerAttacker : IDisposable
     private bool _isSwordReady;
     private bool _isDrawingSword;
     private bool _isHitboxActive;
-    private readonly HashSet<int> _hitTargets = new();
+    private readonly HashSet<IDamageable> _hitTargets = new();
     private float _currentClipDamage;
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
@@ -88,7 +88,7 @@ public sealed class PlayerAttacker : IDisposable
         {
             _animController?.PlayBool(_animName.IsDrawingSword, false);
         }
-        Debug.Log($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
+        CombatLog.Trace($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
     }
 
     public void PlayLightAttack() => PlayLightAttack(0, false);
@@ -206,6 +206,9 @@ public sealed class PlayerAttacker : IDisposable
             return;
         }
         // 対象がダメージを受けられない（環境コライダー等はここで弾く）
+        if (GameManager.Instance != null && !GameManager.Instance.IsCombatActive) return;
+        var enemy = other.GetComponentInParent<EnemyController>();
+        if (enemy != null && enemy.HpRatio <= 0f) return;
         var damageable = other.GetComponentInParent<IDamageable>();
         if (damageable == null)
         {
@@ -213,8 +216,7 @@ public sealed class PlayerAttacker : IDisposable
         }
 
         // 既に当たったコライダーなら無視（ダメージ対象のみを記録）
-        int instanceId = other.GetInstanceID();
-        if (!_hitTargets.Add(instanceId))
+        if (!_hitTargets.Add(damageable))
         {
             return;
         }
@@ -235,14 +237,15 @@ public sealed class PlayerAttacker : IDisposable
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)
         {
-            Debug.Log($"PlayerAttacker: Hit target={other.gameObject.name} damage={damage}");
+            CombatLog.Trace($"PlayerAttacker: Hit target={other.gameObject.name} damage={damage}");
         }
 
         damageable.ApplyDamage(damageInfo);
+        if (damage > 0f) _context?.SkillGauge?.Add((_status != null ? _status.SkillGaugeOnAttackGain : 5f) * RunSession.HitGainMultiplier);
         if (HitStopManager.Instance != null && other != null)
         {
             HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, other.gameObject);
-            Debug.Log($"PlayerAttacker: Played hit stop for target={other.gameObject.name}");
+            CombatLog.Trace($"PlayerAttacker: Played hit stop for target={other.gameObject.name}");
         }
         SpawnPassiveEffects(in damageInfo);
     }
@@ -289,7 +292,7 @@ public sealed class PlayerAttacker : IDisposable
             }
         }
 
-        float final = Mathf.Max(0f, afterLowHp * justMult);
+        float final = Mathf.Max(0f, afterLowHp * justMult * RunSession.DamageMultiplier(currentHpRatio));
         return final;
     }
 

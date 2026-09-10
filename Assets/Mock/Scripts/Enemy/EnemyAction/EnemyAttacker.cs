@@ -32,7 +32,7 @@ public class EnemyAttacker : IDisposable
     private EnemyAttackData[] _attackData;
     private EnemyAnimationController _animController;
     private EnemyWeapon[] _weapons;
-    private HashSet<int> _hitTargets = new();
+    private readonly HashSet<IDamageable> _hitTargets = new();
     private bool _isHitboxActive;
     private readonly Transform _ownerTransform;
     private readonly EnemyStuts _status;
@@ -69,22 +69,22 @@ public class EnemyAttacker : IDisposable
         }
         else
         {
-            Debug.Log($"EnemyAttacker: perform {attackType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
+            CombatLog.Trace($"EnemyAttacker: perform {attackType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
         }
     }
 
     private EnemyAttackData FindData(EnemyActionType action)
     {
         if (_attackData == null) return null;
-        var matches = new System.Collections.Generic.List<EnemyAttackData>();
+        EnemyAttackData selected = null;
+        int count = 0;
         foreach (var d in _attackData)
         {
-            if (d != null && d.ActionType == action) matches.Add(d);
+            if (d == null || d.ActionType != action) continue;
+            if (UnityEngine.Random.Range(0, ++count) == 0) selected = d;
         }
-        if (matches.Count == 0) return null;
         // if multiple attack data entries exist for the same action type (variants), pick one at random
-        int idx = UnityEngine.Random.Range(0, matches.Count);
-        return matches[idx];
+        return selected;
     }
 
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
@@ -95,7 +95,7 @@ public class EnemyAttacker : IDisposable
         if (_weapons == null) return;
         foreach (var w in _weapons)
         {
-            w.EnableHitbox();
+            w?.EnableHitbox();
         }
     }
 
@@ -106,7 +106,7 @@ public class EnemyAttacker : IDisposable
         if (_weapons == null) return;
         foreach (var w in _weapons)
         {
-            w.DisableHitbox();
+            w?.DisableHitbox();
         }
     }
 
@@ -118,12 +118,11 @@ public class EnemyAttacker : IDisposable
         // 自分自身(敵)へのヒットは無視
         if (_ownerTransform != null && other.transform.IsChildOf(_ownerTransform)) return;
 
-        int instanceId = other.GetInstanceID();
-        if (!_hitTargets.Add(instanceId)) return;
 
         var damageable = other.GetComponentInParent<IDamageable>();
 
         if (damageable == null) return;
+        if (!_hitTargets.Add(damageable)) return;
 
         Vector3 origin = _ownerTransform != null ? _ownerTransform.position : other.bounds.center;
         Vector3 hitPoint = other.ClosestPoint(origin);
@@ -131,20 +130,24 @@ public class EnemyAttacker : IDisposable
 
         float damage = sourceWeapon != null ? sourceWeapon.Damage() : (_status != null ? _status.EnemyPower : 0f);
 
+        var owner = _ownerTransform != null ? _ownerTransform.GetComponent<EnemyController>() : null;
+        damage *= RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
-        Debug.Log($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
+        CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
+        bool avoided = damageable is PlayerController player && player.IsInvulnerable;
         damageable.ApplyDamage(damageInfo);
         var go = other != null ? other.gameObject : null;
-        if (HitStopManager.Instance != null && go != null)
+        if (!avoided && HitStopManager.Instance != null && go != null)
         {
             HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, go);
-            Debug.Log($"EnemyAttacker: Played hit stop for {go.name} with duration={HitStopManager.Instance.HitStopTime}");
+            CombatLog.Trace($"EnemyAttacker: Played hit stop for {go.name} with duration={HitStopManager.Instance.HitStopTime}");
         }
     }
 
     public void Dispose()
     {
+        DisableWeaponHitbox();
         // 登録したハンドラを解除
         if (_weapons != null)
         {

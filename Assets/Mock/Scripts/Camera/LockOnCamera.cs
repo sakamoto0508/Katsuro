@@ -75,6 +75,7 @@ public class LockOnCamera
 
     public void LockOn()
     {
+        if (!HasValidTarget() || _playerPosition == null) return;
         IsLockOn = true;
         // ロックオン開始：VirtualCamera の優先度を切り替え、必要なら CinemachineBrain を無効化して
         // 手動でカメラ制御を行えるようにします。
@@ -127,7 +128,7 @@ public class LockOnCamera
         if (!IsLockOn) return Vector3.zero;
         if (_enemyPosition == null || _playerPosition == null)
         {
-            Debug.LogWarning("LockOnCamera: ReturnLockOnDirection - missing positions");
+            UnLockOn();
             return Vector3.zero;
         }
 

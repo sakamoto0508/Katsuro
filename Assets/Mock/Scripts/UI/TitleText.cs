@@ -2,8 +2,8 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using UnityEngine.SceneManagement;
-// Simple title controller that fades out via GlobalFader then loads game scene
+
+/// <summary>Title text pulse, with the same scene transition used by keyboard/gamepad input.</summary>
 public class TitleText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
@@ -11,36 +11,42 @@ public class TitleText : MonoBehaviour
     [SerializeField] private float _fadeOutDuration = 1.0f;
     [SerializeField] private Ease _ease = Ease.InOutSine;
     [SerializeField] private string _gameSceneName = "GameScene";
+    private Sequence _pulse;
+    private bool _isTransitioning;
 
-    private void Start()
+    private void OnEnable()
     {
+        if (_text == null) return;
         _text.alpha = 0f;
-        Sequence seq = DOTween.Sequence();
+        _pulse = DOTween.Sequence().SetUpdate(true);
+        _pulse.Append(_text.DOFade(1f, _fadeInDuration).SetEase(_ease));
+        _pulse.AppendInterval(0.5f);
+        _pulse.Append(_text.DOFade(0f, _fadeOutDuration).SetEase(_ease));
+        _pulse.SetLoops(-1);
+    }
 
-        seq.Append(_text.DOFade(1f, _fadeInDuration).SetEase(_ease));
-        seq.AppendInterval(0.5f);
-        seq.Append(_text.DOFade(0f, _fadeOutDuration).SetEase(_ease));
-
-        seq.SetLoops(-1);
+    private void OnDisable()
+    {
+        _pulse?.Kill();
+        _pulse = null;
     }
 
     public void OnStartButton()
     {
+        if (_isTransitioning) return;
+        var titleManager = FindFirstObjectByType<TitleManager>();
+        if (titleManager != null)
+        {
+            titleManager.OnPressStart();
+            return;
+        }
+        _isTransitioning = true;
         StartGame().Forget();
     }
 
-    private async UniTaskVoid StartGame()
+    private async UniTask StartGame()
     {
-        if (GlobalFader.Instance == null)
-        {
-            Debug.LogWarning("GlobalFader not found. Loading scene directly.");
-            var op = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(_gameSceneName);
-            var tcs = new UniTaskCompletionSource<bool>();
-            op.completed += _ => tcs.TrySetResult(true);
-            await tcs.Task;
-            return;
-        }
-
-        await GlobalFader.Instance.FadeToScene(_gameSceneName);
+        try { await GlobalFader.EnsureInstance().FadeToScene(_gameSceneName); }
+        finally { _isTransitioning = false; }
     }
 }

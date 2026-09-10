@@ -11,14 +11,26 @@ public sealed class EnemyWeapon
     {
         _weaponColliders = weaponColliders;
         _fallbackPower = fallbackPower;
+        InitSwordTrails();
         SetHitboxActive(false);
     }
 
     private readonly Collider[] _weaponColliders;
     // ステータス参照を使わず、フォールバックの攻撃力を保持する（型依存を避けるため）
     private readonly float _fallbackPower;
-    private readonly Dictionary<Collider, Component> _relayCache = new Dictionary<Collider, Component>();
+    private readonly Dictionary<Collider, WeaponHitboxRelay> _relayCache = new Dictionary<Collider, WeaponHitboxRelay>();
     private float _currentAttackDamage = 0f;
+
+    private void InitSwordTrails()
+    {
+        if (_weaponColliders == null) return;
+        foreach (var collider in _weaponColliders)
+        {
+            if (collider == null) continue;
+            var effect = collider.GetComponent<SwordTrail>();
+            if (effect != null) effect.Init();
+        }
+    }
 
     /// <summary>
     /// 一時的に設定される攻撃ダメージ。0 以下ならステータス由来のダメージを返す。
@@ -46,8 +58,7 @@ public sealed class EnemyWeapon
         foreach (var relay in EnumerateRelays())
         {
             // reflection で Subscribe を呼ぶ（WeaponHitboxRelay 型に直接依存しない）
-            var method = relay.GetType().GetMethod("Subscribe");
-            method?.Invoke(relay, new object[] { handler });
+            relay.Subscribe(handler);
         }
     }
 
@@ -61,12 +72,11 @@ public sealed class EnemyWeapon
 
         foreach (var relay in EnumerateRelays())
         {
-            var method = relay.GetType().GetMethod("Unsubscribe");
-            method?.Invoke(relay, new object[] { handler });
+            relay.Unsubscribe(handler);
         }
     }
 
-    private IEnumerable<Component> EnumerateRelays()
+    private IEnumerable<WeaponHitboxRelay> EnumerateRelays()
     {
         if (_weaponColliders == null)
         {
@@ -74,13 +84,6 @@ public sealed class EnemyWeapon
         }
 
         // WeaponHitboxRelay 型は Player 側に定義されているため、リフレクションで取得する
-        Type relayType = null;
-        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            relayType = asm.GetType("WeaponHitboxRelay");
-            if (relayType != null) break;
-        }
-
         foreach (var weaponCollider in _weaponColliders)
         {
             if (weaponCollider == null)
@@ -92,14 +95,9 @@ public sealed class EnemyWeapon
 
             if (!_relayCache.TryGetValue(weaponCollider, out var relay) || relay == null)
             {
-                if (relayType != null)
-                {
-                    relay = weaponCollider.GetComponent(relayType) as Component;
-                    if (relay == null)
-                    {
-                        relay = weaponCollider.gameObject.AddComponent(relayType) as Component;
-                    }
-                }
+                relay = weaponCollider.GetComponent<WeaponHitboxRelay>();
+                if (relay == null) relay = weaponCollider.gameObject.AddComponent<WeaponHitboxRelay>();
+                relay.Init();
                 _relayCache[weaponCollider] = relay;
             }
 
@@ -122,6 +120,7 @@ public sealed class EnemyWeapon
             }
 
             weaponCollider.enabled = isActive;
+            SwordTrail.SetActive(weaponCollider, isActive);
         }
 
         if (!isActive)

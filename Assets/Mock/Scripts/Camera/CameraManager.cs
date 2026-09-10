@@ -7,9 +7,12 @@ public class CameraManager : MonoBehaviour
     private InputBuffer _inputBuffer;
     private LockOnCamera _lookOnCamera;
     private LockOnCameraMover _lockOnCameraMover;
+    private bool _initialized;
     public void Init(InputBuffer inputBuffer, Transform playerPosition
         , Transform enemyPosition, CameraConfig config, LockOnCamera lockOnCamera, CinemachineCamera camera)
     {
+        if (_initialized) return;
+        _initialized = true;
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         _lookOnCamera = lockOnCamera;
