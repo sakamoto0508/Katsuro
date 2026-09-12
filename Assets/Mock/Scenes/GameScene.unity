@@ -9859,6 +9859,10 @@ PrefabInstance:
       propertyPath: _playerAnimationController
       value: 
       objectReference: {fileID: 896154414}
+    - target: {fileID: 4735781494124217749, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
+      propertyPath: _damageNumbers
+      value:
+      objectReference: {fileID: 9100001202}
     - target: {fileID: 6446326928075713348, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -127983,6 +127987,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bc1e993bc9762b24ab51f85e79d8dfd8, type: 3}
+--- !u!114 &9100001202 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6728257244164210586, guid: bc1e993bc9762b24ab51f85e79d8dfd8, type: 3}
+  m_PrefabInstance: {fileID: 9100001200}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ce2a75ec08b4f3889e207c7f5634e7d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::DamageNumbers
 --- !u!1001 &9100001300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -128193,6 +128208,47 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ce69f1b5d9730746b2cda271320ee81, type: 3}
+--- !u!1 &9200000200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9200000201}
+  - component: {fileID: 9200000202}
+  m_Layer: 0
+  m_Name: GlobalFader
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &9200000201
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9200000200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!114 &9200000202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9200000200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f340bc7a0c51e944957bc3d8517df1a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalFader
+  fadeImage: {fileID: 0}
+  duration: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -128221,3 +128277,4 @@ SceneRoots:
   - {fileID: 9100000001}
   - {fileID: 9100001200}
   - {fileID: 9100001300}
+  - {fileID: 9200000201}

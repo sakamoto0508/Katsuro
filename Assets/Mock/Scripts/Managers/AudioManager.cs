@@ -35,9 +35,25 @@ public class AudioManager : MonoBehaviour
     private Dictionary<string, AudioClip> _seDict = new Dictionary<string, AudioClip>();
     private List<AudioSource> _sfxPool = new List<AudioSource>();
 
+    private AudioLowPassFilter _lowPass;
+    [SerializeField, Min(3)] private int _bgmChannelCount = 3;
     private bool _initialized;
-    public void Init()
+    public void Init(AudioListener listener)
     {
+        if (Instance != null && Instance != this)
+        {
+            Instance.Init(listener);
+            Destroy(gameObject);
+            return;
+        }
+        bool listenerChanged = listener != null && listener != _audioListener;
+        if (listenerChanged) _audioListener = listener;
+        if (_audioListener != null && (listenerChanged || _lowPass == null))
+        {
+            _lowPass = _audioListener.GetComponent<AudioLowPassFilter>();
+            if (_lowPass == null) _lowPass = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
+            _lowPass.enabled = false;
+        }
         if (_initialized) return;
         _initialized = true;
         // シングルトン初期化。
@@ -58,6 +74,7 @@ public class AudioManager : MonoBehaviour
     {
         // BGM 用 AudioSource を準備する（複数チャンネル対応）。
         EnsureBGMSources();
+        CreateBgmChannels();
 
         // BGM リストを辞書に登録。
         _bgmDict.Clear();
@@ -108,24 +125,24 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private AudioSource GetBgmSource(int channel)
+    private void CreateBgmChannels()
     {
-        EnsureBGMSources();
-        if (channel < 0) channel = 0;
-        // チャンネルがリスト範囲外の場合は必要分のソースを生成する。
-        while (channel >= bgmSources.Count)
+        while (bgmSources.Count < Mathf.Max(3, _bgmChannelCount))
         {
-            int idx = bgmSources.Count;
-            GameObject bgmObj = new GameObject($"BGM_Source_{idx}");
-            bgmObj.transform.SetParent(transform);
-            var source = bgmObj.AddComponent<AudioSource>();
+            var sourceObject = new GameObject("BGM_Source_" + bgmSources.Count);
+            sourceObject.transform.SetParent(transform, false);
+            var source = sourceObject.AddComponent<AudioSource>();
             source.loop = true;
             source.playOnAwake = false;
             bgmSources.Add(source);
         }
-        return bgmSources[channel];
     }
 
+    private AudioSource GetBgmSource(int channel)
+    {
+        channel = Mathf.Max(0, channel);
+        return bgmSources != null && channel < bgmSources.Count ? bgmSources[channel] : null;
+    }
     private void CreateSFXPool()
     {
         // 既存のプールを破棄してから再生成する。
@@ -358,11 +375,9 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void ApplyLowPassToListener(float cutoffFrequency)
     {
-        if (_audioListener == null) _audioListener = FindFirstObjectByType<AudioListener>();
-        if (_audioListener == null) return;
-        var filter = _audioListener.GetComponent<AudioLowPassFilter>();
-        if (filter == null) filter = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
-        filter.cutoffFrequency = cutoffFrequency;
+        if (_lowPass == null) return;
+        _lowPass.cutoffFrequency = cutoffFrequency;
+        _lowPass.enabled = true;
     }
 
     /// <summary>
@@ -370,9 +385,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void RemoveLowPassFromListener()
     {
-        if (_audioListener == null) return;
-        var filter = _audioListener.GetComponent<AudioLowPassFilter>();
-        if (filter != null) Destroy(filter);
+        if (_lowPass != null) _lowPass.enabled = false;
     }
 
     /// <summary>

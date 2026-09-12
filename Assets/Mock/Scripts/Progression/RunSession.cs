@@ -11,7 +11,7 @@ public sealed class ChampionTrace
     public float ClearSeconds;
 }
 
-/// <summary>One local run; only a victory replaces the saved champion.</summary>
+/// <summary>今回の挑戦を管理し、勝利した場合のみ保存済みの勝者を更新する。</summary>
 public static class RunSession
 {
     private const string SaveKey = "Katsuro.Champion.v1";
@@ -20,7 +20,13 @@ public static class RunSession
     public static int Attack { get; private set; }
     public static int Defense { get; private set; }
     public static int Lives { get; private set; }
+    /// <summary>
+    /// 前回の勝者の痕跡。null の場合はまだ誰も勝利していない。
+    /// </summary>
     public static ChampionTrace Opponent { get; private set; }
+    /// <summary>
+    /// 今回の挑戦が開始された時刻（Time.unscaledTime）。勝利時のクリア時間計算に使う。
+    /// </summary>
     public static float StartedAt { get; private set; }
     public static string Result { get; private set; }
     public static string SaveError { get; private set; }

@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Updates scene-authored HUD labels without creating UI or changing their layout.</summary>
+/// <summary>シーンに配置したゲーム内表示の文字を更新する。表示要素の生成や配置変更は行わない。</summary>
 public sealed class RunHUD : MonoBehaviour
 {
     [SerializeField] private PlayerController _player;
@@ -25,11 +25,13 @@ public sealed class RunHUD : MonoBehaviour
     [SerializeField] private TMP_Text _ghostStatus;
     private float _nextRefresh;
 
+    private GlobalFader _fader;
     private bool _initialized;
-    public void Init()
+    public void Init(GlobalFader fader)
     {
         if (_initialized) return;
         _initialized = true;
+        _fader = fader;
         if (_visibility != null)
         {
             _visibility.alpha = 0f;
@@ -41,7 +43,7 @@ public sealed class RunHUD : MonoBehaviour
     private void LateUpdate()
     {
         bool visible = RunSession.Active && _player != null
-            && !(GlobalFader.Instance != null && GlobalFader.Instance.IsTransitioning);
+            && !(_fader != null && _fader.IsTransitioning);
         if (_visibility != null) _visibility.alpha = visible ? 1f : 0f;
         float enemyHp = _enemy != null ? Mathf.Clamp01(_enemy.HpRatio) : 0f;
         if (_enemyGauge != null) _enemyGauge.SetNormalized(enemyHp);

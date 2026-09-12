@@ -214,6 +214,9 @@ PrefabInstance:
       addedObject: {fileID: 1889450424323499715}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 901234567891234567}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 17211850135981662}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a5aef92b275807d428233907cf572452, type: 3}
       insertIndex: -1
@@ -382,3 +385,18 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: a5aef92b275807d428233907cf572452, type: 3}
   m_PrefabInstance: {fileID: 4481794656253483789}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &901234567891234567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3671526264821687900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f33a6d4a6e64ae4a820175222c5d670, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CombatFeedback
+  _ghostTint: {r: 0.66, g: 0.78, b: 0.8, a: 0.35}
+  _ghostSway: 0.009
+  _ghostFlowSpeed: 1.2

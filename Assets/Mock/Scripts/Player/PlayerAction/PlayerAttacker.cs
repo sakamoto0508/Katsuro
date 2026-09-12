@@ -39,6 +39,9 @@ public sealed class PlayerAttacker : IDisposable
     private readonly PlayerResource _playerResource;
     private PlayerPassiveBuffSet _passiveBuffSet;
     private PlayerStateContext _context;
+    private GameManager _game;
+    private HitStopManager _hitStop;
+    private bool _initialized;
     private int _currentComboStep;
     private bool _currentIsLockOnVariant;
     private bool _currentIsStrongAttack;
@@ -48,6 +51,13 @@ public sealed class PlayerAttacker : IDisposable
     private bool _isHitboxActive;
     private readonly HashSet<IDamageable> _hitTargets = new();
     private float _currentClipDamage;
+
+    public void Init(GameManager game, HitStopManager hitStop)
+    {
+        if (_initialized) return;
+        _initialized = true;
+        _game = game; _hitStop = hitStop;
+    }
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
     public void DrawSword()
@@ -101,7 +111,7 @@ public sealed class PlayerAttacker : IDisposable
         _currentComboStep = comboStep;
         _currentIsLockOnVariant = isLockOnVariant;
         ApplyLockOnFlag(isLockOnVariant);
-        // set clip-specific flat damage from config
+        // 設定からアニメーション固有の固定ダメージを取得する。
         _currentClipDamage = _context?.StateConfig?.GetLightAttackClipDamage(isLockOnVariant, comboStep) ?? 0f;
         PlayAttackTrigger(_animName?.LightAttack, comboStep);
     }
@@ -206,7 +216,7 @@ public sealed class PlayerAttacker : IDisposable
             return;
         }
         // 対象がダメージを受けられない（環境コライダー等はここで弾く）
-        if (GameManager.Instance != null && !GameManager.Instance.IsCombatActive) return;
+        if (_game != null && !_game.IsCombatActive) return;
         var enemy = other.GetComponentInParent<EnemyController>();
         if (enemy != null && enemy.HpRatio <= 0f) return;
         var damageable = other.GetComponentInParent<IDamageable>();
@@ -242,9 +252,9 @@ public sealed class PlayerAttacker : IDisposable
 
         damageable.ApplyDamage(damageInfo);
         if (damage > 0f) _context?.SkillGauge?.Add((_status != null ? _status.SkillGaugeOnAttackGain : 5f) * RunSession.HitGainMultiplier);
-        if (HitStopManager.Instance != null && other != null)
+        if (_hitStop != null && other != null)
         {
-            HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, other.gameObject);
+            _hitStop.PlayHitStop(_hitStop.HitStopTime, other.gameObject);
             CombatLog.Trace($"PlayerAttacker: Played hit stop for target={other.gameObject.name}");
         }
         SpawnPassiveEffects(in damageInfo);
@@ -262,10 +272,10 @@ public sealed class PlayerAttacker : IDisposable
         // パッシブ乗算・加算
         float passiveMult = _passiveBuffSet != null ? _passiveBuffSet.EvaluateDamageMultiplier() : 1f;
         float passiveFlat = _passiveBuffSet != null ? _passiveBuffSet.EvaluateFlatDamageBonus() : 0f;
-        // include clip flat damage as additive component
+        // アニメーション固有の固定ダメージを加算分に含める。
         float clipFlat = _currentClipDamage;
-        float additive = baseDamage + passiveFlat + clipFlat; // (base + equip(flat) + clip)
-        float afterPassive = additive * passiveMult; // apply passive multiplier
+        float additive = baseDamage + passiveFlat + clipFlat; // 基礎ダメージ＋装備の固定加算＋アニメーション固有の加算
+        float afterPassive = additive * passiveMult; // パッシブ効果の倍率を適用する。
 
         // 低HPバフ乗算
         float lowHpMult = 1f;

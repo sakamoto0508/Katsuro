@@ -18,16 +18,22 @@ public class TitleManager : MonoBehaviour
 
     private void Start() => Init();
 
+    private readonly SceneInitialization _scene = new SceneInitialization();
+    private AudioManager _audio;
+    private GlobalFader _fader;
     private bool _initialized;
     public void Init()
     {
         if (_initialized) return;
         _initialized = true;
-        SceneInitialization.Init();
+        _scene.Init();
+        _audio = _scene.Audio;
+        _fader = _scene.Fader;
+        _scene.InitTitleTexts(this);
         // タイトルBGM再生（null ガード）
-        if (_audioConfig != null && AudioManager.Instance != null)
+        if (_audioConfig != null && _audio != null)
         {
-            AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 0.5f);
+            _audio.PlayBGM(_audioConfig.TitleBGM, 0.5f);
         }
     }
 
@@ -52,7 +58,7 @@ public class TitleManager : MonoBehaviour
     /// </summary>
     public void OnPressStart()
     {
-        if (_isTransitioning || (GlobalFader.Instance != null && GlobalFader.Instance.IsTransitioning)) return;
+        if (_isTransitioning || (_fader != null && _fader.IsTransitioning)) return;
         if (_setup != null && _setup.IsOpen) return;
         if (_setup == null) { Debug.LogError("Assign the scene RunSetupUI to TitleManager.", this); return; }
         _setup.Open(this);
@@ -67,9 +73,9 @@ public class TitleManager : MonoBehaviour
         _isTransitioning = true;
 
         // SE再生
-        if (_audioConfig != null && AudioManager.Instance != null)
+        if (_audioConfig != null && _audio != null)
         {
-            AudioManager.Instance.PlaySE(_audioConfig.StartSE);
+            _audio.PlaySE(_audioConfig.StartSE);
         }
 
         LoadGameScene().Forget();
@@ -86,7 +92,7 @@ public class TitleManager : MonoBehaviour
             await UniTask.Delay((int)(Mathf.Max(0f, _transitionDelay) * 1000), ignoreTimeScale: true,
                 cancellationToken: this.GetCancellationTokenOnDestroy());
             var sceneName = _sceneNameConfig != null ? _sceneNameConfig.GameScene : "GameScene";
-            await GlobalFader.EnsureInstance().FadeToScene(sceneName);
+            await _fader.FadeToScene(sceneName);
         }
         catch (System.OperationCanceledException) { }
         catch (System.Exception error)

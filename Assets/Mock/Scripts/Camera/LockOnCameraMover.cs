@@ -1,7 +1,7 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-/// <summary>Moves the camera while lock-on has manual control of the view.</summary>
+/// <summary>ロックオン中に視点を手動制御する際のカメラ移動を行う。</summary>
 public class LockOnCameraMover
 {
     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition,

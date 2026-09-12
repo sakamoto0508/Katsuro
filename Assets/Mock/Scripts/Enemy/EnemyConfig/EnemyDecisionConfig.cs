@@ -10,7 +10,7 @@ public class EnemyDecisionConfig : ScriptableObject
     public float ReconsiderInterval = 0.5f;
 
     [Header("Weights")]
-    // Legacy single-weight fields (kept for compatibility)
+    // 互換性を維持するために残している旧形式の重み設定。
     public float WeightWarpAttack = 10f;
     public float WeightApproach = 30f;
     public float WeightRush = 30f;

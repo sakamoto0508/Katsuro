@@ -7,6 +7,11 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyController : MonoBehaviour, IDamageable
 {
+    /// <summary>
+    /// 敵の現在のHP比率を取得します。0.0f（死亡）から1.0f（満タン）の範囲で返されます。
+    /// </summary>
+    public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
+
     [Header("Enemy Status")]
     [SerializeField] private EnemyStuts _enemyStuts;
     [SerializeField] private AnimationName _animName;
@@ -34,36 +39,42 @@ public class EnemyController : MonoBehaviour, IDamageable
     private EnemyActionType? _pendingAction;
     private CancellationToken _token;
     private bool _dead = false;
-    public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
-
-    /// <summary>
-    /// 初期化処理：必要なランタイムコンポーネントを生成して接続します。
-    /// </summary>
+    private GameManager _game;
+    private AudioManager _audio;
+    private FinalBlowManager _finalBlow;
+    private LoadSceneManager _loader;
+    private DamageNumbers _damageNumbers;
+    private CombatFeedback _combatFeedback;
     private bool _initialized;
-    public void Init(Transform playerPosition)
+
+    public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader)
     {
         if (_initialized) return;
         _initialized = true;
-        CombatFeedback.For(gameObject).Init();
+        _game = game; _audio = audio; _finalBlow = finalBlow; _loader = loader;
+        _damageNumbers = damageNumbers;
+        _combatFeedback = GetComponent<CombatFeedback>();
+        if (_combatFeedback != null) _combatFeedback.Init();
+        else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
         var navMeshAgent = GetComponent<NavMeshAgent>();
         if (navMeshAgent != null) navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
         gameObject.name = RunSession.Opponent?.Name ?? gameObject.name;
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
         _enemyAnimController.Init();
-        foreach (var animator in GetComponentsInChildren<Animator>(true)) AnimationSpeedController.For(animator).Init();
+        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true)) speed.Init();
+        hitStop?.RegisterTarget(gameObject);
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
+        wrapper.Init();
         _attacker = new EnemyAttacker(_enemyAnimController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+        _attacker.Init(hitStop);
         _ai = new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
-        if (GetComponent<StatusEffectManager>() == null)
-        {
-            gameObject.AddComponent<StatusEffectManager>();
-        }
+
 
         GetComponent<StatusEffectManager>()?.Init();
         PlayEffectNextFrame("Dark").Forget();
@@ -72,7 +83,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private async UniTask PlayEffectNextFrame(string key)
     {
-        // wait one frame so that instantiated prefab / VFX graph can be initialized
+        // 生成したプレハブと視覚効果の初期化を待つため、1フレーム待機する。
         await UniTask.NextFrame(cancellationToken: this.GetCancellationTokenOnDestroy());
         if (_characterEffect == null)
         {
@@ -83,7 +94,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     }
 
     /// <summary>
-    /// Called by AI to enqueue an action to be executed on the next Update.
+    /// 敵の思考処理から呼び、次の更新で実行する行動を予約する。
     /// </summary>
     public void EnqueueAction(EnemyActionType action)
     {
@@ -104,22 +115,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void ApplyDamage(DamageInfo info, bool isCritical = false)
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
-        AudioManager.Instance?.PlaySE("Damage");
-        //todo:ダメージSEとヒットストップの追加
-        if (_health == null)
-        {
-            // 予防: Health が未割当ての場合は生成してから適用する
-            _health = new EnemyHealth(_enemyStuts);
-        }
+        if (_health == null || _dead || (_game != null && !_game.IsCombatActive)) return;
+        _audio?.PlaySE("Damage");
 
         float before = _health.CurrentHp;
         _health.ApplyDamage(info.DamageAmount * RunSession.EnemyDefense);
         float dealt = before - _health.CurrentHp;
         if (dealt > 0f)
         {
-            CombatFeedback.For(gameObject).Hit();
-            DamageNumbers.Show(transform.position, dealt, isCritical);
+            _combatFeedback?.Hit();
+            _damageNumbers?.Show(transform.position, dealt, isCritical);
         }
 
         if (_health.CurrentHp <= 0f && !_dead)
@@ -136,7 +141,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) return;
         // AI の Tick を先に呼び、意思決定を行わせる
         _ai?.Tick(Time.deltaTime);
 
@@ -191,9 +196,9 @@ public class EnemyController : MonoBehaviour, IDamageable
         _attacker?.DisableWeaponHitbox();
         _mover?.HoldMovementForAttack();
 
-        GameManager.Instance?.WinGame();
-        if (FinalBlowManager.Instance != null) FinalBlowManager.Instance.StartFinalBlow();
-        else LoadSceneManager.Instance?.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 2000).Forget();
+        _game?.WinGame();
+        if (_finalBlow != null) _finalBlow.StartFinalBlow();
+        else _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 2000).Forget();
     }
 
     private void OnAnimatorMove()
@@ -201,13 +206,13 @@ public class EnemyController : MonoBehaviour, IDamageable
         _mover?.OnAnimatorMove();
     }
 
-    // ---------- Animation Events (Enemy) ----------
+    // ---------- 敵のアニメーションイベント ----------
     /// <summary>
     /// アニメーションイベント用: ヒットボックスを有効化する（攻撃有効フレームで呼ぶ）。
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _attacker?.EnableWeaponHitbox();
     }
 
@@ -226,7 +231,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// <param name="attackIndex">_attackData の配列インデックス</param>
     public void AnimEvent_PerformAttack(int attackIndex)
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) return;
         if (_attackData == null || attackIndex < 0 || attackIndex >= _attackData.Length)
         {
             return;
@@ -242,7 +247,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _ai?.OnAttackFinished();
         // 攻撃終了時に一時停止していた移動制御を復帰させる
         _mover?.ReleaseMovementAfterAttack();
@@ -250,7 +255,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void AnimEvent_OnStepBackFinished()
     {
-        if (_dead || (GameManager.Instance != null && !GameManager.Instance.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _mover?.EndStepBack();
         _ai?.OnAttackFinished(); // または専用の完了処理
         // 攻撃停止後は移動を復帰する
@@ -259,7 +264,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void AnimEvent_OnSoundEffect(string soundName)
     {
-        AudioManager.Instance?.PlaySE(soundName);
+        _audio?.PlaySE(soundName);
         CombatLog.Trace(soundName);
     }
 }

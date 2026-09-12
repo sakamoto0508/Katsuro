@@ -8,7 +8,18 @@ public class HitStopManager : MonoBehaviour
     [SerializeField] private float _lastHitStopTime = .2f;
     public float HitStopTime => _hitStopTime;
     public float LastHitStopTime => _lastHitStopTime;
-    private readonly List<Animator> animators = new();
+    private readonly Dictionary<GameObject, AnimationSpeedController[]> _targets = new();
+    public void RegisterTarget(GameObject owner)
+    {
+        if (owner == null) return;
+        var speeds = owner.GetComponentsInChildren<AnimationSpeedController>(true);
+        foreach (var speed in speeds) speed.Init();
+        foreach (var child in owner.GetComponentsInChildren<Transform>(true))
+            _targets[child.gameObject] = speeds;
+        var stale = new List<GameObject>();
+        foreach (var entry in _targets) if (entry.Key == null) stale.Add(entry.Key);
+        foreach (var key in stale) _targets.Remove(key);
+    }
     private readonly List<AnimationSpeedController> affected = new();
     private bool _initialized;
     public void Init()
@@ -28,16 +39,15 @@ public class HitStopManager : MonoBehaviour
         foreach (var target in targets)
         {
             if (target == null) continue;
-            target.GetComponentsInChildren(true, animators);
-            foreach (var animator in animators)
+            if (!_targets.TryGetValue(target, out var speeds)) continue;
+            foreach (var speed in speeds)
             {
-                var speed = AnimationSpeedController.For(animator);
-                speed.Init();
+                if (speed == null) continue;
                 speed.SetTemporary(slowSpeed, durationRealtime);
                 if (!affected.Contains(speed)) affected.Add(speed);
             }
         }
-        animators.Clear();
+
     }
     private void OnDisable()
     {

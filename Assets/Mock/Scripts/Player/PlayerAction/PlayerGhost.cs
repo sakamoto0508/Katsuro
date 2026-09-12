@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Hold-to-ghost with a brief, non-renewable fallback when activation gauge is insufficient.</summary>
+/// <summary>ボタンを押している間は幽体化する。開始時のゲージ不足では、延長できない短時間の幽体化を行う。</summary>
 public sealed class PlayerGhost : AbilityBase
 {
     public PlayerGhost(SkillGauge gauge, SkillGaugeCostConfig costConfig = null) : base(gauge, costConfig) { }

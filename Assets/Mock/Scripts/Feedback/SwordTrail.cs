@@ -19,11 +19,7 @@ public sealed class SwordTrail : MonoBehaviour
     private bool initialized;
 
     /// <summary>武器の当たり判定から軌跡の表示を切り替えます。</summary>
-    public static void SetActive(Collider blade, bool active)
-    {
-        var effect = blade.GetComponent<SwordTrail>();
-        if (effect != null) effect.SetEmitting(active);
-    }
+    public void SetActive(bool active) => SetEmitting(active);
 
     /// <summary>武器の準備時に呼びます。複数回呼んでも初期化は一度だけ行います。</summary>
     public bool Init()

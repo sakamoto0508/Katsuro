@@ -23,13 +23,11 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     {
         if (_initialized) return;
         _initialized = true;
-        // コンポーネント参照を取得し、現在の速度値を基準値としてキャッシュする。
-        // これによりエフェクトのオン/オフで正しく乗算できる。
         _animator = GetComponent<Animator>();
         _agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         // 乗算の基準となる速度を保存
         if (_agent != null) _baseAgentSpeed = _agent.speed;
-        if (_animator != null) { _speed = AnimationSpeedController.For(_animator); _speed.Init(); }
+        if (_animator != null) { _speed = _animator.GetComponent<AnimationSpeedController>(); _speed?.Init(); }
     }
 
     private void Update()

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
-/// <summary>Title text pulse, with the same scene transition used by keyboard/gamepad input.</summary>
+/// <summary>タイトル文字を明滅させる。シーン遷移はキーボード・パッド入力と共通の処理を使う。</summary>
 public class TitleText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
@@ -13,8 +13,20 @@ public class TitleText : MonoBehaviour
     [SerializeField] private string _gameSceneName = "GameScene";
     private Sequence _pulse;
     private bool _isTransitioning;
+    private TitleManager _title;
+    private GlobalFader _fader;
+    private bool _initialized;
+    public void Init(TitleManager title, GlobalFader fader)
+    {
+        if (_initialized) return;
+        _initialized = true;
+        _title = title;
+        _fader = fader;
+        if (isActiveAndEnabled) StartPulse();
+    }
 
-    private void OnEnable()
+    private void OnEnable() { if (_initialized) StartPulse(); }
+    private void StartPulse()
     {
         if (_text == null) return;
         _text.alpha = 0f;
@@ -34,7 +46,7 @@ public class TitleText : MonoBehaviour
     public void OnStartButton()
     {
         if (_isTransitioning) return;
-        var titleManager = FindFirstObjectByType<TitleManager>();
+        var titleManager = _title;
         if (titleManager != null)
         {
             titleManager.OnPressStart();
@@ -46,7 +58,7 @@ public class TitleText : MonoBehaviour
 
     private async UniTask StartGame()
     {
-        try { await GlobalFader.EnsureInstance().FadeToScene(_gameSceneName); }
+        try { await _fader.FadeToScene(_gameSceneName); }
         finally { _isTransitioning = false; }
     }
 }

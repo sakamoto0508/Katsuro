@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Scene")]
     [SerializeField] private LoadSceneManager _loadSceneManager;
+    [SerializeField] private DamageNumbers _damageNumbers;
 
     [SerializeField] private float _soundVolume = 0.3f;
 
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        // Permanently lock and hide the cursor for the game (do not release)
+        // ゲーム中はカーソルを固定し、非表示にする。
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -83,18 +84,25 @@ public class GameManager : MonoBehaviour
     public PlayerController Player => _playerController;
     public bool IsCombatActive => _state == GameState.InGame && RunSession.Active;
 
+    private readonly SceneInitialization _scene = new SceneInitialization();
+    private AudioManager _audio;
+    private GlobalFader _fader;
     private bool _initialized;
     public void Init()
     {
         if (_initialized) return;
         _initialized = true;
-        SceneInitialization.Init();
+        _scene.Init(this);
+        _audio = _scene.Audio;
+        _fader = _scene.Fader;
         RunSession.EnsureRun();
+        if (_damageNumbers != null) _damageNumbers.Init(_camera);
+        else Debug.LogError("GameManagerにDamageNumbersを割り当ててください。", this);
         _lockOnCamera = new LockOnCamera(_playerPosition, _enemyPosition
             , _cinemachineCamera, _cinemachineLockOncamera, _playerAnimationController, _animationName);
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
-            , _cameraManager, _lockOnCamera);
-        _enemyController?.Init(_playerPosition);
+            , _cameraManager, _lockOnCamera, this, _audio, _scene.HitStop, _scene.PlayerDead, _scene.Loader);
+        _enemyController?.Init(_playerPosition, _damageNumbers, this, _audio, _scene.HitStop, _scene.FinalBlow, _scene.Loader);
         _cameraManager?.Init(_inputBuffer, _playerPosition
             , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera);
     }
@@ -105,7 +113,7 @@ public class GameManager : MonoBehaviour
     public void SetGameState(GameState newState)
     {
         _state = newState;
-        // Input
+        // 入力
         if (_inputBuffer != null)
         {
             var enabled = newState == GameState.InGame;
@@ -113,18 +121,18 @@ public class GameManager : MonoBehaviour
         }
 
         // Audio: タイトル画面ならタイトル BGM を再生
-        if (_audioConfig != null && AudioManager.Instance != null)
+        if (_audioConfig != null && _audio != null)
         {
             if (newState == GameState.Title)
             {
-                AudioManager.Instance.StopAllBGMs();
-                AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 0.5f);
+                _audio.StopAllBGMs();
+                _audio.PlayBGM(_audioConfig.TitleBGM, 0.5f);
             }
             else if (newState == GameState.InGame)
             {
-                AudioManager.Instance.StopAllBGMs();
-                AudioManager.Instance.PlayBGM(_audioConfig.InGameBGM, 0.5f);
-                AudioManager.Instance.PlayBGM(_audioConfig.TitleBGM, 1, _soundVolume);
+                _audio.StopAllBGMs();
+                _audio.PlayBGM(_audioConfig.InGameBGM, 0.5f);
+                _audio.PlayBGM(_audioConfig.TitleBGM, 1, _soundVolume);
             }
         }
         // イベント発行
@@ -161,7 +169,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            GlobalFader.EnsureInstance().FadeToScene(sceneName).Forget();
+            _fader.FadeToScene(sceneName).Forget();
         }
     }
 }

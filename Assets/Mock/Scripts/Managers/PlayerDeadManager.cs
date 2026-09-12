@@ -42,17 +42,23 @@ public class PlayerDeadManager : MonoBehaviour
 
     private GameObject _overlay;
     private Vignette _vignette;
-    // UI image refs for better control
+    // 画面演出を制御するための画像参照。
     private UnityEngine.UI.Image _redImage;
     private UnityEngine.UI.Image _blackImage;
     private Material _blackMaterialInstance;
     private bool _isPlaying;
 
+    private GameManager _game;
+    private AudioManager _audio;
+    private HitStopManager _hitStop;
+    private LoadSceneManager _loader;
+    private GlobalFader _fader;
     private bool _initialized;
-    public void Init()
+    public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
         if (_initialized) return;
         _initialized = true;
+        _game = game; _audio = audio; _hitStop = hitStop; _loader = loader; _fader = fader;
         if (Instance == null)
         {
             Instance = this;
@@ -67,6 +73,7 @@ public class PlayerDeadManager : MonoBehaviour
 
     private void InitPresentation()
     {
+        CreateVignetteOverlay();
         if (_volume != null)
         {
             _volume.profile.TryGet(out _vignette);
@@ -95,7 +102,7 @@ public class PlayerDeadManager : MonoBehaviour
             return;
         }
         _isPlaying = true;
-        GameManager.Instance?.LoseGame();
+        _game?.LoseGame();
         StartDefeatSequenceAsync(playerObject).Forget();
     }
 
@@ -107,32 +114,32 @@ public class PlayerDeadManager : MonoBehaviour
     {
         var token = this.GetCancellationTokenOnDestroy();
         // フェーズ1: Vignette のフェードイン（オーバーレイと Post-process を同時にフェード）
-        CreateVignetteOverlay();
+
         var overlayTask = _overlay != null ? FadeOverlayAlpha(_vignetteMaxAlpha, _vignetteFadeIn) : UniTask.CompletedTask;
         var vigTask = (_vignette != null) ? FadeVignette(_intensity, _smoothness, _vignetteFadeIn) : UniTask.CompletedTask;
         if (_deadText != null)
         {
             _deadText.gameObject.SetActive(true);
-            // ensure starting alpha is zero so fade-in always plays
+            // 必ずフェードインするよう、開始時の不透明度をゼロにする。
             var c = _deadText.color;
             c.a = 0f;
             _deadText.color = c;
             _deadText.DOKill();
-            // use unscaled update so tween runs during hitstop/slow
+            // 停止・スロー中も補間が進むよう、時間倍率の影響を受けない更新を使う。
             _deadText.DOFade(1f, _deadTextFadeIn).SetEase(_ease).SetUpdate(true);
         }
         await UniTask.WhenAll(overlayTask, vigTask);
 
         // Audio: ローパスを適用して音がこもる
-        if (AudioManager.Instance != null)
+        if (_audio != null)
         {
-            AudioManager.Instance.ApplyLowPassToListener(_lowPassCutoff);
+            _audio.ApplyLowPassToListener(_lowPassCutoff);
         }
 
         // スロー: シーン内の Animator を全体的に遅くする（プレイヤー優先）
-        if (HitStopManager.Instance != null)
+        if (_hitStop != null)
         {
-            HitStopManager.Instance.PlayHitStopSlow(_slowDuration, _slowSpeed, playerObject,
+            _hitStop.PlayHitStopSlow(_slowDuration, _slowSpeed, playerObject,
                 _enemyController != null ? _enemyController.gameObject : null);
         }
 
@@ -154,12 +161,12 @@ public class PlayerDeadManager : MonoBehaviour
         }
 
         await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _slowDuration)), ignoreTimeScale: true, cancellationToken: token);
-        AudioManager.Instance?.StopAllAudioImmediate();
+        _audio?.StopAllAudioImmediate();
         await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _silenceDuration)), ignoreTimeScale: true, cancellationToken: token);
 
         // フェーズ3: タイトルへ遷移
-        var config = LoadSceneManager.Instance != null ? LoadSceneManager.Instance.SceneNameConfig : null;
-        await GlobalFader.EnsureInstance().FadeToScene(config != null ? config.TitleScene : "TitleScene");
+        var config = _loader != null ? _loader.SceneNameConfig : null;
+        await _fader.FadeToScene(config != null ? config.TitleScene : "TitleScene");
     }
 
     /// <summary>
@@ -194,7 +201,7 @@ public class PlayerDeadManager : MonoBehaviour
         if (shader != null)
         {
             _blackMaterialInstance = new Material(shader);
-            // initialize black material parameters
+            // 黒い画面効果のマテリアル設定を初期化する。
             _blackMaterialInstance.SetColor("_Color", new Color(0f, 0f, 0f, 0f));
             _blackMaterialInstance.SetFloat("_InnerRadius", 0.3f);
             _blackMaterialInstance.SetFloat("_OuterRadius", 0.95f);
@@ -203,7 +210,7 @@ public class PlayerDeadManager : MonoBehaviour
         }
         else
         {
-            // Fallback for builds where the custom shader might not be included: use plain black Image and start transparent
+            // 専用シェーダーがビルドに含まれない場合は、通常の黒い画像を使用し、透明な状態から開始する。
             _blackImage.color = new Color(0f, 0f, 0f, 0f);
         }
         var blackRect = _blackImage.GetComponent<RectTransform>();
@@ -211,7 +218,7 @@ public class PlayerDeadManager : MonoBehaviour
         blackRect.anchorMax = Vector2.one;
         blackRect.offsetMin = Vector2.zero;
         blackRect.offsetMax = Vector2.zero;
-        // ensure black is rendered on top
+        // 黒い画像を最前面に描画する。
         _blackImage.transform.SetAsLastSibling();
         _blackImage.raycastTarget = false;
     }
@@ -222,7 +229,7 @@ public class PlayerDeadManager : MonoBehaviour
     private async UniTask FadeOverlayAlpha(float targetAlpha, float duration)
     {
         if (_overlay == null) return;
-        // Fade both red background image and black vignette material alpha (if available)
+        // 赤い背景画像と、存在する場合は黒い周辺減光マテリアルの不透明度を変化させる。
         var red = _redImage;
         var blackMat = _blackMaterialInstance;
         var blackImg = _blackImage;
@@ -302,6 +309,6 @@ public class PlayerDeadManager : MonoBehaviour
         Instance = null;
         if (_deadText != null) _deadText.DOKill();
         if (_blackMaterialInstance != null) Destroy(_blackMaterialInstance);
-        AudioManager.Instance?.RemoveLowPassFromListener();
+        _audio?.RemoveLowPassFromListener();
     }
 }

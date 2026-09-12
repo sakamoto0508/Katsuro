@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-/// <summary>Scene-authored canvas and label templates, pooled once before combat.</summary>
+/// <summary>シーンに配置したキャンバスと文字テンプレートを使い、戦闘前に一度だけ表示用プールを準備する。</summary>
 public sealed class DamageNumbers : MonoBehaviour
 {
     [Header("uGUI references")]
@@ -13,25 +13,24 @@ public sealed class DamageNumbers : MonoBehaviour
     [SerializeField, Min(.05f)] private float _lifetime = .85f;
     [SerializeField] private Vector3 _worldOffset = new Vector3(0, 1.85f, 0);
     [SerializeField] private Vector2 _screenOffset;
+    [Tooltip("Random offset range in UI local units. Set both values to zero to disable.")]
+    [SerializeField] private Vector2 _randomOffsetRange = new Vector2(24f, 12f);
     [SerializeField] private float _riseSpeed = .8f;
     [SerializeField, Range(1, 128)] private int _poolSize = 32;
-    private static DamageNumbers instance;
     private TMP_Text[] normal, critical;
     private TMP_Text[] active;
     private Vector3[] positions;
+    private Vector2[] randomOffsets;
     private float[] started, opacity;
     private int next;
     private Canvas canvas;
     private bool[] criticalHit;
-
     private bool _initialized;
-    public void Init()
+    public void Init(Camera camera)
     {
         if (_initialized) return;
-        _initialized = true;
-        if (instance != null && instance != this) { enabled = false; return; }
-        instance = this;
-        Initialize();
+        if (camera != null) _camera = camera;
+        _initialized = Initialize();
     }
     private bool Initialize()
     {
@@ -42,10 +41,16 @@ public sealed class DamageNumbers : MonoBehaviour
             return false;
         }
         canvas = _container.GetComponentInParent<Canvas>();
+        if (canvas == null)
+        {
+            Debug.LogError("ダメージ表示のコンテナをCanvasの子に配置してください。", this);
+            return false;
+        }
         int count = Mathf.Clamp(_poolSize, 1, 128);
         criticalHit = new bool[count];
         normal = new TMP_Text[count]; critical = new TMP_Text[count]; active = new TMP_Text[count];
         positions = new Vector3[count]; started = new float[count]; opacity = new float[count];
+        randomOffsets = new Vector2[count];
         _normalTemplate.gameObject.SetActive(false);
         _criticalTemplate.gameObject.SetActive(false);
         for (int i = 0; i < count; i++)
@@ -58,19 +63,10 @@ public sealed class DamageNumbers : MonoBehaviour
         }
         return true;
     }
-    public static void Prepare(Camera camera = null)
+    public void Show(Vector3 position, float amount, bool isCritical)
     {
-        if (instance == null) instance = FindFirstObjectByType<DamageNumbers>();
-        if (instance == null) { Debug.LogError("Place DamageNumbersCanvas in the combat scene."); return; }
-        if (camera != null) instance._camera = camera;
-        instance.Init();
-    }
-    public static void Show(Vector3 position, float amount, bool isCritical)
-    {
-        if (amount <= 0) return;
-        if (instance == null) return;
-        if (instance == null || instance.normal == null) return;
-        instance.Display(position, amount, isCritical);
+        if (!_initialized || !isActiveAndEnabled || amount <= 0) return;
+        Display(position, amount, isCritical);
     }
     private void Display(Vector3 position, float amount, bool isCritical)
     {
@@ -81,11 +77,18 @@ public sealed class DamageNumbers : MonoBehaviour
         active[index] = label;
         criticalHit[index] = isCritical;
         positions[index] = position + _worldOffset;
+        randomOffsets[index] = CreateRandomOffset();
         started[index] = Time.unscaledTime;
         opacity[index] = isCritical ? _criticalTemplate.color.a : _normalTemplate.color.a;
         label.SetText("{0}", Mathf.Ceil(amount));
         label.gameObject.SetActive(true);
         PositionLabel(index, 0);
+    }
+    private Vector2 CreateRandomOffset()
+    {
+        // 上昇中に文字が揺れないよう、ランダムなずれは命中時に一度だけ決める。
+        return Vector2.Scale(Random.insideUnitCircle,
+            new Vector2(Mathf.Abs(_randomOffsetRange.x), Mathf.Abs(_randomOffsetRange.y)));
     }
     private void LateUpdate()
     {
@@ -103,16 +106,17 @@ public sealed class DamageNumbers : MonoBehaviour
     }
     private void PositionLabel(int index, float age)
     {
-        if (_camera == null || !_camera.isActiveAndEnabled) _camera = Camera.main;
         var label = active[index];
-        if (_camera == null) { label.alpha = 0; return; }
+        if (_camera == null || !_camera.isActiveAndEnabled) { label.alpha = 0; return; }
         Vector3 screen = _camera.WorldToScreenPoint(positions[index] + Vector3.up * age * _riseSpeed);
         if (screen.z <= 0) { label.alpha = 0; return; }
         Camera uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, screen, uiCamera, out var point);
-        // localPosition respects the template's pivot/size without assuming centered anchors.
+        // アンカーが中央にあると仮定せず、ローカル座標でテンプレートの基準点とサイズを尊重する。
         var offset = criticalHit[index] ? _criticalTemplate.rectTransform.localPosition : _normalTemplate.rectTransform.localPosition;
-        label.rectTransform.localPosition = new Vector3(point.x + _screenOffset.x + offset.x, point.y + _screenOffset.y + offset.y, 0);
+        var randomOffset = randomOffsets[index];
+        label.rectTransform.localPosition = new Vector3(point.x + _screenOffset.x + offset.x + randomOffset.x,
+            point.y + _screenOffset.y + offset.y + randomOffset.y, 0);
         label.alpha = opacity[index] * (1f - age / Mathf.Max(.05f, _lifetime));
     }
     private void OnDisable()
@@ -120,5 +124,4 @@ public sealed class DamageNumbers : MonoBehaviour
         if (active == null) return;
         for (int i = 0; i < active.Length; i++) if (active[i] != null) { active[i].gameObject.SetActive(false); active[i] = null; }
     }
-    private void OnDestroy() { if (instance == this) instance = null; }
 }

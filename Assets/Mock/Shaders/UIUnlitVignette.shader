@@ -53,7 +53,7 @@ Shader "UI/UnlitVignette"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                // uv in 0..1
+                // テクスチャ座標の範囲は0～1。
                 float2 uv = i.uv;
                 float2 center = float2(0.5, 0.5);
                 float2 diff = uv - center;
@@ -63,7 +63,7 @@ Shader "UI/UnlitVignette"
                 alphaMask = pow(alphaMask, _Smoothness);
 
                 fixed4 tex = tex2D(_MainTex, i.uv);
-                // multiply texture by color, then apply mask to alpha
+                // テクスチャに色を乗算してから、不透明度にマスクを適用する。
                 fixed4 col = tex * _Color;
                 col.a *= alphaMask;
                 return col;

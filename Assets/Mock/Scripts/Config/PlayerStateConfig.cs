@@ -53,7 +53,7 @@ public class AttackClipList
 
         index = Mathf.Clamp(index, 0, _clipFlatDamage.Count - 1);
         float value = _clipFlatDamage[index];
-        return value; // allow negative/zero as configured
+        return value; // 設定された負数やゼロもそのまま許可する。
     }
 }
 

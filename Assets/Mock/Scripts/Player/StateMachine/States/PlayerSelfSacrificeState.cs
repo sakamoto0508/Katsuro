@@ -36,7 +36,7 @@ public class PlayerSelfSacrificeState : PlayerState
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
         Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectBuff);
-        AudioManager.Instance.PlayBGM("BuffBGM", 2, 1f);
+        Context.Controller.PlayBuffAudio();
 
         //アビリティの終了を監視するための購読を設定
         _selfSacrificeActiveDisp?.Dispose();
@@ -48,7 +48,7 @@ public class PlayerSelfSacrificeState : PlayerState
                 {
                     //アビリティが終了したらエフェクトとBGMを停止する
                     Context?.CharacterEffect?.StopEffect_CharacterEffect();
-                    AudioManager.Instance?.StopBGM(2);
+                    Context.Controller.StopBuffAudio();
                     _selfSacrificeActiveDisp?.Dispose();
                     _selfSacrificeActiveDisp = null;
                 }
@@ -77,7 +77,7 @@ public class PlayerSelfSacrificeState : PlayerState
     {
         Context.SelfSacrifice?.End();
         Context?.CharacterEffect?.StopEffect_CharacterEffect();
-        AudioManager.Instance?.StopBGM(2);
+        Context.Controller.StopBuffAudio();
     }
 
     public override void OnLightAttack()

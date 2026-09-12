@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class EnemyAnimationRelay : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // コンポーネント生成後、最初の更新処理より前に一度だけ呼ばれる。
     void Start()
     {
         
     }
 
-    // Update is called once per frame
+    // 毎フレーム呼ばれる。
     void Update()
     {
         

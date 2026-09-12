@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Only animates fill amounts; Image colors, sprites and layout remain authored in uGUI.</summary>
+/// <summary>ゲージの充填率だけを更新する。画像の色・素材・配置は画面側の設定を維持する。</summary>
 public sealed class DamageTrailGauge : MonoBehaviour
 {
     [SerializeField] private Image _currentFill;

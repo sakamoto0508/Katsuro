@@ -8,11 +8,7 @@ public sealed class AnimationSpeedController : MonoBehaviour
     private float baseSpeed;
     private float status = 1f, temporary = 1f, expires;
 
-    public static AnimationSpeedController For(Animator target)
-    {
-        var value = target.GetComponent<AnimationSpeedController>();
-        return value != null ? value : target.gameObject.AddComponent<AnimationSpeedController>();
-    }
+
 
     private bool _initialized;
     public void Init()

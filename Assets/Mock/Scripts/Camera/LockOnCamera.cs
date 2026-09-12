@@ -107,7 +107,7 @@ public class LockOnCamera
             _camera.Priority = 10;
             _lockOnCamera.Priority = 0;
         }
-        // re-enable brain if we disabled it
+        // –³Œø‰»‚µ‚Ä‚¢‚½ƒJƒƒ‰§Œä‚ğÄ‚Ñ—LŒø‚É‚·‚éB
         if (_cinemachineBrain != null && _brainDisabledByLockOn)
         {
             _cinemachineBrain.enabled = true;

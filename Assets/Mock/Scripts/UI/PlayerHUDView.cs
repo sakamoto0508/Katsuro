@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Mock.UI
 {
-    /// <summary>Green current HP over red delayed damage, with the empty frame below both.</summary>
+    /// <summary>空ゲージの上に赤い遅延ダメージ、その上に緑の現在体力を重ねて表示する。</summary>
     public class PlayerHUDView : MonoBehaviour, IKatsuroPlayerHUDView
     {
         [SerializeField] private Image _hpFill;
@@ -22,7 +22,7 @@ namespace Mock.UI
             if (_hpFill != null) _hpFill.fillAmount = normalized;
             if (!_initialized || normalized > _targetHp)
             {
-                // Initial binding, healing and revival must not leave red behind green.
+                // 初期表示・回復・復活時には、緑の現在体力と赤い遅延表示を一致させる。
                 if (_damageFill != null) _damageFill.fillAmount = normalized;
                 _catchupAt = 0;
             }

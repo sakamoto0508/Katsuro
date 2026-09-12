@@ -34,6 +34,14 @@ public class EnemyAttacker : IDisposable
     private EnemyWeapon[] _weapons;
     private readonly HashSet<IDamageable> _hitTargets = new();
     private bool _isHitboxActive;
+    private HitStopManager _hitStop;
+    private bool _initialized;
+    public void Init(HitStopManager hitStop)
+    {
+        if (_initialized) return;
+        _initialized = true;
+        _hitStop = hitStop;
+    }
     private readonly Transform _ownerTransform;
     private readonly EnemyStuts _status;
     private readonly Dictionary<EnemyWeapon, Action<Collider>> _handlerMap = new();
@@ -83,7 +91,7 @@ public class EnemyAttacker : IDisposable
             if (d == null || d.ActionType != action) continue;
             if (UnityEngine.Random.Range(0, ++count) == 0) selected = d;
         }
-        // if multiple attack data entries exist for the same action type (variants), pick one at random
+        // 同じ行動種別の攻撃データが複数ある場合は、ランダムに1つ選ぶ。
         return selected;
     }
 
@@ -138,10 +146,10 @@ public class EnemyAttacker : IDisposable
         bool avoided = damageable is PlayerController player && player.IsInvulnerable;
         damageable.ApplyDamage(damageInfo);
         var go = other != null ? other.gameObject : null;
-        if (!avoided && HitStopManager.Instance != null && go != null)
+        if (!avoided && _hitStop != null && go != null)
         {
-            HitStopManager.Instance.PlayHitStop(HitStopManager.Instance.HitStopTime, go);
-            CombatLog.Trace($"EnemyAttacker: Played hit stop for {go.name} with duration={HitStopManager.Instance.HitStopTime}");
+            _hitStop.PlayHitStop(_hitStop.HitStopTime, go);
+            CombatLog.Trace($"EnemyAttacker: Played hit stop for {go.name} with duration={_hitStop.HitStopTime}");
         }
     }
 

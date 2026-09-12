@@ -34,7 +34,7 @@ Shader "Katsuro/CombatGlow"
                 Varyings o;
                 if (_Ghost > .5)
                 {
-                    // Gentle upward-travelling ripples, anchored to the character.
+                    // キャラクターを基準に、穏やかな波を上方向へ流す。
                     float phase = input.positionOS.y * 13 - _GhostTime * _GhostFlowSpeed * 2;
                     input.positionOS.x += sin(phase + input.positionOS.z * 6) * _GhostSway;
                     input.positionOS.z += sin(phase * .73 + input.positionOS.x * 5) * _GhostSway * .65;
@@ -53,7 +53,7 @@ Shader "Katsuro/CombatGlow"
                 {
                     float phase = input.positionWS.y * 16 - _GhostTime * _GhostFlowSpeed * 2;
                     float haze = .65 + .35 * sin(phase + sin(input.positionWS.x * 9 + _GhostTime * .6));
-                    // Transparent body, faint broken rim. No bright pulsing glow.
+                    // 胴体を透過させ、輪郭を薄く途切れさせる。強い明滅は加えない。
                     color.rgb *= .65 + rim * .35;
                     color.a *= (.07 + rim * .48) * lerp(.35, 1, haze);
                 }

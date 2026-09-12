@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     // デバッグ用：入力を通して攻撃が可能かを制御。
     [SerializeField] private bool _canAttack;
-    // MVP HUD
+    // 表示・状態・仲介を分離したゲーム内表示。
     [Header("UI")]
     [SerializeField] private PlayerHUDView _playerHudView;
     private PlayerHUDPresenter _playerHudPresenter;
@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float JustBonus => JustStacks * (_playerStatus != null && _playerStatus.JustAvoidBuffConfig != null ? _playerStatus.JustAvoidBuffConfig.DamageMultiplierPerStack : 0f);
     public bool IsInvulnerable => (_stateContext?.IsGhostMode ?? false) || (_playerResource != null && Time.time < _playerResource.InvulnerableUntil);
     private bool CanFight => _playerResource != null && !_playerResource.IsDead
-        && (GameManager.Instance == null || GameManager.Instance.IsCombatActive);
+        && (_game == null || _game.IsCombatActive);
     private void OnRevived()
     {
         _stateMachine.ChangeState(PlayerStateId.Locomotion);
@@ -65,26 +65,37 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateContext.Attacker.EndAttack();
         _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
         _justBuffRemaining = 0f;
-        AudioManager.Instance?.StopBGM(2);
+        _audio?.StopBGM(2);
     }
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
+    public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
+    private GameManager _game;
+    private AudioManager _audio;
+    private CombatFeedback _combatFeedback;
+    public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
+    public void StopBuffAudio() => _audio?.StopBGM(2);
     private bool _initialized;
     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
-        , CameraManager cameraManager, LockOnCamera lockOnCamera)
+        , CameraManager cameraManager, LockOnCamera lockOnCamera, GameManager game, AudioManager audio, HitStopManager hitStop, PlayerDeadManager playerDead, LoadSceneManager loader)
     {
         if (_initialized) return;
         _initialized = true;
-        CombatFeedback.For(gameObject).Init();
-        DamageNumbers.Prepare(camera);
+        _game = game;
+        _audio = audio;
+        _combatFeedback = GetComponent<CombatFeedback>();
+        if (_combatFeedback != null) _combatFeedback.Init();
+        else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
+
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
         _animationController.Init();
-        foreach (var animator in GetComponentsInChildren<Animator>(true)) AnimationSpeedController.For(animator).Init();
+        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true)) speed.Init();
+        hitStop?.RegisterTarget(gameObject);
         GetComponent<StatusEffectManager>()?.Init();
         _lookOnCamera = lockOnCamera;
         CharacterEffect characterEffect = GetComponent<CharacterEffect>();
@@ -97,8 +108,10 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         // --- 各種コンポーネントを生成
         _playerResource = new PlayerResource(_playerStatus, _animationController);
+        _playerResource.Init(game, audio, playerDead, loader);
         var ownerColliders = GetComponentsInChildren<Collider>();
         var playerWeapon = new PlayerWeapon(_weaponColliders, ownerColliders);
+        playerWeapon.Init();
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController);
@@ -108,6 +121,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         var playerBuff = new PlayerSelfSacrifice(skillGauge, skillGaugeCostConfig);
         var playerAttacker = new PlayerAttacker(_animationController, _animationName, playerWeapon
             , _playerStatus, _passiveBuffSet, transform, _playerResource);
+        playerAttacker.Init(game, hitStop);
         _animationEventStream = new AnimationEventStream();
         _stateContext = new PlayerStateContext(this, _playerResource, skillGauge, _playerStatus, playerMover, playerSprint,
             playerGhost, playerBuff, playerHeal, _lookOnCamera, _playerStateConfig, playerAttacker
@@ -177,7 +191,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             _stateContext.SkillGauge.Add(_playerStatus != null ? _playerStatus.SkillGaugeOnAvoidGain : 5f);
             return;
         }
-        CombatFeedback.For(gameObject).Hit();
+        _combatFeedback?.Hit();
         _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier);
     }
 
@@ -236,7 +250,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         // deltaSeconds：このフレームの経過秒（Ability が通知）
         // SelfSacrifice の秒あたり%値は SkillGaugeCost 側で管理（未設定時は 1%/s をフォールバック）
         float percentPerSecond = _playerStatus?.SkillGaugeCost?.SelfSacrificeDamagePercentPerSecond ?? 1f;
-        float percent = percentPerSecond * deltaSeconds; // % of MaxHP
+        float percent = percentPerSecond * deltaSeconds; // 最大体力に対する割合。
         float damage = _playerResource.MaxHp * (percent / 100f);
 
         // 最小HP保護: SelfSacrificeMinHpRatio を超えないように分割適用または自動停止
@@ -271,7 +285,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _playerResource.HealByPercent(healedPercent);
     }
 
-    /// <summary>必要な InputAction を購読する。</summary>
+    /// <summary>必要な 入力Action を購読する。</summary>
     private void InputEventRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed += OnMove;
@@ -287,7 +301,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         inputBuffer.SprintAction.canceled += OnSprint;
     }
 
-    /// <summary>購読していた InputAction を解除する。</summary>
+    /// <summary>購読していた 入力Action を解除する。</summary>
     private void InputEventUnRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed -= OnMove;
@@ -391,7 +405,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
             else
             {
-                // Toggle returned false -> either ended or failed to start
+                // 切り替え結果が無効なら、終了したか開始に失敗している。
                 _stateMachine?.HandleSelfSacrificeCanceled();
                 CombatLog.Trace("SelfSacrifice Canceled/Failed (via AbilityManager)");
             }
@@ -526,6 +540,6 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void AnimEvent_OnSoundEffect(string soundName)
     {
-        AudioManager.Instance?.PlaySE(soundName);
+        _audio?.PlaySE(soundName);
     }
 }

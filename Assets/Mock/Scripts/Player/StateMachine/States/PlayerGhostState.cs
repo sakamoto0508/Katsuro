@@ -16,14 +16,14 @@ public class PlayerGhostState : PlayerState
         _justRemaining = (Context.StateConfig != null ? Context.StateConfig.JustAvoidTime : 0.2f)
             * GameplayRules.Current.AvoidWindow(Context.PlayerResource.CurrentHpRatio);
         Context.SetJustAvoidWindow(_justRemaining > 0f);
-        CombatFeedback.For(Context.Controller.gameObject).SetGhost(true);
+        Context.Controller.SetGhostVisual(true);
     }
     public override void Exit()
     {
         Context.Ghost?.End();
         Context.IsGhostMode = false;
         Context.SetJustAvoidWindow(false);
-        CombatFeedback.For(Context.Controller.gameObject).SetGhost(false);
+        Context.Controller.SetGhostVisual(false);
     }
     public override void Update(float deltaTime)
     {

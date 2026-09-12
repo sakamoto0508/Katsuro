@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Clips the supplied bar's baked checkerboard using its authored silhouette mesh.</summary>
+/// <summary>バー画像に描き込まれた市松模様を、設定した輪郭メッシュで描画対象から除く。</summary>
 [RequireComponent(typeof(Image))]
 public sealed class BossBarSilhouette : BaseMeshEffect
 {

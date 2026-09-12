@@ -21,11 +21,17 @@ public class FinalBlowManager : MonoBehaviour
     [SerializeField] private Ease _ease = Ease.InQuint;
     private bool _isPlaying;
 
+    private GameManager _game;
+    private AudioManager _audio;
+    private HitStopManager _hitStop;
+    private LoadSceneManager _loader;
+    private GlobalFader _fader;
     private bool _initialized;
-    public void Init()
+    public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
         if (_initialized) return;
         _initialized = true;
+        _game = game; _audio = audio; _hitStop = hitStop; _loader = loader; _fader = fader;
         if (Instance == null)
         {
             Instance = this;
@@ -45,7 +51,7 @@ public class FinalBlowManager : MonoBehaviour
     {
         if (_isPlaying || _enemyController == null || _player == null) return;
         _isPlaying = true;
-        GameManager.Instance?.WinGame();
+        _game?.WinGame();
         DoFinalBlow().Forget();
     }
 
@@ -55,16 +61,16 @@ public class FinalBlowManager : MonoBehaviour
         // フェーズ1: ヒットストップ（敵の Animator を一時停止）とプレイヤーの短時間スロー
         // 注意: 呼び出し元が player を null で渡しているとスローが適用されないため、
 
-        HitStopManager.Instance?.PlayHitStop(_phase1HitStop, _enemyController.gameObject);
+        _hitStop?.PlayHitStop(_phase1HitStop, _enemyController.gameObject);
         // BGM を停止し、敵の死亡SEを再生する
-        if (AudioManager.Instance != null)
+        if (_audio != null)
         {
-            AudioManager.Instance.StopAllBGMs();
-            if (_audioConfig != null) AudioManager.Instance.PlaySE(_audioConfig.EnemyDeadSound);
+            _audio.StopAllBGMs();
+            if (_audioConfig != null) _audio.PlaySE(_audioConfig.EnemyDeadSound);
         }
 
         // プレイヤーは完全停止ではなくスローにする（例: 0.3 の速度）
-        HitStopManager.Instance?.PlayHitStopSlow(0.2f, 0.3f, _player.gameObject);
+        _hitStop?.PlayHitStopSlow(0.2f, 0.3f, _player.gameObject);
 
         if (_finalBlowText != null)
         {
@@ -85,8 +91,8 @@ public class FinalBlowManager : MonoBehaviour
         // player のスローは上のコルーチンが終了すると自動で元に戻るため、ここで再設定はしない
         _player.AnimController.PlayTrigger(_player.AnimController.AnimName.SwordSheathing);
         await UniTask.Delay((int)(Mathf.Max(0f, _phase2Duration) * 1000), ignoreTimeScale: true, cancellationToken: token);
-        var config = LoadSceneManager.Instance != null ? LoadSceneManager.Instance.SceneNameConfig : null;
-        await GlobalFader.EnsureInstance().FadeToScene(config != null ? config.TitleScene : "TitleScene");
+        var config = _loader != null ? _loader.SceneNameConfig : null;
+        await _fader.FadeToScene(config != null ? config.TitleScene : "TitleScene");
     }
 
     private void OnDestroy()

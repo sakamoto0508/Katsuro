@@ -11,8 +11,6 @@ public sealed class EnemyWeapon
     {
         _weaponColliders = weaponColliders;
         _fallbackPower = fallbackPower;
-        InitSwordTrails();
-        SetHitboxActive(false);
     }
 
     private readonly Collider[] _weaponColliders;
@@ -21,14 +19,22 @@ public sealed class EnemyWeapon
     private readonly Dictionary<Collider, WeaponHitboxRelay> _relayCache = new Dictionary<Collider, WeaponHitboxRelay>();
     private float _currentAttackDamage = 0f;
 
-    private void InitSwordTrails()
+    private readonly Dictionary<Collider, SwordTrail> _trails = new();
+    private bool _initialized;
+    public void Init()
     {
+        if (_initialized) return;
+        _initialized = true;
         if (_weaponColliders == null) return;
         foreach (var collider in _weaponColliders)
         {
             if (collider == null) continue;
             var effect = collider.GetComponent<SwordTrail>();
-            if (effect != null) effect.Init();
+            if (effect != null) { effect.Init(); _trails[collider] = effect; }
+            var relay = collider.GetComponent<WeaponHitboxRelay>();
+            if (relay != null) { relay.Init(); _relayCache[collider] = relay; }
+            else Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
+            collider.enabled = false;
         }
     }
 
@@ -76,34 +82,7 @@ public sealed class EnemyWeapon
         }
     }
 
-    private IEnumerable<WeaponHitboxRelay> EnumerateRelays()
-    {
-        if (_weaponColliders == null)
-        {
-            yield break;
-        }
-
-        // WeaponHitboxRelay 型は Player 側に定義されているため、リフレクションで取得する
-        foreach (var weaponCollider in _weaponColliders)
-        {
-            if (weaponCollider == null)
-            {
-                continue;
-            }
-
-            weaponCollider.isTrigger = true;
-
-            if (!_relayCache.TryGetValue(weaponCollider, out var relay) || relay == null)
-            {
-                relay = weaponCollider.GetComponent<WeaponHitboxRelay>();
-                if (relay == null) relay = weaponCollider.gameObject.AddComponent<WeaponHitboxRelay>();
-                relay.Init();
-                _relayCache[weaponCollider] = relay;
-            }
-
-            if (relay != null) yield return relay;
-        }
-    }
+    private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
 
     private void SetHitboxActive(bool isActive)
     {
@@ -120,7 +99,7 @@ public sealed class EnemyWeapon
             }
 
             weaponCollider.enabled = isActive;
-            SwordTrail.SetActive(weaponCollider, isActive);
+            if (_trails.TryGetValue(weaponCollider, out var trail)) trail.SetActive(isActive);
         }
 
         if (!isActive)

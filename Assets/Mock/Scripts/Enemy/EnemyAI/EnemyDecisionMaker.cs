@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-/// <summary>Weighted selection directly from the config; no per-decision candidate allocation.</summary>
+/// <summary>設定から直接、重み付きで行動を選ぶ。判断のたびに候補領域を確保しない。</summary>
 public sealed class EnemyDecisionMaker
 {
     private readonly System.Random _rand = new();

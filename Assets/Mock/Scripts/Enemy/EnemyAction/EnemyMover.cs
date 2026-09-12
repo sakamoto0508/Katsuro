@@ -255,7 +255,7 @@ public class EnemyMover
 
         if (_rb != null)
         {
-            // Clear velocities before making kinematic. Setting velocity on a kinematic body is not supported.
+            // 物理演算を無効にする前に速度を消去する。無効化後の剛体には速度を設定できない。
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
             _rb.isKinematic = true;
@@ -333,7 +333,7 @@ public class EnemyMover
     {
         if (_playerPosition == null) return playerPos;
 
-        // Try find a collider on the player to determine radius; prefer CapsuleCollider then CharacterController
+        // プレイヤーの半径を取得する。カプセル状の当たり判定、キャラクター制御用の当たり判定の順に探す。
         var playerRoot = _playerPosition.gameObject;
         CapsuleCollider cap = playerRoot.GetComponentInChildren<CapsuleCollider>();
         float radius = 0f;
@@ -350,7 +350,7 @@ public class EnemyMover
             }
         }
 
-        // fallback: small default if no collider
+        // 当たり判定が見つからない場合は、小さな既定の半径を使用する。
         if (radius <= 0f) radius = 0.5f;
 
         // 目標位置をプレイヤー方向から radius 分だけ手前に引く
@@ -374,7 +374,7 @@ public class EnemyMover
         if (_isMovementHeldForAttack || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh) return;
         if (_agent.isStopped) _destinationUpdateTimer = 0f;
         _agent.isStopped = false;
-        // UpdateTrackingAndDestination owns the throttled path request.
+        // 経路更新の頻度制限は、追跡と目的地を更新する処理で管理する。
         ApplyRotationMode();
     }
 
@@ -387,7 +387,7 @@ public class EnemyMover
         if (_agent == null || _playerPosition == null || _enemyTransform == null) return;
         ApplyRotationMode();
         // ランダムで左右どちらかに移動する（プレイヤーを基準）
-        int choice = UnityEngine.Random.Range(0, 2); // 0 or 1
+        int choice = UnityEngine.Random.Range(0, 2); // 0または1
 
         // プレイヤー基準の正面方向
         Vector3 toPlayer = (_playerPosition.position - _enemyTransform.position);

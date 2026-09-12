@@ -14,21 +14,23 @@ public class LoadSceneManager : MonoBehaviour
     /// </summary>
     public void LoadScene(string sceneName)
     {
-        GlobalFader.EnsureInstance().FadeToScene(sceneName).Forget();
+        _fader.FadeToScene(sceneName).Forget();
     }
 
     public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
     {
         await UniTask.Delay(Mathf.Max(0, waitTime), ignoreTimeScale: true,
             cancellationToken: this.GetCancellationTokenOnDestroy());
-        await GlobalFader.EnsureInstance().FadeToScene(sceneName);
+        await _fader.FadeToScene(sceneName);
     }
 
+    private GlobalFader _fader;
     private bool _initialized;
-    public void Init()
+    public void Init(GlobalFader fader)
     {
         if (_initialized) return;
         _initialized = true;
+        _fader = fader;
         if (Instance == null)
         {
             Instance = this;

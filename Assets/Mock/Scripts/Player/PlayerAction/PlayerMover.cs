@@ -36,8 +36,8 @@ public class PlayerMover
         _animationController?.PlayBool(_animationController.AnimName.IsDrawingSword, IsDrawnSword);
         _animationController?.MoveVelocity(ReturnVelocity());
         _animationController?.MoveVector(ReturnVector());
-        // Debug quick-check: log velocity and animator presence when running into animation issues
-        // (temporary) remove or comment out when confirmed
+        // アニメーションの不具合調査用に、速度とアニメーターの有無を記録する。
+        // 一時的な調査処理。確認後は削除するかコメントアウトする。
         
     }
 

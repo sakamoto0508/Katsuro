@@ -23,7 +23,7 @@ public class EnemyAI
         _config = config;
         _decisionMaker = new EnemyDecisionMaker();
 
-        // initial decision
+        // 最初の行動を決定する。
         TriggerDecision();
     }
 

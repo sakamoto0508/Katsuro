@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 
-/// <summary>Owns the persistent overlay and the complete fade/load/fade transition.</summary>
+/// <summary>シーンをまたいで残る画面被覆と、フェード・読み込み・フェードの遷移全体を管理する。</summary>
 public class GlobalFader : MonoBehaviour
 {
     public static GlobalFader Instance { get; private set; }
@@ -13,13 +13,6 @@ public class GlobalFader : MonoBehaviour
 
     [SerializeField] private Image fadeImage;
     [SerializeField, Min(0f)] private float duration = 1f;
-
-    public static GlobalFader EnsureInstance()
-    {
-        if (Instance == null)
-            new GameObject("GlobalFader").AddComponent<GlobalFader>().Init();
-        return Instance;
-    }
 
     private bool _initialized;
     public void Init()
@@ -46,9 +39,12 @@ public class GlobalFader : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
+    /// <summary>
+    /// フェード用のオーバーレイを確保する。シーン遷移中に破棄されないよう、永続オブジェクトの子に配置する。
+    /// </summary>
     private void EnsureOverlay()
     {
-        // A scene-owned image would be destroyed halfway through the transition.
+        // シーンに属する画像は遷移途中で破棄されるため、永続オブジェクトの子に配置する。
         if (fadeImage == null || !fadeImage.transform.IsChildOf(transform))
         {
             if (fadeImage != null) fadeImage.gameObject.SetActive(false);
@@ -86,10 +82,10 @@ public class GlobalFader : MonoBehaviour
         var token = this.GetCancellationTokenOnDestroy();
         try
         {
-            EnsureOverlay();
+
             fadeImage.gameObject.SetActive(true);
             await FadeAlpha(1f, token);
-            // Stay opaque while sceneLoaded and Start initialize the new scene.
+            // シーン読み込み完了時と開始時の初期化が済むまで、画面を不透明に保つ。
             var operation = SceneManager.LoadSceneAsync(sceneName);
             if (operation == null) throw new InvalidOperationException($"Could not load scene: {sceneName}");
             await operation.ToUniTask(cancellationToken: token);

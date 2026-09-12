@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-/// <summary>Scene-authored uGUI view. Layout, labels and styles belong to the prefab.</summary>
+/// <summary>シーンに配置して使用する画面表示。配置・文字・見た目はプレハブで設定する。</summary>
 public sealed class RunSetupUI : MonoBehaviour
 {
     [SerializeField] private CanvasGroup _panel;
@@ -66,7 +66,7 @@ public sealed class RunSetupUI : MonoBehaviour
     }
     public void Confirm()
     {
-        // The key that opened the panel must not also submit it.
+        // 画面を開いたときの入力で、そのまま決定されないようにする。
         if (!IsOpen || _title == null || Time.frameCount == _openedFrame) return;
         RunSession.Begin(_nameInput.text, _attack, _defense);
         IsOpen = false;

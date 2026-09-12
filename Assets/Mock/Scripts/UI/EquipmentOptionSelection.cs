@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-/// <summary>Navigation focus selects equipment just as a pointer click does.</summary>
+/// <summary>方向入力による選択先の移動でも、クリックと同様に装備を選択する。</summary>
 [RequireComponent(typeof(Toggle))]
 public sealed class EquipmentOptionSelection : MonoBehaviour, ISelectHandler
 {

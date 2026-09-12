@@ -33,6 +33,17 @@ public class PlayerResource : IDisposable
     private readonly PlayerAnimationController _animController;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
+    private GameManager _game;
+    private AudioManager _audio;
+    private PlayerDeadManager _playerDead;
+    private LoadSceneManager _loader;
+    private bool _initialized;
+    public void Init(GameManager game, AudioManager audio, PlayerDeadManager playerDead, LoadSceneManager loader)
+    {
+        if (_initialized) return;
+        _initialized = true;
+        _game = game; _audio = audio; _playerDead = playerDead; _loader = loader;
+    }
     private bool _dead;
     public event Action Revived;
     public bool IsDead => _dead;
@@ -60,7 +71,7 @@ public class PlayerResource : IDisposable
         // 再生は呼び出し側の意図に委ねる（SelfSacrifice 等、毎フレーム発生するダメージでは不要な場合がある）
         if (playSfx)
         {
-            AudioManager.Instance?.PlaySE("Damage");
+            _audio?.PlaySE("Damage");
         }
 
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
@@ -81,18 +92,18 @@ public class PlayerResource : IDisposable
             return;
         }
         _dead = true;
-        GameManager.Instance?.LoseGame();
-        AudioManager.Instance?.PlaySE("PlayerDeath");
+        _game?.LoseGame();
+        _audio?.PlaySE("PlayerDeath");
 
         // PlayerDeadManager があればそちらで演出（ヴィネット／ローパス／スロー等）を実行し、
         // 最終的にタイトル遷移まで行う。無ければ既存の即時遷移をフォールバックとして実行する。
-        if (PlayerDeadManager.Instance != null)
+        if (_playerDead != null)
         {
-            PlayerDeadManager.Instance.StartDefeatSequence(_animController != null ? _animController.gameObject : null);
+            _playerDead.StartDefeatSequence(_animController != null ? _animController.gameObject : null);
         }
         else
         {
-            LoadSceneManager.Instance?.LoadSceneAsync(LoadSceneManager.Instance.SceneNameConfig.TitleScene, 1000).Forget();
+            _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 1000).Forget();
         }
     }
 
