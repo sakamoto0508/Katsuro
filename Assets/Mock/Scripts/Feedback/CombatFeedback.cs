@@ -273,19 +273,28 @@ public sealed class CombatFeedback : MonoBehaviour
     public void Hit() { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; Refresh(); }
 
     /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
-    public void Hit(DamageInfo info)
+    [SerializeField, Min(0f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
+    private float _justAvoidCounterHitStop = .1f;
+
+    public void Hit(DamageInfo info, bool useBoneReaction = true)
     {
         if (!_initialized || !isActiveAndEnabled) return;
         float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
+        bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
         Vector3 direction = transform.InverseTransformDirection(info.HitNormal.normalized);
-        _reactionEuler = new Vector3(-direction.z * angle, 0, direction.x * angle);
+        if (!useBoneReaction) RemoveOffset();
+        _reactionEuler = useBoneReaction ? new Vector3(-direction.z * angle, 0, direction.x * angle) : Vector3.zero;
         _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
         Refresh();
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsHeavy ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), info.IsHeavy ? .65f : .45f, new Color(1f, .96f, .9f));
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, strongFeedback ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), strongFeedback ? .65f : .45f, new Color(1f, .96f, .9f));
         PlayHitVFX(info);
         var config = _audio != null ? _audio.AudioConfig : null;
-        _audio?.PlaySE(config != null ? (info.IsHeavy ? config.HeavyHitSound : config.LightHitSound) : "Damage");
-        _hitStop?.PlayHitStop(info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop, gameObject, info.Instigator);
+        _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
+        if (_hitStop != null)
+        {
+            float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
+            _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
+        }
         _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint);
     }
 
@@ -323,13 +332,14 @@ public sealed class CombatFeedback : MonoBehaviour
     private void PlayHitVFX(DamageInfo info)
     {
         if (_hitRoots == null) return;
+        bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
         int i = _nextHit; _nextHit = (_nextHit + 1) % _hitRoots.Length;
         Vector3 direction = info.SlashDirection.sqrMagnitude > .0001f ? info.SlashDirection : info.HitNormal;
         if (direction.sqrMagnitude < .0001f) direction = transform.forward;
         // 垂直の斬り上げでもLookRotationのforward/upが平行にならないようにする。
         Vector3 up = Mathf.Abs(Vector3.Dot(direction.normalized, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
         _hitRoots[i].transform.SetPositionAndRotation(info.HitPoint, Quaternion.LookRotation(direction, up));
-        _hitRoots[i].transform.localScale = Vector3.one * (info.IsHeavy ? _vfxConfig.HeavyHitVFXScale : 1f);
+        _hitRoots[i].transform.localScale = Vector3.one * (strongFeedback ? _vfxConfig.HeavyHitVFXScale : 1f);
         _hitRoots[i].SetActive(true); _hitStarted[i] = Time.unscaledTime;
         for (int j = 0; j < _hitParticles[i].Length; j++)
         {
@@ -337,7 +347,7 @@ public sealed class CombatFeedback : MonoBehaviour
             if (particle == null) continue;
             particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
-            float amount = info.IsHeavy ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            float amount = strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
             var emission = particle.emission;
             for (int b = 0; b < _hitBursts[i][j].Length; b++)
             {
@@ -351,10 +361,10 @@ public sealed class CombatFeedback : MonoBehaviour
                 emission.SetBurst(b, burst);
             }
             var shape = particle.shape;
-            shape.angle = _hitAngles[i][j] * (info.IsHeavy ? _vfxConfig.HeavyHitVFXSpread : 1f);
+            shape.angle = _hitAngles[i][j] * (strongFeedback ? _vfxConfig.HeavyHitVFXSpread : 1f);
             var main = particle.main;
-            main.startSize = ScaleHitCurve(_hitSizes[i][j], info.IsHeavy ? _vfxConfig.HeavyHitVFXSize : 1f);
-            main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], info.IsHeavy ? _vfxConfig.HeavyHitVFXSpeed : 1f);
+            main.startSize = ScaleHitCurve(_hitSizes[i][j], strongFeedback ? _vfxConfig.HeavyHitVFXSize : 1f);
+            main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], strongFeedback ? _vfxConfig.HeavyHitVFXSpeed : 1f);
             particle.Play(false);
         }
     }

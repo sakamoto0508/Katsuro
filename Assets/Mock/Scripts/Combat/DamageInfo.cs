@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public readonly struct DamageInfo
 {
-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default)
+    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false)
     {
         DamageAmount = damageAmount;
         HitPoint = hitPoint;
@@ -14,10 +14,14 @@ public readonly struct DamageInfo
         TargetCollider = targetCollider;
         IsHeavy = isHeavy;
         SlashDirection = slashDirection;
+        IsJustAvoidCounter = isJustAvoidCounter;
     }
 
     /// <summary>演出の強度区分。ダメージ計算には使わない。</summary>
     public bool IsHeavy { get; }
+
+    /// <summary>Just Avoid専用の追撃Animationから成立した命中。通常Heavyとは独立。</summary>
+    public bool IsJustAvoidCounter { get; }
 
     /// <summary>最終的に与えるダメージ量。</summary>
     public float DamageAmount { get; }

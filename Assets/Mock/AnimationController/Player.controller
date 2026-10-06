@@ -2141,7 +2141,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 18a97c0e57dde1644a3c013099500545, type: 2}
-  m_Tag: 
+  m_Tag: JustAvoidCounter
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -2520,7 +2520,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: ad519287d1a131c4e85dd5aa63d9dae3, type: 2}
-  m_Tag: 
+  m_Tag: JustAvoidCounter
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 

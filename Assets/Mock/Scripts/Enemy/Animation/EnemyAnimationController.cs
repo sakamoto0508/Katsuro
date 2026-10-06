@@ -9,6 +9,90 @@ public class EnemyAnimationController : MonoBehaviour
     private int _moveVelocityHash;
     private int _moveVectorXHash;
     private int _moveVectorYHash;
+    [Header("Hit Reaction")]
+    [SerializeField] private string _reactionLayerName = "HitReaction";
+    [SerializeField, Range(.15f, .3f)] private float _lightHitDuration = .24f;
+    [SerializeField, Range(.3f, .5f)] private float _heavyHitDuration = .4f;
+    [SerializeField, Range(0f, 1f)] private float _lightHitWeight = .6f;
+    [SerializeField, Range(.05f, .12f)] private float _reactionBlendIn = .08f;
+    [SerializeField, Range(.05f, .12f)] private float _reactionBlendOut = .08f;
+    private static readonly string[] HitDirections = { "Front", "Back", "Left", "Right" };
+    private int _reactionLayer = -1;
+    private bool _reactionConfigured;
+    private float _reactionElapsed, _reactionDuration, _reactionWeight, _reactionStartWeight;
+    public bool IsReacting { get; private set; }
+    public bool IsHeavyReacting { get; private set; }
+
+    // Direction identifies the side the attacker occupies in the enemy's local space.
+    public static int GetHitDirection(Transform enemy, DamageInfo info)
+    {
+        Vector3 source = info.Instigator != null ? info.Instigator.transform.position - enemy.position : Vector3.zero;
+        source.y = 0f;
+        if (source.sqrMagnitude < .0001f) source = -info.HitNormal;
+        source.y = 0f;
+        if (source.sqrMagnitude < .0001f) source = info.HitPoint - enemy.position;
+        source.y = 0f;
+        Vector3 local = enemy.InverseTransformDirection(source);
+        if (Mathf.Abs(local.x) > Mathf.Abs(local.z)) return local.x > 0f ? 3 : 2;
+        return local.z >= 0f ? 0 : 1;
+    }
+
+    public bool TryPlayHitReaction(DamageInfo info)
+    {
+        if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
+        int direction = GetHitDirection(transform, info);
+        string state = _reactionLayerName + ".Heavy" + HitDirections[direction];
+        if (!_animator.HasState(_reactionLayer, Animator.StringToHash(state))) return false;
+        IsReacting = true;
+        IsHeavyReacting = true;
+        _reactionElapsed = 0f;
+        _reactionDuration = _heavyHitDuration;
+        _reactionWeight = 1f;
+        // Blend from the visible layer weight, including consecutive counter hits.
+        _reactionStartWeight = _animator.GetLayerWeight(_reactionLayer);
+        _animator.SetInteger("HitDirection", direction);
+        _animator.SetInteger("HitType", 1);
+        _animator.SetBool("IsJustAvoidCounter", true);
+        _animator.SetFloat("HitPlaybackSpeed", 1f / _reactionDuration);
+        _animator.SetTrigger("HitReaction");
+        // Consume the request before CombatFeedback freezes Animator.speed for HitStop.
+        _animator.Update(0f);
+        return true;
+    }
+
+    public void InterruptAttackForHitReaction()
+    {
+        if (_animator == null) return;
+        // Even when reaction clips are unavailable, cancel the outgoing attack.
+        foreach (var parameter in _animator.parameters)
+            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name != "HitReaction" && parameter.name != _animName.EnemyDead)
+                _animator.ResetTrigger(parameter.nameHash);
+        int idle = Animator.StringToHash("Base Layer.Idle");
+        if (_animator.HasState(0, idle)) _animator.CrossFadeInFixedTime(idle, _reactionBlendIn, 0, 0f);
+    }
+
+    public bool TickHitReaction(float deltaTime)
+    {
+        if (!IsReacting) return false;
+        _reactionElapsed += deltaTime * Mathf.Max(0f, _animator.speed);
+        float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / _reactionBlendIn));
+        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _reactionDuration) / _reactionBlendOut));
+        _animator.SetLayerWeight(_reactionLayer, Mathf.Lerp(_reactionStartWeight, _reactionWeight, blendIn) * (1f - fade));
+        // Movement remains held until the visible reaction has fully blended out.
+        if (_reactionElapsed < _reactionDuration + _reactionBlendOut) return false;
+        CancelHitReaction();
+        return true;
+    }
+
+    public void CancelHitReaction()
+    {
+        IsReacting = IsHeavyReacting = false;
+        if (!_reactionConfigured) return;
+        _animator.ResetTrigger("HitReaction");
+        _animator.SetBool("IsJustAvoidCounter", false);
+        _animator.SetLayerWeight(_reactionLayer, 0f);
+        _animator.Play(Animator.StringToHash(_reactionLayerName + ".Empty"), _reactionLayer, 0f);
+    }
 
     /// <summary>
     /// 速度をスムージング付きで Animator に反映する。
@@ -65,6 +149,22 @@ public class EnemyAnimationController : MonoBehaviour
         if (_initialized) return;
         _initialized = true;
         _animator = GetComponent<Animator>();
+        _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
+        bool trigger = false, direction = false, type = false, speed = false, counter = false;
+        foreach (var p in _animator.parameters)
+        {
+            trigger |= p.name == "HitReaction" && p.type == AnimatorControllerParameterType.Trigger;
+            direction |= p.name == "HitDirection" && p.type == AnimatorControllerParameterType.Int;
+            type |= p.name == "HitType" && p.type == AnimatorControllerParameterType.Int;
+            speed |= p.name == "HitPlaybackSpeed" && p.type == AnimatorControllerParameterType.Float;
+            counter |= p.name == "IsJustAvoidCounter" && p.type == AnimatorControllerParameterType.Bool;
+        }
+        _reactionConfigured = _reactionLayer >= 0 && trigger && direction && type && speed && counter;
+        if (_reactionConfigured)
+        {
+            _animator.SetLayerWeight(_reactionLayer, 0f);
+            _animator.SetBool("IsJustAvoidCounter", false);
+        }
         // エディターで検証処理が呼ばれていなくても、実行時にパラメーターのハッシュ値を初期化する。
         _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);
         _moveVectorXHash = Animator.StringToHash(_animName.MoveVectorX);

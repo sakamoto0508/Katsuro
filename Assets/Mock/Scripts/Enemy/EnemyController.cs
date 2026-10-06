@@ -46,6 +46,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private DamageNumbers _damageNumbers;
     private CombatFeedback _combatFeedback;
     private bool _initialized;
+    private bool _reactionInterruptedAttack;
 
     public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader, CameraManager cameraManager = null, VFXConfig vfxConfig = null)
     {
@@ -122,7 +123,25 @@ public class EnemyController : MonoBehaviour, IDamageable
         float dealt = before - _health.CurrentHp;
         if (dealt > 0f)
         {
-            _combatFeedback?.Hit(info);
+            bool lethal = _health.CurrentHp <= 0f;
+            bool counter = !lethal && info.IsJustAvoidCounter;
+            if (counter)
+            {
+                _attacker?.DisableWeaponHitbox();
+                _pendingAction = null;
+                _mover?.ReleaseMovementAfterReaction();
+                _mover?.InterruptMovementAction();
+                _enemyAnimController?.InterruptAttackForHitReaction();
+            }
+            bool animated = counter && _enemyAnimController != null && _enemyAnimController.TryPlayHitReaction(info);
+            if (animated)
+            {
+                _reactionInterruptedAttack = true;
+                _mover?.HoldMovementForReaction();
+            }
+            else if (counter) _ai?.OnAttackFinished();
+            bool boneReaction = !lethal && !animated && !(_enemyAnimController != null && _enemyAnimController.IsReacting);
+            _combatFeedback?.Hit(info, boneReaction);
             if (_combatFeedback == null) _audio?.PlaySE("Damage");
             _damageNumbers?.Show(transform.position, dealt, isCritical);
         }
@@ -142,6 +161,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     private void Update()
     {
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
+        if (_enemyAnimController != null && _enemyAnimController.IsReacting)
+        {
+            if (_enemyAnimController.TickHitReaction(Time.deltaTime))
+            {
+                _mover?.ReleaseMovementAfterReaction();
+                if (_reactionInterruptedAttack) _ai?.OnAttackFinished();
+                _reactionInterruptedAttack = false;
+            }
+            else return;
+        }
         // AI の Tick を先に呼び、意思決定を行わせる
         _ai?.Tick(Time.deltaTime);
 
@@ -190,6 +219,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void EnemyDead()
     {
+        _enemyAnimController.CancelHitReaction();
+        _mover?.ReleaseMovementAfterReaction();
         _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
         _dead = true;
         _pendingAction = null;
@@ -212,6 +243,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
+        if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _attacker?.EnableWeaponHitbox();
     }
@@ -231,6 +263,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// <param name="attackIndex">_attackData の配列インデックス</param>
     public void AnimEvent_PerformAttack(int attackIndex)
     {
+        if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
         if (_attackData == null || attackIndex < 0 || attackIndex >= _attackData.Length)
         {
@@ -247,6 +280,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_OnAttackFinished()
     {
+        if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _ai?.OnAttackFinished();
         // 攻撃終了時に一時停止していた移動制御を復帰させる
@@ -255,6 +289,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     public void AnimEvent_OnStepBackFinished()
     {
+        if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _mover?.EndStepBack();
         _ai?.OnAttackFinished(); // または専用の完了処理

@@ -53,6 +53,53 @@ public class EnemyMover
     private bool _isMovementHeldForAttack = false;
     private bool _prevAnimatorApplyRootMotion = false;
     private bool _prevAgentEnabled = true;
+    private bool _reactionHeld, _reactionAgentStopped, _reactionAgentRotation, _reactionKinematic;
+    private bool _releaseAttackAfterReaction, _endStepBackAfterReaction;
+
+    public void HoldMovementForReaction()
+    {
+        if (_reactionHeld) return;
+        _reactionHeld = true;
+        if (_agent != null)
+        {
+            _reactionAgentRotation = _agent.updateRotation;
+            _agent.updateRotation = false;
+            if (_agent.isActiveAndEnabled && _agent.isOnNavMesh)
+            {
+                _reactionAgentStopped = _agent.isStopped;
+                _agent.isStopped = true;
+                _agent.velocity = Vector3.zero;
+            }
+        }
+        if (_rb != null)
+        {
+            _reactionKinematic = _rb.isKinematic;
+            if (!_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
+            _rb.isKinematic = true;
+        }
+        _animationController?.MoveVelocity(0f);
+        _animationController?.MoveVector(Vector2.zero);
+    }
+
+    public void ReleaseMovementAfterReaction()
+    {
+        if (!_reactionHeld) return;
+        _reactionHeld = false;
+        if (_agent != null)
+        {
+            _agent.updateRotation = _reactionAgentRotation;
+            if (_agent.isActiveAndEnabled && _agent.isOnNavMesh) _agent.isStopped = _reactionAgentStopped;
+        }
+        if (_rb != null) _rb.isKinematic = _reactionKinematic;
+        if (_endStepBackAfterReaction) { _endStepBackAfterReaction = false; EndStepBack(); }
+        if (_releaseAttackAfterReaction) { _releaseAttackAfterReaction = false; ReleaseMovementAfterAttack(); }
+    }
+
+    public void InterruptMovementAction()
+    {
+        if (_isStepBack) EndStepBack();
+        ReleaseMovementAfterAttack();
+    }
 
     /// <summary>
     /// 毎フレーム呼び出す更新処理。
@@ -62,6 +109,7 @@ public class EnemyMover
     /// </summary>
     public void Update()
     {
+        if (_reactionHeld) return;
         if (_playerPosition == null) return;
 
         if (_isStepBack)
@@ -276,6 +324,7 @@ public class EnemyMover
     /// </summary>
     public void ReleaseMovementAfterAttack()
     {
+        if (_reactionHeld) { _releaseAttackAfterReaction = true; return; }
         if (_agent == null) return;
         if (!_isMovementHeldForAttack) return;
 
@@ -447,6 +496,7 @@ public class EnemyMover
     /// </summary>
     public void EndStepBack()
     {
+        if (_reactionHeld) { _endStepBackAfterReaction = true; return; }
         _usingRootMotionStepBack = false;
         if (_animator != null) _animator.applyRootMotion = false;
 
@@ -476,6 +526,7 @@ public class EnemyMover
     /// </summary>
     public void OnAnimatorMove()
     {
+        if (_reactionHeld) return;
         if (!_usingRootMotionStepBack) return;
         // Animator.deltaPosition/Rotation を transform に適用
         _enemyTransform.position += _animator.deltaPosition;

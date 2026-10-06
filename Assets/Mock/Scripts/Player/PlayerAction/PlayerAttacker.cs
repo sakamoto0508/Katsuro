@@ -16,6 +16,7 @@ public sealed class PlayerAttacker : IDisposable
         _weapon = playerWeapon;
         _status = status;
         _ownerTransform = ownerTransform;
+        _ownerAnimator = ownerTransform != null ? ownerTransform.GetComponent<Animator>() : null;
         _playerResource = playerResource;
 
         ApplyPassiveBuffSet(passiveBuffSet);
@@ -36,6 +37,13 @@ public sealed class PlayerAttacker : IDisposable
     private readonly PlayerWeapon _weapon;
     private readonly PlayerStatus _status;
     private readonly Transform _ownerTransform;
+    private readonly Animator _ownerAnimator;
+    public const string JustAvoidCounterTag = "JustAvoidCounter";
+
+    // The existing Just Avoid branch is tagged in the Animator. Buff stacks and
+    // Heavy input cannot authorize a counter; transitioning out clears eligibility.
+    private bool IsJustAvoidCounterAttack => _ownerAnimator != null && _ownerAnimator.isActiveAndEnabled &&
+        (_ownerAnimator.IsInTransition(0) ? _ownerAnimator.GetNextAnimatorStateInfo(0) : _ownerAnimator.GetCurrentAnimatorStateInfo(0)).IsTag(JustAvoidCounterTag);
     private readonly PlayerResource _playerResource;
     private PlayerPassiveBuffSet _passiveBuffSet;
     private PlayerStateContext _context;
@@ -243,7 +251,8 @@ public sealed class PlayerAttacker : IDisposable
         float damage = ResolveDamageAmount();
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
             _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack,
-            _weapon != null ? _weapon.GetSlashDirection(other) : Vector3.zero);
+            _weapon != null ? _weapon.GetSlashDirection(other) : Vector3.zero,
+            isJustAvoidCounter: IsJustAvoidCounterAttack);
 
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)
