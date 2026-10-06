@@ -403,7 +403,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2657799758123976354}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -517,14 +517,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.16
+  _duration: 0.11
   _bladeBase: {fileID: 2928109130905257396}
   _tip: {fileID: 2928109130905257398}
   _sharedTrail: {fileID: 0}
-  _trailMaterial: {fileID: 0}
-  _brightness: 0.8
-  _fade: 1.5
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+  _brightness: 1.05
+  _fade: 1.15
+  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _minimumSpeed: 2
+  _fullSpeed: 14
+  _heavyDuration: 0.16
+  _counterDuration: 0.18
+  _heavyBrightness: 1.18
+  _counterBrightness: 1.35
   _width: 0.045
 --- !u!114 &2685883468460359435
 MonoBehaviour:
@@ -561,7 +567,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3364876375464077024}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -675,14 +681,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.16
+  _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
-  _trailMaterial: {fileID: 0}
-  _brightness: 0.8
-  _fade: 1.5
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+  _brightness: 1.05
+  _fade: 1.15
+  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _minimumSpeed: 2
+  _fullSpeed: 14
+  _heavyDuration: 0.16
+  _counterDuration: 0.18
+  _heavyBrightness: 1.18
+  _counterBrightness: 1.35
   _width: 0.045
 --- !u!114 &2827786783917834820
 MonoBehaviour:
@@ -709,7 +721,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3660119093613518366}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -823,14 +835,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.16
+  _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
-  _trailMaterial: {fileID: 0}
-  _brightness: 0.8
-  _fade: 1.5
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+  _brightness: 1.05
+  _fade: 1.15
+  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _minimumSpeed: 2
+  _fullSpeed: 14
+  _heavyDuration: 0.16
+  _counterDuration: 0.18
+  _heavyBrightness: 1.18
+  _counterBrightness: 1.35
   _width: 0.045
 --- !u!114 &219595742750856084
 MonoBehaviour:
@@ -877,7 +895,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6248196616770480950}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -991,14 +1009,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.16
+  _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
-  _trailMaterial: {fileID: 0}
-  _brightness: 0.8
-  _fade: 1.5
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+  _brightness: 1.05
+  _fade: 1.15
+  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _minimumSpeed: 2
+  _fullSpeed: 14
+  _heavyDuration: 0.16
+  _counterDuration: 0.18
+  _heavyBrightness: 1.18
+  _counterBrightness: 1.35
   _width: 0.045
 --- !u!114 &4341062004680815879
 MonoBehaviour:
@@ -1029,14 +1053,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.16
+  _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
-  _trailMaterial: {fileID: 0}
-  _brightness: 0.8
-  _fade: 1.5
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+  _brightness: 1.05
+  _fade: 1.15
+  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _minimumSpeed: 2
+  _fullSpeed: 14
+  _heavyDuration: 0.16
+  _counterDuration: 0.18
+  _heavyBrightness: 1.18
+  _counterBrightness: 1.35
   _width: 0.035
 --- !u!114 &3014878826444549024
 MonoBehaviour:
@@ -1058,7 +1088,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8328299860419709666}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1842,6 +1872,7 @@ MonoBehaviour:
   _heavyReactionAngle: 10
   _reactionDuration: 0.18
   _justAvoidBodyFlashStrength: 0.2
+  _justAvoidCounterHitStop: 0.1
 --- !u!114 &6603691807611529658
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -151,6 +151,7 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
     public void EnableWeaponHitbox()
     {
+        _weapon?.SetTrailStyle(IsJustAvoidCounterAttack ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
         _hitTargets.Clear();
         _isHitboxActive = true;
         _weapon?.EnableHitbox();

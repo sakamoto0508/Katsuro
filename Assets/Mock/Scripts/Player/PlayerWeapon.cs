@@ -55,6 +55,11 @@ public sealed class PlayerWeapon
     /// <summary>ヒットボックスを無効化する。</summary>
     public void DisableHitbox() => SetHitboxActive(false);
 
+    public void SetTrailStyle(SwordTrail.AttackStyle style)
+    {
+        foreach (var trail in _trails.Values) trail.SetStyle(style);
+    }
+
     /// <summary>武器がヒットした際の通知先を登録する。</summary>
     public void RegisterHitObserver(Action<Collider> handler)
     {
