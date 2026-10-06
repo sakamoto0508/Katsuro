@@ -1073,48 +1073,19 @@ MonoBehaviour:
   m_Name: DefaultSettingsVolumeProfile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: 7686318427622180703}
-  - {fileID: -1016694868962581565}
-  - {fileID: 7502528774814404555}
-  - {fileID: 7542669330009093999}
-  - {fileID: 1501199423866068322}
-  - {fileID: 5315503232242033309}
-  - {fileID: 1932259527246508038}
-  - {fileID: 448115243408767295}
-  - {fileID: -7089757308646879465}
-  - {fileID: -8500501345142028434}
-  - {fileID: 2097231660816403494}
-  - {fileID: -400730961922129322}
-  - {fileID: -437012520410882665}
-  - {fileID: -3342587394989697754}
-  - {fileID: 2701360105650152193}
-  - {fileID: 3917605098068701410}
-  - {fileID: 5320780374730959925}
-  - {fileID: -990696274475316801}
-  - {fileID: -6189196381098423222}
-  - {fileID: 4558450837300158549}
-  - {fileID: -4332339539149353572}
-  - {fileID: 132200229832242747}
-  - {fileID: -2419890052820159740}
-  - {fileID: -7421150175840892534}
-  - {fileID: 8060650308657136559}
-  - {fileID: -2656306711808018980}
-  - {fileID: -8113877348735554942}
-  - {fileID: -773050231934515603}
-  - {fileID: -1506487632567342284}
-  - {fileID: -5402515276139612668}
-  - {fileID: -1228260345875932630}
-  - {fileID: -472301168078327002}
-  - {fileID: 1982073416058986750}
-  - {fileID: 1358069086957986639}
-  - {fileID: 2719441498800547098}
-  - {fileID: -1183122103486092212}
-  - {fileID: -6795440364557438144}
-  - {fileID: 4315843327866008329}
-  - {fileID: 7988067849862804152}
-  - {fileID: 1304324734081881208}
-  - {fileID: 5453770852051687580}
-  - {fileID: -7571044391632465793}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 4697593540289816494}
 --- !u!114 &132200229832242747
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2220,6 +2191,24 @@ MonoBehaviour:
   writeDepthAlphaThreshold:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &4697593540289816494
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a7ff42a8c5be6646ad3975f3a54c1eb, type: 3}
+  m_Name: DiffusionProfileList
+  m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.DiffusionProfileList
+  active: 1
+  diffusionProfiles:
+    m_OverrideState: 1
+    m_Value:
+    - {fileID: 11400000, guid: 404820c4cf36ad944862fa59c56064f0, type: 2}
+    - {fileID: 11400000, guid: 2384dbf2c1c420f45a792fbc315fbfb1, type: 2}
 --- !u!114 &5315503232242033309
 MonoBehaviour:
   m_ObjectHideFlags: 3
