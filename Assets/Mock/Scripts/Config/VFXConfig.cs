@@ -13,7 +13,18 @@ public class VFXConfig : ScriptableObject
     [Header("命中")]
     [Tooltip("追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。")]
     [SerializeField] private GameObject _hitVFX;
-    [SerializeField, Min(.01f)] private float _hitVFXDuration = .15f;
+    [SerializeField, Min(.01f)] private float _hitVFXDuration = .32f;
+    [Tooltip("強攻撃の粒子数倍率。PrefabのBurst数を基準に毎回適用する。")]
+    [SerializeField, Range(1f, 1.6f)] private float _heavyHitVFXAmount = 1.45f;
+    [SerializeField, Range(1f, 1.3f)] private float _heavyHitVFXSpread = 1.15f;
+    [SerializeField, Range(1f, 1.2f)] private float _heavyHitVFXSize = 1.1f;
+    [SerializeField, Range(1f, 1.4f)] private float _heavyHitVFXScale = 1.3f;
+    [SerializeField, Range(1f, 1.3f)] private float _heavyHitVFXSpeed = 1.2f;
+    public float HeavyHitVFXScale => _heavyHitVFXScale;
+    public float HeavyHitVFXSpeed => _heavyHitVFXSpeed;
+    public float HeavyHitVFXAmount => _heavyHitVFXAmount;
+    public float HeavyHitVFXSpread => _heavyHitVFXSpread;
+    public float HeavyHitVFXSize => _heavyHitVFXSize;
     public GameObject HitVFX => _hitVFX;
     public float HitVFXDuration => _hitVFXDuration;
     public bool ShockwaveEnable => _shockwaveEnable;

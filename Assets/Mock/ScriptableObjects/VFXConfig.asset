@@ -12,13 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
   m_Name: VFXConfig
   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
-  _playEffectHeal: Heal
-  _playEffectGhost: Ghost
-  _playEffectBuff: Buff
   _justAvoidShockwavePrefab: {fileID: 3032302795391208821, guid: 2d005552031c1e446b7cad9273902f91, type: 3}
   _shockwaveDuration: 0.25
   _shockwaveEnable: 0
   _shockwaveStrength: 0.2
   _shockwaveSize: 0.5
-  _hitVFX: {fileID: 0}
-  _hitVFXDuration: 0.15
+  _hitVFX: {fileID: 6802810917159284204, guid: 0606e9ce5afba844d8f73096112372ce, type: 3}
+  _hitVFXDuration: 0.42
+  _heavyHitVFXAmount: 1.4
+  _heavyHitVFXSpread: 1.05
+  _heavyHitVFXSize: 1
+  _heavyHitVFXScale: 1.3
+  _heavyHitVFXSpeed: 1.2
+  _playEffectHeal: Heal
+  _playEffectGhost: Ghost
+  _playEffectBuff: Buff

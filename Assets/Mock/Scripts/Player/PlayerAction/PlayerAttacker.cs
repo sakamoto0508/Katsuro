@@ -242,7 +242,8 @@ public sealed class PlayerAttacker : IDisposable
         // ダメージ情報を生成して IDamageable へ通知、続けてパッシブ固有エフェクトを再生。
         float damage = ResolveDamageAmount();
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
-            _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack);
+            _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack,
+            _weapon != null ? _weapon.GetSlashDirection(other) : Vector3.zero);
 
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)

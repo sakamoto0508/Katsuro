@@ -17,6 +17,10 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private MeshRenderer _playerWeapon;
     [SerializeField] private GameObject _playerStartWeapon;
     [SerializeField] private Collider[] _weaponColliders;
+    [Tooltip("プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。")]
+    [SerializeField] private Vector3 _weaponHitboxPadding = new Vector3(.08f, .02f, .08f);
+    private PlayerWeapon _weaponHitboxes;
+    private Vector3 _appliedHitboxPadding;
     [SerializeField] private Collider[] _enemyWeaponColliders;
 
     [Header("ScriptableObject")]
@@ -112,7 +116,9 @@ public class PlayerController : MonoBehaviour, IDamageable
         _playerResource.Init(game, audio, playerDead, loader);
         var ownerColliders = GetComponentsInChildren<Collider>();
         var playerWeapon = new PlayerWeapon(_weaponColliders, ownerColliders);
-        playerWeapon.Init();
+        playerWeapon.Init(_weaponHitboxPadding);
+        _weaponHitboxes = playerWeapon;
+        _appliedHitboxPadding = _weaponHitboxPadding;
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
         var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController);
@@ -225,6 +231,11 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        if (_weaponHitboxes != null && _appliedHitboxPadding != _weaponHitboxPadding)
+        {
+            _weaponHitboxes.SetHitboxPadding(_weaponHitboxPadding);
+            _appliedHitboxPadding = _weaponHitboxPadding;
+        }
         if (!CanFight) return;
         if (_justBuffRemaining > 0f)
         {

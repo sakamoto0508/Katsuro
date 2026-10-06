@@ -33,6 +33,10 @@ public sealed class CombatFeedback : MonoBehaviour
     private HitStopManager _hitStop;
     private ContactPulse _contactPulse;
     private ParticleSystem[][] _hitParticles;
+    private ParticleSystem.Burst[][][] _hitBursts;
+    private float[][] _hitAngles;
+    private ParticleSystem.MinMaxCurve[][] _hitSizes;
+    private ParticleSystem.MinMaxCurve[][] _hitSpeeds;
     private GameObject[] _hitRoots;
     private float[] _hitStarted;
     private int _nextHit;
@@ -277,7 +281,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _reactionEuler = new Vector3(-direction.z * angle, 0, direction.x * angle);
         _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
         Refresh();
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsHeavy ? .3f : .2f, _hitFlashDuration, info.IsHeavy ? .85f : .55f);
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsHeavy ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), info.IsHeavy ? .65f : .45f, new Color(1f, .96f, .9f));
         PlayHitVFX(info);
         var config = _audio != null ? _audio.AudioConfig : null;
         _audio?.PlaySE(config != null ? (info.IsHeavy ? config.HeavyHitSound : config.LightHitSound) : "Damage");
@@ -290,13 +294,27 @@ public sealed class CombatFeedback : MonoBehaviour
         _contactPulse = new ContactPulse(gameObject.layer);
         if (_vfxConfig == null || _vfxConfig.HitVFX == null) return;
         _hitRoots = new GameObject[4]; _hitParticles = new ParticleSystem[4][]; _hitStarted = new float[4];
+        _hitBursts = new ParticleSystem.Burst[4][][];
+        _hitAngles = new float[4][]; _hitSizes = new ParticleSystem.MinMaxCurve[4][];
+        _hitSpeeds = new ParticleSystem.MinMaxCurve[4][];
         for (int i = 0; i < 4; i++)
         {
             _hitRoots[i] = new GameObject("Contact VFX"); _hitRoots[i].SetActive(false);
             var effect = Instantiate(_vfxConfig.HitVFX, _hitRoots[i].transform, false); effect.SetActive(true);
             _hitParticles[i] = effect.GetComponentsInChildren<ParticleSystem>(true);
-            foreach (var particle in _hitParticles[i])
+            _hitBursts[i] = new ParticleSystem.Burst[_hitParticles[i].Length][];
+            _hitAngles[i] = new float[_hitParticles[i].Length];
+            _hitSizes[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            _hitSpeeds[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            for (int j = 0; j < _hitParticles[i].Length; j++)
             {
+                var particle = _hitParticles[i][j];
+                var emission = particle.emission;
+                _hitBursts[i][j] = new ParticleSystem.Burst[emission.burstCount];
+                emission.GetBursts(_hitBursts[i][j]);
+                _hitAngles[i][j] = particle.shape.angle;
+                _hitSizes[i][j] = particle.main.startSize;
+                _hitSpeeds[i][j] = particle.main.startSpeed;
                 var main = particle.main;
                 main.loop = false; main.playOnAwake = false; main.useUnscaledTime = true; main.stopAction = ParticleSystemStopAction.None;
             }
@@ -306,14 +324,49 @@ public sealed class CombatFeedback : MonoBehaviour
     {
         if (_hitRoots == null) return;
         int i = _nextHit; _nextHit = (_nextHit + 1) % _hitRoots.Length;
-        _hitRoots[i].transform.SetPositionAndRotation(info.HitPoint, info.HitNormal.sqrMagnitude > .0001f ? Quaternion.LookRotation(info.HitNormal) : Quaternion.identity);
+        Vector3 direction = info.SlashDirection.sqrMagnitude > .0001f ? info.SlashDirection : info.HitNormal;
+        if (direction.sqrMagnitude < .0001f) direction = transform.forward;
+        // 垂直の斬り上げでもLookRotationのforward/upが平行にならないようにする。
+        Vector3 up = Mathf.Abs(Vector3.Dot(direction.normalized, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
+        _hitRoots[i].transform.SetPositionAndRotation(info.HitPoint, Quaternion.LookRotation(direction, up));
+        _hitRoots[i].transform.localScale = Vector3.one * (info.IsHeavy ? _vfxConfig.HeavyHitVFXScale : 1f);
         _hitRoots[i].SetActive(true); _hitStarted[i] = Time.unscaledTime;
-        foreach (var particle in _hitParticles[i])
+        for (int j = 0; j < _hitParticles[i].Length; j++)
         {
+            var particle = _hitParticles[i][j];
             if (particle == null) continue;
-            particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear); particle.Play(false);
+            particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+            // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
+            float amount = info.IsHeavy ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            var emission = particle.emission;
+            for (int b = 0; b < _hitBursts[i][j].Length; b++)
+            {
+                var burst = _hitBursts[i][j][b];
+                var count = ScaleHitCurve(burst.count, amount);
+                // Burstは整数粒子数なので、端数の切り捨てで強攻撃が弱くならないよう丸める。
+                if (count.mode == ParticleSystemCurveMode.Constant) count.constant = Mathf.RoundToInt(count.constant);
+                else if (count.mode == ParticleSystemCurveMode.TwoConstants)
+                { count.constantMin = Mathf.RoundToInt(count.constantMin); count.constantMax = Mathf.RoundToInt(count.constantMax); }
+                burst.count = count;
+                emission.SetBurst(b, burst);
+            }
+            var shape = particle.shape;
+            shape.angle = _hitAngles[i][j] * (info.IsHeavy ? _vfxConfig.HeavyHitVFXSpread : 1f);
+            var main = particle.main;
+            main.startSize = ScaleHitCurve(_hitSizes[i][j], info.IsHeavy ? _vfxConfig.HeavyHitVFXSize : 1f);
+            main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], info.IsHeavy ? _vfxConfig.HeavyHitVFXSpeed : 1f);
+            particle.Play(false);
         }
     }
+    private static ParticleSystem.MinMaxCurve ScaleHitCurve(ParticleSystem.MinMaxCurve value, float scale)
+    {
+        if (value.mode == ParticleSystemCurveMode.Constant) value.constant *= scale;
+        else if (value.mode == ParticleSystemCurveMode.TwoConstants)
+        { value.constantMin *= scale; value.constantMax *= scale; }
+        else value.curveMultiplier *= scale;
+        return value;
+    }
+
     private void StopHitVFX(int i)
     {
         foreach (var particle in _hitParticles[i]) if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -405,6 +458,7 @@ internal sealed class ContactPulse
     private readonly GameObject[] objects;
     private readonly MeshRenderer[] renderers;
     private readonly float[] started, durations, strengths;
+    private readonly Color[] tints;
     private readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
     private readonly Material material;
     private readonly Mesh mesh;
@@ -419,7 +473,7 @@ internal sealed class ContactPulse
         mesh.uv = new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one };
         mesh.triangles = new[] { 0, 2, 1, 1, 2, 3 }; mesh.RecalculateBounds();
         objects = new GameObject[4]; renderers = new MeshRenderer[4];
-        started = new float[4]; durations = new float[4]; strengths = new float[4];
+        started = new float[4]; durations = new float[4]; strengths = new float[4]; tints = new Color[4];
         for (int i = 0; i < 4; i++)
         {
             objects[i] = new GameObject("Contact Flash", typeof(MeshFilter), typeof(MeshRenderer));
@@ -430,7 +484,7 @@ internal sealed class ContactPulse
             renderers[i].receiveShadows = false; objects[i].SetActive(false);
         }
     }
-    public void Play(Vector3 position, Vector3 direction, float size, float duration, float strength)
+    public void Play(Vector3 position, Vector3 direction, float size, float duration, float strength, Color? tint = null)
     {
         if (objects == null) return;
         int i = next; next = (next + 1) % objects.Length;
@@ -438,6 +492,7 @@ internal sealed class ContactPulse
             direction.sqrMagnitude > .0001f ? Quaternion.LookRotation(direction) : Quaternion.identity);
         objects[i].transform.localScale = Vector3.one * Mathf.Max(.01f, size);
         started[i] = Time.unscaledTime; durations[i] = Mathf.Max(.01f, duration); strengths[i] = strength;
+        tints[i] = tint ?? new Color(.86f, .95f, 1f);
         objects[i].SetActive(true); Update();
     }
     public void Update()
@@ -448,7 +503,8 @@ internal sealed class ContactPulse
             if (objects[i] == null || !objects[i].activeSelf) continue;
             float age = (Time.unscaledTime - started[i]) / durations[i];
             if (age >= 1) { objects[i].SetActive(false); continue; }
-            block.SetColor("_Tint", new Color(.86f, .95f, 1f, strengths[i] * (1 - age)));
+            var tint = tints[i]; tint.a *= strengths[i] * (1 - age);
+            block.SetColor("_Tint", tint);
             renderers[i].SetPropertyBlock(block);
         }
     }

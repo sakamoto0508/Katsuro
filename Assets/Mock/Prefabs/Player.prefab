@@ -293,6 +293,34 @@ PrefabInstance:
       propertyPath: m_CollisionDetection
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.059
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7240478162968695313, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -490,10 +518,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
   _duration: 0.16
-  _width: 0.045
+  _bladeBase: {fileID: 2928109130905257396}
+  _tip: {fileID: 2928109130905257398}
+  _sharedTrail: {fileID: 0}
+  _trailMaterial: {fileID: 0}
+  _brightness: 0.8
+  _fade: 1.5
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
-  _tip: {fileID: 9300000203}
-  _bladeBase: {fileID: 9300000201}
+  _width: 0.045
 --- !u!114 &2685883468460359435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -506,6 +538,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a24ce3c3ac413d744b59a2bdf3871c2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponHitboxRelay
+--- !u!4 &2928109130905257396 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9300000101, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+  m_PrefabInstance: {fileID: 2928109139064076497}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2928109130905257398 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9300000103, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+  m_PrefabInstance: {fileID: 2928109139064076497}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3364876375464077024 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 437071831499726385, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
@@ -634,10 +676,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
   _duration: 0.16
-  _width: 0.045
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
+  _trailMaterial: {fileID: 0}
+  _brightness: 0.8
+  _fade: 1.5
+  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _width: 0.045
 --- !u!114 &2827786783917834820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,10 +824,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
   _duration: 0.16
-  _width: 0.045
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
+  _trailMaterial: {fileID: 0}
+  _brightness: 0.8
+  _fade: 1.5
+  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _width: 0.045
 --- !u!114 &219595742750856084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -942,10 +992,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
   _duration: 0.16
-  _width: 0.045
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
+  _trailMaterial: {fileID: 0}
+  _brightness: 0.8
+  _fade: 1.5
+  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _width: 0.045
 --- !u!114 &4341062004680815879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -976,10 +1030,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
   _duration: 0.16
-  _width: 0.035
-  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
   _sharedTrail: {fileID: 6188147716110040468}
+  _trailMaterial: {fileID: 0}
+  _brightness: 0.8
+  _fade: 1.5
+  _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
+  _width: 0.035
 --- !u!114 &3014878826444549024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1689,6 +1747,7 @@ MonoBehaviour:
   - {fileID: 3661875669892085876}
   - {fileID: 1852234771052466540}
   - {fileID: 3863964144040833327}
+  _weaponHitboxPadding: {x: 0.16, y: 0.08, z: 0.16}
   _enemyWeaponColliders:
   - {fileID: 0}
   - {fileID: 0}
@@ -1772,6 +1831,17 @@ MonoBehaviour:
   _ghostTint: {r: 0.6354076, g: 0.765099, b: 0.78867924, a: 0.35686275}
   _ghostSway: 0.016
   _ghostFlowSpeed: 2.05
+  _afterImageDuration: 0.3
+  _flashDuration: 0.15
+  _afterImageTint: {r: 0.75, g: 0.9, b: 1, a: 0.3}
+  _flashTint: {r: 0.85, g: 0.95, b: 1, a: 0.65}
+  _hitFlashDuration: 0.09
+  _justAvoidFlashDuration: 0.09
+  _justAvoidFlashSize: 0.35
+  _lightReactionAngle: 5
+  _heavyReactionAngle: 10
+  _reactionDuration: 0.18
+  _justAvoidBodyFlashStrength: 0.2
 --- !u!114 &6603691807611529658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1818,14 +1888,4 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: -7520100684144184798, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
   m_PrefabInstance: {fileID: 7668312681955159595}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &9300000201 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9300000101, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-  m_PrefabInstance: {fileID: 2928109139064076497}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &9300000203 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9300000103, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-  m_PrefabInstance: {fileID: 2928109139064076497}
   m_PrefabAsset: {fileID: 0}

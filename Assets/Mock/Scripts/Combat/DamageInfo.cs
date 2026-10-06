@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 public readonly struct DamageInfo
 {
-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false)
+    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default)
     {
         DamageAmount = damageAmount;
         HitPoint = hitPoint;
@@ -13,6 +13,7 @@ public readonly struct DamageInfo
         Instigator = instigator;
         TargetCollider = targetCollider;
         IsHeavy = isHeavy;
+        SlashDirection = slashDirection;
     }
 
     /// <summary>演出の強度区分。ダメージ計算には使わない。</summary>
@@ -26,6 +27,9 @@ public readonly struct DamageInfo
 
     /// <summary>命中面の法線ベクトル。ヒット演出の向き決定などに使用。</summary>
     public Vector3 HitNormal { get; }
+
+    /// <summary>血飛沫用の刀の移動方向。取得できない攻撃はHitNormalへフォールバックする。</summary>
+    public Vector3 SlashDirection { get; }
 
     /// <summary>攻撃を発生させたオブジェクト（プレイヤー等）。</summary>
     public GameObject Instigator { get; }

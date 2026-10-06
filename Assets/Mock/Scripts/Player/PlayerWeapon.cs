@@ -18,8 +18,10 @@ public sealed class PlayerWeapon
     private readonly Collider[] _ignoreColliders;
 
     private readonly Dictionary<Collider, SwordTrail> _trails = new();
+    private readonly Dictionary<BoxCollider, Vector3> _authoredSizes = new();
     private bool _initialized;
-    public void Init()
+    public void Init() => Init(Vector3.zero);
+    public void Init(Vector3 padding)
     {
         if (_initialized) return;
         _initialized = true;
@@ -27,6 +29,7 @@ public sealed class PlayerWeapon
         foreach (var collider in _weaponColliders)
         {
             if (collider == null) continue;
+            if (collider is BoxCollider box) _authoredSizes[box] = box.size;
             var effect = collider.GetComponent<SwordTrail>();
             if (effect != null) { effect.Init(); _trails[collider] = effect; }
             var relay = collider.GetComponent<WeaponHitboxRelay>();
@@ -34,7 +37,16 @@ public sealed class PlayerWeapon
             else Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
             collider.enabled = false;
         }
+        SetHitboxPadding(padding);
         SetupIgnoreCollisions();
+    }
+
+    /// <summary>刀のローカル軸で全体のサイズを加算する。中心と攻撃受付時間は変えない。</summary>
+    public void SetHitboxPadding(Vector3 padding)
+    {
+        padding = Vector3.Max(Vector3.zero, padding);
+        foreach (var entry in _authoredSizes)
+            if (entry.Key != null) entry.Key.size = entry.Value + padding;
     }
 
     /// <summary>ヒットボックスを有効化する。</summary>
@@ -87,6 +99,23 @@ public sealed class PlayerWeapon
             if (distance < nearest) { nearest = distance; point = candidate; }
         }
         return point;
+    }
+
+    /// <summary>接触点と同じ最寄りの刀から、血飛沫用の移動方向を取得する。</summary>
+    public Vector3 GetSlashDirection(Collider target)
+    {
+        float nearest = float.PositiveInfinity;
+        Vector3 direction = Vector3.zero;
+        if (_weaponColliders == null) return direction;
+        foreach (var blade in _weaponColliders)
+        {
+            if (blade == null || !blade.enabled) continue;
+            float distance = (target.ClosestPoint(blade.bounds.center) - blade.bounds.center).sqrMagnitude;
+            if (distance >= nearest) continue;
+            nearest = distance;
+            direction = _relayCache.TryGetValue(blade, out var relay) ? relay.SweepDirection : Vector3.zero;
+        }
+        return direction;
     }
 
     private void SetHitboxActive(bool isActive)

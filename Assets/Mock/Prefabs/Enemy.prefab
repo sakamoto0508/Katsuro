@@ -397,6 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f33a6d4a6e64ae4a820175222c5d670, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::CombatFeedback
+  _hitFlashDuration: 0.055
   _ghostTint: {r: 0.66, g: 0.78, b: 0.8, a: 0.35}
   _ghostSway: 0.009
   _ghostFlowSpeed: 1.2
