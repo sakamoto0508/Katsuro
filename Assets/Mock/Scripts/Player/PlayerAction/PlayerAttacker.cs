@@ -232,7 +232,7 @@ public sealed class PlayerAttacker : IDisposable
         }
         // 攻撃者起点と命中位置・法線を算出し、安定しない場合は forward をフォールバックとする
         Vector3 origin = _ownerTransform != null ? _ownerTransform.position : other.bounds.center;
-        Vector3 hitPoint = other.ClosestPoint(origin);
+        Vector3 hitPoint = _weapon != null ? _weapon.GetContactPoint(other) : other.ClosestPoint(origin);
         Vector3 hitNormal = (hitPoint - origin).normalized;
 
         if (hitNormal.sqrMagnitude < 0.0001f)
@@ -242,7 +242,7 @@ public sealed class PlayerAttacker : IDisposable
         // ダメージ情報を生成して IDamageable へ通知、続けてパッシブ固有エフェクトを再生。
         float damage = ResolveDamageAmount();
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
-            _ownerTransform != null ? _ownerTransform.gameObject : null, other);
+            _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack);
 
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)
@@ -251,12 +251,8 @@ public sealed class PlayerAttacker : IDisposable
         }
 
         damageable.ApplyDamage(damageInfo);
-        if (damage > 0f) _context?.SkillGauge?.Add((_status != null ? _status.SkillGaugeOnAttackGain : 5f) * RunSession.HitGainMultiplier);
-        if (_hitStop != null && other != null)
-        {
-            _hitStop.PlayHitStop(_hitStop.HitStopTime, other.gameObject);
-            CombatLog.Trace($"PlayerAttacker: Played hit stop for target={other.gameObject.name}");
-        }
+        if (damage > 0f) 
+            _context?.SkillGauge?.Add((_status != null ? _status.SkillGaugeOnAttackGain : 5f) * RunSession.HitGainMultiplier);
         SpawnPassiveEffects(in damageInfo);
     }
 

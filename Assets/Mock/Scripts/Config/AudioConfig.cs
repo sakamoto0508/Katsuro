@@ -11,6 +11,13 @@ public class AudioConfig : ScriptableObject
     public string HitSound => _hitSound;
     public string PlayerDeadSound => _plaeyrDeadSound;
     public string EnemyDeadSound => _enemyDeadSound;
+    public string LightHitSound => _lightHitSound;
+    public string HeavyHitSound => _heavyHitSound;
+    [SerializeField] private string _lightHitSound = "Damage";
+    [SerializeField] private string _heavyHitSound = "Damage";
+    public string JustAvoidSound => _justAvoidSound;
+    [Tooltip("AudioManagerのSEリストに登録した名前。空欄なら再生しない。")]
+    [SerializeField] private string _justAvoidSound;
 
     [SerializeField] private string _titleBGM = "TitleBGM";
     [SerializeField] private string _startSE = "StartSE";

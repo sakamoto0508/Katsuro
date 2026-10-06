@@ -15,6 +15,39 @@ public sealed class CombatFeedback : MonoBehaviour
     /// ゴースト表示時の流れる速度。値が大きいほど流れが速くなる。
     /// </summary>
     [SerializeField, Range(.1f, 4f)] private float _ghostFlowSpeed = 1.2f;
+    [Header("ジャスト回避")]
+    [SerializeField, Min(.01f)] private float _afterImageDuration = .3f;
+    [SerializeField, Min(.01f)] private float _flashDuration = .15f;
+    [SerializeField] private Color _afterImageTint = new Color(.75f, .9f, 1f, .3f);
+    [SerializeField] private Color _flashTint = new Color(.85f, .95f, 1f, .65f);
+    [Header("接触フィードバック")]
+    [SerializeField, Min(.01f)] private float _hitFlashDuration = .09f;
+    [SerializeField, Min(.01f)] private float _justAvoidFlashDuration = .09f;
+    [SerializeField, Min(.01f)] private float _justAvoidFlashSize = .35f;
+    [SerializeField, Range(0f, 20f)] private float _lightReactionAngle = 5f;
+    [SerializeField, Range(0f, 25f)] private float _heavyReactionAngle = 10f;
+    [SerializeField, Min(.01f)] private float _reactionDuration = .18f;
+    [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
+    private Vector3 _reactionEuler;
+    private CameraManager _cameraFeedback;
+    private HitStopManager _hitStop;
+    private ContactPulse _contactPulse;
+    private ParticleSystem[][] _hitParticles;
+    private GameObject[] _hitRoots;
+    private float[] _hitStarted;
+    private int _nextHit;
+    private float[] _shockwaveSizes;
+    private ParticleSystem.MinMaxGradient[] _shockwaveColors;
+    private AudioManager _audio;
+    private VFXConfig _vfxConfig;
+    private GameObject _afterImageRoot, _shockwaveRoot;
+    private Mesh[] _afterImageMeshes;
+    private MeshRenderer[] _afterImageRenderers;
+    private SkinnedMeshRenderer[] _flashRenderers;
+    private ParticleSystem[] _shockwaveParticles;
+    private Material _afterImageMaterial, _flashMaterial;
+    private float _justAvoidStarted;
+    private bool _justAvoidPlaying;
     private Renderer[] _renderers;
     private Material[][] _original, _glow;
     private Material _material;
@@ -24,7 +57,7 @@ public sealed class CombatFeedback : MonoBehaviour
     private bool _ghost, _showing;
     private bool _initialized;
 
-    public void Init()
+    public void Init(AudioManager audio = null, VFXConfig vfxConfig = null, CameraManager camera = null, HitStopManager hitStop = null, bool enableJustAvoid = true)
     {
         if (_initialized) return;
         _initialized = true;
@@ -42,6 +75,186 @@ public sealed class CombatFeedback : MonoBehaviour
         var animator = GetComponentInChildren<Animator>();
         if (animator != null && animator.isHuman) _bone = animator.GetBoneTransform(HumanBodyBones.Chest);
         if (_bone == null && _renderers.Length > 0) _bone = ((SkinnedMeshRenderer)_renderers[0]).rootBone;
+        _audio = audio;
+        _vfxConfig = vfxConfig;
+        _cameraFeedback = camera; _hitStop = hitStop;
+        PrepareContactFeedback();
+        // 敵の被弾用コンポーネントには残像用リソースを作らない。
+        if (enableJustAvoid && (audio != null || vfxConfig != null)) PrepareJustAvoid(shader);
+    }
+
+    private void PrepareJustAvoid(Shader shader)
+    {
+        if (shader != null)
+        {
+            _afterImageMaterial = new Material(shader) { name = "JustAvoid AfterImage" };
+            _flashMaterial = new Material(shader) { name = "JustAvoid Flash" };
+            _afterImageRoot = new GameObject("JustAvoid AfterImage");
+            _afterImageRoot.SetActive(false);
+            _afterImageMeshes = new Mesh[_renderers.Length];
+            _afterImageRenderers = new MeshRenderer[_renderers.Length];
+            _flashRenderers = new SkinnedMeshRenderer[_renderers.Length];
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                var source = (SkinnedMeshRenderer)_renderers[i];
+                if (source.sharedMesh == null) continue;
+                var snapshot = new GameObject(source.name, typeof(MeshFilter), typeof(MeshRenderer));
+                snapshot.layer = source.gameObject.layer;
+                snapshot.transform.SetParent(_afterImageRoot.transform, false);
+                var mesh = new Mesh { name = "JustAvoid Pose" };
+                mesh.MarkDynamic();
+                _afterImageMeshes[i] = mesh;
+                snapshot.GetComponent<MeshFilter>().sharedMesh = mesh;
+                var renderer = snapshot.GetComponent<MeshRenderer>();
+                renderer.sharedMaterials = RepeatedMaterial(_afterImageMaterial, source.sharedMesh.subMeshCount);
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                _afterImageRenderers[i] = renderer;
+
+                // 本体のMaterialには触れず、同じ骨で動く薄い発光レイヤーを重ねる。
+                var flash = new GameObject("JustAvoid Flash", typeof(SkinnedMeshRenderer));
+                flash.layer = source.gameObject.layer;
+                flash.transform.SetParent(source.transform, false);
+                var overlay = flash.GetComponent<SkinnedMeshRenderer>();
+                overlay.sharedMesh = source.sharedMesh;
+                overlay.bones = source.bones;
+                overlay.rootBone = source.rootBone;
+                overlay.localBounds = source.localBounds;
+                overlay.sharedMaterials = RepeatedMaterial(_flashMaterial, source.sharedMesh.subMeshCount);
+                overlay.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                overlay.receiveShadows = false;
+                overlay.enabled = false;
+                _flashRenderers[i] = overlay;
+            }
+        }
+        if (_vfxConfig != null && _vfxConfig.JustAvoidShockwavePrefab != null)
+        {
+            // 非アクティブな親の下で準備し、初期化時の自動再生を防ぐ。
+            _shockwaveRoot = new GameObject("JustAvoid Shockwave");
+            _shockwaveRoot.SetActive(false);
+            var effect = Instantiate(_vfxConfig.JustAvoidShockwavePrefab, _shockwaveRoot.transform, false);
+            effect.SetActive(true);
+            _shockwaveParticles = effect.GetComponentsInChildren<ParticleSystem>(true);
+            _shockwaveSizes = new float[_shockwaveParticles.Length];
+            _shockwaveColors = new ParticleSystem.MinMaxGradient[_shockwaveParticles.Length];
+            for (int i = 0; i < _shockwaveParticles.Length; i++)
+            {
+                var particle = _shockwaveParticles[i];
+                var main = particle.main;
+                _shockwaveSizes[i] = main.startSizeMultiplier;
+                _shockwaveColors[i] = main.startColor;
+                main.loop = false;
+                main.playOnAwake = false;
+                main.useUnscaledTime = true;
+                main.stopAction = ParticleSystemStopAction.None;
+            }
+        }
+    }
+
+    private Material[] RepeatedMaterial(Material material, int count)
+    {
+        var materials = new Material[count];
+        for (int i = 0; i < count; i++) materials[i] = material;
+        return materials;
+    }
+
+    /// <summary>成立通知から一度だけ呼ぶ。判定、ゲージ、スローには触れない。</summary>
+    public void PlayJustAvoidFeedback() => PlayJustAvoidFeedback(new DamageInfo(0, transform.position + Vector3.up, transform.forward, null, null));
+    public void PlayJustAvoidFeedback(DamageInfo info)
+    {
+        if (!_initialized || !isActiveAndEnabled) return;
+        StopJustAvoid();
+        _justAvoidStarted = Time.unscaledTime;
+        _justAvoidPlaying = true;
+        if (_afterImageRoot != null)
+        {
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                var source = (SkinnedMeshRenderer)_renderers[i];
+                var snapshot = _afterImageRenderers[i];
+                if (snapshot == null) continue;
+                bool visible = source != null && source.enabled && source.gameObject.activeInHierarchy;
+                snapshot.enabled = visible;
+                if (!visible) continue;
+                // 成功時の姿勢を一度だけ焼き付け、ワールド上の成功地点に固定する。
+                source.BakeMesh(_afterImageMeshes[i], true);
+                snapshot.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
+                snapshot.transform.localScale = source.transform.lossyScale;
+            }
+            _afterImageRoot.SetActive(true);
+        }
+        if (_shockwaveRoot != null && _vfxConfig != null && _vfxConfig.ShockwaveEnable)
+        {
+            _shockwaveRoot.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
+            _shockwaveRoot.SetActive(true);
+            for (int i = 0; i < _shockwaveParticles.Length; i++)
+            {
+                var particle = _shockwaveParticles[i];
+                if (particle == null) continue;
+                var main = particle.main;
+                main.startSizeMultiplier = _shockwaveSizes[i] * _vfxConfig.ShockwaveSize;
+                var baseColor = _shockwaveColors[i];
+                baseColor.color = new Color(baseColor.color.r, baseColor.color.g, baseColor.color.b, baseColor.color.a * _vfxConfig.ShockwaveStrength);
+                main.startColor = baseColor;
+                particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                particle.Play(false);
+            }
+        }
+        var sound = _audio != null && _audio.AudioConfig != null ? _audio.AudioConfig.JustAvoidSound : null;
+        if (!string.IsNullOrEmpty(sound)) _audio.PlaySE(sound);
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, _justAvoidFlashSize, _justAvoidFlashDuration, .65f);
+        _cameraFeedback?.PlayJustAvoidFeedback();
+        UpdateJustAvoid();
+    }
+
+    private void UpdateJustAvoid()
+    {
+        if (!_justAvoidPlaying) return;
+        float elapsed = Time.unscaledTime - _justAvoidStarted;
+        if (_afterImageRoot != null)
+        {
+            var tint = _afterImageTint;
+            tint.a *= 1f - Mathf.Clamp01(elapsed / Mathf.Max(.01f, _afterImageDuration));
+            _afterImageMaterial.SetColor("_Tint", tint);
+            _afterImageRoot.SetActive(elapsed < _afterImageDuration);
+        }
+        if (_flashMaterial != null)
+        {
+            var tint = _flashTint;
+            tint.a *= _justAvoidBodyFlashStrength;
+            tint.a *= 1f - Mathf.Clamp01(elapsed / Mathf.Max(.01f, _flashDuration));
+            _flashMaterial.SetColor("_Tint", tint);
+            for (int i = 0; i < _flashRenderers.Length; i++)
+            {
+                var overlay = _flashRenderers[i];
+                if (overlay == null) continue;
+                var source = (SkinnedMeshRenderer)_renderers[i];
+                overlay.enabled = elapsed < _flashDuration && source != null && source.enabled;
+                if (overlay.enabled)
+                    for (int shape = 0; shape < source.sharedMesh.blendShapeCount; shape++)
+                        overlay.SetBlendShapeWeight(shape, source.GetBlendShapeWeight(shape));
+            }
+        }
+        float shockwaveDuration = _vfxConfig != null ? _vfxConfig.ShockwaveDuration : 0f;
+        if (_shockwaveRoot != null && elapsed >= shockwaveDuration) StopShockwave();
+        if (elapsed >= Mathf.Max(_afterImageDuration, Mathf.Max(_flashDuration, shockwaveDuration))) StopJustAvoid();
+    }
+
+    private void StopShockwave()
+    {
+        if (_shockwaveRoot == null || !_shockwaveRoot.activeSelf) return;
+        foreach (var particle in _shockwaveParticles)
+            if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        _shockwaveRoot.SetActive(false);
+    }
+
+    private void StopJustAvoid()
+    {
+        _justAvoidPlaying = false;
+        if (_afterImageRoot != null) _afterImageRoot.SetActive(false);
+        if (_flashRenderers != null)
+            foreach (var overlay in _flashRenderers) if (overlay != null) overlay.enabled = false;
+        StopShockwave();
     }
 
     /// <summary>
@@ -53,20 +266,77 @@ public sealed class CombatFeedback : MonoBehaviour
     /// <summary>
     /// 攻撃や被弾時のヒットエフェクトをトリガーします。
     /// </summary>
-    public void Hit() { _hitUntil = Time.unscaledTime + .18f; Refresh(); }
+    public void Hit() { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; Refresh(); }
+
+    /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
+    public void Hit(DamageInfo info)
+    {
+        if (!_initialized || !isActiveAndEnabled) return;
+        float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
+        Vector3 direction = transform.InverseTransformDirection(info.HitNormal.normalized);
+        _reactionEuler = new Vector3(-direction.z * angle, 0, direction.x * angle);
+        _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
+        Refresh();
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsHeavy ? .3f : .2f, _hitFlashDuration, info.IsHeavy ? .85f : .55f);
+        PlayHitVFX(info);
+        var config = _audio != null ? _audio.AudioConfig : null;
+        _audio?.PlaySE(config != null ? (info.IsHeavy ? config.HeavyHitSound : config.LightHitSound) : "Damage");
+        _hitStop?.PlayHitStop(info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop, gameObject, info.Instigator);
+        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint);
+    }
+
+    private void PrepareContactFeedback()
+    {
+        _contactPulse = new ContactPulse(gameObject.layer);
+        if (_vfxConfig == null || _vfxConfig.HitVFX == null) return;
+        _hitRoots = new GameObject[4]; _hitParticles = new ParticleSystem[4][]; _hitStarted = new float[4];
+        for (int i = 0; i < 4; i++)
+        {
+            _hitRoots[i] = new GameObject("Contact VFX"); _hitRoots[i].SetActive(false);
+            var effect = Instantiate(_vfxConfig.HitVFX, _hitRoots[i].transform, false); effect.SetActive(true);
+            _hitParticles[i] = effect.GetComponentsInChildren<ParticleSystem>(true);
+            foreach (var particle in _hitParticles[i])
+            {
+                var main = particle.main;
+                main.loop = false; main.playOnAwake = false; main.useUnscaledTime = true; main.stopAction = ParticleSystemStopAction.None;
+            }
+        }
+    }
+    private void PlayHitVFX(DamageInfo info)
+    {
+        if (_hitRoots == null) return;
+        int i = _nextHit; _nextHit = (_nextHit + 1) % _hitRoots.Length;
+        _hitRoots[i].transform.SetPositionAndRotation(info.HitPoint, info.HitNormal.sqrMagnitude > .0001f ? Quaternion.LookRotation(info.HitNormal) : Quaternion.identity);
+        _hitRoots[i].SetActive(true); _hitStarted[i] = Time.unscaledTime;
+        foreach (var particle in _hitParticles[i])
+        {
+            if (particle == null) continue;
+            particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear); particle.Play(false);
+        }
+    }
+    private void StopHitVFX(int i)
+    {
+        foreach (var particle in _hitParticles[i]) if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        _hitRoots[i].SetActive(false);
+    }
 
     private void Update() 
     { 
         RemoveOffset(); 
         Refresh(); 
+        UpdateJustAvoid();
+        _contactPulse?.Update();
+        if (_hitRoots != null)
+            for (int i = 0; i < _hitRoots.Length; i++)
+                if (_hitRoots[i].activeSelf && Time.unscaledTime - _hitStarted[i] >= _vfxConfig.HitVFXDuration) StopHitVFX(i);
     }
 
     private void LateUpdate()
     {
         if (_bone == null) return;
         // ヒットエフェクトの残り時間に応じてボーンを揺らす
-        float remaining = Mathf.Clamp01((_hitUntil - Time.unscaledTime) / .18f);
-        _applied = Quaternion.Euler(-10f * remaining * Mathf.Sin(remaining * Mathf.PI), 0, 0);
+        float remaining = Mathf.Clamp01((_hitUntil - Time.unscaledTime) / Mathf.Max(.01f, _reactionDuration));
+        _applied = Quaternion.Euler(_reactionEuler * remaining * Mathf.Sin(remaining * Mathf.PI));
         _bone.localRotation *= _applied;
     }
 
@@ -84,7 +354,7 @@ public sealed class CombatFeedback : MonoBehaviour
     /// </summary>
     private void Refresh()
     {
-        bool hit = Time.unscaledTime < _hitUntil;
+        bool hit = Time.unscaledTime < _hitUntil - Mathf.Max(0f, _reactionDuration - _hitFlashDuration);
         bool visible = _material != null && (hit || _ghost);
         if (_material != null && visible)
         {
@@ -105,6 +375,9 @@ public sealed class CombatFeedback : MonoBehaviour
 
     private void OnDisable()
     {
+        StopJustAvoid();
+        _contactPulse?.Stop();
+        if (_hitRoots != null) for (int i = 0; i < _hitRoots.Length; i++) StopHitVFX(i);
         RemoveOffset();
         _ghost = false; _hitUntil = 0;
         Refresh();
@@ -112,6 +385,78 @@ public sealed class CombatFeedback : MonoBehaviour
 
     private void OnDestroy() 
     { 
+        _contactPulse?.Dispose();
+        if (_hitRoots != null) foreach (var root in _hitRoots) if (root != null) Destroy(root);
+        if (_afterImageMeshes != null)
+            foreach (var mesh in _afterImageMeshes) if (mesh != null) Destroy(mesh);
+        if (_flashRenderers != null)
+            foreach (var overlay in _flashRenderers) if (overlay != null) Destroy(overlay.gameObject);
+        if (_afterImageRoot != null) Destroy(_afterImageRoot);
+        if (_shockwaveRoot != null) Destroy(_shockwaveRoot);
+        if (_afterImageMaterial != null) Destroy(_afterImageMaterial);
+        if (_flashMaterial != null) Destroy(_flashMaterial);
         if (_material != null) Destroy(_material); 
+    }
+}
+
+/// <summary>接触位置の短い光を固定数で再利用する。MaterialとMeshは初期化時に一度だけ作る。</summary>
+internal sealed class ContactPulse
+{
+    private readonly GameObject[] objects;
+    private readonly MeshRenderer[] renderers;
+    private readonly float[] started, durations, strengths;
+    private readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
+    private readonly Material material;
+    private readonly Mesh mesh;
+    private int next;
+    public ContactPulse(int layer)
+    {
+        var shader = Resources.Load<Shader>("ContactFlash");
+        if (shader == null) return;
+        material = new Material(shader);
+        mesh = new Mesh { name = "Contact Flash Quad" };
+        mesh.vertices = new[] { new Vector3(-.5f,-.5f,0), new Vector3(.5f,-.5f,0), new Vector3(-.5f,.5f,0), new Vector3(.5f,.5f,0) };
+        mesh.uv = new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one };
+        mesh.triangles = new[] { 0, 2, 1, 1, 2, 3 }; mesh.RecalculateBounds();
+        objects = new GameObject[4]; renderers = new MeshRenderer[4];
+        started = new float[4]; durations = new float[4]; strengths = new float[4];
+        for (int i = 0; i < 4; i++)
+        {
+            objects[i] = new GameObject("Contact Flash", typeof(MeshFilter), typeof(MeshRenderer));
+            objects[i].layer = layer;
+            objects[i].GetComponent<MeshFilter>().sharedMesh = mesh;
+            renderers[i] = objects[i].GetComponent<MeshRenderer>(); renderers[i].sharedMaterial = material;
+            renderers[i].shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderers[i].receiveShadows = false; objects[i].SetActive(false);
+        }
+    }
+    public void Play(Vector3 position, Vector3 direction, float size, float duration, float strength)
+    {
+        if (objects == null) return;
+        int i = next; next = (next + 1) % objects.Length;
+        objects[i].transform.SetPositionAndRotation(position,
+            direction.sqrMagnitude > .0001f ? Quaternion.LookRotation(direction) : Quaternion.identity);
+        objects[i].transform.localScale = Vector3.one * Mathf.Max(.01f, size);
+        started[i] = Time.unscaledTime; durations[i] = Mathf.Max(.01f, duration); strengths[i] = strength;
+        objects[i].SetActive(true); Update();
+    }
+    public void Update()
+    {
+        if (objects == null) return;
+        for (int i = 0; i < objects.Length; i++)
+        {
+            if (objects[i] == null || !objects[i].activeSelf) continue;
+            float age = (Time.unscaledTime - started[i]) / durations[i];
+            if (age >= 1) { objects[i].SetActive(false); continue; }
+            block.SetColor("_Tint", new Color(.86f, .95f, 1f, strengths[i] * (1 - age)));
+            renderers[i].SetPropertyBlock(block);
+        }
+    }
+    public void Stop() { if (objects != null) foreach (var obj in objects) if (obj != null) obj.SetActive(false); }
+    public void Dispose()
+    {
+        if (objects != null) foreach (var obj in objects) if (obj != null) Object.Destroy(obj);
+        if (mesh != null) Object.Destroy(mesh);
+        if (material != null) Object.Destroy(material);
     }
 }

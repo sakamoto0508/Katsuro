@@ -102,9 +102,9 @@ public class GameManager : MonoBehaviour
             , _cinemachineCamera, _cinemachineLockOncamera, _playerAnimationController, _animationName);
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
             , _cameraManager, _lockOnCamera, this, _audio, _scene.HitStop, _scene.PlayerDead, _scene.Loader);
-        _enemyController?.Init(_playerPosition, _damageNumbers, this, _audio, _scene.HitStop, _scene.FinalBlow, _scene.Loader);
+        _enemyController?.Init(_playerPosition, _damageNumbers, this, _audio, _scene.HitStop, _scene.FinalBlow, _scene.Loader, _cameraManager, _playerController != null ? _playerController.FeedbackConfig : null);
         _cameraManager?.Init(_inputBuffer, _playerPosition
-            , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera);
+            , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera, _camera);
     }
 
     /// <summary>

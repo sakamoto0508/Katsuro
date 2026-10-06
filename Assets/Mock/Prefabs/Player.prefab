@@ -489,10 +489,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.09
+  _duration: 0.16
   _width: 0.045
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
-  _tip: {fileID: 0}
+  _tip: {fileID: 9300000203}
+  _bladeBase: {fileID: 9300000201}
 --- !u!114 &2685883468460359435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,10 +633,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.09
+  _duration: 0.16
   _width: 0.045
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
   _tip: {fileID: 0}
+  _sharedTrail: {fileID: 6188147716110040468}
 --- !u!114 &2827786783917834820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -775,10 +777,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.09
+  _duration: 0.16
   _width: 0.045
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
   _tip: {fileID: 0}
+  _sharedTrail: {fileID: 6188147716110040468}
 --- !u!114 &219595742750856084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -938,10 +941,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.09
+  _duration: 0.16
   _width: 0.045
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
   _tip: {fileID: 0}
+  _sharedTrail: {fileID: 6188147716110040468}
 --- !u!114 &4341062004680815879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -971,10 +975,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.05
+  _duration: 0.16
   _width: 0.035
   _color: {r: 0.78, g: 0.8, b: 0.82, a: 0.3}
   _tip: {fileID: 0}
+  _sharedTrail: {fileID: 6188147716110040468}
 --- !u!114 &3014878826444549024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1813,4 +1818,14 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: -7520100684144184798, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
   m_PrefabInstance: {fileID: 7668312681955159595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9300000201 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9300000101, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+  m_PrefabInstance: {fileID: 2928109139064076497}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9300000203 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9300000103, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+  m_PrefabInstance: {fileID: 2928109139064076497}
   m_PrefabAsset: {fileID: 0}

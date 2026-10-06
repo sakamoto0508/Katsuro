@@ -5,14 +5,18 @@ using UnityEngine;
 /// </summary>
 public readonly struct DamageInfo
 {
-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider)
+    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false)
     {
         DamageAmount = damageAmount;
         HitPoint = hitPoint;
         HitNormal = hitNormal;
         Instigator = instigator;
         TargetCollider = targetCollider;
+        IsHeavy = isHeavy;
     }
+
+    /// <summary>演出の強度区分。ダメージ計算には使わない。</summary>
+    public bool IsHeavy { get; }
 
     /// <summary>最終的に与えるダメージ量。</summary>
     public float DamageAmount { get; }

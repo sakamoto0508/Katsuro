@@ -6,6 +6,9 @@ public class HitStopManager : MonoBehaviour
     public static HitStopManager Instance { get; private set; }
     [SerializeField] private float _hitStopTime = .05f;
     [SerializeField] private float _lastHitStopTime = .2f;
+    [SerializeField, Min(0f)] private float _heavyHitStop = .075f;
+    public float LightHitStop => _hitStopTime;
+    public float HeavyHitStop => _heavyHitStop;
     public float HitStopTime => _hitStopTime;
     public float LastHitStopTime => _lastHitStopTime;
     private readonly Dictionary<GameObject, AnimationSpeedController[]> _targets = new();

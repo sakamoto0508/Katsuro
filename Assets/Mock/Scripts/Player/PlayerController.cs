@@ -71,6 +71,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
+    public VFXConfig FeedbackConfig => _vfxConfig;
     public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
     private GameManager _game;
     private AudioManager _audio;
@@ -86,7 +87,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _game = game;
         _audio = audio;
         _combatFeedback = GetComponent<CombatFeedback>();
-        if (_combatFeedback != null) _combatFeedback.Init();
+        if (_combatFeedback != null) _combatFeedback.Init(audio, _vfxConfig, cameraManager, hitStop);
         else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
 
         _inputBuffer = inputBuffer;
@@ -183,6 +184,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                     receiver.ApplyStatusEffect(new StatusEffectInstance(_justAvoidSlowDef, this.gameObject));
                 }
             }
+            _combatFeedback?.PlayJustAvoidFeedback(info);
             return;
         }
         // ゴーストモード中はダメージを無効化する。
@@ -191,8 +193,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             _stateContext.SkillGauge.Add(_playerStatus != null ? _playerStatus.SkillGaugeOnAvoidGain : 5f);
             return;
         }
-        _combatFeedback?.Hit();
-        _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier);
+        _combatFeedback?.Hit(info);
+        _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier, _combatFeedback == null);
     }
 
     private void OnDestroy()

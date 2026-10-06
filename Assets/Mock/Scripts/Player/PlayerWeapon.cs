@@ -73,6 +73,22 @@ public sealed class PlayerWeapon
 
     private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
 
+    /// <summary>対象に最も近い刀の判定部分から、接触面の位置を求める。</summary>
+    public Vector3 GetContactPoint(Collider target)
+    {
+        Vector3 point = target.bounds.center;
+        float nearest = float.PositiveInfinity;
+        if (_weaponColliders == null) return point;
+        foreach (var blade in _weaponColliders)
+        {
+            if (blade == null || !blade.enabled) continue;
+            Vector3 candidate = target.ClosestPoint(blade.bounds.center);
+            float distance = (candidate - blade.bounds.center).sqrMagnitude;
+            if (distance < nearest) { nearest = distance; point = candidate; }
+        }
+        return point;
+    }
+
     private void SetHitboxActive(bool isActive)
     {
         if (_weaponColliders == null)

@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioConfig
   _titleBGM: TitleBGM
   _startSE: StartSE
+  _lightHitSound: Damage
+  _heavyHitSound: Damage

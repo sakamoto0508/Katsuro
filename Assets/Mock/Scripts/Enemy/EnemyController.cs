@@ -47,14 +47,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     private CombatFeedback _combatFeedback;
     private bool _initialized;
 
-    public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader)
+    public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader, CameraManager cameraManager = null, VFXConfig vfxConfig = null)
     {
         if (_initialized) return;
         _initialized = true;
         _game = game; _audio = audio; _finalBlow = finalBlow; _loader = loader;
         _damageNumbers = damageNumbers;
         _combatFeedback = GetComponent<CombatFeedback>();
-        if (_combatFeedback != null) _combatFeedback.Init();
+        if (_combatFeedback != null) _combatFeedback.Init(audio, vfxConfig, cameraManager, hitStop, false);
         else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
         var navMeshAgent = GetComponent<NavMeshAgent>();
         if (navMeshAgent != null) navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
@@ -116,14 +116,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     public void ApplyDamage(DamageInfo info, bool isCritical = false)
     {
         if (_health == null || _dead || (_game != null && !_game.IsCombatActive)) return;
-        _audio?.PlaySE("Damage");
 
         float before = _health.CurrentHp;
         _health.ApplyDamage(info.DamageAmount * RunSession.EnemyDefense);
         float dealt = before - _health.CurrentHp;
         if (dealt > 0f)
         {
-            _combatFeedback?.Hit();
+            _combatFeedback?.Hit(info);
+            if (_combatFeedback == null) _audio?.PlaySE("Damage");
             _damageNumbers?.Show(transform.position, dealt, isCritical);
         }
 

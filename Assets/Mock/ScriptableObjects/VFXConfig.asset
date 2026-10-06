@@ -15,3 +15,10 @@ MonoBehaviour:
   _playEffectHeal: Heal
   _playEffectGhost: Ghost
   _playEffectBuff: Buff
+  _justAvoidShockwavePrefab: {fileID: 3032302795391208821, guid: 2d005552031c1e446b7cad9273902f91, type: 3}
+  _shockwaveDuration: 0.25
+  _shockwaveEnable: 0
+  _shockwaveStrength: 0.2
+  _shockwaveSize: 0.5
+  _hitVFX: {fileID: 0}
+  _hitVFXDuration: 0.15

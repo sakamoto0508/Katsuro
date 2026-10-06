@@ -34,6 +34,7 @@ public class EnemyAttacker : IDisposable
     private EnemyWeapon[] _weapons;
     private readonly HashSet<IDamageable> _hitTargets = new();
     private bool _isHitboxActive;
+    private bool _currentIsHeavy;
     private HitStopManager _hitStop;
     private bool _initialized;
     public void Init(HitStopManager hitStop)
@@ -69,6 +70,8 @@ public class EnemyAttacker : IDisposable
                 Debug.LogWarning($"EnemyAttacker: attack data for {attackType} has no AnimatorTrigger assigned.");
             }
         }
+
+        _currentIsHeavy = attackType == EnemyActionType.HeavySlash;
 
         // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
         if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
@@ -133,24 +136,17 @@ public class EnemyAttacker : IDisposable
         if (!_hitTargets.Add(damageable)) return;
 
         Vector3 origin = _ownerTransform != null ? _ownerTransform.position : other.bounds.center;
-        Vector3 hitPoint = other.ClosestPoint(origin);
+        Vector3 hitPoint = sourceWeapon != null ? sourceWeapon.GetContactPoint(other) : other.ClosestPoint(origin);
         Vector3 hitNormal = (hitPoint - origin).sqrMagnitude > 0.0001f ? (hitPoint - origin).normalized : Vector3.forward;
 
         float damage = sourceWeapon != null ? sourceWeapon.Damage() : (_status != null ? _status.EnemyPower : 0f);
 
         var owner = _ownerTransform != null ? _ownerTransform.GetComponent<EnemyController>() : null;
         damage *= RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
-        DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other);
+        DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
         CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
-        bool avoided = damageable is PlayerController player && player.IsInvulnerable;
         damageable.ApplyDamage(damageInfo);
-        var go = other != null ? other.gameObject : null;
-        if (!avoided && _hitStop != null && go != null)
-        {
-            _hitStop.PlayHitStop(_hitStop.HitStopTime, go);
-            CombatLog.Trace($"EnemyAttacker: Played hit stop for {go.name} with duration={_hitStop.HitStopTime}");
-        }
     }
 
     public void Dispose()

@@ -18,3 +18,8 @@ MonoBehaviour:
   _rotationSmooth: 20
   _lookAtHeight: 1.62
   _cameraCollisionRadius: 0.3
+  _lightHitCameraStrength: 0.025
+  _heavyHitCameraStrength: 0.055
+  _cameraDuration: 0.12
+  _justAvoidFOVOffset: 1.5
+  _justAvoidFOVDuration: 0.18
