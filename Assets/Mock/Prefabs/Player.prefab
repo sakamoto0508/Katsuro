@@ -544,15 +544,16 @@ MonoBehaviour:
   _duration: 0.11
   _bladeBase: {fileID: 2928109130905257396}
   _tip: {fileID: 2928109130905257398}
+  _bladeTrailStart: 0.48
   _sharedTrail: {fileID: 0}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
   _brightness: 1.05
   _fade: 1.15
   _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
-  _minimumSpeed: 2
-  _fullSpeed: 14
-  _heavyDuration: 0.16
-  _counterDuration: 0.18
+  _minimumSpeed: 3.5
+  _fullSpeed: 16
+  _heavyDuration: 0.13
+  _counterDuration: 0.15
   _heavyBrightness: 1.18
   _counterBrightness: 1.35
   _width: 0.045
@@ -708,15 +709,16 @@ MonoBehaviour:
   _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
+  _bladeTrailStart: 0.48
   _sharedTrail: {fileID: 6188147716110040468}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
   _brightness: 1.05
   _fade: 1.15
   _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
-  _minimumSpeed: 2
-  _fullSpeed: 14
-  _heavyDuration: 0.16
-  _counterDuration: 0.18
+  _minimumSpeed: 3.5
+  _fullSpeed: 16
+  _heavyDuration: 0.13
+  _counterDuration: 0.15
   _heavyBrightness: 1.18
   _counterBrightness: 1.35
   _width: 0.045
@@ -862,15 +864,16 @@ MonoBehaviour:
   _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
+  _bladeTrailStart: 0.48
   _sharedTrail: {fileID: 6188147716110040468}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
   _brightness: 1.05
   _fade: 1.15
   _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
-  _minimumSpeed: 2
-  _fullSpeed: 14
-  _heavyDuration: 0.16
-  _counterDuration: 0.18
+  _minimumSpeed: 3.5
+  _fullSpeed: 16
+  _heavyDuration: 0.13
+  _counterDuration: 0.15
   _heavyBrightness: 1.18
   _counterBrightness: 1.35
   _width: 0.045
@@ -1036,15 +1039,16 @@ MonoBehaviour:
   _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
+  _bladeTrailStart: 0.48
   _sharedTrail: {fileID: 6188147716110040468}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
   _brightness: 1.05
   _fade: 1.15
   _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
-  _minimumSpeed: 2
-  _fullSpeed: 14
-  _heavyDuration: 0.16
-  _counterDuration: 0.18
+  _minimumSpeed: 3.5
+  _fullSpeed: 16
+  _heavyDuration: 0.13
+  _counterDuration: 0.15
   _heavyBrightness: 1.18
   _counterBrightness: 1.35
   _width: 0.045
@@ -1080,15 +1084,16 @@ MonoBehaviour:
   _duration: 0.11
   _bladeBase: {fileID: 0}
   _tip: {fileID: 0}
+  _bladeTrailStart: 0.48
   _sharedTrail: {fileID: 6188147716110040468}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
   _brightness: 1.05
   _fade: 1.15
   _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
-  _minimumSpeed: 2
-  _fullSpeed: 14
-  _heavyDuration: 0.16
-  _counterDuration: 0.18
+  _minimumSpeed: 3.5
+  _fullSpeed: 16
+  _heavyDuration: 0.13
+  _counterDuration: 0.15
   _heavyBrightness: 1.18
   _counterBrightness: 1.35
   _width: 0.035
@@ -1796,6 +1801,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b801cca8496ad0047a3d77b1496275dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  _attackRootMotionScale: 0.25
   _playerWeapon: {fileID: 2382559430674468122}
   _playerStartWeapon: {fileID: 2290892604967497847}
   _weaponColliders:

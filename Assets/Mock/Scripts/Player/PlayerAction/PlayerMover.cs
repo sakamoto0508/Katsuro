@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerMover
 {
     public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
-        , Transform cameraPosition, PlayerAnimationController animationController)
+        , Transform cameraPosition, PlayerAnimationController animationController, float attackRootMotionScale = 1f)
     {
         _playerStatus = playerStatus;
         _rb = rb;
@@ -13,6 +13,7 @@ public class PlayerMover
         _enemyPosition = enemy;
         _cameraPosition = cameraPosition;
         _animationController = animationController;
+        _attackRootMotionScale = Mathf.Max(0f, attackRootMotionScale);
     }
     /// <summary>î≤ìÅÇµÇƒÇ¢ÇÈÇ©Ç«Ç§Ç©ÅB</summary>
     public bool IsDrawnSword { get; private set; }
@@ -29,6 +30,43 @@ public class PlayerMover
     private Vector3 _velXZ;
     private bool _isLockOn;
     private bool _isSprinting;
+    private readonly float _attackRootMotionScale;
+    private Vector3 _pendingAttackRootMotion;
+    public bool IsUsingAttackRootMotion { get; private set; }
+
+    public void BeginAttackRootMotion()
+    {
+        if (IsUsingAttackRootMotion) return;
+        IsUsingAttackRootMotion = true;
+        _pendingAttackRootMotion = Vector3.zero;
+        StopAttackVelocity();
+    }
+    public void EndAttackRootMotion()
+    {
+        _pendingAttackRootMotion = Vector3.zero;
+        if (IsUsingAttackRootMotion) StopAttackVelocity();
+        IsUsingAttackRootMotion = false;
+    }
+    public void QueueAttackRootMotion(Vector3 delta, bool animationRunning)
+    {
+        if (!IsUsingAttackRootMotion) return;
+        if (!animationRunning) { _pendingAttackRootMotion = Vector3.zero; StopAttackVelocity(); return; }
+        delta.y = 0f;
+        _pendingAttackRootMotion += delta * _attackRootMotionScale;
+    }
+    public void FixedUpdateAttackRootMotion(bool animationRunning)
+    {
+        if (!IsUsingAttackRootMotion) return;
+        Vector3 delta = animationRunning ? AttackRootMotionPhysics.LimitDisplacement(_rb, _pendingAttackRootMotion) : Vector3.zero;
+        _pendingAttackRootMotion = Vector3.zero;
+        // Dynamic Rigidbody remains under physics collision/gravity control.
+        Vector3 velocity = delta / Time.fixedDeltaTime;
+        _rb.linearVelocity = new Vector3(velocity.x, _rb.linearVelocity.y, velocity.z);
+    }
+    private void StopAttackVelocity()
+    {
+        if (_rb != null && !_rb.isKinematic) _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+    }
 
     public void Update()
     {
@@ -43,6 +81,7 @@ public class PlayerMover
 
     public void FixedUpdate()
     {
+        if (IsUsingAttackRootMotion) return;
         Movement();
         UpdateRotation();
         SpeedControll();

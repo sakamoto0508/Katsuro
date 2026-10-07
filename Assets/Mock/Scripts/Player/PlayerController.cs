@@ -12,6 +12,34 @@ using INab.VFXAssets;
 public class PlayerController : MonoBehaviour, IDamageable
 {
     public PlayerAnimationController AnimController => _animationController;
+    [Header("Attack Root Motion")]
+    [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
+    private Animator _rootMotionAnimator;
+    private int _attackAnimationHash;
+    public void BeginAnimationAttackRootMotion(int stateHash)
+    {
+        if (!CanFight) { StopAttackRootMotion(); return; }
+        _attackAnimationHash = stateHash;
+        _stateContext?.Mover?.BeginAttackRootMotion();
+    }
+    public void EndAnimationAttackRootMotion(int stateHash)
+    {
+        if (_attackAnimationHash == stateHash) StopAttackRootMotion();
+    }
+    public void StopAttackRootMotion()
+    {
+        _attackAnimationHash = 0;
+        _stateContext?.Mover?.EndAttackRootMotion();
+    }
+    private void OnAnimatorMove()
+    {
+        if (!CanFight) { StopAttackRootMotion(); return; }
+        if (_rootMotionAnimator == null) _rootMotionAnimator = GetComponent<Animator>();
+        var state = _rootMotionAnimator.IsInTransition(0) ? _rootMotionAnimator.GetNextAnimatorStateInfo(0) : _rootMotionAnimator.GetCurrentAnimatorStateInfo(0);
+        if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
+        _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
+    }
+    private void OnDisable() => StopAttackRootMotion();
 
     [Header("PlayerStatus")]
     [SerializeField] private MeshRenderer _playerWeapon;
@@ -121,7 +149,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _appliedHitboxPadding = _weaponHitboxPadding;
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
-        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController);
+        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController, _attackRootMotionScale);
         var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig);
         var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig);
         var playerHeal = new PlayerHeal(skillGauge, playerMover, skillGaugeCostConfig);
@@ -201,10 +229,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         _combatFeedback?.Hit(info);
         _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier, _combatFeedback == null);
+        if (!CanFight) StopAttackRootMotion();
     }
 
     private void OnDestroy()
     {
+        StopAttackRootMotion();
         if (_inputBuffer != null)
         {
             InputEventUnRegistry(_inputBuffer);
@@ -236,7 +266,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             _weaponHitboxes.SetHitboxPadding(_weaponHitboxPadding);
             _appliedHitboxPadding = _weaponHitboxPadding;
         }
-        if (!CanFight) return;
+        if (!CanFight) { StopAttackRootMotion(); return; }
         if (_justBuffRemaining > 0f)
         {
             _justBuffRemaining -= Time.deltaTime;
@@ -254,7 +284,8 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
-        if (!CanFight) return;
+        if (!CanFight) { StopAttackRootMotion(); return; }
+        _stateContext?.Mover?.FixedUpdateAttackRootMotion(_rootMotionAnimator != null && _rootMotionAnimator.speed > 0f);
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
 

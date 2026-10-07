@@ -55,6 +55,7 @@ public abstract class PlayerAttackState : PlayerState
         base.Enter();
 
         Context?.Mover?.MoveStop();
+        Context?.Mover?.BeginAttackRootMotion();
         _lookCts?.Cancel();
         _lookCts?.Dispose();
         _lookCts = new CancellationTokenSource();
@@ -83,6 +84,7 @@ public abstract class PlayerAttackState : PlayerState
         _lookCts?.Cancel();
         _lookCts?.Dispose();
         _lookCts = null;
+        Context.Controller?.StopAttackRootMotion();
         Context.Attacker?.EndAttack();
     }
 

@@ -97,6 +97,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-8632674916256315494
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LockOnLightAttack AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &-8080028471732562437
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -122,6 +134,30 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-7894085126040783723
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LOLightAttack3 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
+--- !u!114 &-7869815677653099850
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LOLightAttack5 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!206 &-7857869503139375510
 BlendTree:
   m_ObjectHideFlags: 1
@@ -197,6 +233,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-7801731073251580452
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: StrongAttackReady AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &-7800370420633713930
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -322,6 +370,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-7441473027149724537
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: UnLockLightAttack AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &-7395495771273511796
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -375,6 +435,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-7196374510473163664
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo1 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &-7172981527281603223
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -652,6 +724,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-6137440555493668707
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!114 &-5904839013479774328
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -729,7 +813,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -6937796060608560462}
   - {fileID: 2206541255654907815}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -7894085126040783723}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -766,6 +851,30 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-4842205826068084289
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: StrongAttack AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
+--- !u!114 &-4602925813972043834
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo3 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1102 &-4565217949457277032
 AnimatorState:
   serializedVersion: 6
@@ -779,7 +888,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 8580654011664694396}
   - {fileID: -1917278568962732856}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -7196374510473163664}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -951,7 +1061,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -7818801697387242395}
   - {fileID: -1055707593828537246}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -4602925813972043834}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1059,7 +1170,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 8923547865594890160}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -7801731073251580452}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1218,7 +1330,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -1192225429750529039}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 6846944226239206623}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1346,7 +1459,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -7577089592854813066}
   - {fileID: -6256737828292125027}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 1476322374859151586}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1948,6 +2062,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &1476322374859151586
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Halberd_Attack_Heavy2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &1562730184005697399
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1976,6 +2102,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &1852340904248753726
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LOLightAttack2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1102 &1945860757552294789
 AnimatorState:
   serializedVersion: 6
@@ -1989,7 +2127,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -677437748983759664}
   - {fileID: -7800370420633713930}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -6137440555493668707}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2066,7 +2205,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5792273058408910685}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -7441473027149724537}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2137,6 +2277,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &2813950279205913330
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LOLightAttack4 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1102 &3317788833815829307
 AnimatorState:
   serializedVersion: 6
@@ -2151,6 +2303,7 @@ AnimatorState:
   - {fileID: 4610685700439167960}
   m_StateMachineBehaviours:
   - {fileID: -5904839013479774328}
+  - {fileID: 6283144667069961624}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2423,7 +2576,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -1236827536948767313}
   - {fileID: 3793542400429430574}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -8632674916256315494}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2531,6 +2685,7 @@ AnimatorState:
   - {fileID: -5321764402839933726}
   m_StateMachineBehaviours:
   - {fileID: 6913638976728850279}
+  - {fileID: 8008500366693141497}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2647,7 +2802,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 3427400789054076471}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -7869815677653099850}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2709,6 +2865,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &6283144667069961624
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Heavy2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1102 &6324455009772041738
 AnimatorState:
   serializedVersion: 6
@@ -2723,7 +2891,8 @@ AnimatorState:
   - {fileID: -6403966727355169644}
   - {fileID: -7172981527281603223}
   - {fileID: 8047843046999012700}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -4842205826068084289}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -2824,6 +2993,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &6846944226239206623
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo4 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!114 &6913638976728850279
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2878,7 +3059,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: -2902810381247533681}
   - {fileID: -9034761680619920034}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 1852340904248753726}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -3036,6 +3218,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &8008500366693141497
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: ARPG_Samurai_Attack_Heavy1 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &8047843046999012700
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -3257,7 +3451,8 @@ AnimatorState:
   m_Transitions:
   - {fileID: 1075503645185772776}
   - {fileID: 3787366653914618756}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 2813950279205913330}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1

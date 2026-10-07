@@ -1,14 +1,16 @@
 using UnityEngine;
 
-/// <summary>刀身の根元と切先を時間方向につなぎ、刀が通過した面を短く残す。</summary>
+/// <summary>刀身の切先側だけを時間方向につなぎ、細い軌跡を短く残す。</summary>
 [DisallowMultipleComponent]
 public sealed class SwordTrail : MonoBehaviour
 {
     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
     [Header("刀身の軌跡")]
-    [SerializeField, Min(.01f)] private float _duration = .16f;
+    [SerializeField, Min(.01f)] private float _duration = .11f;
     [SerializeField] private Transform _bladeBase;
     [SerializeField] private Transform _tip;
+    [Tooltip("実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。")]
+    [SerializeField, Range(0f, 1f)] private float _bladeTrailStart = .48f;
     [Tooltip("同じ刀の複数Colliderは、代表となるSwordTrailを共有する。")]
     [SerializeField] private SwordTrail _sharedTrail;
     [SerializeField] private Material _trailMaterial;
@@ -16,10 +18,10 @@ public sealed class SwordTrail : MonoBehaviour
     [SerializeField, Min(.1f)] private float _fade = 1.5f;
     [SerializeField] private Color _color = new Color(.78f, .9f, 1f, .32f);
     [Header("振りの速度 / 攻撃差")]
-    [SerializeField, Min(0f)] private float _minimumSpeed = 2f;
-    [SerializeField, Min(.1f)] private float _fullSpeed = 14f;
-    [SerializeField, Min(.01f)] private float _heavyDuration = .16f;
-    [SerializeField, Min(.01f)] private float _counterDuration = .18f;
+    [SerializeField, Min(0f)] private float _minimumSpeed = 3.5f;
+    [SerializeField, Min(.1f)] private float _fullSpeed = 16f;
+    [SerializeField, Min(.01f)] private float _heavyDuration = .13f;
+    [SerializeField, Min(.01f)] private float _counterDuration = .15f;
     [SerializeField, Range(1f, 2f)] private float _heavyBrightness = 1.18f;
     [SerializeField, Range(1f, 2f)] private float _counterBrightness = 1.35f;
     // 旧Prefabの幅設定を保持する。端点未設定の場合だけ使う。
@@ -42,7 +44,7 @@ public sealed class SwordTrail : MonoBehaviour
     private AttackStyle style;
     private Transform owner;
     private Vector3 previousTip, previousOwnerPosition;
-    private float previousTime, speedStrength, started;
+    private float previousTime, speedStrength;
     private bool hasPrevious;
 
     public void SetStyle(AttackStyle value)
@@ -55,7 +57,7 @@ public sealed class SwordTrail : MonoBehaviour
         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetActive(active); return; }
         if (!initialized || emitting == active) return;
         emitting = active;
-        if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; started = Time.unscaledTime; Sample(); }
+        if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; Sample(); }
     }
     public bool Init()
     {
@@ -81,8 +83,9 @@ public sealed class SwordTrail : MonoBehaviour
     }
     private void Sample()
     {
-        Vector3 a = _bladeBase != null ? _bladeBase.position : transform.position;
+        Vector3 realBase = _bladeBase != null ? _bladeBase.position : transform.position;
         Vector3 b = _tip != null ? _tip.position : transform.position + transform.up * _width;
+        Vector3 a = Vector3.Lerp(realBase, b, _bladeTrailStart);
         float now = Time.unscaledTime;
         Vector3 ownerPosition = owner != null ? owner.position : Vector3.zero;
         float delta = now - previousTime;
@@ -95,18 +98,16 @@ public sealed class SwordTrail : MonoBehaviour
         {
             // Keep one invisible seed at the current blade, rather than bridging
             // a long pause to the next fast sample.
-            if (count == 0) { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = .01f; strengths[0] = 0f; sampleWidths[0] = .82f; count = 1; }
+            if (count == 0) { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = .01f; strengths[0] = 0f; sampleWidths[0] = 1f; count = 1; }
             return;
         }
         if (count == Capacity) RemoveOldest();
         float duration = style == AttackStyle.JustAvoidCounter ? _counterDuration : style == AttackStyle.Heavy ? _heavyDuration : _duration;
         float power = style == AttackStyle.JustAvoidCounter ? _counterBrightness : style == AttackStyle.Heavy ? _heavyBrightness : 1f;
-        // Counter gets a restrained early glint, in the same steel-white palette.
-        if (style == AttackStyle.JustAvoidCounter) power *= 1f + .1f * Mathf.Clamp01(1f - (now - started) / .06f);
         bases[count] = a; tips[count] = b; times[count] = now;
         lifetimes[count] = duration * Mathf.Lerp(.6f, 1f, speedStrength);
         strengths[count] = speedStrength * power;
-        sampleWidths[count] = style == AttackStyle.Light ? .82f : style == AttackStyle.Heavy ? 1f : 1.08f;
+        sampleWidths[count] = style == AttackStyle.Light ? 1f : style == AttackStyle.Heavy ? 1.04f : 1.08f;
         count++;
     }
     private void RemoveOldest()

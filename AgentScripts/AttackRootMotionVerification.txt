@@ -1,0 +1,25 @@
+Player scale=0.25 automatic applyRootMotion=False RB kinematic=False collisions=True
+ Attack: ARPG_Samurai_Attack_Heavy1 clip=Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy1.anim
+ Attack: ARPG_Samurai_Attack_Heavy2 clip=Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy2.anim
+ Attack: LockOnLightAttack clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B1.anim
+ Attack: LOLightAttack2 clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B2.anim
+ Attack: LOLightAttack3 clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B3.anim
+ Attack: LOLightAttack4 clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B4.anim
+ Attack: LOLightAttack5 clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B5.anim
+ Attack: UnLockLightAttack clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Idle2_to_Idle1.anim
+ Attack: ARPG_Samurai_Attack_Combo1 clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo1.anim
+ Attack: ARPG_Samurai_Attack_Combo2 clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo2.anim
+ Attack: ARPG_Samurai_Attack_Combo4 clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo4.anim
+ Attack: ARPG_Samurai_Attack_Combo3 clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo3.anim
+ Attack: StrongAttackReady clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1_Start.anim
+ Attack: StrongAttack clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1.anim
+ Attack: ARPG_Halberd_Attack_Heavy2 clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy2.anim
+Verified 15 attack states; locomotion/reaction/death/StepBack have no attack gate.
+Enemy scale=0.18 automatic applyRootMotion=False RB kinematic=True collisions=True
+ Attack: AttackHeavy2Start clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1_Start.anim
+ Attack: AttackHeavy2 clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1.anim
+ Attack: AttackHeavy1Start clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1_Start.anim
+ Attack: AttackHeavy clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1.anim
+ Attack: LightAttack1 clip=Assets/Mock/Animation/Enemy/LightAttack/Attack1/ARPG_Halberd_Attack_Dodge.anim
+ Attack: LightAttack2 clip=Assets/Mock/Animation/Enemy/LightAttack/Attack2/ARPG_Halberd_Attack_Combo4.anim
+Verified 6 attack states; locomotion/reaction/death/StepBack have no attack gate.

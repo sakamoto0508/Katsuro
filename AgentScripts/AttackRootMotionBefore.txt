@@ -1,0 +1,231 @@
+Player: animator=Assets/Mock/AnimationController/Player.controller rootMotion=False update=Normal scale=(1.00, 1.00, 1.00) RB kinematic=False constraints=FreezeRotation collision=Discrete interpolate=None agent=none
+STATE Base Layer/NoWeaponIdle tag= speed=1 motion=Assets/Mock/Animation/Player/NoWeapone/ARPG_Samurai_Idle_no_weapon.anim
+STATE Base Layer/NoWeapponMove tag= speed=1 motion=Assets/Mock/AnimationController/Player.controller
+STATE Base Layer/LockOnMoveStart tag= speed=1 motion=Assets/Mock/AnimationController/Player.controller
+STATE Base Layer/UnLockOnMove tag= speed=1 motion=Assets/Mock/AnimationController/Player.controller
+STATE Base Layer/LockOnMove tag= speed=1 motion=Assets/Mock/AnimationController/Player.controller
+STATE Base Layer/ARPG_Samurai_Attack_Heavy1_Start tag= speed=0.9 motion=Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy1_Start.anim
+STATE Base Layer/ARPG_Samurai_Attack_Heavy1 tag=JustAvoidCounter speed=1 motion=Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy1.anim
+STATE Base Layer/ARPG_Samurai_Attack_Heavy2 tag=JustAvoidCounter speed=1 motion=Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy2.anim
+STATE Base Layer/ARPG_Samurai_Death2 tag= speed=1 motion=Assets/InportAssets/ARPGPack/ARPGSamurai/Animations/Humanoid/ARPG_Samurai_Death2.anim
+STATE Base Layer/Samurai_UnequipB tag= speed=1 motion=Assets/Mock/Animation/Player/Samurai_UnequipB.anim
+STATE Base Layer/LockOnIdle tag= speed=1 motion=Assets/Mock/Animation/Player/LockOnIdle/ARPG_Samurai_Idle1.anim
+STATE Base Layer/UnLockOnIdle tag= speed=1 motion=Assets/Mock/Animation/Player/UnLockOnIdle/ARPG_Samurai_Idle2.anim
+STATE Base Layer/Idle2toIdle1 tag= speed=1 motion=Assets/Mock/Animation/Player/UnLockOnIdle/ARPG_Samurai_Idle2_to_Idle1.anim
+STATE Base Layer/Idle1toIdle2 tag= speed=1 motion=Assets/Mock/Animation/Player/LockOnIdle/ARPG_Samurai_Idle1_to_Idle2.anim
+STATE Base Layer/LockOnLightAttack tag= speed=0.8 motion=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B1.anim
+STATE Base Layer/LOLightAttack2 tag= speed=0.8 motion=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B2.anim
+STATE Base Layer/LOLightAttack3 tag= speed=0.8 motion=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B3.anim
+STATE Base Layer/LOLightAttack4 tag= speed=0.8 motion=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B4.anim
+STATE Base Layer/LOLightAttack5 tag= speed=0.8 motion=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B5.anim
+STATE Base Layer/UnLockLightAttack tag= speed=0.8 motion=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Idle2_to_Idle1.anim
+STATE Base Layer/ARPG_Samurai_Attack_Combo1 tag= speed=0.8 motion=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo1.anim
+STATE Base Layer/ARPG_Samurai_Attack_Combo2 tag= speed=0.8 motion=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo2.anim
+STATE Base Layer/ARPG_Samurai_Attack_Combo4 tag= speed=0.8 motion=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo4.anim
+STATE Base Layer/ARPG_Samurai_Attack_Combo3 tag= speed=0.8 motion=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo3.anim
+STATE Base Layer/StrongAttackReady tag= speed=0.8 motion=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1_Start.anim
+STATE Base Layer/StrongAttack tag= speed=0.8 motion=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1.anim
+STATE Base Layer/ARPG_Halberd_Attack_Heavy2 tag= speed=0.8 motion=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy2.anim
+STATE UpperBody/Empty tag= speed=1 motion=
+STATE UpperBody/IsDrawingSword tag= speed=1 motion=Assets/Mock/Animation/Player/ISDrawingSord/ARPG_Samurai_Equip.anim
+CLIP Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy1_Start.anim length=0.8166667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8166667222976685,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.007400574 end=-0.04221819 min=-0.06957258 max=0.007400574
+ CURVE /RootT.y start=0.9336498 end=0.6503204 min=0.6503204 max=0.9336498
+ CURVE /RootT.z start=0.008752238 end=-0.3144418 min=-0.3144418 max=0.008752238
+ CURVE /RootQ.x start=0.1418913 end=0.3662304 min=0.1418913 max=0.3662304
+ CURVE /RootQ.y start=-0.06613904 end=-0.8003728 min=-0.8003728 max=-0.06613904
+ CURVE /RootQ.z start=0.01098733 end=0.1359105 min=0.01098733 max=0.1725889
+ CURVE /RootQ.w start=0.9876092 end=0.4547602 min=0.4547602 max=0.9876092
+ CURVE Armature/Hips/Spine02/Spine01/Spine/RightShoulder/RightArm/RightForeArm/RightHand/Katana_Mokko (1)/m_LocalPosition.x start=-0.049 end=-0.049 min=-0.049 max=-0.049
+ CURVE Armature/Hips/Spine02/Spine01/Spine/RightShoulder/RightArm/RightForeArm/RightHand/Katana_Mokko (1)/m_LocalPosition.y start=0.168 end=0.168 min=0.168 max=0.168
+ CURVE Armature/Hips/Spine02/Spine01/Spine/RightShoulder/RightArm/RightForeArm/RightHand/Katana_Mokko (1)/m_LocalPosition.z start=-0.032 end=-0.032 min=-0.032 max=-0.032
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.x start=-0.18 end=-0.2008 min=-0.2457 max=-0.18
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.y start=0.169 end=0.3781 min=0.169 max=0.3781
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.z start=0.125 end=0.283 min=0.12 max=0.283
+CLIP Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy1.anim length=0.7333333 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.7333333492279053,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.04221819 end=0.007400579 min=-0.04221819 max=0.0479605
+ CURVE /RootT.y start=0.6503204 end=0.9336503 min=0.6503204 max=0.9336503
+ CURVE /RootT.z start=-0.3144418 end=2.433424 min=-0.3144418 max=2.43608
+ CURVE /RootQ.x start=0.3662304 end=0.1418913 min=0.1418913 max=0.4644341
+ CURVE /RootQ.y start=-0.8003728 end=-0.06613903 min=-0.8003728 max=0.2250444
+ CURVE /RootQ.z start=0.1359105 end=0.01098733 min=-0.109856 max=0.1359105
+ CURVE /RootQ.w start=0.4547602 end=0.9876092 min=0.4547602 max=0.9876092
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.x start=-0.212 end=-0.213 min=-0.248 max=-0.212
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.y start=0.375 end=0.2 min=0.2 max=0.375
+ CURVE Armature/Hips/Saya_KatanaMokko/m_LocalPosition.z start=0.235 end=0.205 min=0.143 max=0.235
+CLIP Assets/Mock/Animation/Player/JustVoidAttack/ARPG_Samurai_Attack_Heavy2.anim length=1.133333 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.133333444595337,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.04863583 end=0.007400564 min=-0.04939195 max=0.1531561
+ CURVE /RootT.y start=0.6994591 end=0.9336503 min=0.6994591 max=0.9341826
+ CURVE /RootT.z start=2.364486 end=4.470846 min=2.364486 max=4.470846
+ CURVE /RootQ.x start=0.3538544 end=-0.1418914 min=-0.265871 max=0.3538544
+ CURVE /RootQ.y start=0.2251505 end=0.06613903 min=-0.7988679 max=0.9766317
+ CURVE /RootQ.z start=0.08354421 end=-0.01098743 min=-0.2024096 max=0.1749941
+ CURVE /RootQ.w start=0.903944 end=-0.987609 min=-0.9898592 max=0.903944
+CLIP Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B1.anim length=0.9666667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.9666666984558106,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.01562246 end=0.007400585 min=-0.1059784 max=0.02901801
+ CURVE /RootT.y start=0.9515342 end=0.9336498 min=0.7419923 max=0.9704602
+ CURVE /RootT.z start=0.02943274 end=0.5412029 min=0.02943274 max=0.5703931
+ CURVE /RootQ.x start=0.1376451 end=0.1418914 min=0.1376451 max=0.3292096
+ CURVE /RootQ.y start=0.08457079 end=-0.06613912 min=-0.7849401 max=0.283353
+ CURVE /RootQ.z start=0.006671098 end=0.01098738 min=-0.03246376 max=0.03148695
+ CURVE /RootQ.w start=0.986842 end=0.9876091 min=0.5177078 max=0.9876091
+CLIP Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B2.anim length=1.05 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.0500000715255738,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.07034964 end=0.007400611 min=-0.07034964 max=0.06900557
+ CURVE /RootT.y start=0.8187906 end=0.9336501 min=0.6968032 max=0.9671776
+ CURVE /RootT.z start=0.5758823 end=2.08556 min=0.5758823 max=2.08556
+ CURVE /RootQ.x start=0.2293603 end=0.1418913 min=0.1418913 max=0.3478875
+ CURVE /RootQ.y start=-0.6371791 end=-0.06613901 min=-0.6371791 max=0.6779824
+ CURVE /RootQ.z start=0.03044027 end=0.01098734 min=-0.0220817 max=0.04265251
+ CURVE /RootQ.w start=0.7351667 end=0.9876091 min=0.6458479 max=0.9876091
+CLIP Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B3.anim length=0.9666667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.9666666984558106,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.06294555 end=0.007400581 min=-0.06250216 max=0.06294555
+ CURVE /RootT.y start=0.7730176 end=0.93365 min=0.7730176 max=0.9382514
+ CURVE /RootT.z start=1.480193 end=2.295712 min=1.480193 max=2.295712
+ CURVE /RootQ.x start=0.243153 end=0.1418914 min=-0.04219865 max=0.3095112
+ CURVE /RootQ.y start=0.7809947 end=-0.06613909 min=-0.8405062 max=0.7809947
+ CURVE /RootQ.z start=0.01614037 end=0.0109874 min=-0.1050868 max=0.06478755
+ CURVE /RootQ.w start=0.5750334 end=0.9876092 min=0.5368739 max=0.9876092
+CLIP Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B4.anim length=1.05 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.0500000715255738,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.05301598 end=0.007400617 min=-0.09958404 max=0.06529628
+ CURVE /RootT.y start=0.8587509 end=0.9336503 min=0.7362323 max=0.9336503
+ CURVE /RootT.z start=2.2053 end=3.788949 min=2.2053 max=3.788949
+ CURVE /RootQ.x start=-0.07532054 end=0.1418914 min=-0.07532054 max=0.316718
+ CURVE /RootQ.y start=-0.8333682 end=-0.06613909 min=-0.8333682 max=0.8292862
+ CURVE /RootQ.z start=0.04721645 end=0.0109874 min=-0.01419449 max=0.1355667
+ CURVE /RootQ.w start=0.5455227 end=0.9876092 min=0.5019225 max=0.9876092
+CLIP Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B5.anim length=1.216667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.2166666984558106,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.04763743 end=0.007400587 min=-0.09177482 max=0.04763743
+ CURVE /RootT.y start=0.8045911 end=0.9336501 min=0.6848264 max=0.987662
+ CURVE /RootT.z start=3.32859 end=4.435633 min=3.32859 max=4.435633
+ CURVE /RootQ.x start=0.1965286 end=0.1418914 min=0.1418914 max=0.2949497
+ CURVE /RootQ.y start=0.7774903 end=-0.06613912 min=-0.8249317 max=0.7774903
+ CURVE /RootQ.z start=0.03973785 end=0.01098738 min=-0.1001055 max=0.04182463
+ CURVE /RootQ.w start=0.5960759 end=0.9876091 min=0.4722001 max=0.9876091
+CLIP Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo1.anim length=0.8166667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8166667222976685,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.007400574 end=0.00740056 min=0.0009897928 max=0.007741126
+ CURVE /RootT.y start=0.9336498 end=0.9336498 min=0.8135667 max=0.9336498
+ CURVE /RootT.z start=0.008752238 end=0.6492314 min=0.008752238 max=0.757727
+ CURVE /RootQ.x start=0.1418913 end=0.1418913 min=0.1374903 max=0.3493753
+ CURVE /RootQ.y start=-0.06613904 end=-0.06613904 min=-0.1075389 max=-0.03965172
+ CURVE /RootQ.z start=0.01098733 end=0.01098733 min=-0.01108616 max=0.01098733
+ CURVE /RootQ.w start=0.9876092 end=0.9876092 min=0.9362051 max=0.9876092
+CLIP Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo2.anim length=0.9666667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.9666666984558106,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.004775492 end=0.007400582 min=-0.03513701 max=0.0448384
+ CURVE /RootT.y start=0.8362788 end=0.9336501 min=0.7287083 max=0.9336501
+ CURVE /RootT.z start=0.7542539 end=1.838693 min=0.7542539 max=1.838693
+ CURVE /RootQ.x start=0.337764 end=0.1418913 min=0.1418913 max=0.3714713
+ CURVE /RootQ.y start=-0.105214 end=-0.06613904 min=-0.508202 max=0.7893838
+ CURVE /RootQ.z start=-0.01043048 end=0.01098733 min=-0.06607211 max=0.03567883
+ CURVE /RootQ.w start=0.9352736 end=0.9876092 min=0.5353667 max=0.9876092
+CLIP Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo4.anim length=1.15 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.1500000953674317,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.1314443 end=0.007400562 min=-0.1361636 max=0.08713711
+ CURVE /RootT.y start=0.7596647 end=0.9336504 min=0.5208574 max=0.9647226
+ CURVE /RootT.z start=3.083758 end=4.583603 min=3.083758 max=4.77111
+ CURVE /RootQ.x start=0.1998349 end=-0.1418911 min=-0.3361451 max=0.1998349
+ CURVE /RootQ.y start=-0.6788373 end=0.06613915 min=-0.9748598 max=0.7968982
+ CURVE /RootQ.z start=0.03216915 end=-0.01098744 min=-0.1504238 max=0.2019272
+ CURVE /RootQ.w start=0.7058408 end=-0.9876091 min=-0.9876091 max=0.7058408
+CLIP Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo3.anim length=0.8666667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8666667342185974,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.041848 end=0.007400616 min=-0.1338582 max=0.08878363
+ CURVE /RootT.y start=0.711778 end=0.9336503 min=0.711778 max=0.9336503
+ CURVE /RootT.z start=1.459566 end=3.055603 min=1.459566 max=3.215187
+ CURVE /RootQ.x start=0.2977427 end=0.1418913 min=0.09239154 max=0.2977427
+ CURVE /RootQ.y start=0.7909469 end=-0.06613904 min=-0.6950543 max=0.842513
+ CURVE /RootQ.z start=-0.0365058 end=0.01098733 min=-0.0365058 max=0.138151
+ CURVE /RootQ.w start=0.5333104 end=0.9876092 min=0.4643666 max=0.9876092
+CLIP Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1_Start.anim length=0.8166667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8166667222976685,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.006925572 end=0.0396173 min=0.006925572 max=0.0396173
+ CURVE /RootT.y start=0.9262958 end=0.6546366 min=0.6525593 max=0.9262958
+ CURVE /RootT.z start=-0.01131267 end=-0.4540173 min=-0.4540173 max=-0.01131267
+ CURVE /RootQ.x start=0.0836072 end=0.06875014 min=0.01353377 max=0.0836072
+ CURVE /RootQ.y start=0.4054429 end=0.8109345 min=0.4054429 max=0.8109345
+ CURVE /RootQ.z start=-0.01858375 end=-0.1642333 min=-0.1642333 max=-0.01858375
+ CURVE /RootQ.w start=0.9100993 end=0.5573922 min=0.5573922 max=0.9100993
+CLIP Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1.anim length=0.9833334 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.98333340883255,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.0396173 end=0.006925572 min=-0.122773 max=0.04047009
+ CURVE /RootT.y start=0.6546366 end=0.9262961 min=0.6546366 max=0.9262961
+ CURVE /RootT.z start=-0.4540173 end=2.336668 min=-0.4540173 max=2.336668
+ CURVE /RootQ.x start=0.06875014 end=0.0836072 min=0.06875014 max=0.1723395
+ CURVE /RootQ.y start=0.8109345 end=0.4054429 min=-0.6016334 max=0.8109345
+ CURVE /RootQ.z start=-0.1642333 end=-0.01858375 min=-0.1746383 max=0.001809573
+ CURVE /RootQ.w start=0.5573922 end=0.9100993 min=0.5573922 max=0.9755424
+CLIP Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy2.anim length=1.15 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.1500000953674317,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.1007412 end=0.006925531 min=-0.1747713 max=0.04442128
+ CURVE /RootT.y start=0.6958447 end=0.9262966 min=0.547399 max=1.280053
+ CURVE /RootT.z start=1.902339 end=3.590987 min=1.902339 max=3.627919
+ CURVE /RootQ.x start=0.1357614 end=-0.08360741 min=-0.3998806 max=0.1357614
+ CURVE /RootQ.y start=-0.6002693 end=-0.4054428 min=-0.9572477 max=0.4721111
+ CURVE /RootQ.z start=-0.1804653 end=0.0185836 min=-0.2166212 max=0.02011617
+ CURVE /RootQ.w start=0.7672535 end=-0.9100993 min=-0.9929428 max=0.7672535
+Enemy: animator=Assets/Mock/AnimationController/Enemy.controller rootMotion=False update=Normal scale=(1.51, 1.51, 1.51) RB kinematic=True constraints=None collision=Discrete interpolate=None agent=enabled=True updatePosition=True updateRotation=True
+STATE Base Layer/Idle tag= speed=1 motion=Assets/Mock/Animation/Enemy/Idle/ARPG_Halberd_Idle1.anim
+STATE Base Layer/BackStep tag= speed=1 motion=Assets/Mock/Animation/Enemy/BackStep/ARPG_Halberd_Evade_Backward.anim
+STATE Base Layer/Move 0 tag= speed=1 motion=Assets/Mock/AnimationController/Enemy.controller
+STATE Base Layer/ARPG_Halberd_Death2 tag= speed=1 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Death2.anim
+STATE Base Layer/AttackHeavy2Start tag= speed=0.8 motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1_Start.anim
+STATE Base Layer/AttackHeavy2 tag= speed=0.7 motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1.anim
+STATE Base Layer/AttackHeavy1Start tag= speed=0.8 motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1_Start.anim
+STATE Base Layer/AttackHeavy tag= speed=0.7 motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1.anim
+STATE Base Layer/LightAttack1 tag= speed=0.7 motion=Assets/Mock/Animation/Enemy/LightAttack/Attack1/ARPG_Halberd_Attack_Dodge.anim
+STATE Base Layer/LightAttack2 tag= speed=0.7 motion=Assets/Mock/Animation/Enemy/LightAttack/Attack2/ARPG_Halberd_Attack_Combo4.anim
+STATE HitReaction/Empty tag= speed=1 motion=
+STATE HitReaction/LightFront tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim
+STATE HitReaction/LightBack tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit3.anim
+STATE HitReaction/LightLeft tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+STATE HitReaction/LightRight tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+STATE HitReaction/HeavyFront tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim
+STATE HitReaction/HeavyBack tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit4.anim
+STATE HitReaction/HeavyLeft tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+STATE HitReaction/HeavyRight tag= speed=0.8166667 motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+CLIP Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1_Start.anim length=0.8166667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8166667222976685,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.006925572 end=0.0396173 min=0.006925572 max=0.0396173
+ CURVE /RootT.y start=0.9262958 end=0.6546366 min=0.6525593 max=0.9262958
+ CURVE /RootT.z start=-0.01131267 end=-0.4540173 min=-0.4540173 max=-0.01131267
+ CURVE /RootQ.x start=0.0836072 end=0.06875014 min=0.01353377 max=0.0836072
+ CURVE /RootQ.y start=0.4054429 end=0.8109345 min=0.4054429 max=0.8109345
+ CURVE /RootQ.z start=-0.01858375 end=-0.1642333 min=-0.1642333 max=-0.01858375
+ CURVE /RootQ.w start=0.9100993 end=0.5573922 min=0.5573922 max=0.9100993
+CLIP Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1.anim length=1.083333 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.0833333730697632,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.0396173 end=0.006925572 min=-0.122773 max=0.04047009
+ CURVE /RootT.y start=0.6546366 end=0.9262961 min=0.6546366 max=0.9262961
+ CURVE /RootT.z start=-0.4540173 end=2.336668 min=-0.4540173 max=2.336668
+ CURVE /RootQ.x start=0.06875014 end=0.0836072 min=0.06875014 max=0.1723395
+ CURVE /RootQ.y start=0.8109345 end=0.4054429 min=-0.6016334 max=0.8109345
+ CURVE /RootQ.z start=-0.1642333 end=-0.01858375 min=-0.1746383 max=0.001809573
+ CURVE /RootQ.w start=0.5573922 end=0.9100993 min=0.5573922 max=0.9755424
+CLIP Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1_Start.anim length=0.8166667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":0.8166667222976685,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.007400574 end=-0.04221819 min=-0.06957258 max=0.007400574
+ CURVE /RootT.y start=0.9336498 end=0.6503204 min=0.6503204 max=0.9336498
+ CURVE /RootT.z start=0.008752238 end=-0.3144418 min=-0.3144418 max=0.008752238
+ CURVE /RootQ.x start=0.1418913 end=0.3662304 min=0.1418913 max=0.3662304
+ CURVE /RootQ.y start=-0.06613904 end=-0.8003728 min=-0.8003728 max=-0.06613904
+ CURVE /RootQ.z start=0.01098733 end=0.1359105 min=0.01098733 max=0.1725889
+ CURVE /RootQ.w start=0.9876092 end=0.4547602 min=0.4547602 max=0.9876092
+CLIP Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1.anim length=1.016667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.0166666507720948,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=-0.04221819 end=0.007400579 min=-0.04221819 max=0.0479605
+ CURVE /RootT.y start=0.6503204 end=0.9336503 min=0.6503204 max=0.9336503
+ CURVE /RootT.z start=-0.3144418 end=2.433424 min=-0.3144418 max=2.43608
+ CURVE /RootQ.x start=0.3662304 end=0.1418913 min=0.1418913 max=0.4644341
+ CURVE /RootQ.y start=-0.8003728 end=-0.06613903 min=-0.8003728 max=0.2250444
+ CURVE /RootQ.z start=0.1359105 end=0.01098733 min=-0.109856 max=0.1359105
+ CURVE /RootQ.w start=0.4547602 end=0.9876092 min=0.4547602 max=0.9876092
+CLIP Assets/Mock/Animation/Enemy/LightAttack/Attack1/ARPG_Halberd_Attack_Dodge.anim length=1.466667 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.4666666984558106,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.04050068 end=0.006925538 min=-0.02752011 max=0.08334066
+ CURVE /RootT.y start=0.7552652 end=0.9262959 min=0.7163579 max=0.9311095
+ CURVE /RootT.z start=-2.652064 end=-0.6201974 min=-2.652064 max=-0.614157
+ CURVE /RootQ.x start=0.1274989 end=0.08360717 min=0.04796647 max=0.3191418
+ CURVE /RootQ.y start=0.4923759 end=0.4054428 min=-0.4138041 max=0.8508814
+ CURVE /RootQ.z start=0.01762634 end=-0.01858374 min=-0.07373201 max=0.05758144
+ CURVE /RootQ.w start=0.8608133 end=0.9100994 min=0.4305718 max=0.9718319
+CLIP Assets/Mock/Animation/Enemy/LightAttack/Attack2/ARPG_Halberd_Attack_Combo4.anim length=1.333333 rootCurves=True settings={"additiveReferencePoseClip":{"instanceID":0},"additiveReferencePoseTime":0.0,"startTime":0.0,"stopTime":1.3333333730697632,"orientationOffsetY":0.0,"level":0.0,"cycleOffset":0.0,"hasAdditiveReferencePose":false,"loopTime":false,"loopBlend":false,"loopBlendOrientation":true,"loopBlendPositionY":true,"loopBlendPositionXZ":false,"keepOriginalOrientation":true,"keepOriginalPositionY":true,"keepOriginalPositionXZ":false,"heightFromFeet":false,"mirror":false} rootNode=standalone .anim
+ CURVE /RootT.x start=0.1212016 end=0.00692551 min=-0.1686077 max=0.1212016
+ CURVE /RootT.y start=0.7055434 end=0.9262961 min=0.7055434 max=0.9262961
+ CURVE /RootT.z start=1.868674 end=3.834629 min=1.868674 max=3.834629
+ CURVE /RootQ.x start=0.1634468 end=-0.08360717 min=-0.4065603 max=0.1634468
+ CURVE /RootQ.y start=0.831181 end=-0.4054429 min=-0.4055521 max=0.9457121
+ CURVE /RootQ.z start=-0.2914554 end=0.01858367 min=-0.2914554 max=0.01858367
+ CURVE /RootQ.w start=0.4443839 end=-0.9100993 min=-0.9219869 max=0.4443839
+DATA EnemyAttackData action=Slash trigger=LightAttack range=1.2
+DATA EnemyAttackData 1 action=Slash trigger=LightAttack2 range=1.2
+DATA EnemyAttackData 2 action=Slash trigger=HeavyAttack range=1.2
+DATA EnemyAttackData 3 action=Slash trigger=HeavyAttack2 range=1.2

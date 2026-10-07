@@ -35,6 +35,32 @@ public class EnemyController : MonoBehaviour, IDamageable
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
     private EnemyMover _mover;
+    [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
+    private int _attackAnimationHash;
+    public void BeginAnimationAttackRootMotion(int stateHash)
+    {
+        if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
+        _attackAnimationHash = stateHash;
+        _mover?.BeginAttackRootMotion();
+    }
+    public void EndAnimationAttackRootMotion(int stateHash)
+    {
+        if (_attackAnimationHash != stateHash) return;
+        _attackAnimationHash = 0;
+        _mover?.ReleaseMovementAfterAttack();
+    }
+    private void FixedUpdate()
+    {
+        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+        _mover?.FixedUpdateAttackRootMotion();
+    }
+    private void OnDisable()
+    {
+        _attackAnimationHash = 0;
+        _mover?.EndAttackRootMotion();
+        _mover?.ReleaseMovementAfterReaction();
+        _mover?.ReleaseMovementAfterAttack();
+    }
     private EnemyAI _ai;
     private EnemyActionType? _pendingAction;
     private CancellationToken _token;
@@ -67,7 +93,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         hitStop?.RegisterTarget(gameObject);
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
-            , navMeshAgent, _animator, _animName);
+            , navMeshAgent, _animator, _animName, _attackRootMotionScale);
         _health = new EnemyHealth(_enemyStuts);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
@@ -154,6 +180,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void OnDestroy()
     {
+        _mover?.EndAttackRootMotion();
         _attacker?.Dispose();
         _health?.Dispose();
     }
@@ -219,6 +246,8 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void EnemyDead()
     {
+        _attackAnimationHash = 0;
+        _mover?.InterruptMovementAction();
         _enemyAnimController.CancelHitReaction();
         _mover?.ReleaseMovementAfterReaction();
         _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
@@ -234,6 +263,12 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void OnAnimatorMove()
     {
+        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+        if (_mover != null && _mover.IsUsingAttackRootMotion)
+        {
+            var state = _animator.IsInTransition(0) ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
+            if (state.fullPathHash != _attackAnimationHash) { _attackAnimationHash = 0; _mover.ReleaseMovementAfterAttack(); return; }
+        }
         _mover?.OnAnimatorMove();
     }
 

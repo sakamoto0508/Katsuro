@@ -263,6 +263,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-5760637029769431202
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: AttackHeavy2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &-5677693637400921410
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -401,7 +413,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 2095804924854149233}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -5760637029769431202}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -509,7 +522,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -183926330397327127}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 5210524204324067961}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -753,7 +767,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -4058384742897984628}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 1324674248541182821}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -802,6 +817,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 1
   m_OrderedInterruption: 0
   m_CanTransitionToSelf: 1
+--- !u!114 &-898980602647007405
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LightAttack1 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1107 &-808352215948855781
 AnimatorStateMachine:
   serializedVersion: 6
@@ -1062,7 +1089,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 6418751152049012656}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 5078092130789269098}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1156,6 +1184,18 @@ BlendTree:
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 3
+--- !u!114 &1324674248541182821
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: AttackHeavy1Start AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1102 &1975286423527993533
 AnimatorState:
   serializedVersion: 6
@@ -1168,7 +1208,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -8093105009488408713}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -898980602647007405}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -1343,6 +1384,30 @@ AnimatorStateTransition:
   m_InterruptionSource: 1
   m_OrderedInterruption: 0
   m_CanTransitionToSelf: 1
+--- !u!114 &5078092130789269098
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: AttackHeavy2Start AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
+--- !u!114 &5210524204324067961
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: LightAttack2 AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &5498739370078049593
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1516,6 +1581,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &6480900731347739615
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
+  m_Name: AttackHeavy AttackRootMotion
+  m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
 --- !u!1101 &6570331165164477983
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1703,7 +1780,8 @@ AnimatorState:
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -8203062238688953971}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 6480900731347739615}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1

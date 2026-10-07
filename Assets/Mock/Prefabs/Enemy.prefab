@@ -338,6 +338,7 @@ MonoBehaviour:
   _stepBackDistance: 2
   _characterEffect: {fileID: 0}
   _enemyDeadDelay: 2000
+  _attackRootMotionScale: 0.18
 --- !u!114 &901234567891234567
 MonoBehaviour:
   m_ObjectHideFlags: 0

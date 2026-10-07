@@ -21,7 +21,7 @@ public class EnemyMover
     /// <param name="animName">アニメーションパラメータ名集</param>
     public EnemyMover(EnemyStuts enemyStuts, Transform enemyPosition, Transform playerPosition
         , EnemyAnimationController animationController, Rigidbody rb, NavMeshAgent agent
-        , Animator animator, AnimationName animName)
+        , Animator animator, AnimationName animName, float attackRootMotionScale = 1f)
     {
         _enemyStuts = enemyStuts;
         _enemyTransform = enemyPosition;
@@ -31,6 +31,7 @@ public class EnemyMover
         _agent = agent;
         _animator = animator;
         _animName = animName;
+        _attackRootMotionScale = Mathf.Max(0f, attackRootMotionScale);
         // 初期化時に RotationMode に応じた設定を反映しておく
         ApplyRotationMode();
     }
@@ -45,6 +46,40 @@ public class EnemyMover
     private AnimationName _animName;
     private float _destinationUpdateTimer = 0f;
     private bool _usingRootMotionStepBack;
+    private bool _usingRootMotionAttack, _attackKinematic, _attackAgentRotation;
+    private readonly float _attackRootMotionScale;
+    private Vector3 _pendingAttackRootMotion;
+    public bool IsUsingAttackRootMotion => _usingRootMotionAttack;
+    public void BeginAttackRootMotion()
+    {
+        if (!_isMovementHeldForAttack || _reactionHeld || _usingRootMotionStepBack) return;
+        _usingRootMotionAttack = true;
+    }
+    public void EndAttackRootMotion()
+    {
+        _usingRootMotionAttack = false;
+        _pendingAttackRootMotion = Vector3.zero;
+        if (_rb != null && !_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
+    }
+    public void FixedUpdateAttackRootMotion()
+    {
+        if (!_usingRootMotionAttack) return;
+        if (_reactionHeld || _animator == null || _animator.speed <= 0f) { _pendingAttackRootMotion = Vector3.zero; return; }
+        var delta = AttackRootMotionPhysics.LimitDisplacement(_rb, _pendingAttackRootMotion);
+        _pendingAttackRootMotion = Vector3.zero;
+        if (_rb == null) return;
+        // Retain the attack hold's kinematic Rigidbody and sweep before MovePosition.
+        var position = _rb.position;
+        UnityEngine.AI.NavMeshHit hit;
+        if (_agent != null)
+        {
+            UnityEngine.AI.NavMeshHit start;
+            if (!UnityEngine.AI.NavMesh.SamplePosition(position, out start, .5f, _agent.areaMask)) return;
+            if (UnityEngine.AI.NavMesh.Raycast(start.position, start.position + delta, out hit, _agent.areaMask))
+            { delta = hit.position - position; delta.y = 0f; }
+        }
+        _rb.MovePosition(position + delta);
+    }
     private bool _isStepBack;
     private bool _isPatrolWalking;
     private bool _manualRotationDisabledByAgent = false;
@@ -58,6 +93,7 @@ public class EnemyMover
 
     public void HoldMovementForReaction()
     {
+        EndAttackRootMotion();
         if (_reactionHeld) return;
         _reactionHeld = true;
         if (_agent != null)
@@ -288,8 +324,10 @@ public class EnemyMover
     /// </summary>
     public void HoldMovementForAttack()
     {
-        if (_agent == null) return;
         if (_isMovementHeldForAttack) return;
+        if (_agent == null) { _isMovementHeldForAttack = true; return; }
+        _attackAgentRotation = _agent.updateRotation;
+        _agent.updateRotation = false;
 
         // 保存して無効化
         _prevAgentUpdatePosition = _agent.updatePosition;
@@ -304,8 +342,8 @@ public class EnemyMover
         if (_rb != null)
         {
             // 物理演算を無効にする前に速度を消去する。無効化後の剛体には速度を設定できない。
-            _rb.linearVelocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
+            _attackKinematic = _rb.isKinematic;
+            if (!_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
             _rb.isKinematic = true;
         }
 
@@ -324,25 +362,31 @@ public class EnemyMover
     /// </summary>
     public void ReleaseMovementAfterAttack()
     {
+        EndAttackRootMotion();
         if (_reactionHeld) { _releaseAttackAfterReaction = true; return; }
-        if (_agent == null) return;
         if (!_isMovementHeldForAttack) return;
+        if (_agent == null) { _isMovementHeldForAttack = false; return; }
+        Vector3 currentPosition = _rb != null ? _rb.position : _enemyTransform.position;
 
         // コンポーネントを再有効化して位置を同期
         _agent.enabled = _prevAgentEnabled;
         if (_agent.enabled)
         {
             // warp して NavMeshAgent の位置を現在の Transform に合わせる
-            _agent.Warp(_enemyTransform.position);
-            _agent.velocity = Vector3.zero;
-            _agent.isStopped = false;
+            if (_agent.isActiveAndEnabled && _agent.Warp(currentPosition) && _agent.isOnNavMesh)
+            {
+                _agent.nextPosition = currentPosition;
+                _agent.velocity = Vector3.zero;
+                _agent.isStopped = false;
+            }
             _agent.updatePosition = _prevAgentUpdatePosition;
+            _agent.updateRotation = _attackAgentRotation;
             _destinationUpdateTimer = 0f;
         }
 
         if (_rb != null)
         {
-            _rb.isKinematic = false;
+            _rb.isKinematic = _attackKinematic;
         }
 
         // Animator の root motion の設定を復帰
@@ -526,7 +570,14 @@ public class EnemyMover
     /// </summary>
     public void OnAnimatorMove()
     {
-        if (_reactionHeld) return;
+        if (_reactionHeld) { EndAttackRootMotion(); return; }
+        if (_usingRootMotionAttack)
+        {
+            if (_animator.speed <= 0f) { _pendingAttackRootMotion = Vector3.zero; return; }
+            Vector3 delta = _animator.deltaPosition; delta.y = 0f;
+            _pendingAttackRootMotion += delta * _attackRootMotionScale;
+            return;
+        }
         if (!_usingRootMotionStepBack) return;
         // Animator.deltaPosition/Rotation を transform に適用
         _enemyTransform.position += _animator.deltaPosition;

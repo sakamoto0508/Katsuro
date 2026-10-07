@@ -25,16 +25,16 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _AfterGlowAlpha: 0.055
-    - _BodyAlpha: 0.24
-    - _BodyWidth: 0.22
+    - _AfterGlowAlpha: 0.03
+    - _BodyAlpha: 0.14
+    - _BodyWidth: 0.12
     - _Brightness: 1.05
     - _CoreBrightness: 2.8
-    - _CoreWidth: 0.035
+    - _CoreWidth: 0.022
     - _EdgeFade: 0.12
-    - _FadePower: 1.2
-    - _TailFade: 0.5
-    - _TipBrightness: 1.2
+    - _FadePower: 1.8
+    - _TailFade: 0.4
+    - _TipBrightness: 1.35
     m_Colors:
     - _Tint: {r: 0.93, g: 0.97, b: 1, a: 1}
   m_BuildTextureStacks: []
