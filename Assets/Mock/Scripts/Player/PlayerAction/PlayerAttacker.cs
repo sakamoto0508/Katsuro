@@ -146,6 +146,7 @@ public sealed class PlayerAttacker : IDisposable
     public void EndAttack()
     {
         DisableWeaponHitbox();
+        _ownerAnimator?.GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
     }
 
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
@@ -172,6 +173,7 @@ public sealed class PlayerAttacker : IDisposable
 
     public void Dispose()
     {
+        _ownerAnimator?.GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
         _weapon?.UnregisterHitObserver(HandleWeaponHit);
         _hitTargets.Clear();
         _isHitboxActive = false;

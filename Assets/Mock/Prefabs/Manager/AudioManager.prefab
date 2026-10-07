@@ -83,6 +83,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
   - name: JustAvoid
     clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+  - name: EnemyDead
+    clip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
+  - name: Death
+    clip: {fileID: 8300000, guid: 7f51de64f3d2963439302f857b69f11f, type: 3}
   sfxPoolSize: 14
   maxSfxPoolSize: 32
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}

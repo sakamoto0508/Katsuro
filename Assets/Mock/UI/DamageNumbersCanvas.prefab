@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7368054810075776205}
   - component: {fileID: 7802597369648487832}
   - component: {fileID: 6728257244164210586}
+  - component: {fileID: 8612256581431382372}
   m_Layer: 5
   m_Name: DamageNumbersCanvas
   m_TagString: Untagged
@@ -107,6 +108,18 @@ MonoBehaviour:
   _randomOffsetRange: {x: 24, y: 12}
   _riseSpeed: 0.8
   _poolSize: 32
+--- !u!225 &8612256581431382372
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 735710095811615974}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1446514310371368724
 GameObject:
   m_ObjectHideFlags: 0

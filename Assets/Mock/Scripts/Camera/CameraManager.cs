@@ -13,6 +13,11 @@ public class CameraManager : MonoBehaviour
     public Camera OutputCamera => _outputCamera;
     private CameraConfig _config;
     private float _fovStarted = float.NegativeInfinity;
+    [Header("Final Blow")]
+    [SerializeField, Range(-6f, -3f)] private float _finalBlowFOVOffset = -4f;
+    [SerializeField, Range(.3f, .6f)] private float _finalBlowPushDuration = .42f;
+    private bool _finalBlowPlaying;
+    private float _finalBlowStarted;
     private Vector3 _savedPosition;
     private float _savedFov;
     private bool _renderOffsetApplied;
@@ -59,10 +64,18 @@ public class CameraManager : MonoBehaviour
     }
     public void PlayJustAvoidFeedback()
     {
-        if (_initialized && isActiveAndEnabled) _fovStarted = Time.unscaledTime;
+        if (_initialized && isActiveAndEnabled && !_finalBlowPlaying) _fovStarted = Time.unscaledTime;
     }
+    public void PlayFinalBlowFeedback(float delay = 0f)
+    {
+        if (!_initialized || !isActiveAndEnabled) return;
+        _fovStarted = float.NegativeInfinity;
+        _finalBlowStarted = Time.unscaledTime + Mathf.Max(0f, delay);
+        _finalBlowPlaying = true;
+    }
+    public void StopFinalBlowFeedback() { _finalBlowPlaying = false; RestoreCamera(); }
     private void OnEnable() { if (_initialized) SubscribeRendering(); }
-    private void OnDisable() { UnsubscribeRendering(); _fovStarted = float.NegativeInfinity; }
+    private void OnDisable() { UnsubscribeRendering(); _fovStarted = float.NegativeInfinity; StopFinalBlowFeedback(); }
     private void SubscribeRendering()
     {
         if (_subscribed) return;
@@ -90,7 +103,12 @@ public class CameraManager : MonoBehaviour
             _savedPosition, false, 2, out var offset, out var rotation))
             camera.transform.position += Vector3.ClampMagnitude(offset, .15f);
         float progress = (Time.unscaledTime - _fovStarted) / Mathf.Max(.01f, _config.JustAvoidFOVDuration);
-        if (progress >= 0f && progress < 1f)
+        if (_finalBlowPlaying)
+        {
+            float push = Mathf.SmoothStep(0, 1, Mathf.Clamp01((Time.unscaledTime - _finalBlowStarted) / Mathf.Max(.01f, _finalBlowPushDuration)));
+            camera.fieldOfView = Mathf.Clamp(_savedFov + _finalBlowFOVOffset * push, 1f, 179f);
+        }
+        else if (progress >= 0f && progress < 1f)
             camera.fieldOfView = Mathf.Clamp(_savedFov + _config.JustAvoidFOVOffset * Mathf.Sin(progress * Mathf.PI), 1f, 179f);
     }
     private void EndRendering(ScriptableRenderContext context, Camera camera)

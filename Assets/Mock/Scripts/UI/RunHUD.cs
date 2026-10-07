@@ -24,6 +24,8 @@ public sealed class RunHUD : MonoBehaviour
     [SerializeField] private TMP_Text _skill;
     [SerializeField] private TMP_Text _ghostStatus;
     private float _nextRefresh;
+    private bool _presentationControlsVisibility;
+    public void SetPresentationVisibility(bool controlled) => _presentationControlsVisibility = controlled;
 
     private GlobalFader _fader;
     private bool _initialized;
@@ -44,7 +46,7 @@ public sealed class RunHUD : MonoBehaviour
     {
         bool visible = RunSession.Active && _player != null
             && !(_fader != null && _fader.IsTransitioning);
-        if (_visibility != null) _visibility.alpha = visible ? 1f : 0f;
+        if (_visibility != null && !_presentationControlsVisibility) _visibility.alpha = visible ? 1f : 0f;
         float enemyHp = _enemy != null ? Mathf.Clamp01(_enemy.HpRatio) : 0f;
         if (_enemyGauge != null) _enemyGauge.SetNormalized(enemyHp);
         else if (_enemyHpFill != null) _enemyHpFill.fillAmount = enemyHp;

@@ -35,6 +35,8 @@ MonoBehaviour:
   _heavyHitVFXSize: 1
   _heavyHitVFXScale: 1.3
   _heavyHitVFXSpeed: 1.2
+  _counterHitVFXSpeed: 1.3
+  _counterHitVFXSize: 1.05
   _playEffectHeal: Heal
   _playEffectGhost: Ghost
   _playEffectBuff: Buff

@@ -26,6 +26,8 @@ public sealed class DamageNumbers : MonoBehaviour
     private Canvas canvas;
     private bool[] criticalHit;
     private bool _initialized;
+    private bool _presentationSuppressed;
+    public void SetPresentationSuppressed(bool suppressed) => _presentationSuppressed = suppressed;
     public void Init(Camera camera)
     {
         if (_initialized) return;
@@ -65,7 +67,7 @@ public sealed class DamageNumbers : MonoBehaviour
     }
     public void Show(Vector3 position, float amount, bool isCritical)
     {
-        if (!_initialized || !isActiveAndEnabled || amount <= 0) return;
+        if (!_initialized || _presentationSuppressed || !isActiveAndEnabled || amount <= 0) return;
         Display(position, amount, isCritical);
     }
     private void Display(Vector3 position, float amount, bool isCritical)

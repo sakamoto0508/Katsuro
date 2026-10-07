@@ -50,6 +50,11 @@ public class VFXConfig : ScriptableObject
     public float HeavyHitVFXAmount => _heavyHitVFXAmount;
     public float HeavyHitVFXSpread => _heavyHitVFXSpread;
     public float HeavyHitVFXSize => _heavyHitVFXSize;
+    [Header("Just Avoid Counter / Blood")]
+    [SerializeField, Range(1f, 1.4f)] private float _counterHitVFXSpeed = 1.3f;
+    [SerializeField, Range(1f, 1.2f)] private float _counterHitVFXSize = 1.05f;
+    public float CounterHitVFXSpeed => _counterHitVFXSpeed;
+    public float CounterHitVFXSize => _counterHitVFXSize;
     public GameObject HitVFX => _hitVFX;
     public float HitVFXDuration => _hitVFXDuration;
     public bool ShockwaveEnable => _shockwaveEnable;

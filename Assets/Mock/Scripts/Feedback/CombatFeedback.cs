@@ -276,20 +276,24 @@ public sealed class CombatFeedback : MonoBehaviour
     public void Hit() { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; Refresh(); }
 
     /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
-    [SerializeField, Min(0f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
-    private float _justAvoidCounterHitStop = .1f;
+    [SerializeField, Range(.12f, .16f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
+    private float _justAvoidCounterHitStop = .14f;
 
     public void Hit(DamageInfo info, bool useBoneReaction = true)
     {
         if (!_initialized || !isActiveAndEnabled) return;
+        // プレイヤー自身が被弾した場合も、追撃倍率を残さない。
+        GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
         float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
         bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
+        if (info.IsJustAvoidCounter && info.Instigator != null)
+            info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
         Vector3 direction = transform.InverseTransformDirection(info.HitNormal.normalized);
         if (!useBoneReaction) RemoveOffset();
         _reactionEuler = useBoneReaction ? new Vector3(-direction.z * angle, 0, direction.x * angle) : Vector3.zero;
         _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
         Refresh();
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, strongFeedback ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), strongFeedback ? .65f : .45f, new Color(1f, .96f, .9f));
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsJustAvoidCounter ? .17f : strongFeedback ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), info.IsJustAvoidCounter ? .7f : strongFeedback ? .65f : .45f, new Color(1f, .96f, .9f));
         PlayHitVFX(info);
         var config = _audio != null ? _audio.AudioConfig : null;
         _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
@@ -366,8 +370,8 @@ public sealed class CombatFeedback : MonoBehaviour
             var shape = particle.shape;
             shape.angle = _hitAngles[i][j] * (strongFeedback ? _vfxConfig.HeavyHitVFXSpread : 1f);
             var main = particle.main;
-            main.startSize = ScaleHitCurve(_hitSizes[i][j], strongFeedback ? _vfxConfig.HeavyHitVFXSize : 1f);
-            main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], strongFeedback ? _vfxConfig.HeavyHitVFXSpeed : 1f);
+            main.startSize = ScaleHitCurve(_hitSizes[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSize : strongFeedback ? _vfxConfig.HeavyHitVFXSize : 1f);
+            main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSpeed : strongFeedback ? _vfxConfig.HeavyHitVFXSpeed : 1f);
             particle.Play(false);
         }
     }

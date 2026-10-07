@@ -295,27 +295,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.2
+      value: 1.27
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.2
+      value: 1.27
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.2
+      value: 1.27
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.059
+      value: 0.086
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70706165
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7070614
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.008004958
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.008005226
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 1.297
       objectReference: {fileID: 0}
     - target: {fileID: 6561164620339482226, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -1530,6 +1554,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6603691807611529658}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3929211125781539537}
   m_SourcePrefab: {fileID: 100100000, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
 --- !u!4 &397743367516346889 stripped
 Transform:
@@ -1872,7 +1899,7 @@ MonoBehaviour:
   _heavyReactionAngle: 10
   _reactionDuration: 0.18
   _justAvoidBodyFlashStrength: 0.2
-  _justAvoidCounterHitStop: 0.1
+  _justAvoidCounterHitStop: 0.14
 --- !u!114 &6603691807611529658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1885,6 +1912,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e7d707dfbeb462883dfed68a2b7784c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationSpeedController
+--- !u!114 &3929211125781539537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7397786981939434362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5cbc042d32db334c933452567b094a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterAnimation
+  _counterWindupSpeed: 0.78
+  _counterSlashSpeed: 1.1
 --- !u!4 &7883702564304463566 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 505485589189708005, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
