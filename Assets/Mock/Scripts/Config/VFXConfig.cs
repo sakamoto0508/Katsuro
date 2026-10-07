@@ -3,6 +3,31 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
 public class VFXConfig : ScriptableObject
 {
+    [Header("Just Avoid / Screen Distortion")]
+    [SerializeField] private bool _screenDistortionEnable = true;
+    [SerializeField, Range(.1f, .18f)] private float _distortionDuration = .14f;
+    [Tooltip("画面高さを1とした最終半径。画面の隅まで届く半径は自動で保証する。")]
+    [SerializeField, Min(.1f)] private float _distortionMaxRadius = 1.15f;
+    [Tooltip("拡大速度の曲線。大きいほど最初に速く広がる。")]
+    [SerializeField, Range(1f, 3f)] private float _distortionRadiusSpeed = 1.6f;
+    [SerializeField, Range(.005f, .08f)] private float _distortionRingWidth = .03f;
+    [SerializeField, Range(0f, .02f)] private float _distortionStrength = .006f;
+    [SerializeField, Range(0f, .004f)] private float _distortionNoiseStrength = .001f;
+    [SerializeField, Range(1f, 60f)] private float _distortionNoiseScale = 24f;
+    [SerializeField, Range(.5f, 4f)] private float _distortionFadePower = 1.5f;
+    [SerializeField] private Color _distortionEdgeTint = new Color(.9f, .95f, 1f, 1f);
+    [SerializeField, Range(0f, .05f)] private float _distortionEdgeTintStrength;
+    public bool ScreenDistortionEnable => _screenDistortionEnable;
+    public float DistortionDuration => _distortionDuration;
+    public float DistortionMaxRadius => _distortionMaxRadius;
+    public float DistortionRadiusSpeed => _distortionRadiusSpeed;
+    public float DistortionRingWidth => _distortionRingWidth;
+    public float DistortionStrength => _distortionStrength;
+    public float DistortionNoiseStrength => _distortionNoiseStrength;
+    public float DistortionNoiseScale => _distortionNoiseScale;
+    public float DistortionFadePower => _distortionFadePower;
+    public Color DistortionEdgeTint => _distortionEdgeTint;
+    public float DistortionEdgeTintStrength => _distortionEdgeTintStrength;
     [Header("ジャスト回避")]
     [Tooltip("薄い円形衝撃波のParticleSystem Prefab。未設定なら衝撃波のみ省略。自動破棄スクリプトは付けない。")]
     [SerializeField] private GameObject _justAvoidShockwavePrefab;

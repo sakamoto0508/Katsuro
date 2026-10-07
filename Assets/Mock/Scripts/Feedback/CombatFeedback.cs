@@ -30,6 +30,7 @@ public sealed class CombatFeedback : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
     private Vector3 _reactionEuler;
     private CameraManager _cameraFeedback;
+    private JustAvoidScreenDistortion _screenDistortion;
     private HitStopManager _hitStop;
     private ContactPulse _contactPulse;
     private ParticleSystem[][] _hitParticles;
@@ -82,6 +83,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _audio = audio;
         _vfxConfig = vfxConfig;
         _cameraFeedback = camera; _hitStop = hitStop;
+        if (enableJustAvoid && camera != null) _screenDistortion = camera.GetComponent<JustAvoidScreenDistortion>();
         PrepareContactFeedback();
         // 敵の被弾用コンポーネントには残像用リソースを作らない。
         if (enableJustAvoid && (audio != null || vfxConfig != null)) PrepareJustAvoid(shader);
@@ -206,6 +208,7 @@ public sealed class CombatFeedback : MonoBehaviour
         }
         var sound = _audio != null && _audio.AudioConfig != null ? _audio.AudioConfig.JustAvoidSound : null;
         if (!string.IsNullOrEmpty(sound)) _audio.PlaySE(sound);
+        _screenDistortion?.Play(info.HitPoint, transform.position + Vector3.up, _vfxConfig);
         _contactPulse?.Play(info.HitPoint, info.HitNormal, _justAvoidFlashSize, _justAvoidFlashDuration, .65f);
         _cameraFeedback?.PlayJustAvoidFeedback();
         UpdateJustAvoid();

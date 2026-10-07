@@ -10,6 +10,7 @@ public class CameraManager : MonoBehaviour
     private LockOnCameraMover _lockOnCameraMover;
     [SerializeField] private CinemachineImpulseSource _combatImpulse;
     private Camera _outputCamera;
+    public Camera OutputCamera => _outputCamera;
     private CameraConfig _config;
     private float _fovStarted = float.NegativeInfinity;
     private Vector3 _savedPosition;

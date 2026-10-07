@@ -12,6 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
   m_Name: VFXConfig
   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
+  _screenDistortionEnable: 1
+  _distortionDuration: 0.14
+  _distortionMaxRadius: 1.15
+  _distortionRadiusSpeed: 1.6
+  _distortionRingWidth: 0.03
+  _distortionStrength: 0.006
+  _distortionNoiseStrength: 0.001
+  _distortionNoiseScale: 24
+  _distortionFadePower: 1.5
+  _distortionEdgeTint: {r: 0.9, g: 0.95, b: 1, a: 1}
+  _distortionEdgeTintStrength: 0
   _justAvoidShockwavePrefab: {fileID: 3032302795391208821, guid: 2d005552031c1e446b7cad9273902f91, type: 3}
   _shockwaveDuration: 0.25
   _shockwaveEnable: 0
