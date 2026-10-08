@@ -1,0 +1,35 @@
+Prefab Enemy; animator=Assets/Mock/AnimationController/Enemy.controller auto rootMotion=False agent enabled=True updatePosition=True updateRotation=True rootMotionScale=0.18
+Status Assets/Mock/ScriptableObjects/Enemy/EnemyStuts.asset RotationMode=Smooth TurnSpeed=180 ChaseStart=100 Stop=1.2
+TREE Blend Tree type=FreeformCartesian2D parameters=MoveVectorX/MoveVectorY
+ CHILD (0.00, 1.00) threshold=0 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Forward_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.001625013 end=0.001625013
+  RootT.z start=0.009530917 end=0.009530917
+ CHILD (0.70, 0.70) threshold=0.1428571 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Forward_Right_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.04122392 end=0.04122392
+  RootT.z start=0.04934706 end=0.04934706
+ CHILD (1.00, 0.00) threshold=0.2857143 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Rightward_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.04228549 end=0.04228549
+  RootT.z start=0.05489222 end=0.05489222
+ CHILD (0.70, -0.70) threshold=0.4285714 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Backward_Right_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.04718765 end=0.04718765
+  RootT.z start=-0.00379023 end=-0.00379023
+ CHILD (0.00, -1.00) threshold=0.5714286 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Backward_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.004345277 end=0.004345277
+  RootT.z start=0.003246093 end=0.003246093
+ CHILD (-0.70, -0.70) threshold=0.7142857 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Backward_Left_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.01599846 end=0.01599846
+  RootT.z start=0.03825494 end=0.03825494
+ CHILD (-1.00, 0.00) threshold=0.8571429 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Leftward_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=0.005569009 end=0.005569009
+  RootT.z start=0.05408322 end=0.05408322
+ CHILD (-0.70, 0.70) threshold=1 mirror=False clip=Assets/Mock/Animation/Enemy/Walk/ARPG_Halberd_Walk_Forward_Left_IPC.anim
+  clip mirror=False XZbake=False Ybake=True RotBake=True
+  RootT.x start=-0.009804635 end=-0.009804635
+  RootT.z start=0.01181585 end=0.01181585

@@ -1,0 +1,9 @@
+Edit Mode foot pose analysis: stance-foot travel is opposite locomotion. No runtime visual check.
+ARPG_Halberd_Walk_Forward_IPC tree=(0.00, 1.00) inferred direction=(0.08, 1.00) alignment=0.997 contact samples=89
+ARPG_Halberd_Walk_Forward_Right_IPC tree=(0.70, 0.70) inferred direction=(0.66, 0.75) alignment=0.998 contact samples=87
+ARPG_Halberd_Walk_Rightward_IPC tree=(1.00, 0.00) inferred direction=(0.99, 0.11) alignment=0.994 contact samples=96
+ARPG_Halberd_Walk_Backward_Right_IPC tree=(0.70, -0.70) inferred direction=(0.18, -0.98) alignment=0.820 contact samples=118
+ARPG_Halberd_Walk_Backward_IPC tree=(0.00, -1.00) inferred direction=(-0.07, -1.00) alignment=0.998 contact samples=100
+ARPG_Halberd_Walk_Backward_Left_IPC tree=(-0.70, -0.70) inferred direction=(-0.66, -0.75) alignment=0.998 contact samples=90
+ARPG_Halberd_Walk_Leftward_IPC tree=(-1.00, 0.00) inferred direction=(-0.99, -0.11) alignment=0.994 contact samples=105
+ARPG_Halberd_Walk_Forward_Left_IPC tree=(-0.70, 0.70) inferred direction=(-0.16, 0.99) alignment=0.809 contact samples=89

@@ -187,9 +187,10 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        if (_dead || (_game != null && !_game.IsCombatActive)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.ResetLocomotionAnimation(); return; }
         if (_enemyAnimController != null && _enemyAnimController.IsReacting)
         {
+            _mover?.ResetLocomotionAnimation();
             if (_enemyAnimController.TickHitReaction(Time.deltaTime))
             {
                 _mover?.ReleaseMovementAfterReaction();

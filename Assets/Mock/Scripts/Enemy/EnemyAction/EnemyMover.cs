@@ -83,7 +83,7 @@ public class EnemyMover
     private bool _isStepBack;
     private bool _isPatrolWalking;
     private bool _manualRotationDisabledByAgent = false;
-    float _speed = 0f;
+    private const float MovementDeadZone = .05f;
     private bool _prevAgentUpdatePosition = true;
     private bool _isMovementHeldForAttack = false;
     private bool _prevAnimatorApplyRootMotion = false;
@@ -113,8 +113,7 @@ public class EnemyMover
             if (!_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
             _rb.isKinematic = true;
         }
-        _animationController?.MoveVelocity(0f);
-        _animationController?.MoveVector(Vector2.zero);
+        ResetLocomotionAnimation();
     }
 
     public void ReleaseMovementAfterReaction()
@@ -145,7 +144,7 @@ public class EnemyMover
     /// </summary>
     public void Update()
     {
-        if (_reactionHeld) return;
+        if (_reactionHeld) { ResetLocomotionAnimation(); return; }
         if (_playerPosition == null) return;
 
         if (_isStepBack)
@@ -170,16 +169,13 @@ public class EnemyMover
         }
 
         // 通常追跡／追跡待機時の更新
-        UpdateAnimatorValues();
         UpdateTrackingAndDestination();
+        UpdateAnimatorValues();
     }
 
     // パトロール中のアニメ／回転／到達判定の更新
     private void UpdatePatrolWalking()
     {
-        _animationController?.MoveVelocity(_agent != null ? _agent.velocity.magnitude : 0f);
-        _animationController?.MoveVector(_agent != null ? TargetVector() : Vector2.zero);
-
         if (_enemyStuts != null)
         {
             switch (_enemyStuts.RotationMode)
@@ -210,22 +206,38 @@ public class EnemyMover
                 _isPatrolWalking = false;
             }
         }
+        UpdateAnimatorValues();
     }
 
     // Animator に渡す速度・方向値の更新
     private void UpdateAnimatorValues()
     {
-        if (_agent != null)
-        {
-            _speed = _agent.velocity.magnitude;
-        }
-        else if (_rb != null)
-        {
-            _speed = _rb.linearVelocity.magnitude;
-        }
+        Vector3 velocity = GetLocomotionVelocity();
+        _animationController?.MoveVelocity(velocity.magnitude);
+        _animationController?.MoveVector(GetLocalMovementDirection(velocity));
+    }
 
-        _animationController?.MoveVelocity(_speed);
-        _animationController?.MoveVector(_agent != null ? TargetVector() : Vector2.zero);
+    public void ResetLocomotionAnimation()
+    {
+        _animationController?.MoveVelocity(0f);
+        _animationController?.MoveVector(Vector2.zero);
+    }
+
+    private Vector3 GetLocomotionVelocity()
+    {
+        if (_reactionHeld || _isMovementHeldForAttack || _isStepBack || _agent == null ||
+            !_agent.isActiveAndEnabled || !_agent.isOnNavMesh || _agent.isStopped) return Vector3.zero;
+        Vector3 velocity = _agent.velocity;
+        velocity.y = 0f;
+        return velocity.sqrMagnitude < MovementDeadZone * MovementDeadZone ? Vector3.zero : velocity;
+    }
+
+    private Vector2 GetLocalMovementDirection(Vector3 velocity)
+    {
+        velocity.y = 0f;
+        if (_enemyTransform == null || velocity.sqrMagnitude < MovementDeadZone * MovementDeadZone) return Vector2.zero;
+        Vector3 local = _enemyTransform.InverseTransformDirection(velocity.normalized);
+        return new Vector2(local.x, local.z).normalized;
     }
 
     // 追跡の有効判定、目的地更新、回転の更新をまとめた処理
@@ -283,6 +295,7 @@ public class EnemyMover
     /// </summary>
     public void StopMove()
     {
+        ResetLocomotionAnimation();
         if (_agent == null)
         {
             return;
@@ -324,6 +337,7 @@ public class EnemyMover
     /// </summary>
     public void HoldMovementForAttack()
     {
+        ResetLocomotionAnimation();
         if (_isMovementHeldForAttack) return;
         if (_agent == null) { _isMovementHeldForAttack = true; return; }
         _attackAgentRotation = _agent.updateRotation;
@@ -410,15 +424,6 @@ public class EnemyMover
     {
         _agent.isStopped = false;
         _destinationUpdateTimer = 0f;
-    }
-
-    public Vector2 TargetVector()
-    {
-        if (_agent == null) return Vector2.zero;
-        Vector3 toTarget = _playerPosition.position - _enemyTransform.position;
-        Vector3 localDir = _enemyTransform.InverseTransformDirection(toTarget.normalized);
-        return new Vector2(localDir.x, localDir.z).normalized;
-
     }
 
     // プレイヤーのコライダー半径を考慮して目的地を少し手前にずらす
