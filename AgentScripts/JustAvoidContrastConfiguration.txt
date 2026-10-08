@@ -1,0 +1,10 @@
+Camera=Main Camera mask=1
+ExistingVolume=Global Volume priority=0 profile=Assets/Mock/Scenes/Demo_01/Global Volume Profile.asset
+ExistingVolume=Sky and Fog Volume - Out priority=0 profile=Assets/InportAssets/ForestLake/Maps/Demo_Profiles/PP_Demo_Main.asset
+Canvas=Canvas mode=ScreenSpaceOverlay
+Canvas=Canvas mode=ScreenSpaceOverlay
+Canvas=RunHUD_Legacy mode=ScreenSpaceOverlay
+Canvas=DamageNumbersCanvas mode=ScreenSpaceOverlay
+Canvas=BattleHUD mode=ScreenSpaceOverlay
+Canvas=FinalBlowOverlay mode=ScreenSpaceOverlay
+Saved dedicated profile, CameraManager and AudioManager prefabs. Priority=100

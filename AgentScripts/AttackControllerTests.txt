@@ -1,0 +1,9 @@
+Initial state=426572355 expected=426572355 path=Base Layer.Attacks.LockOnLightAttack.LockOnLightAttack
+Actual controller: state entry, phase speed=1.13, HitStop freeze, combo 1->2, outgoing multiplier reset passed.
+Actual controller chain LockOnLightAttack -> LOLightAttack2 -> LOLightAttack3 -> LOLightAttack4 -> LOLightAttack5 -> Idle passed; all phase multipliers reset.
+No next trigger: every stage returns to Idle, including single-stage and intermediate stops.
+Actual controller chain ARPG_Samurai_Attack_Combo1 -> ARPG_Samurai_Attack_Combo2 -> ARPG_Samurai_Attack_Combo3 -> ARPG_Samurai_Attack_Combo4 -> Idle passed; all phase multipliers reset.
+No next trigger: every stage returns to Idle, including single-stage and intermediate stops.
+Actual controller chain StrongAttack -> ARPG_Halberd_Attack_Heavy2 -> Idle passed; all phase multipliers reset.
+No next trigger: every stage returns to Idle, including single-stage and intermediate stops.
+Events disabled in controller checks; physical input routing/runtime untested.

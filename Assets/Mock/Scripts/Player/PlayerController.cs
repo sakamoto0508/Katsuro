@@ -508,34 +508,39 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>
     /// アニメーションイベント（ヒットボックス有効化）から呼ばれ、ゴースト中なら無効化を維持、それ以外は武器ヒットボックスを有効化する。
     /// </summary>
-    public void AnimEvent_EnableWeaponHitbox()
+    public void AnimEvent_EnableWeaponHitbox(AnimationEvent animationEvent)
     {
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
         _stateContext?.Attacker?.EnableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }
 
     /// <summary>アニメーションイベント（ヒットボックス無効化）で呼ばれ、武器ヒットボックスを強制的にオフにする。</summary>
-    public void AnimEvent_DisableWeaponHitbox()
+    public void AnimEvent_DisableWeaponHitbox(AnimationEvent animationEvent)
     {
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
         _stateContext?.Attacker?.DisableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
     }
 
     /// <summary>アニメーションイベントでコンボ受付が開いたタイミングを通知する。</summary>
-    public void AnimEvent_OnComboWindowOpened()
+    public void AnimEvent_OnComboWindowOpened(AnimationEvent animationEvent)
     {
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowOpened);
     }
 
     /// <summary>アニメーションイベントでコンボ受付が閉じたタイミングを通知する。</summary>
-    public void AnimEvent_OnComboWindowClosed()
+    public void AnimEvent_OnComboWindowClosed(AnimationEvent animationEvent)
     {
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowClosed);
     }
 
     /// <summary>攻撃アニメーション完了を現在ステートへ伝える。</summary>
-    public void AnimEvent_OnAttackFinished()
+    public void AnimEvent_OnAttackFinished(AnimationEvent animationEvent)
     {
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.AttackFinished);
     }
 

@@ -1,0 +1,14 @@
+Scene=Assets/Mock/Scenes/TitleScene.unity
+Canvas RunSetupCanvas mode=ScreenSpaceOverlay
+Canvas Canvas mode=ScreenSpaceOverlay
+Camera Default HDAdditionalCameraData volumeMask=1
+Camera Main Camera volumeMask=1
+Assets/Mock/Prefabs/Manager/CameraManager.prefab
+Transform CameraManager
+CinemachineImpulseSource CameraManager
+CameraManager CameraManager
+JustAvoidScreenDistortion CameraManager
+Assets/Mock/Prefabs/Manager/AudioManager.prefab
+Transform AudioManager
+AudioManager AudioManager
+SuccessSE=

@@ -1,0 +1,1 @@
+PASS: unscaled envelope timing, 1000 repeats/no stacking, 3 BGM baselines, SetBGMVolume/PlayBGM during duck, exact recovery, stopped BGM not restarted, cancellation/disable, saved prefab/profile re-read, GameScene inherited settings. Compile errors: none. Play Mode: not run.

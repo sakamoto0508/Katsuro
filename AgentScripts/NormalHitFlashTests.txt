@@ -1,0 +1,1 @@
+Enemy normal overlay created on actual skeleton; original materials unchanged; Light alpha=0.180 Heavy alpha=0.280; mesh/bones binding and cancellation passed. Rendering appearance untested.

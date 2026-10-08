@@ -1,0 +1,1 @@
+Edit Mode manual Animator.Update did not dispatch Animation Events on this Editor. Event delivery/ordering remains Runtime unverified; clip signatures and event poses were checked separately.

@@ -27,6 +27,19 @@ public sealed class CombatFeedback : MonoBehaviour
     [SerializeField, Range(0f, 20f)] private float _lightReactionAngle = 5f;
     [SerializeField, Range(0f, 25f)] private float _heavyReactionAngle = 10f;
     [SerializeField, Min(.01f)] private float _reactionDuration = .18f;
+    [Header("Enemy normal hit presentation only")]
+    [SerializeField, Range(.18f, .25f)] private float _enemyHeavyReactionDuration = .22f;
+    [SerializeField, Range(.3f, 1f)] private float _enemyAttackReactionScale = .55f;
+    [SerializeField, Range(0f, .5f)] private float _enemyLightFlashStrength = .18f;
+    [SerializeField, Range(0f, .5f)] private float _enemyHeavyFlashStrength = .28f;
+    private EnemyController _enemyOwner;
+    private EnemyAnimationController _enemyAnimation;
+    private Animator _reactionAnimator;
+    private EnemyBoneHitReaction _enemyBoneReaction;
+    private SkinnedMeshRenderer[] _normalFlashRenderers;
+    private Material _normalFlashMaterial;
+    private float _normalFlashUntil, _normalFlashLength;
+    private bool _normalFlashHeavy;
     [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
     private Vector3 _reactionEuler;
     private CameraManager _cameraFeedback;
@@ -61,6 +74,7 @@ public sealed class CombatFeedback : MonoBehaviour
     private float _hitUntil;
     private bool _ghost, _showing;
     private bool _initialized;
+    private JustAvoidContrast _justAvoidContrast;
 
     public void Init(AudioManager audio = null, VFXConfig vfxConfig = null, CameraManager camera = null, HitStopManager hitStop = null, bool enableJustAvoid = true)
     {
@@ -80,13 +94,72 @@ public sealed class CombatFeedback : MonoBehaviour
         var animator = GetComponentInChildren<Animator>();
         if (animator != null && animator.isHuman) _bone = animator.GetBoneTransform(HumanBodyBones.Chest);
         if (_bone == null && _renderers.Length > 0) _bone = ((SkinnedMeshRenderer)_renderers[0]).rootBone;
+        _reactionAnimator = animator;
+        _enemyOwner = GetComponent<EnemyController>();
+        if (_enemyOwner != null)
+        {
+            _enemyAnimation = GetComponent<EnemyAnimationController>();
+            _enemyBoneReaction = new EnemyBoneHitReaction(transform, animator);
+            PrepareNormalHitFlash(shader);
+        }
         _audio = audio;
         _vfxConfig = vfxConfig;
         _cameraFeedback = camera; _hitStop = hitStop;
         if (enableJustAvoid && camera != null) _screenDistortion = camera.GetComponent<JustAvoidScreenDistortion>();
+        if (enableJustAvoid && camera != null) _justAvoidContrast = camera.GetComponent<JustAvoidContrast>();
         PrepareContactFeedback();
         // 敵の被弾用コンポーネントには残像用リソースを作らない。
         if (enableJustAvoid && (audio != null || vfxConfig != null)) PrepareJustAvoid(shader);
+    }
+
+    private void PrepareNormalHitFlash(Shader shader)
+    {
+        if (shader == null) return;
+        _normalFlashMaterial = new Material(shader) { name = "Enemy Normal Hit Overlay" };
+        _normalFlashRenderers = new SkinnedMeshRenderer[_renderers.Length];
+        for (int i = 0; i < _renderers.Length; i++)
+        {
+            var source = (SkinnedMeshRenderer)_renderers[i];
+            if (source.sharedMesh == null) continue;
+            var flash = new GameObject("Normal Hit Flash", typeof(SkinnedMeshRenderer));
+            flash.layer = source.gameObject.layer;
+            flash.transform.SetParent(source.transform, false);
+            var overlay = flash.GetComponent<SkinnedMeshRenderer>();
+            overlay.sharedMesh = source.sharedMesh; overlay.bones = source.bones;
+            overlay.rootBone = source.rootBone; overlay.localBounds = source.localBounds;
+            overlay.sharedMaterials = RepeatedMaterial(_normalFlashMaterial, source.sharedMesh.subMeshCount);
+            overlay.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            overlay.receiveShadows = false; overlay.enabled = false;
+            _normalFlashRenderers[i] = overlay;
+        }
+    }
+
+    private void BeginNormalHitFlash(bool heavy)
+    {
+        _normalFlashHeavy = heavy;
+        _normalFlashLength = _hitFlashDuration;
+        _normalFlashUntil = Time.unscaledTime + _normalFlashLength;
+    }
+
+    private void UpdateNormalHitFlash()
+    {
+        if (_normalFlashMaterial == null) return;
+        float fade = Mathf.Clamp01((_normalFlashUntil - Time.unscaledTime) / Mathf.Max(.01f, _normalFlashLength));
+        _normalFlashMaterial.SetColor("_Tint", new Color(1f, .75f, .6f, fade * (_normalFlashHeavy ? _enemyHeavyFlashStrength : _enemyLightFlashStrength)));
+        for (int i = 0; i < _normalFlashRenderers.Length; i++)
+        {
+            var overlay = _normalFlashRenderers[i]; if (overlay == null) continue;
+            var source = (SkinnedMeshRenderer)_renderers[i];
+            overlay.enabled = fade > 0f && source != null && source.enabled && source.gameObject.activeInHierarchy;
+            if (overlay.enabled) for (int shape = 0; shape < source.sharedMesh.blendShapeCount; shape++) overlay.SetBlendShapeWeight(shape, source.GetBlendShapeWeight(shape));
+        }
+    }
+
+    public void CancelNormalHitReaction()
+    {
+        _enemyBoneReaction?.Clear();
+        _normalFlashUntil = 0f;
+        UpdateNormalHitFlash();
     }
 
     private void PrepareJustAvoid(Shader shader)
@@ -172,6 +245,7 @@ public sealed class CombatFeedback : MonoBehaviour
         StopJustAvoid();
         _justAvoidStarted = Time.unscaledTime;
         _justAvoidPlaying = true;
+        _justAvoidContrast?.Play(_audio);
         if (_afterImageRoot != null)
         {
             for (int i = 0; i < _renderers.Length; i++)
@@ -273,7 +347,17 @@ public sealed class CombatFeedback : MonoBehaviour
     /// <summary>
     /// 攻撃や被弾時のヒットエフェクトをトリガーします。
     /// </summary>
-    public void Hit() { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; Refresh(); }
+    public void Hit()
+    {
+        if (_enemyOwner != null)
+        {
+            _enemyBoneReaction?.Begin(new DamageInfo(0f, transform.position, -transform.forward, null, null),
+                _lightReactionAngle, _reactionDuration, _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f);
+            _hitUntil = 0f; BeginNormalHitFlash(false);
+        }
+        else { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; }
+        Refresh();
+    }
 
     /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
     [SerializeField, Range(.12f, .16f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
@@ -288,10 +372,27 @@ public sealed class CombatFeedback : MonoBehaviour
         bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
         if (info.IsJustAvoidCounter && info.Instigator != null)
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
-        Vector3 direction = transform.InverseTransformDirection(info.HitNormal.normalized);
-        if (!useBoneReaction) RemoveOffset();
-        _reactionEuler = useBoneReaction ? new Vector3(-direction.z * angle, 0, direction.x * angle) : Vector3.zero;
-        _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
+        if (_enemyOwner != null)
+        {
+            bool normal = !info.IsJustAvoidCounter;
+            if (normal && useBoneReaction)
+                _enemyBoneReaction?.Begin(info, angle, info.IsHeavy ? _enemyHeavyReactionDuration : _reactionDuration,
+                    _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f);
+            else CancelNormalHitReaction();
+            if (normal)
+            {
+                _hitUntil = 0f;
+                if (_enemyAnimation == null || !_enemyAnimation.IsReacting) BeginNormalHitFlash(info.IsHeavy);
+            }
+            else _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
+        }
+        else
+        {
+            Vector3 direction = transform.InverseTransformDirection(info.HitNormal.normalized);
+            if (!useBoneReaction) RemoveOffset();
+            _reactionEuler = useBoneReaction ? new Vector3(-direction.z * angle, 0, direction.x * angle) : Vector3.zero;
+            _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
+        }
         Refresh();
         _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsJustAvoidCounter ? .17f : strongFeedback ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), info.IsJustAvoidCounter ? .7f : strongFeedback ? .65f : .45f, new Color(1f, .96f, .9f));
         PlayHitVFX(info);
@@ -393,6 +494,7 @@ public sealed class CombatFeedback : MonoBehaviour
     private void Update() 
     { 
         RemoveOffset(); 
+        _enemyBoneReaction?.RemoveOffsets();
         Refresh(); 
         UpdateJustAvoid();
         _contactPulse?.Update();
@@ -403,6 +505,14 @@ public sealed class CombatFeedback : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (_enemyOwner != null)
+        {
+            if (_enemyOwner.HpRatio <= 0f || (_enemyAnimation != null && _enemyAnimation.IsReacting)) _enemyBoneReaction?.Clear();
+            _enemyBoneReaction?.Apply();
+            _enemyBoneReaction?.Tick(Time.deltaTime, _reactionAnimator != null ? _reactionAnimator.speed : 1f);
+            UpdateNormalHitFlash();
+            return;
+        }
         if (_bone == null) return;
         // ヒットエフェクトの残り時間に応じてボーンを揺らす
         float remaining = Mathf.Clamp01((_hitUntil - Time.unscaledTime) / Mathf.Max(.01f, _reactionDuration));
@@ -445,16 +555,21 @@ public sealed class CombatFeedback : MonoBehaviour
 
     private void OnDisable()
     {
+        _justAvoidContrast?.Cancel();
         StopJustAvoid();
         _contactPulse?.Stop();
         if (_hitRoots != null) for (int i = 0; i < _hitRoots.Length; i++) StopHitVFX(i);
         RemoveOffset();
+        CancelNormalHitReaction();
         _ghost = false; _hitUntil = 0;
         Refresh();
     }
 
     private void OnDestroy() 
     { 
+        _enemyBoneReaction?.Clear();
+        if (_normalFlashRenderers != null) foreach (var overlay in _normalFlashRenderers) if (overlay != null) Destroy(overlay.gameObject);
+        if (_normalFlashMaterial != null) Destroy(_normalFlashMaterial);
         _contactPulse?.Dispose();
         if (_hitRoots != null) foreach (var root in _hitRoots) if (root != null) Destroy(root);
         if (_afterImageMeshes != null)

@@ -39,7 +39,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.14
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -109,6 +109,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614d415a2ceda5948b0286ae0de5169a, type: 3}
   m_Name: LockOnLightAttack AttackRootMotion
   m_EditorClassIdentifier: Assembly-CSharp::AttackRootMotionState
+--- !u!114 &-8273167298339190877
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: LOLightAttack3 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_LOLightAttack3
+  _windupSpeed: 0.97
+  _slashSpeed: 1.12
+  _recoverySpeed: 1
+  _slashStart: 0.20689654
+  _slashEnd: 0.51724136
+  _recoveryStart: 0.59999996
 --- !u!1101 &-8080028471732562437
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -262,7 +281,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.15
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -362,7 +381,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.2
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -467,7 +486,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.18
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -621,6 +640,25 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &-6628450325741274478
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: LockOnLightAttack NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_LockOnLightAttack
+  _windupSpeed: 0.96
+  _slashSpeed: 1.13
+  _recoverySpeed: 1
+  _slashStart: 0.18620689
+  _slashEnd: 0.48310345
+  _recoveryStart: 0.5689655
 --- !u!1101 &-6554692271118426536
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -666,7 +704,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.18
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -691,7 +729,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.2
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -815,17 +853,18 @@ AnimatorState:
   - {fileID: 2206541255654907815}
   m_StateMachineBehaviours:
   - {fileID: -7894085126040783723}
+  - {fileID: -8273167298339190877}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 0badb8a681214374b9c489c12e569135, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_LOLightAttack3
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -890,17 +929,18 @@ AnimatorState:
   - {fileID: -1917278568962732856}
   m_StateMachineBehaviours:
   - {fileID: -7196374510473163664}
+  - {fileID: 2447734996991098948}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 1d51e6c804c6fdf4a858eb75053806c6, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_ARPG_Samurai_Attack_Combo1
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -1063,17 +1103,18 @@ AnimatorState:
   - {fileID: -1055707593828537246}
   m_StateMachineBehaviours:
   - {fileID: -4602925813972043834}
+  - {fileID: 1185625886411095589}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 584acc98c5f6d6949b8b6997f02f28c8, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_ARPG_Samurai_Attack_Combo3
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -1158,6 +1199,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-2796247167608160988
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: StrongAttack NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_StrongAttack
+  _windupSpeed: 0.88
+  _slashSpeed: 1.15
+  _recoverySpeed: 0.97
+  _slashStart: 0.10169491
+  _slashEnd: 0.2338983
+  _recoveryStart: 0.6610169
 --- !u!1102 &-2489328957119337317
 AnimatorState:
   serializedVersion: 6
@@ -1239,6 +1299,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-1999088374179010247
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo2 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_ARPG_Samurai_Attack_Combo2
+  _windupSpeed: 0.96
+  _slashSpeed: 1.13
+  _recoverySpeed: 1
+  _slashStart: 0.29999998
+  _slashEnd: 0.46551722
+  _recoveryStart: 0.5482758
 --- !u!1101 &-1917278568962732856
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1256,7 +1335,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.14
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -1310,7 +1389,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.14
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -1318,6 +1397,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &-1235307691996447005
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo4 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_ARPG_Samurai_Attack_Combo4
+  _windupSpeed: 0.94
+  _slashSpeed: 1.12
+  _recoverySpeed: 0.99
+  _slashStart: 0.34782606
+  _slashEnd: 0.4608695
+  _recoveryStart: 0.6782608
 --- !u!1102 &-1204903817692061895
 AnimatorState:
   serializedVersion: 6
@@ -1332,17 +1430,18 @@ AnimatorState:
   - {fileID: -1192225429750529039}
   m_StateMachineBehaviours:
   - {fileID: 6846944226239206623}
+  - {fileID: -1235307691996447005}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: e3a9c885862184849917677177ec16d0, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_ARPG_Samurai_Attack_Combo4
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -1360,7 +1459,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.16
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -1461,17 +1560,18 @@ AnimatorState:
   - {fileID: -6256737828292125027}
   m_StateMachineBehaviours:
   - {fileID: 1476322374859151586}
+  - {fileID: 4245527211975199750}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: a60387158dce5d441a4e701f68411d73, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_ARPG_Halberd_Attack_Heavy2
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -1492,7 +1592,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.14
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -1702,6 +1802,72 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
   - m_Name: JustAvoidCounterSpeed
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_LockOnLightAttack
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_StrongAttack
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_LOLightAttack2
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_LOLightAttack3
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_LOLightAttack4
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_LOLightAttack5
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_ARPG_Samurai_Attack_Combo1
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_ARPG_Samurai_Attack_Combo2
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_ARPG_Samurai_Attack_Combo4
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_ARPG_Samurai_Attack_Combo3
+    m_Type: 1
+    m_DefaultFloat: 1
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AttackPhase_ARPG_Halberd_Attack_Heavy2
     m_Type: 1
     m_DefaultFloat: 1
     m_DefaultInt: 0
@@ -2037,6 +2203,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &1185625886411095589
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo3 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_ARPG_Samurai_Attack_Combo3
+  _windupSpeed: 0.98
+  _slashSpeed: 1.1
+  _recoverySpeed: 1
+  _slashStart: 0.2076923
+  _slashEnd: 0.34615383
+  _recoveryStart: 0.46153843
 --- !u!1101 &1276741305430082299
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -2062,6 +2247,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &1381091112901214453
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: LOLightAttack2 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_LOLightAttack2
+  _windupSpeed: 0.98
+  _slashSpeed: 1.1
+  _recoverySpeed: 1
+  _slashStart: 0.14285713
+  _slashEnd: 0.3333333
+  _recoveryStart: 0.4095238
 --- !u!114 &1476322374859151586
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2129,17 +2333,18 @@ AnimatorState:
   - {fileID: -7800370420633713930}
   m_StateMachineBehaviours:
   - {fileID: -6137440555493668707}
+  - {fileID: -1999088374179010247}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: aaf9d0158ed08de4292c0edda2e5b35a, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_ARPG_Samurai_Attack_Combo2
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -2157,7 +2362,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.15
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -2193,6 +2398,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &2447734996991098948
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: ARPG_Samurai_Attack_Combo1 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_ARPG_Samurai_Attack_Combo1
+  _windupSpeed: 0.96
+  _slashSpeed: 1.12
+  _recoverySpeed: 1
+  _slashStart: 0.20816325
+  _slashEnd: 0.4285714
+  _recoveryStart: 0.52653056
 --- !u!1102 &2457002711215313475
 AnimatorState:
   serializedVersion: 6
@@ -2332,7 +2556,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.16
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -2379,7 +2603,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.14
   m_TransitionOffset: 0
   m_ExitTime: 1
   m_HasExitTime: 1
@@ -2533,6 +2757,25 @@ BlendTree:
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 2
+--- !u!114 &4245527211975199750
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: ARPG_Halberd_Attack_Heavy2 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_ARPG_Halberd_Attack_Heavy2
+  _windupSpeed: 0.87
+  _slashSpeed: 1.16
+  _recoverySpeed: 0.96
+  _slashStart: 0.20869564
+  _slashEnd: 0.40608692
+  _recoveryStart: 0.49565214
 --- !u!1102 &4288687338870418054
 AnimatorState:
   serializedVersion: 6
@@ -2578,17 +2821,18 @@ AnimatorState:
   - {fileID: 3793542400429430574}
   m_StateMachineBehaviours:
   - {fileID: -8632674916256315494}
+  - {fileID: -6628450325741274478}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 698f11a879b74ff45a027cdbd52aef2d, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_LockOnLightAttack
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -2728,6 +2972,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &4859882275230149316
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: LOLightAttack5 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_LOLightAttack5
+  _windupSpeed: 0.94
+  _slashSpeed: 1.15
+  _recoverySpeed: 0.98
+  _slashStart: 0.16438356
+  _slashEnd: 0.3558904
+  _recoveryStart: 0.42739722
 --- !u!1102 &5159963881509107748
 AnimatorState:
   serializedVersion: 6
@@ -2804,17 +3067,18 @@ AnimatorState:
   - {fileID: 3427400789054076471}
   m_StateMachineBehaviours:
   - {fileID: -7869815677653099850}
+  - {fileID: 4859882275230149316}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 9c8231dc4d0800b4a9a85b731cbdb620, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_LOLightAttack5
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -2893,17 +3157,18 @@ AnimatorState:
   - {fileID: 8047843046999012700}
   m_StateMachineBehaviours:
   - {fileID: -4842205826068084289}
+  - {fileID: -2796247167608160988}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: f2b3aa49c017ca64e99a95884ba7ca5f, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_StrongAttack
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -3061,17 +3326,18 @@ AnimatorState:
   - {fileID: -9034761680619920034}
   m_StateMachineBehaviours:
   - {fileID: 1852340904248753726}
+  - {fileID: 1381091112901214453}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: b982d08b4e65eae4c957d299bb59b691, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_LOLightAttack2
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
@@ -3125,6 +3391,25 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &7444933818512967140
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e5e95f2a216474da5c030308986a89, type: 3}
+  m_Name: LOLightAttack4 NormalAttackPhase
+  m_EditorClassIdentifier: Assembly-CSharp::NormalAttackSpeedState
+  _speedParameter: AttackPhase_LOLightAttack4
+  _windupSpeed: 1
+  _slashSpeed: 1.08
+  _recoverySpeed: 1
+  _slashStart: 0.07619047
+  _slashEnd: 0.3333333
+  _recoveryStart: 0.4095238
 --- !u!1102 &7449208368846366493
 AnimatorState:
   serializedVersion: 6
@@ -3453,17 +3738,18 @@ AnimatorState:
   - {fileID: 3787366653914618756}
   m_StateMachineBehaviours:
   - {fileID: 2813950279205913330}
+  - {fileID: 7444933818512967140}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
   m_Mirror: 0
-  m_SpeedParameterActive: 0
+  m_SpeedParameterActive: 1
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: efded1b06d94af943aebb26173140f81, type: 2}
-  m_Tag: 
-  m_SpeedParameter: 
+  m_Tag: NormalAttack
+  m_SpeedParameter: AttackPhase_LOLightAttack4
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 

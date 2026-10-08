@@ -1,0 +1,24 @@
+Player/LockOnLightAttack window seconds 0.917 -> 0.871
+Player/LockOnLightAttack root XZ baseline=(-0.0078, 0.0000, 0.4851) phase=(-0.0078, 0.0000, 0.4851) full duration=1.208 -> 1.170s; frozen clip test passed
+Player/LOLightAttack2 window seconds 1.188 -> 1.163
+Player/LOLightAttack2 root XZ baseline=(0.0737, 0.0000, 1.4309) phase=(0.0737, 0.0000, 1.4309) full duration=1.313 -> 1.289s; frozen clip test passed
+Player/LOLightAttack3 window seconds 1.042 -> 1.002
+Player/LOLightAttack3 root XZ baseline=(-0.0526, 0.0000, 0.7730) phase=(-0.0526, 0.0000, 0.7730) full duration=1.208 -> 1.170s; frozen clip test passed
+Player/LOLightAttack4 window seconds 1.125 -> 1.096
+Player/LOLightAttack4 root XZ baseline=(0.0573, 0.0000, 1.5010) phase=(0.0573, 0.0000, 1.5010) full duration=1.313 -> 1.284s; frozen clip test passed
+Player/LOLightAttack5 root XZ baseline=(-0.0381, 0.0000, 1.0493) phase=(-0.0381, 0.0000, 1.0493) full duration=1.521 -> 1.510s; frozen clip test passed
+Player/ARPG_Samurai_Attack_Combo1 window seconds 0.875 -> 0.853
+Player/ARPG_Samurai_Attack_Combo1 root XZ baseline=(0.0000, 0.0000, 0.6071) phase=(0.0000, 0.0000, 0.6071) full duration=1.021 -> 1.000s; frozen clip test passed
+Player/ARPG_Samurai_Attack_Combo2 window seconds 1.083 -> 1.067
+Player/ARPG_Samurai_Attack_Combo2 root XZ baseline=(0.0025, 0.0000, 1.0278) phase=(0.0025, 0.0000, 1.0278) full duration=1.208 -> 1.195s; frozen clip test passed
+Player/ARPG_Samurai_Attack_Combo4 root XZ baseline=(0.1316, 0.0000, 1.4216) phase=(0.1316, 0.0000, 1.4216) full duration=1.438 -> 1.441s; frozen clip test passed
+Player/ARPG_Samurai_Attack_Combo3 window seconds 0.875 -> 0.858
+Player/ARPG_Samurai_Attack_Combo3 root XZ baseline=(-0.0326, 0.0000, 1.5127) phase=(-0.0326, 0.0000, 1.5127) full duration=1.083 -> 1.069s; frozen clip test passed
+Player/StrongAttack window seconds 0.813 -> 0.778
+Player/StrongAttack root XZ baseline=(-0.0310, 0.0000, 2.6450) phase=(-0.0310, 0.0000, 2.6450) full duration=1.229 -> 1.210s; frozen clip test passed
+Player/ARPG_Halberd_Attack_Heavy2 root XZ baseline=(0.1020, 0.0000, 1.6005) phase=(0.1020, 0.0000, 1.6005) full duration=1.438 -> 1.467s; frozen clip test passed
+Enemy/AttackHeavy2 root XZ baseline=(-0.2333, 0.0000, -3.7012) phase=(-0.2333, 0.0000, -3.7012) full duration=1.548 -> 1.525s; frozen clip test passed
+Enemy/AttackHeavy root XZ baseline=(-0.3382, 0.0000, -3.6363) phase=(-0.3381, 0.0000, -3.6363) full duration=1.452 -> 1.420s; frozen clip test passed
+Enemy/LightAttack1 root XZ baseline=(-0.1569, 0.0000, -2.6958) phase=(-0.1569, 0.0000, -2.6958) full duration=2.095 -> 2.089s; frozen clip test passed
+Enemy/LightAttack2 root XZ baseline=(-0.0435, 0.0000, -2.6164) phase=(-0.0435, 0.0000, -2.6164) full duration=1.905 -> 1.898s; frozen clip test passed
+Validated 15 normal attack profiles. Isolated clip/root math; no Play Mode or input/physics runtime claims.

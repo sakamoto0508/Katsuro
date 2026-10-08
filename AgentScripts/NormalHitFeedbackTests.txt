@@ -1,0 +1,3 @@
+16 direction/yaw cases; Light chest peak=5.85deg Heavy=10.14deg; continuous Light->Heavy; 100 paused frames; 1000 repeated hits; clean recovery; fresh Animator pose preservation; Root/Hips unchanged passed.
+EnemyController.ApplyDamage integration: Light/Heavy preserve Base Layer, attack hash, root motion, hitbox, pending action, nav settings; Counter retains full-body interruption; Death clears normal/full-body reactions. Injected dependencies; no game loop or physics/AI decisions executed.
+Player shared-code regression: original 5/10deg Chest Euler path and .18s duration retained; no Enemy reaction helper.

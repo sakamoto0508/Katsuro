@@ -37,6 +37,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private EnemyMover _mover;
     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
     private int _attackAnimationHash;
+    public bool IsAttackAnimationActive => _attackAnimationHash != 0;
     public void BeginAnimationAttackRootMotion(int stateHash)
     {
         if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
@@ -151,6 +152,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             bool lethal = _health.CurrentHp <= 0f;
             bool counter = !lethal && info.IsJustAvoidCounter;
+            if (counter || lethal) _combatFeedback?.CancelNormalHitReaction();
             if (counter)
             {
                 _attacker?.DisableWeaponHitbox();
@@ -247,6 +249,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void EnemyDead()
     {
+        _combatFeedback?.CancelNormalHitReaction();
         _attackAnimationHash = 0;
         _mover?.InterruptMovementAction();
         _enemyAnimController.CancelHitReaction();

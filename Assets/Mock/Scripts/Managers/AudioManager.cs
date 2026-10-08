@@ -38,6 +38,59 @@ public class AudioManager : MonoBehaviour
     private AudioLowPassFilter _lowPass;
     [SerializeField, Min(3)] private int _bgmChannelCount = 3;
     private bool _initialized;
+    [Header("Just Avoid BGM Duck (unscaled seconds)")]
+    [SerializeField, Range(0, 1)] private float _justAvoidDuckVolume = .25f;
+    [SerializeField, Min(0)] private float _justAvoidDuckEnter = .03f;
+    [SerializeField, Min(0)] private float _justAvoidDuckHold = .10f;
+    [SerializeField, Min(0)] private float _justAvoidDuckRestore = .18f;
+    private readonly Dictionary<AudioSource, float> _bgmBaseVolumes = new();
+    private JustAvoidEnvelope _duckEnvelope;
+    private float _duckMultiplier = 1;
+    private float BaseVolume(AudioSource source)
+    {
+        if (!_bgmBaseVolumes.TryGetValue(source, out float volume))
+            _bgmBaseVolumes[source] = volume = source.volume;
+        return volume;
+    }
+    private void SetBaseVolume(AudioSource source, float volume)
+    {
+        _bgmBaseVolumes[source] = volume;
+        source.volume = volume * _duckMultiplier;
+    }
+    public void PlayJustAvoidDuck()
+    {
+        if (!isActiveAndEnabled) return;
+        UpdateDuck(Time.unscaledTime);
+        _duckEnvelope.Begin(Time.unscaledTime);
+    }
+    private void Update() => UpdateDuck(Time.unscaledTime);
+    private void UpdateDuck(float now)
+    {
+        _duckMultiplier = Mathf.Lerp(1, _justAvoidDuckVolume,
+            _duckEnvelope.Evaluate(now, _justAvoidDuckEnter, _justAvoidDuckHold, _justAvoidDuckRestore));
+        if (bgmSources != null) foreach (var source in bgmSources)
+            if (source != null) source.volume = BaseVolume(source) * _duckMultiplier;
+    }
+    public void CancelJustAvoidDuck() { _duckEnvelope.Reset(); UpdateDuck(Time.unscaledTime); }
+    private void SceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next) => CancelJustAvoidDuck();
+    private void SceneUnloaded(UnityEngine.SceneManagement.Scene scene) => CancelJustAvoidDuck();
+    private void GameStateChanged(GameManager.GameState state)
+    {
+        if (state != GameManager.GameState.InGame && state != GameManager.GameState.Pause) CancelJustAvoidDuck();
+    }
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
+        UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SceneUnloaded;
+        GameManager.OnGameStateChanged += GameStateChanged;
+    }
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= SceneChanged;
+        UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= SceneUnloaded;
+        GameManager.OnGameStateChanged -= GameStateChanged;
+        CancelJustAvoidDuck();
+    }
     public void Init(AudioListener listener)
     {
         if (Instance != null && Instance != this)
@@ -192,12 +245,12 @@ public class AudioManager : MonoBehaviour
 
         // 既に指定チャンネルで同じクリップ・同じ音量で再生中なら処理しない。
         float clampedVolume = Mathf.Clamp01(volume);
-        if (source.clip == clip && source.isPlaying && Mathf.Approximately(source.volume, clampedVolume)) return;
+        if (source.clip == clip && source.isPlaying && Mathf.Approximately(BaseVolume(source), clampedVolume)) return;
 
         source.Stop();
         source.clip = clip;
         source.loop = true;
-        source.volume = clampedVolume;
+        SetBaseVolume(source, clampedVolume);
         source.Play();
     }
 
@@ -301,13 +354,13 @@ public class AudioManager : MonoBehaviour
             if (bgmSources == null) return;
             foreach (var s in bgmSources)
             {
-                if (s != null) s.volume = volume;
+                if (s != null) SetBaseVolume(s, volume);
             }
         }
         else
         {
             var src = GetBgmSource(channel);
-            if (src != null) src.volume = volume;
+            if (src != null) SetBaseVolume(src, volume);
         }
     }
 
@@ -406,6 +459,7 @@ public class AudioManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        CancelJustAvoidDuck();
         if (Instance == this) Instance = null;
     }
 }

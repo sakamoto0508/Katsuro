@@ -28,6 +28,7 @@ public class FinalBlowManager : MonoBehaviour
     [SerializeField, Min(0f)] private float _textDelay = 1.05f;
     private CancellationTokenSource _sequenceCancellation;
     private bool _isPlaying;
+    public bool IsPlaying => _isPlaying;
 
     private GameManager _game;
     private AudioManager _audio;
@@ -60,6 +61,8 @@ public class FinalBlowManager : MonoBehaviour
     {
         if (_isPlaying || _sequenceCancellation != null || !isActiveAndEnabled || _enemyController == null || _player == null) return;
         _isPlaying = true;
+        _cameraFeedback?.GetComponent<JustAvoidContrast>()?.Cancel();
+        _audio?.CancelJustAvoidDuck();
         _sequenceCancellation = new CancellationTokenSource();
         if (_presentation != null) _presentation.Begin(_finalBlowText, _whiteFlashDuration, _textDelay, _finalBlowTextFadeIn);
         _game?.WinGame();

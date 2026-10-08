@@ -1,0 +1,197 @@
+Player PREFAB rootMotion=False components=Transform,Animator,BoneRenderer,CapsuleCollider,Rigidbody,PlayerController,PlayerAnimationController,CharacterEffect,CombatFeedback,AnimationSpeedController,JustAvoidCounterAnimation
+PARAM MoveVelocity Float default=0
+PARAM IsDrawing Bool default=0
+PARAM IsSwordDrawn Bool default=0
+PARAM IsLockOn Bool default=0
+PARAM MoveVectorX Float default=0
+PARAM MoveVectorY Float default=0
+PARAM LightAttack Trigger default=0
+PARAM StrongAttack Trigger default=0
+PARAM ComboStep Int default=0
+PARAM JustAvoid Bool default=0
+PARAM JustAvoidWindow Trigger default=0
+PARAM PlayerDead Trigger default=0
+PARAM SwordSheathing Trigger default=0
+PARAM JustAvoidCounterSpeed Float default=1
+PARAM AttackPhase_LockOnLightAttack Float default=1
+PARAM AttackPhase_StrongAttack Float default=1
+PARAM AttackPhase_LOLightAttack2 Float default=1
+PARAM AttackPhase_LOLightAttack3 Float default=1
+PARAM AttackPhase_LOLightAttack4 Float default=1
+PARAM AttackPhase_LOLightAttack5 Float default=1
+PARAM AttackPhase_ARPG_Samurai_Attack_Combo1 Float default=1
+PARAM AttackPhase_ARPG_Samurai_Attack_Combo2 Float default=1
+PARAM AttackPhase_ARPG_Samurai_Attack_Combo4 Float default=1
+PARAM AttackPhase_ARPG_Samurai_Attack_Combo3 Float default=1
+PARAM AttackPhase_ARPG_Halberd_Attack_Heavy2 Float default=1
+LAYER Base Layer weight=0 mode=Override
+STATE LockOnLightAttack speed=0.8 parameter=AttackPhase_LockOnLightAttack active=True clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B1.anim length=0.9666667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.15000 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.20000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.23333 AnimEvent_OnSoundEffect args=0/0/NormalSlash
+ EVENT 0.46667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.88333 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.96667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LockOnIdle duration=0.14 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=ComboStep:NotEqual:1
+ TRANS LOLightAttack2 duration=0.25 fixed=True exit=False time=0.7413793 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:1
+STATE LOLightAttack2 speed=0.8 parameter=AttackPhase_LOLightAttack2 active=True clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B2.anim length=1.05 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.05000 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.16667 AnimEvent_OnSoundEffect args=0/0/Slash
+ EVENT 0.20000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.35000 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.00000 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 1.05000 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LOLightAttack3 duration=0.25 fixed=True exit=False time=0.7619048 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:2
+ TRANS LockOnIdle duration=0.14 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE LOLightAttack3 speed=0.8 parameter=AttackPhase_LOLightAttack3 active=True clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B3.anim length=0.9666667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.05000 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.21667 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.23333 AnimEvent_OnSoundEffect args=0/0/NormalSlash
+ EVENT 0.50000 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.88333 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.96667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LOLightAttack4 duration=0.25 fixed=True exit=False time=0.7413793 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:3
+ TRANS LockOnIdle duration=0.15 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE LOLightAttack4 speed=0.8 parameter=AttackPhase_LOLightAttack4 active=True clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B4.anim length=1.05 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.00000 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.10000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.28333 AnimEvent_OnSoundEffect args=0/0/SmallSlash
+ EVENT 0.31667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.90000 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 1.05000 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LOLightAttack5 duration=0.25 fixed=True exit=False time=0.7619048 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:4
+ TRANS LockOnIdle duration=0.14 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE LOLightAttack5 speed=0.8 parameter=AttackPhase_LOLightAttack5 active=True clip=Assets/Mock/Animation/Player/LightAttack/Samurai_Attack_Combo_B5.anim length=1.216667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.21667 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.31667 AnimEvent_OnSoundEffect args=0/0/NormalSlash2
+ EVENT 0.43333 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.21667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LockOnIdle duration=0.16 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE UnLockLightAttack speed=0.8 parameter= active=False clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Idle2_to_Idle1.anim length=0.4833333 behaviours=AttackRootMotionState
+ TRANS ARPG_Samurai_Attack_Combo1 duration=0.06011137 fixed=True exit=True time=0.03472959 offset=0 interrupt=None ordered=True cond=
+STATE ARPG_Samurai_Attack_Combo1 speed=0.8 parameter=AttackPhase_ARPG_Samurai_Attack_Combo1 active=True clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo1.anim length=0.8166667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.03333 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.18333 AnimEvent_OnSoundEffect args=0/0/NormalSlash
+ EVENT 0.20000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.31667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.73333 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.81667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS ARPG_Samurai_Attack_Combo2 duration=0.25 fixed=True exit=False time=0.6938776 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:1
+ TRANS UnLockOnIdle duration=0.14 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=ComboStep:NotEqual:1
+STATE ARPG_Samurai_Attack_Combo2 speed=0.8 parameter=AttackPhase_ARPG_Samurai_Attack_Combo2 active=True clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo2.anim length=0.9666667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.05000 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.31667 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.35000 AnimEvent_OnSoundEffect args=0/0/Slash
+ EVENT 0.43333 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.91667 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.96667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS ARPG_Samurai_Attack_Combo3 duration=0.25 fixed=True exit=False time=0.7413793 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:2
+ TRANS UnLockOnIdle duration=0.15 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=ComboStep:NotEqual:2
+STATE ARPG_Samurai_Attack_Combo4 speed=0.8 parameter=AttackPhase_ARPG_Samurai_Attack_Combo4 active=True clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo4.anim length=1.15 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.43333 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.45000 AnimEvent_OnSoundEffect args=0/0/BigSlash
+ EVENT 0.75000 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.15000 AnimEvent_OnAttackFinished args=0/0/
+ TRANS UnLockOnIdle duration=0.16 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE ARPG_Samurai_Attack_Combo3 speed=0.8 parameter=AttackPhase_ARPG_Samurai_Attack_Combo3 active=True clip=Assets/Mock/Animation/Player/UnLockLightAttack/ARPG_Samurai_Attack_Combo3.anim length=0.8666667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.08333 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.20000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.25000 AnimEvent_OnSoundEffect args=0/0/Poke
+ EVENT 0.60000 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.78333 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.86667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS ARPG_Samurai_Attack_Combo4 duration=0.25 fixed=True exit=False time=0.7115385 offset=0 interrupt=None ordered=True cond=LightAttack:If:0,ComboStep:Equals:3
+ TRANS UnLockOnIdle duration=0.14 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=ComboStep:NotEqual:3
+STATE StrongAttackReady speed=0.8 parameter= active=False clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1_Start.anim length=0.8166667 behaviours=AttackRootMotionState
+ TRANS StrongAttack duration=0.06629054 fixed=True exit=True time=0 offset=0 interrupt=None ordered=True cond=
+STATE StrongAttack speed=0.8 parameter=AttackPhase_StrongAttack active=True clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy1.anim length=0.9833334 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.01667 AnimEvent_OnComboWindowOpened args=0/0/
+ EVENT 0.15000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.16667 AnimEvent_OnSoundEffect args=0/0/Poke
+ EVENT 0.58333 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.66667 AnimEvent_OnComboWindowClosed args=0/0/
+ EVENT 0.98333 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LockOnIdle duration=0.18 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=IsLockOn:If:0,ComboStep:NotEqual:1
+ TRANS UnLockOnIdle duration=0.18 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=IsLockOn:IfNot:0,ComboStep:NotEqual:1
+ TRANS ARPG_Halberd_Attack_Heavy2 duration=0.25 fixed=True exit=False time=0.4519821 offset=0 interrupt=None ordered=True cond=StrongAttack:If:0,ComboStep:Equals:1
+STATE ARPG_Halberd_Attack_Heavy2 speed=0.8 parameter=AttackPhase_ARPG_Halberd_Attack_Heavy2 active=True clip=Assets/Mock/Animation/Player/StrongAttack/ARPG_Halberd_Attack_Heavy2.anim length=1.15 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.26667 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.28333 AnimEvent_OnSoundEffect args=0/0/BigSlash
+ EVENT 0.46667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.15000 AnimEvent_OnAttackFinished args=0/0/
+ TRANS LockOnIdle duration=0.2 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=IsLockOn:If:0
+ TRANS UnLockOnIdle duration=0.2 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=IsLockOn:IfNot:0
+ANY ARPG_Samurai_Attack_Heavy1_Start duration=0.25 exit=False offset=0 interrupt=None cond=JustAvoidWindow:If:0
+ANY ARPG_Samurai_Death2 duration=0.2499999 exit=False offset=0 interrupt=None cond=PlayerDead:If:0
+ANY Samurai_UnequipB duration=0.25 exit=False offset=0 interrupt=None cond=SwordSheathing:If:0
+LAYER UpperBody weight=1 mode=Override
+Enemy PREFAB rootMotion=False components=Transform,Animator,Rigidbody,CapsuleCollider,NavMeshAgent,EnemyController,CombatFeedback,EnemyAnimationController,AnimationSpeedController,StatusEffectManager
+PARAM MoveVelocity Float default=0
+PARAM LightAttack Trigger default=0
+PARAM HeavyAttack Trigger default=0
+PARAM LightAttack2 Trigger default=0
+PARAM HeavyAttack2 Trigger default=0
+PARAM BackStep Trigger default=0
+PARAM MoveVectorX Float default=0
+PARAM MoveVectorY Float default=0
+PARAM EnemyDead Trigger default=0
+PARAM HitReaction Trigger default=0
+PARAM HitDirection Int default=0
+PARAM HitType Int default=0
+PARAM HitPlaybackSpeed Float default=0
+PARAM IsJustAvoidCounter Bool default=0
+PARAM AttackPhase_AttackHeavy Float default=1
+PARAM AttackPhase_LightAttack1 Float default=1
+PARAM AttackPhase_AttackHeavy2 Float default=1
+PARAM AttackPhase_LightAttack2 Float default=1
+LAYER Base Layer weight=0 mode=Override
+STATE AttackHeavy2Start speed=0.8 parameter= active=False clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1_Start.anim length=0.8166667 behaviours=AttackRootMotionState
+ TRANS AttackHeavy2 duration=0.25 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE AttackHeavy2 speed=0.7 parameter=AttackPhase_AttackHeavy2 active=True clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1.anim length=1.083333 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.21667 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.23333 AnimEvent_OnSoundEffect args=0/0/Poke
+ EVENT 0.46667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.08333 AnimEvent_OnAttackFinished args=0/0/
+ TRANS Idle duration=0.2 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE AttackHeavy1Start speed=0.8 parameter= active=False clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1_Start.anim length=0.8166667 behaviours=AttackRootMotionState
+ EVENT 0.20000 AnimEvent_OnSoundEffect args=0/0/Sheathing
+ TRANS AttackHeavy duration=0.2532757 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE AttackHeavy speed=0.7 parameter=AttackPhase_AttackHeavy active=True clip=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1.anim length=1.016667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.16667 AnimEvent_OnSoundEffect args=0/0/Iai
+ EVENT 0.20000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.43333 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 0.93333 AnimEvent_OnAttackFinished args=0/0/
+ TRANS Idle duration=0.2 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE LightAttack1 speed=0.7 parameter=AttackPhase_LightAttack1 active=True clip=Assets/Mock/Animation/Enemy/LightAttack/Attack1/ARPG_Halberd_Attack_Dodge.anim length=1.466667 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.55000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.58333 AnimEvent_OnSoundEffect args=0/0/NormalSlash
+ EVENT 0.71667 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.46667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS Idle duration=0.16 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+STATE LightAttack2 speed=0.7 parameter=AttackPhase_LightAttack2 active=True clip=Assets/Mock/Animation/Enemy/LightAttack/Attack2/ARPG_Halberd_Attack_Combo4.anim length=1.333333 behaviours=AttackRootMotionState,NormalAttackSpeedState
+ EVENT 0.40000 AnimEvent_OnSoundEffect args=0/0/Slash2
+ EVENT 0.45000 AnimEvent_EnableWeaponHitbox args=0/0/
+ EVENT 0.58333 AnimEvent_DisableWeaponHitbox args=0/0/
+ EVENT 1.26667 AnimEvent_OnAttackFinished args=0/0/
+ TRANS Idle duration=0.16 fixed=True exit=True time=1 offset=0 interrupt=None ordered=True cond=
+ANY ARPG_Halberd_Death2 duration=0.25 exit=False offset=0 interrupt=None cond=EnemyDead:If:0
+LAYER HitReaction weight=0 mode=Override
+ANY LightFront duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:0,HitType:Equals:0,IsJustAvoidCounter:If:0
+ANY LightBack duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:1,HitType:Equals:0,IsJustAvoidCounter:If:0
+ANY LightLeft duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:2,HitType:Equals:0,IsJustAvoidCounter:If:0
+ANY LightRight duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:3,HitType:Equals:0,IsJustAvoidCounter:If:0
+ANY HeavyFront duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:0,HitType:Equals:1,IsJustAvoidCounter:If:0
+ANY HeavyBack duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:1,HitType:Equals:1,IsJustAvoidCounter:If:0
+ANY HeavyLeft duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:2,HitType:Equals:1,IsJustAvoidCounter:If:0
+ANY HeavyRight duration=0.08 exit=False offset=0 interrupt=Source cond=HitReaction:If:0,HitDirection:Equals:3,HitType:Equals:1,IsJustAvoidCounter:If:0
+COMBO light locked=False step=0 clip=ARPG_Samurai_Attack_Combo1 delay=0.1
+COMBO light locked=False step=1 clip=ARPG_Samurai_Attack_Combo2 delay=0.12
+COMBO light locked=False step=2 clip=ARPG_Samurai_Attack_Combo3 delay=0.2
+COMBO light locked=False step=3 clip=ARPG_Samurai_Attack_Combo4 delay=0.2
+COMBO light locked=True step=0 clip=Samurai_Attack_Combo_B1 delay=0.1
+COMBO light locked=True step=1 clip=Samurai_Attack_Combo_B2 delay=0.12
+COMBO light locked=True step=2 clip=Samurai_Attack_Combo_B3 delay=0.2
+COMBO light locked=True step=3 clip=Samurai_Attack_Combo_B4 delay=0.2
+COMBO light locked=True step=4 clip=Samurai_Attack_Combo_B5 delay=0.25
+COMBO heavy step=0 clip=ARPG_Halberd_Attack_Heavy1 delay=0.3
+COMBO heavy step=1 clip=ARPG_Halberd_Attack_Heavy2 delay=0.3

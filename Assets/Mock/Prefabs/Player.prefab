@@ -1904,6 +1904,10 @@ MonoBehaviour:
   _lightReactionAngle: 5
   _heavyReactionAngle: 10
   _reactionDuration: 0.18
+  _enemyHeavyReactionDuration: 0.22
+  _enemyAttackReactionScale: 0.55
+  _enemyLightFlashStrength: 0.18
+  _enemyHeavyFlashStrength: 0.28
   _justAvoidBodyFlashStrength: 0.2
   _justAvoidCounterHitStop: 0.14
 --- !u!114 &6603691807611529658

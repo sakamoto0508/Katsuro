@@ -1,0 +1,4 @@
+Base combo logic 5 stages: buffered closed-window input, open delay, pause/resume, one consume per queued input, no skip/repeat, final completion passed.
+Base combo logic 4 stages: buffered closed-window input, open delay, pause/resume, one consume per queued input, no skip/repeat, final completion passed.
+Base combo logic 2 stages: buffered closed-window input, open delay, pause/resume, one consume per queued input, no skip/repeat, final completion passed.
+Closed window, premature timeout protection, cancellation hitbox cleanup passed. Harness uses existing base logic; hardware input/real Event dispatch/physics are not runtime-tested.

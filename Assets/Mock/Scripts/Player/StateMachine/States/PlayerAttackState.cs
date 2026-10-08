@@ -35,6 +35,8 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>コンボ入力を消費できる最短時刻（受付ディレイを吸収する）。</summary>
     private float _comboConsumeUnlockTime;
 
+    private Animator _attackAnimator;
+
     /// <summary>最大コンボ段数。派生クラスでクリップ数に応じて上書きする。</summary>
     protected virtual int MaxComboSteps => 1;
 
@@ -53,6 +55,8 @@ public abstract class PlayerAttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
+
+        _attackAnimator = Context?.Controller != null ? Context.Controller.GetComponent<Animator>() : null;
 
         Context?.Mover?.MoveStop();
         Context?.Mover?.BeginAttackRootMotion();
@@ -94,10 +98,12 @@ public abstract class PlayerAttackState : PlayerState
     public override void Update(float deltaTime)
     {
         Context.Mover?.Update();
+        // HitStop must not consume a buffered combo or expire the attack timer.
+        if (_attackAnimator != null && _attackAnimator.speed <= 0f) return;
         _elapsedTime += deltaTime;
         if (TryConsumeComboRequest()) return;
 
-        if (_elapsedTime >= _currentAttackDuration)
+        if (_elapsedTime >= _currentAttackDuration && !IsNormalAttackStillPlaying())
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
         }
@@ -172,6 +178,7 @@ public abstract class PlayerAttackState : PlayerState
     /// </summary>
     private bool TryConsumeComboRequest()
     {
+        if (_attackAnimator != null && _attackAnimator.speed <= 0f) return false;
         if (!_comboQueued || !_comboWindowOpen || !CanQueueNextCombo()
             || _elapsedTime < _comboConsumeUnlockTime)
         {
@@ -187,4 +194,14 @@ public abstract class PlayerAttackState : PlayerState
 
     /// <summary>次段に進める余地があるか判定する。</summary>
     private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
+
+    private bool IsNormalAttackStillPlaying()
+    {
+        if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;
+        var state = _attackAnimator.IsInTransition(0)
+            ? _attackAnimator.GetNextAnimatorStateInfo(0) : _attackAnimator.GetCurrentAnimatorStateInfo(0);
+        // Finished events remain the primary exit. The clip-length timer is only a
+        // fallback after animation completion, rather than cutting off a slower clip.
+        return state.IsTag(NormalAttackSpeedState.AttackTag) && state.normalizedTime < 1f;
+    }
 }

@@ -92,3 +92,7 @@ MonoBehaviour:
   _audioConfig: {fileID: 11400000, guid: 01b6a76e3828a8543a849f7445b4bb22, type: 2}
   _audioListener: {fileID: 0}
   _bgmChannelCount: 3
+  _justAvoidDuckVolume: 0.25
+  _justAvoidDuckEnter: 0.03
+  _justAvoidDuckHold: 0.1
+  _justAvoidDuckRestore: 0.18
