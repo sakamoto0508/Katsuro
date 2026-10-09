@@ -35,11 +35,13 @@ public sealed class AnimationEventStream : IAnimationEventStream
 
     public IObservable<AnimationEventType> OnEvent => _subject;
 
+    /// <summary>Animation Eventの種類を購読中のPlayer状態管理へ通知する。</summary>
     public void Publish(AnimationEventType eventType)
     {
         _subject.OnNext(eventType);
     }
 
+    /// <summary>通知を完了し、Subjectの購読リソースを解放する。</summary>
     public void Dispose()
     {
         _subject.OnCompleted();

@@ -1,0 +1,4028 @@
+--- a/Assets/Mock/Scripts/Camera/CameraManager.cs
++++ b/Assets/Mock/Scripts/Camera/CameraManager.cs
+@@ -3,6 +3,7 @@
+ using UnityEngine.InputSystem;
+ using UnityEngine.Rendering;
+ 
++/// <summary>入力・Lock-On・Cinemachineと戦闘時の一時的な画面補正を接続し、勝利中は専用カメラへ制御を渡す。</summary>
+ public class CameraManager : MonoBehaviour
+ {
+     private InputBuffer _inputBuffer;
+@@ -10,6 +11,7 @@
+     private LockOnCameraMover _lockOnCameraMover;
+     [SerializeField] private CinemachineImpulseSource _combatImpulse;
+     private Camera _outputCamera;
++    /// <summary>描画補正とHDRP Passの対象になるSceneの出力カメラ。</summary>
+     public Camera OutputCamera => _outputCamera;
+     private CameraConfig _config;
+     private float _fovStarted = float.NegativeInfinity;
+@@ -24,6 +26,7 @@
+     private bool _subscribed;
+     private bool _initialized;
+     private VictoryCameraRig _victoryRig;
++    /// <summary>入力イベントとLock-On移動、出力カメラ、勝利カメラの依存先を一度だけ接続する。</summary>
+     public void Init(InputBuffer inputBuffer, Transform playerPosition
+         , Transform enemyPosition, CameraConfig config, LockOnCamera lockOnCamera, CinemachineCamera camera, Camera outputCamera = null)
+     {
+@@ -49,6 +52,7 @@
+             , enemyPosition, camera, config);
+     }
+ 
++    /// <summary>描画イベントと入力購読を解除し、勝利カメラの一時状態を解放する。</summary>
+     private void OnDestroy()
+     {
+         UnsubscribeRendering();
+@@ -59,6 +63,7 @@
+         }
+     }
+ 
++    /// <summary>攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。</summary>
+     public void PlayHitFeedback(bool heavy, Vector3 contactPoint)
+     {
+         if (!_initialized || !isActiveAndEnabled || _combatImpulse == null || _config == null) return;
+@@ -66,10 +71,12 @@
+         _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.CameraDuration;
+         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
+     }
++    /// <summary>Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。</summary>
+     public void PlayJustAvoidFeedback()
+     {
+         if (_initialized && isActiveAndEnabled && !_finalBlowPlaying) _fovStarted = Time.unscaledTime;
+     }
++    /// <summary>回避FOVを解除して勝利FOVと専用構図を開始する。寄り始めは指定秒数だけ遅らせる。</summary>
+     public void PlayFinalBlowFeedback(float delay = 0f)
+     {
+         if (!_initialized || !isActiveAndEnabled) return;
+@@ -78,9 +85,13 @@
+         _finalBlowPlaying = true;
+         _victoryRig?.Begin(delay);
+     }
++    /// <summary>勝利補正を解除し、出力カメラとCinemachineの通常制御を復元する。</summary>
+     public void StopFinalBlowFeedback() { _finalBlowPlaying = false; RestoreCamera(); _victoryRig?.Stop(); }
++    /// <summary>初期化済みなら描画前後の補正イベントを再登録する。</summary>
+     private void OnEnable() { if (_initialized) SubscribeRendering(); }
++    /// <summary>描画購読を解除し、回避・勝利の一時カメラ補正を消去する。</summary>
+     private void OnDisable() { UnsubscribeRendering(); _fovStarted = float.NegativeInfinity; StopFinalBlowFeedback(); }
++    /// <summary>出力カメラの描画前後で一時補正を適用・解除するイベントを重複なく登録する。</summary>
+     private void SubscribeRendering()
+     {
+         if (_subscribed) return;
+@@ -88,6 +99,7 @@
+         RenderPipelineManager.beginCameraRendering += BeginRendering;
+         RenderPipelineManager.endCameraRendering += EndRendering;
+     }
++    /// <summary>描画イベントを解除し、適用中の一時補正が残らないよう復元する。</summary>
+     private void UnsubscribeRendering()
+     {
+         if (!_subscribed) return;
+@@ -97,6 +109,7 @@
+         RestoreCamera();
+     }
+     // Cinemachineと手動ロックオンの更新後、描画する瞬間だけ小さな補正を重ねる。
++    /// <summary>Cinemachine更新後の出力構図を保存し、その描画だけImpulseとFOV補正を重ねる。</summary>
+     private void BeginRendering(ScriptableRenderContext context, Camera camera)
+     {
+         if (camera != _outputCamera || _config == null) return;
+@@ -116,10 +129,12 @@
+         else if (progress >= 0f && progress < 1f)
+             camera.fieldOfView = Mathf.Clamp(_savedFov + _config.JustAvoidFOVOffset * Mathf.Sin(progress * Mathf.PI), 1f, 179f);
+     }
++    /// <summary>出力カメラの描画終了後に元の位置とFOVを戻し、次のカメラ更新に補正を持ち越さない。</summary>
+     private void EndRendering(ScriptableRenderContext context, Camera camera)
+     {
+         if (camera == _outputCamera) RestoreCamera();
+     }
++    /// <summary>描画用に保存した位置とFOVを一度だけ復元する。</summary>
+     private void RestoreCamera()
+     {
+         if (!_renderOffsetApplied || _outputCamera == null) return;
+@@ -128,22 +143,26 @@
+         _renderOffsetApplied = false;
+     }
+ 
++    /// <summary>勝利中は専用仮想カメラを進行し、それ以外はLock-Onの手動追従を更新する。</summary>
+     private void LateUpdate()
+     {
+         if (_finalBlowPlaying) { _victoryRig?.Tick(Time.unscaledTime); return; }
+         _lockOnCameraMover?.LateUpdate();
+     }
+ 
++    /// <summary>Lock-On開始入力をこのカメラ管理へ接続する。</summary>
+     private void InputEventRegistry(InputBuffer inputBuffer)
+     {
+         inputBuffer.LookOnAction.started += OnLookOnAction;
+     }
+ 
++    /// <summary>Lock-On入力の購読を解除して破棄後の呼び出しを防ぐ。</summary>
+     private void InputEventUnRegistry(InputBuffer inputBuffer)
+     {
+         inputBuffer.LookOnAction.started -= OnLookOnAction;
+     }
+ 
++    /// <summary>現在のLock-On状態に応じて対象の固定と解除を切り替える。</summary>
+     private void OnLookOnAction(InputAction.CallbackContext context)
+     {
+         if (_lookOnCamera.IsLockOn == false)
+--- a/Assets/Mock/Scripts/Camera/LockOnCamera.cs
++++ b/Assets/Mock/Scripts/Camera/LockOnCamera.cs
+@@ -5,6 +5,7 @@
+ // - プレイヤーとターゲット（敵）の Transform を受け取り、ロックオン状態の管理を行う
+ // - Cinemachine の VirtualCamera 優先度制御や、必要に応じて CinemachineBrain を無効化して
+ //   手動でカメラの Transform を制御するためのラッパです
++/// <summary>通常・Lock-Onカメラの優先度とAnimatorフラグを切り替え、手動追従中のBrain停止と復帰を管理する。</summary>
+ public class LockOnCamera
+ {
+     /// <summary>
+@@ -68,11 +69,13 @@
+     /// <summary>
+     /// 現在有効なロック対象が設定されているかを返します。
+     /// </summary>
++    /// <returns>対象が存在し、Hierarchy上で有効ならtrue。</returns>
+     public bool HasValidTarget()
+     {
+         return _enemyPosition != null && _enemyPosition.gameObject.activeInHierarchy;
+     }
+ 
++    /// <summary>有効な対象へLock-Onし、カメラ優先度とAnimatorフラグを変更する。手動追従中はBrainを停止する。</summary>
+     public void LockOn()
+     {
+         if (!HasValidTarget() || _playerPosition == null) return;
+@@ -96,6 +99,7 @@
+         }
+     }
+ 
++    /// <summary>Lock-Onを解除して仮想カメラ優先度とAnimatorフラグを戻し、自身が停止したBrainだけを再開する。</summary>
+     public void UnLockOn()
+     {
+         if (!IsLockOn) return;
+--- a/Assets/Mock/Scripts/Camera/LockOnCameraMover.cs
++++ b/Assets/Mock/Scripts/Camera/LockOnCameraMover.cs
+@@ -4,6 +4,7 @@
+ /// <summary>ロックオン中に視点を手動制御する際のカメラ移動を行う。</summary>
+ public class LockOnCameraMover
+ {
++    /// <summary>追従対象とカメラ設定を保持し、Brainの有効状態に応じた追従先を準備する。</summary>
+     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition,
+         Transform enemyPosition, CinemachineCamera camera, CameraConfig config)
+     {
+@@ -24,6 +25,7 @@
+     private Camera _mainCamera;
+     private CinemachineBrain _brain;
+ 
++    /// <summary>有効なLock-On対象を向く位置と角度へ補間する。対象を失った場合はLock-Onを解除する。</summary>
+     public void LateUpdate()
+     {
+         if (_lockOnCamera == null || !_lockOnCamera.IsLockOn) return;
+--- a/Assets/Mock/Scripts/Camera/VictoryCameraRig.cs
++++ b/Assets/Mock/Scripts/Camera/VictoryCameraRig.cs
+@@ -22,6 +22,7 @@
+     /// <summary>撮影対象と出力カメラを保持する。通常カメラの優先度や追従設定は変更しない。</summary>
+     public void Init(Transform player, Camera output) { _player = player; _output = output; _brain = output != null ? output.GetComponent<CinemachineBrain>() : null; }
+     /// <summary>現在の出力構図を起点に勝利用カメラへ制御を渡す。Lock-OnがBrainを停止していても一時的に有効にする。</summary>
++    /// <param name="delay">構図の移行を始めるまでの実時間秒数。</param>
+     public void Begin(float delay)
+     {
+         if (_playing || !isActiveAndEnabled || _player == null || _output == null || _brain == null || _camera == null) return;
+@@ -51,6 +52,7 @@
+         return _lookTarget + delta.normalized * distance;
+     }
+     /// <summary>開始時に確定した構図へ補間し、通常のCinemachine更新に勝利用仮想カメラを渡す。</summary>
++    /// <param name="now">Time.unscaledTimeと同じ基準の実時刻。</param>
+     public void Tick(float now)
+     {
+         if (!_playing || _camera == null || _brain == null) return;
+@@ -67,6 +69,8 @@
+         _overrideId = -1; if (_camera != null) _camera.enabled = false;
+         if (!_brainWasEnabled && _output != null) { _output.transform.SetPositionAndRotation(_startPosition, _startRotation); _output.fieldOfView = _fov; }
+     }
++    /// <summary>勝利Overrideを解放してBrainの有効状態を復元する。</summary>
+     private void OnDisable() => Stop();
++    /// <summary>所有する勝利Overrideを残さず通常カメラへ制御を返す。</summary>
+     private void OnDestroy() => Stop();
+ }
+--- a/Assets/Mock/Scripts/Combat/DamageInfo.cs
++++ b/Assets/Mock/Scripts/Combat/DamageInfo.cs
+@@ -5,6 +5,7 @@
+ /// </summary>
+ public readonly struct DamageInfo
+ {
++    /// <summary>命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。</summary>
+     public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false)
+     {
+         DamageAmount = damageAmount;
+--- a/Assets/Mock/Scripts/Config/AnimationName.cs
++++ b/Assets/Mock/Scripts/Config/AnimationName.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>PlayerとEnemyが使用するAnimatorパラメータ名をInspectorで共有する設定。</summary>
+ [CreateAssetMenu(fileName = "AnimName", menuName = "ScriptableObjects/Player/AnimName")]
+ public class AnimationName : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Config/AudioConfig.cs
++++ b/Assets/Mock/Scripts/Config/AudioConfig.cs
+@@ -2,6 +2,7 @@
+ 
+ [CreateAssetMenu(fileName = "AudioConfig", menuName = "Config/AudioConfig")]
+ 
++/// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
+ public class AudioConfig : ScriptableObject
+ {
+     public string StartSE => _startSE;
+--- a/Assets/Mock/Scripts/Config/CameraConfig.cs
++++ b/Assets/Mock/Scripts/Config/CameraConfig.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>通常追従・Lock-On・命中・ジャスト回避のカメラ距離と補正量をまとめる設定。</summary>
+ [CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
+ public class CameraConfig : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs
++++ b/Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>ジャスト回避成功で蓄積する攻撃倍率の加算量と最大スタック数を定義する。</summary>
+ [CreateAssetMenu(fileName = "JustAvoidBuffConfig", menuName = "ScriptableObjects/Player/JustAvoidBuffConfig")]
+ public sealed class JustAvoidBuffConfig : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Config/LowHpBuffTable.cs
++++ b/Assets/Mock/Scripts/Config/LowHpBuffTable.cs
+@@ -9,6 +9,7 @@
+ [CreateAssetMenu(fileName = "LowHpBuffTable", menuName = "ScriptableObjects/Player/LowHpBuffTable")]
+ public sealed class LowHpBuffTable : ScriptableObject
+ {
++    /// <summary>HP割合のしきい値と、その段階で付与する低HP効果を対応付ける。</summary>
+     [Serializable]
+     public sealed class Tier
+     {
+@@ -35,6 +36,7 @@
+     /// 最初にマッチした Tier を返す（Inspector 上で小さい方から大きい方へ並べるか、上から評価する運用にして下さい）。
+     /// マッチなしの場合は null を返します。
+     /// </summary>
++    /// <returns>Inspector順で最初にしきい値を満たすTier。該当なしならnull。</returns>
+     public Tier GetTier(float currentHpRatio)
+     {
+         if (_tiers == null || _tiers.Count == 0) return null;
+@@ -49,6 +51,7 @@
+     /// <summary>
+     /// 指定の currentHpRatio に応じたダメージ乗算係数を返します（デフォルト 1.0）。
+     /// </summary>
++    /// <returns>Tierの非負ダメージ倍率。該当なしなら1。</returns>
+     public float EvaluateDamageMultiplier(float currentHpRatio)
+     {
+         var tier = GetTier(currentHpRatio);
+@@ -57,8 +60,9 @@
+ 
+     /// <summary>
+     /// 指定の currentHpRatio に応じたスキルゲージ回復ボーナス（加算割合）を返します（デフォルト 0）。
+-    /// 返値は 0..1 の割合（例: 0.05 = +5% 回復量）です。
++    /// 返値は設定した加算割合をそのまま返します（例: 0.05 = +5% 回復量）。
+     /// </summary>
++    /// <returns>Tierに設定したゲージ回復への加算割合。該当なしなら0。</returns>
+     public float EvaluateSkillGaugeRegenBonus(float currentHpRatio)
+     {
+         var tier = GetTier(currentHpRatio);
+--- a/Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs
++++ b/Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs
+@@ -4,12 +4,14 @@
+ 
+ [CreateAssetMenu(fileName = "PlayerPassiveBuffSet"
+     , menuName = "ScriptableObjects/Player/PlayerPassiveBuffSet")]
++/// <summary>Player装備の攻撃倍率・加算威力と命中時Effectをまとめる設定。</summary>
+ public class PlayerPassiveBuffSet : ScriptableObject
+ {
+     public IReadOnlyList<PassiveBuffEntry> Buffs => _buffs;
+     [SerializeField] private List<PassiveBuffEntry> _buffs = new();
+ 
+     /// <summary>登録済みパッシブを積算した乗算ダメージ係数。</summary>
++    /// <returns>登録装備の攻撃倍率を掛け合わせた値。未登録なら1。</returns>
+     public float EvaluateDamageMultiplier()
+     {
+         if (_buffs == null || _buffs.Count == 0)
+@@ -25,6 +27,7 @@
+     }
+ 
+     /// <summary>登録済みパッシブを合算した加算ダメージ値。</summary>
++    /// <returns>登録装備の固定攻撃力を合計した加算値。</returns>
+     public float EvaluateFlatDamageBonus()
+     {
+         if (_buffs == null || _buffs.Count == 0)
+@@ -40,6 +43,7 @@
+     }
+ }
+ 
++/// <summary>装備の表示名、攻撃倍率・加算威力と任意の命中Effectを組として保持する。</summary>
+ [Serializable]
+ public sealed class PassiveBuffEntry
+ {
+@@ -59,4 +63,4 @@
+     [SerializeField, Min(0f)] private float _attackPowerMultiplier = 1f;
+     [SerializeField] private float _flatAttackBonus;
+     [SerializeField] private GameObject _onHitEffectPrefab;
+-}+}
+--- a/Assets/Mock/Scripts/Config/PlayerStateConfig.cs
++++ b/Assets/Mock/Scripts/Config/PlayerStateConfig.cs
+@@ -1,6 +1,7 @@
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
++/// <summary>コンボ段階ごとのClip、受付遅延、固定ダメージを保持し、未設定時の代替値を提供する。</summary>
+ [System.Serializable]
+ public class AttackClipList
+ {
+@@ -10,6 +11,8 @@
+ 
+     public IReadOnlyList<AnimationClip> Clips => _clips;
+ 
++    /// <summary>段階番号を有効範囲へ制限してClipを取得する。未設定ならnullを返す。</summary>
++    /// <returns>指定段階に対応するClip。リストが空ならnull。</returns>
+     public AnimationClip GetClip(int index)
+     {
+         if (_clips == null || _clips.Count == 0)
+@@ -21,6 +24,8 @@
+         return _clips[index];
+     }
+ 
++    /// <summary>Clip長を返し、Clip未設定時は指定の代替秒数を使用する。</summary>
++    /// <returns>最低0.1秒を保証したClip長または代替秒数。</returns>
+     public float GetDuration(int index, float fallbackSeconds)
+     {
+         var clip = GetClip(index);
+@@ -32,6 +37,8 @@
+         return Mathf.Max(0.1f, clip.length);
+     }
+ 
++    /// <summary>段階別のコンボ受付遅延を取得し、未設定・負値の場合は代替値を使用する。</summary>
++    /// <returns>0以上の受付遅延秒数。</returns>
+     public float GetComboWindowDelay(int index, float fallbackSeconds)
+     {
+         if (_comboWindowDelaySeconds == null || _comboWindowDelaySeconds.Count == 0)
+@@ -44,6 +51,8 @@
+         return value >= 0f ? value : Mathf.Max(0f, fallbackSeconds);
+     }
+ 
++    /// <summary>段階別の固定ダメージを取得する。設定済みの負数やゼロはそのまま返す。</summary>
++    /// <returns>設定されたダメージ値。未設定の場合は非負の代替値。</returns>
+     public float GetClipDamage(int index, float fallback = 0f)
+     {
+         if (_clipFlatDamage == null || _clipFlatDamage.Count == 0)
+@@ -57,6 +66,7 @@
+     }
+ }
+ 
++/// <summary>Playerのスキルゲージ、幽体化、攻撃Clipとコンボ受付時間を共有する設定。</summary>
+ [CreateAssetMenu(fileName = "PlayerStateConfig", menuName = "ScriptableObjects/Player/PlayerStateConfig")]
+ public class PlayerStateConfig : ScriptableObject
+ {
+@@ -78,33 +88,53 @@
+     public IReadOnlyList<AnimationClip> StrongAttackClips => _strongAttackClips.Clips;
+     public IReadOnlyList<AnimationClip> JustAvoidAttackClips => _justAvoidAttackClips.Clips;
+ 
++    /// <summary>Lock-Onに応じた弱攻撃Clipの長さを取得し、未設定時は弱攻撃用の代替時間を返す。</summary>
++    /// <returns>指定段階のClip長または代替秒数。</returns>
+     public float GetLightAttackDuration(int comboIndex = 0) => GetLightAttackDuration(false, comboIndex);
+ 
++    /// <summary>Lock-Onに応じた弱攻撃Clipの長さを取得し、未設定時は弱攻撃用の代替時間を返す。</summary>
++    /// <returns>指定段階のClip長または代替秒数。</returns>
+     public float GetLightAttackDuration(bool isLockOn, int comboIndex = 0)
+         => SelectLightAttackList(isLockOn).GetDuration(comboIndex, 0.8f);
+ 
++    /// <summary>Lock-Onの有無とコンボ段階に対応する弱攻撃の固定ダメージを取得する。</summary>
++    /// <returns>指定段階のダメージ設定値。</returns>
+     public float GetLightAttackClipDamage(bool isLockOn, int comboIndex = 0)
+         => SelectLightAttackList(isLockOn).GetClipDamage(comboIndex, 0f);
+ 
++    /// <summary>Lock-Onの有無に応じて弱攻撃のコンボ受付遅延を取得する。</summary>
++    /// <returns>受付遅延秒数。</returns>
+     public float GetLightAttackComboWindowDelay(bool isLockOn, int comboIndex = 0)
+         => SelectLightAttackList(isLockOn).GetComboWindowDelay(comboIndex, _defaultLightComboWindowDelay);
+ 
++    /// <summary>使用する弱攻撃Clipリストからコンボ段数を求める。</summary>
++    /// <returns>使用可能な弱攻撃段数。</returns>
+     public int GetLightAttackComboCount(bool isLockOn)
+     {
+         var clips = SelectLightAttackList(isLockOn).Clips;
+         return Mathf.Max(1, clips?.Count ?? 0);
+     }
+ 
++    /// <summary>Lock-On用Clipが設定されていればそのリストを選び、なければ通常弱攻撃を使用する。</summary>
++    /// <returns>選択された弱攻撃Clipリスト。</returns>
+     public IReadOnlyList<AnimationClip> GetLightAttackClips(bool isLockOn)
+         => SelectLightAttackList(isLockOn).Clips;
+ 
++    /// <summary>強攻撃の段階別Clip長を取得し、未設定時は代替時間を使用する。</summary>
++    /// <returns>指定段階の強攻撃時間。</returns>
+     public float GetStrongAttackDuration(int comboIndex = 0) => _strongAttackClips.GetDuration(comboIndex, 1.0f);
+ 
++    /// <summary>強攻撃のコンボ段階に対応する固定ダメージを取得する。</summary>
++    /// <returns>指定段階のダメージ設定値。</returns>
+     public float GetStrongAttackClipDamage(int comboIndex = 0) => _strongAttackClips.GetClipDamage(comboIndex, 0f);
+ 
++    /// <summary>強攻撃の段階別コンボ受付遅延を取得する。</summary>
++    /// <returns>受付遅延秒数。</returns>
+     public float GetStrongAttackComboWindowDelay(int comboIndex = 0)
+         => _strongAttackClips.GetComboWindowDelay(comboIndex, _defaultStrongComboWindowDelay);
+ 
++    /// <summary>追撃の段階別Clip長を取得し、未設定時は追撃用の代替時間を使用する。</summary>
++    /// <returns>指定段階の追撃時間。</returns>
+     public float GetJustAvoidAttackDuration(int comboIndex = 0) => _justAvoidAttackClips.GetDuration(comboIndex, 0.9f);
+ 
+     [Header("Skill Gauge")]
+@@ -126,6 +156,8 @@
+     [SerializeField] private AttackClipList _strongAttackClips = new();
+     [SerializeField] private AttackClipList _justAvoidAttackClips = new();
+ 
++    /// <summary>Lock-On用Clipの存在を確認し、実際に使用する弱攻撃リストを選ぶ。</summary>
++    /// <returns>使用対象の弱攻撃設定。</returns>
+     private AttackClipList SelectLightAttackList(bool isLockOn)
+     {
+         bool hasLockOnVariant = _lockOnLightAttackClips != null
+--- a/Assets/Mock/Scripts/Config/PlayerStatus.cs
++++ b/Assets/Mock/Scripts/Config/PlayerStatus.cs
+@@ -22,7 +22,7 @@
+ 
+     /// <summary>自傷を行うときに許容される最小HP割合（この値以下のときは自傷を許可しないなどの判定に使用）。</summary>
+     public float SelfSacrificeMinHpRatio => _selfSacrificeMinHpRatio;
+-    /// <summary>自傷（Self Sacrifice）時の HP% 減少量（秒あたり、1 = 1%/秒）。 /// </summary>
++    /// <summary>自傷（Self Sacrifice）時の HP% 減少量（秒あたり、1 = 1%/秒）。</summary>
+     public float SelfSacrificeDamagePercentPerSecond => _selfSacrificeDamagePercentPerSecond;
+ 
+     /// <summary>回復（Heal）時に、HPの1%あたり何ポイントのゲージを消費するか。</summary>
+@@ -50,6 +50,7 @@
+     [SerializeField, Min(0f)] private float _buffGaugePerSecond = 8f;
+ }
+ 
++/// <summary>PlayerのHP・移動・攻撃などの基礎値と能力コストをInspectorで設定する。</summary>
+ [CreateAssetMenu(fileName = "PlayerStatus", menuName = "ScriptableObjects/Player/PlayerStatus", order = 1)]
+ public sealed class PlayerStatus : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Config/SceneNameConfig.cs
++++ b/Assets/Mock/Scripts/Config/SceneNameConfig.cs
+@@ -2,6 +2,7 @@
+ 
+ [CreateAssetMenu(fileName = "SceneNameConfig", menuName = "Config/SceneNameConfig")]
+ 
++/// <summary>TitleとGameの遷移先名を共有し、呼び出し側の文字列重複を避ける設定。</summary>
+ public class SceneNameConfig : ScriptableObject
+ {
+     public string TitleScene => _titleScene;
+--- a/Assets/Mock/Scripts/Config/VFXConfig.cs
++++ b/Assets/Mock/Scripts/Config/VFXConfig.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>命中、追撃、ジャスト回避のPrefabと表示量を定義する。命中判定やダメージ計算は担当しない。</summary>
+ [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
+ public class VFXConfig : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyActionLock.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyActionLock.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemy行動ロック用に残されている拡張枠。現在のStartとUpdateには処理がない。</summary>
+ public class EnemyActionLock : MonoBehaviour
+ {
+     // コンポーネント生成後、最初の更新処理より前に一度だけ呼ばれる。
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyActionTimer.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyActionTimer.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemy行動時間の管理用に残されている拡張枠。現在のStartとUpdateには処理がない。</summary>
+ public class EnemyActionTimer : MonoBehaviour
+ {
+     // コンポーネント生成後、最初の更新処理より前に一度だけ呼ばれる。
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemyの移動・攻撃パラメータと追撃専用被弾Layerを制御する。AI判断と位置移動は担当しない。</summary>
+ [RequireComponent(typeof(Animator))]
+ public class EnemyAnimationController : MonoBehaviour
+ {
+@@ -24,6 +25,8 @@
+     public bool IsHeavyReacting { get; private set; }
+ 
+     // Direction identifies the side the attacker occupies in the enemy's local space.
++    /// <summary>攻撃者位置または命中情報をEnemyのローカル方向へ変換し、四方向の被弾Clipを選ぶ。</summary>
++    /// <returns>前・後・左・右を表す方向インデックス。</returns>
+     public static int GetHitDirection(Transform enemy, DamageInfo info)
+     {
+         Vector3 source = info.Instigator != null ? info.Instigator.transform.position - enemy.position : Vector3.zero;
+@@ -37,6 +40,8 @@
+         return local.z >= 0f ? 0 : 1;
+     }
+ 
++    /// <summary>有効な専用Layerと追撃フラグがある場合だけ大きい被弾反応を開始する。</summary>
++    /// <returns>追撃専用の被弾Stateを開始した場合はtrue。</returns>
+     public bool TryPlayHitReaction(DamageInfo info)
+     {
+         if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
+@@ -60,6 +65,7 @@
+         return true;
+     }
+ 
++    /// <summary>攻撃用トリガーと攻撃再生を解除して被弾への短いBlendを要求する。死亡トリガーは保持する。</summary>
+     public void InterruptAttackForHitReaction()
+     {
+         if (_animator == null) return;
+@@ -71,6 +77,8 @@
+         if (_animator.HasState(0, idle)) _animator.CrossFadeInFixedTime(idle, _reactionBlendIn, 0, 0f);
+     }
+ 
++    /// <summary>Animator速度に合わせて被弾Layerと減速移動の進行を更新し、復帰完了を通知する。</summary>
++    /// <returns>被弾反応がこの更新で完了した場合はtrue。</returns>
+     public bool TickHitReaction(float deltaTime)
+     {
+         if (!IsReacting) return false;
+@@ -84,6 +92,7 @@
+         return true;
+     }
+ 
++    /// <summary>被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。</summary>
+     public void CancelHitReaction()
+     {
+         IsReacting = IsHeavyReacting = false;
+@@ -140,10 +149,8 @@
+         _animator?.SetInteger(parameterName, value);
+     }
+ 
+-    /// <summary>
+-    /// Animator 参照を取得する。
+-    /// </summary>
+     private bool _initialized;
++    /// <summary>Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationRelay.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationRelay.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemyの攻撃終了イベントをAI側へ中継し、Animatorと行動管理を接続する。</summary>
+ public class EnemyAnimationRelay : MonoBehaviour
+ {
+     // コンポーネント生成後、最初の更新処理より前に一度だけ呼ばれる。
+--- a/Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs
++++ b/Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemy行動ごとのAnimator名、攻撃力・武器などをInspectorで定義する。</summary>
+ [CreateAssetMenu(menuName = "Enemy/AttackData", fileName = "EnemyAttackData")]
+ public class EnemyAttackData : ScriptableObject
+ {
+--- a/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyAction.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyAction.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemy行動用に残されている空の拡張枠。現在は実行処理を持たない。</summary>
+ public class EnemyAction 
+ {
+     
+--- a/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyActionType.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyActionType.cs
+@@ -1,3 +1,4 @@
++/// <summary>Enemyが選択可能な接近・待機・攻撃・後退などの行動を識別する。</summary>
+ public enum EnemyActionType
+ {
+     //移動系
+--- a/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyAttacker.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyAttacker.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public class EnemyAttacker : IDisposable
+ {
++    /// <summary>Enemyの攻撃設定、武器、Animator、基礎威力と攻撃者を保持する。</summary>
+     public EnemyAttacker(EnemyAnimationController aniController, EnemyAttackData[] attackData
+         , EnemyWeapon[] weapons, EnemyStuts status, Transform owner)
+     {
+@@ -37,6 +38,7 @@
+     private bool _currentIsHeavy;
+     private HitStopManager _hitStop;
+     private bool _initialized;
++    /// <summary>命中時に使用するHitStopManagerを一度だけ接続する。</summary>
+     public void Init(HitStopManager hitStop)
+     {
+         if (_initialized) return;
+@@ -84,6 +86,8 @@
+         }
+     }
+ 
++    /// <summary>指定行動に対応する攻撃設定を候補から選ぶ。</summary>
++    /// <returns>対応する攻撃設定。候補がなければnull。</returns>
+     private EnemyAttackData FindData(EnemyActionType action)
+     {
+         if (_attackData == null) return null;
+@@ -149,6 +153,7 @@
+         damageable.ApplyDamage(damageInfo);
+     }
+ 
++    /// <summary>全武器の命中判定を停止し、自身が登録した命中通知ハンドラを解除する。</summary>
+     public void Dispose()
+     {
+         DisableWeaponHitbox();
+--- a/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyMover.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyAction/EnemyMover.cs
+@@ -50,17 +50,20 @@
+     private readonly float _attackRootMotionScale;
+     private Vector3 _pendingAttackRootMotion;
+     public bool IsUsingAttackRootMotion => _usingRootMotionAttack;
++    /// <summary>攻撃の移動停止中だけ水平Root Motionを受け付ける。被弾と後退移動が優先中なら開始しない。</summary>
+     public void BeginAttackRootMotion()
+     {
+         if (!_isMovementHeldForAttack || _reactionHeld || _usingRootMotionStepBack) return;
+         _usingRootMotionAttack = true;
+     }
++    /// <summary>攻撃移動の受付・保留量を解除し、動的Rigidbodyの残留速度を消去する。</summary>
+     public void EndAttackRootMotion()
+     {
+         _usingRootMotionAttack = false;
+         _pendingAttackRootMotion = Vector3.zero;
+         if (_rb != null && !_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
+     }
++    /// <summary>蓄積した水平移動を衝突とNavMeshで制限して物理フレームに反映する。HitStop中は移動を消去する。</summary>
+     public void FixedUpdateAttackRootMotion()
+     {
+         if (!_usingRootMotionAttack) return;
+@@ -91,6 +94,7 @@
+     private bool _reactionHeld, _reactionAgentStopped, _reactionAgentRotation, _reactionKinematic;
+     private bool _releaseAttackAfterReaction, _endStepBackAfterReaction;
+ 
++    /// <summary>被弾用にAgentとRigidbodyの状態を保存して移動を停止し、攻撃Root Motionを解除する。</summary>
+     public void HoldMovementForReaction()
+     {
+         EndAttackRootMotion();
+@@ -116,6 +120,7 @@
+         ResetLocomotionAnimation();
+     }
+ 
++    /// <summary>被弾前のAgentとRigidbody設定を復元し、現在位置にAgentを再同期する。</summary>
+     public void ReleaseMovementAfterReaction()
+     {
+         if (!_reactionHeld) return;
+@@ -130,6 +135,7 @@
+         if (_releaseAttackAfterReaction) { _releaseAttackAfterReaction = false; ReleaseMovementAfterAttack(); }
+     }
+ 
++    /// <summary>後退と攻撃による移動停止を終了し、別の行動や死亡へ安全に切り替える。</summary>
+     public void InterruptMovementAction()
+     {
+         if (_isStepBack) EndStepBack();
+@@ -174,6 +180,7 @@
+     }
+ 
+     // パトロール中のアニメ／回転／到達判定の更新
++    /// <summary>待機歩行中の旋回設定と移動先を更新し、実移動に合わせてAnimatorへ反映する。</summary>
+     private void UpdatePatrolWalking()
+     {
+         if (_enemyStuts != null)
+@@ -210,6 +217,7 @@
+     }
+ 
+     // Animator に渡す速度・方向値の更新
++    /// <summary>Agentの実速度を取得し、Enemyの向きを基準に移動BlendTreeへ反映する。</summary>
+     private void UpdateAnimatorValues()
+     {
+         Vector3 velocity = GetLocomotionVelocity();
+@@ -217,12 +225,15 @@
+         _animationController?.MoveVector(GetLocalMovementDirection(velocity));
+     }
+ 
++    /// <summary>移動速度と二軸方向をゼロにして、攻撃・被弾中の歩行Blendを止める。</summary>
+     public void ResetLocomotionAnimation()
+     {
+         _animationController?.MoveVelocity(0f);
+         _animationController?.MoveVector(Vector2.zero);
+     }
+ 
++    /// <summary>移動停止・被弾・後退と微小速度を除外し、Agentの有効な水平実速度を取得する。</summary>
++    /// <returns>移動表示に使用する水平速度。停止条件ではゼロ。</returns>
+     private Vector3 GetLocomotionVelocity()
+     {
+         if (_reactionHeld || _isMovementHeldForAttack || _isStepBack || _agent == null ||
+@@ -232,6 +243,8 @@
+         return velocity.sqrMagnitude < MovementDeadZone * MovementDeadZone ? Vector3.zero : velocity;
+     }
+ 
++    /// <summary>水平速度をEnemyの向きに対する正規化二軸方向へ変換する。</summary>
++    /// <returns>ローカルX/Z方向。微小速度ではゼロ。</returns>
+     private Vector2 GetLocalMovementDirection(Vector3 velocity)
+     {
+         velocity.y = 0f;
+@@ -241,6 +254,7 @@
+     }
+ 
+     // 追跡の有効判定、目的地更新、回転の更新をまとめた処理
++    /// <summary>追跡距離と更新間隔を判定してPlayer側の移動先を更新し、範囲外ならAgentを停止する。</summary>
+     private void UpdateTrackingAndDestination()
+     {
+         if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh || _enemyStuts == null) return;
+@@ -427,6 +441,8 @@
+     }
+ 
+     // プレイヤーのコライダー半径を考慮して目的地を少し手前にずらす
++    /// <summary>PlayerのCollider半径を考慮して接近先をずらし、中心へのめり込みを抑える。</summary>
++    /// <returns>Playerの占有半径を考慮した接近先。</returns>
+     private Vector3 GetAdjustedDestination(Vector3 playerPos)
+     {
+         if (_playerPosition == null) return playerPos;
+@@ -661,6 +677,7 @@
+ 
+     /// <summary>指定ターゲットの方向を見る。</summary>
+ 
++    /// <returns>対象方向への補間旋回が終了するまで待機するタスク。</returns>
+     public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
+     {
+         if (_enemyTransform == null || _playerPosition == null) return;
+--- a/Assets/Mock/Scripts/Enemy/EnemyActionProvider.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyActionProvider.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemyの行動提供用に残されている空の拡張枠。現在のAI行動はこのクラスで実行しない。</summary>
+ public class EnemyActionProvider
+ {
+     
+--- a/Assets/Mock/Scripts/Enemy/EnemyAI/EnemyDecisionMaker.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyAI/EnemyDecisionMaker.cs
+@@ -6,6 +6,8 @@
+ {
+     private readonly System.Random _rand = new();
+ 
++    /// <summary>距離帯の候補から無効な重みを除外し、連続選択の補正を含めて行動を抽選する。</summary>
++    /// <returns>選ばれた行動。有効候補がない場合はWait。</returns>
+     public EnemyActionType Decide(float distance, EnemyActionType lastAction, EnemyDecisionConfig config)
+     {
+         if (config == null) return EnemyActionType.Wait;
+@@ -32,6 +34,8 @@
+         return fallback;
+     }
+ 
++    /// <summary>候補の重みを検証し、直前と同じ行動には繰り返し補正を適用する。</summary>
++    /// <returns>抽選に使用する有効重み。無効値ならゼロ。</returns>
+     private static float Weight(EnemyDecisionConfig.ActionWeight candidate, EnemyActionType lastAction, float repeatPenalty)
+     {
+         float weight = candidate.Weight;
+--- a/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>距離帯ごとの行動候補と重み・連続選択の補正を定義するAI判断用設定。</summary>
+ [CreateAssetMenu(fileName = "EnemyDecisionConfig", menuName = "ScriptableObjects/Enemy/DecisionConfig")]
+ public class EnemyDecisionConfig : ScriptableObject
+ {
+@@ -22,6 +23,7 @@
+     [Range(0f, 1f), Tooltip("直前に実行した行動の重みを何倍にするか（0 = 完全に除外、1 = 変化なし）")]
+     public float RepeatPenalty = 0.25f;
+ 
++    /// <summary>Enemyの行動候補と抽選時の基準重みを対応付ける。</summary>
+     [System.Serializable]
+     public struct ActionWeight
+     {
+--- a/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>EnemyのHP・攻撃・追跡・移動・旋回方式をInspectorで定義する基礎設定。</summary>
+ [CreateAssetMenu(fileName = "EnemyStuts", menuName = "ScriptableObjects/Enemy/EnemyStuts", order = 1)]
+ public class EnemyStuts : ScriptableObject
+ {
+@@ -37,6 +38,7 @@
+     [SerializeField] public float WeightBackstep = 20f;
+     [SerializeField] private float _rotateSmoothTime = 0.1f;
+ 
++    /// <summary>Enemyの旋回をAgent任せ、対象へ即時旋回、手動補間のいずれで行うか識別する。</summary>
+     public enum RotationControlMode
+     {
+         Agent,      // NavMeshAgent に回転を任せる
+--- a/Assets/Mock/Scripts/Enemy/EnemyController.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyController.cs
+@@ -4,6 +4,7 @@
+ using UnityEngine;
+ using UnityEngine.AI;
+ 
++/// <summary>Enemyの依存先を接続し、AI更新・命中・死亡・Animation Eventを統括する。死亡後の戦闘更新を遮断する。</summary>
+ [RequireComponent(typeof(Rigidbody))]
+ public class EnemyController : MonoBehaviour, IDamageable
+ {
+@@ -37,24 +38,31 @@
+     private EnemyMover _mover;
+     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
+     private int _attackAnimationHash;
++    /// <summary>Root Motionを所有する攻撃Stateが記録されているか。通常被弾の表示量の調整に使用する。</summary>
+     public bool IsAttackAnimationActive => _attackAnimationHash != 0;
++    /// <summary>戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。</summary>
++    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
+     public void BeginAnimationAttackRootMotion(int stateHash)
+     {
+         if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
+         _attackAnimationHash = stateHash;
+         _mover?.BeginAttackRootMotion();
+     }
++    /// <summary>終了Stateが攻撃移動の所有者に一致する場合だけ移動停止を解除する。</summary>
++    /// <param name="stateHash">終了したStateのfullPathHash。現在の所有者と一致する場合だけ解除する。</param>
+     public void EndAnimationAttackRootMotion(int stateHash)
+     {
+         if (_attackAnimationHash != stateHash) return;
+         _attackAnimationHash = 0;
+         _mover?.ReleaseMovementAfterAttack();
+     }
++    /// <summary>戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。</summary>
+     private void FixedUpdate()
+     {
+         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+         _mover?.FixedUpdateAttackRootMotion();
+     }
++    /// <summary>攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。</summary>
+     private void OnDisable()
+     {
+         _attackAnimationHash = 0;
+@@ -75,6 +83,7 @@
+     private bool _initialized;
+     private bool _reactionInterruptedAttack;
+ 
++    /// <summary>EnemyのHP・AI・移動・武器・演出を作成し、ゲーム進行と命中通知を一度だけ接続する。</summary>
+     public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader, CameraManager cameraManager = null, VFXConfig vfxConfig = null)
+     {
+         if (_initialized) return;
+@@ -109,6 +118,7 @@
+         if (_characterEffect != null) _characterEffect.PlayEffect_CharacterEffect();
+     }
+ 
++    /// <summary>生成直後の初期化を一フレーム待ってCharacterEffectを再生する。破棄時は待機をキャンセルする。</summary>
+     private async UniTask PlayEffectNextFrame(string key)
+     {
+         // 生成したプレハブと視覚効果の初期化を待つため、1フレーム待機する。
+@@ -133,6 +143,7 @@
+     /// 公開: ダメージを適用するエントリポイント。DamageInfo を受け取り HP を減算します。
+     /// </summary>
+     // IDamageable インターフェース実装（正確なシグネチャ）
++    /// <summary>通常の命中情報をクリティカルなしの共通ダメージ処理へ渡す。</summary>
+     public void ApplyDamage(DamageInfo info)
+     {
+         ApplyDamage(info, false);
+@@ -180,6 +191,7 @@
+         }
+     }
+ 
++    /// <summary>Root Motionを終了し、武器購読とHP通知の所有リソースを解放する。</summary>
+     private void OnDestroy()
+     {
+         _mover?.EndAttackRootMotion();
+@@ -187,6 +199,7 @@
+         _health?.Dispose();
+     }
+ 
++    /// <summary>戦闘中だけ被弾の復帰・AI判断・予約行動・移動を順に進める。死亡時は歩行表示を停止する。</summary>
+     private void Update()
+     {
+         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.ResetLocomotionAnimation(); return; }
+@@ -247,6 +260,7 @@
+         _mover?.Update();
+     }
+ 
++    /// <summary>死亡を確定して攻撃・AI更新・移動を停止し、既存死亡ClipとFinal Blowまたは遷移を要求する。</summary>
+     private void EnemyDead()
+     {
+         _combatFeedback?.CancelNormalHitReaction();
+@@ -265,6 +279,7 @@
+         else _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 2000).Forget();
+     }
+ 
++    /// <summary>所有中の攻撃Stateの移動をMoverへ渡す。死亡・別Stateへの切り替えではRoot Motionを解除する。</summary>
+     private void OnAnimatorMove()
+     {
+         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+@@ -326,6 +341,7 @@
+         _mover?.ReleaseMovementAfterAttack();
+     }
+ 
++    /// <summary>有効な後退終了Eventで移動を再開し、AIへ行動完了を通知する。死亡・大被弾中は無視する。</summary>
+     public void AnimEvent_OnStepBackFinished()
+     {
+         if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
+@@ -336,6 +352,7 @@
+         _mover?.ReleaseMovementAfterAttack();
+     }
+ 
++    /// <summary>Clipから指定されたSEを再生し、診断用の戦闘ログへ記録する。</summary>
+     public void AnimEvent_OnSoundEffect(string soundName)
+     {
+         _audio?.PlaySE(soundName);
+--- a/Assets/Mock/Scripts/Enemy/EnemyHealth.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyHealth.cs
+@@ -2,8 +2,10 @@
+ using UniRx;
+ using UnityEngine;
+ 
++/// <summary>Enemyの最大HPと現在HPを保持して変更を通知する。死亡演出とAI停止はControllerに任せる。</summary>
+ public class EnemyHealth : IDisposable
+ {
++    /// <summary>基礎HPにラン継承倍率を適用し、現在HPのReactive通知を初期化する。</summary>
+     public EnemyHealth(EnemyStuts status)
+     {
+         _maxHp = status != null ? status.EnemyMaxHealth * RunSession.EnemyHealth : 100f * RunSession.EnemyHealth;
+@@ -39,6 +41,7 @@
+         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
+     }
+ 
++    /// <summary>EnemyのHP通知に使用するReactivePropertyを解放する。</summary>
+     public void Dispose()
+     {
+         _hpRx?.Dispose();
+--- a/Assets/Mock/Scripts/Enemy/EnemyState/EnemyState.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyState/EnemyState.cs
+@@ -1,3 +1,4 @@
++/// <summary>Enemyの待機・追跡・攻撃などの行動状態を識別する。</summary>
+ public enum EnemyState
+ {
+     Idle,
+--- a/Assets/Mock/Scripts/Enemy/EnemyState/EnemyStateMachine.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyState/EnemyStateMachine.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>Enemy状態管理用に残されている空の拡張枠。現在の戦闘状態管理は別のAI実装が担当する。</summary>
+ public class EnemyStateMachine
+ {
+     
+--- a/Assets/Mock/Scripts/Enemy/EnemyWeapon.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyWeapon.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public sealed class EnemyWeapon
+ {
++    /// <summary>刀判定Colliderと攻撃設定未指定時の基礎威力を保持する。</summary>
+     public EnemyWeapon(Collider[] weaponColliders, float fallbackPower)
+     {
+         _weaponColliders = weaponColliders;
+@@ -21,6 +22,7 @@
+ 
+     private readonly Dictionary<Collider, SwordTrail> _trails = new();
+     private bool _initialized;
++    /// <summary>武器ColliderのTrigger Relayと刀の軌跡を一度だけ準備する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -85,9 +87,12 @@
+         }
+     }
+ 
++    /// <summary>武器に保存した命中通知Relayを列挙する。</summary>
++    /// <returns>登録済みの武器Relay。</returns>
+     private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
+ 
+     /// <summary>対象に最も近い刀の判定部分から、接触面の位置を求める。</summary>
++    /// <returns>刀の判定形状と対象の近接点から求めた接触位置。</returns>
+     public Vector3 GetContactPoint(Collider target)
+     {
+         Vector3 point = target.bounds.center;
+@@ -103,6 +108,7 @@
+         return point;
+     }
+ 
++    /// <summary>武器Colliderと軌跡の有効状態を切り替え、攻撃判定区間と表示を同期する。</summary>
+     private void SetHitboxActive(bool isActive)
+     {
+         if (_weaponColliders == null)
+@@ -129,6 +135,7 @@
+     }
+ 
+     /// <summary>この武器のダメージ量（ステータス参照）。</summary>
++    /// <returns>攻撃中の指定威力。指定が正でなければ基礎威力。</returns>
+     public float Damage()
+     {
+         if (_currentAttackDamage > 0f) return _currentAttackDamage;
+--- a/Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs
++++ b/Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs
+@@ -1,6 +1,7 @@
+ using UnityEngine;
+ 
+ // インスペクターで簡単に設定できるよう、攻撃データのサンプル参照を保持する補助コンポーネント。
++/// <summary>InspectorでEnemyAttackDataのサンプル参照一覧を保持する補助コンポーネント。攻撃の実行処理は持たない。</summary>
+ public class SampleEnemyAttacks　: MonoBehaviour 
+ {
+     public EnemyAttackData[] attacks;
+--- a/Assets/Mock/Scripts/Feedback/AttackRootMotionPhysics.cs
++++ b/Assets/Mock/Scripts/Feedback/AttackRootMotionPhysics.cs
+@@ -1,6 +1,9 @@
+ using UnityEngine;
++/// <summary>攻撃Root Motionの水平移動をRigidbodyの衝突形状で制限する共通処理。</summary>
+ public static class AttackRootMotionPhysics
+ {
++    /// <summary>RigidbodyのSweepで水平移動先の衝突を確認し、接触面より手前まで移動量を制限する。</summary>
++    /// <returns>衝突を考慮した水平移動量。</returns>
+     public static Vector3 LimitDisplacement(Rigidbody body, Vector3 delta)
+     {
+         delta.y = 0f;
+--- a/Assets/Mock/Scripts/Feedback/AttackRootMotionState.cs
++++ b/Assets/Mock/Scripts/Feedback/AttackRootMotionState.cs
+@@ -1,13 +1,16 @@
+ using UnityEngine;
+ // Incoming combo states replace ownership before the outgoing state's Exit.
++/// <summary>攻撃Stateへの入退場をControllerへ通知し、Root Motionを適用するStateの所有権を管理する。</summary>
+ public sealed class AttackRootMotionState : StateMachineBehaviour
+ {
++    /// <summary>ベースLayerの攻撃開始StateをPlayerまたはEnemy Controllerへ通知してRoot Motionを受け付ける。</summary>
+     public override void OnStateEnter(Animator animator, AnimatorStateInfo info, int layer)
+     {
+         if (layer != 0) return;
+         animator.GetComponent<PlayerController>()?.BeginAnimationAttackRootMotion(info.fullPathHash);
+         animator.GetComponent<EnemyController>()?.BeginAnimationAttackRootMotion(info.fullPathHash);
+     }
++    /// <summary>終了StateのハッシュをControllerへ渡し、所有者に一致する攻撃Root Motionだけを解除する。</summary>
+     public override void OnStateExit(Animator animator, AnimatorStateInfo info, int layer)
+     {
+         if (layer != 0) return;
+--- a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+@@ -76,6 +76,7 @@
+     private bool _initialized;
+     private JustAvoidContrast _justAvoidContrast;
+ 
++    /// <summary>キャラクター表示と命中演出を準備し、Playerには回避演出、Enemyには通常被弾用の骨補正を接続する。</summary>
+     public void Init(AudioManager audio = null, VFXConfig vfxConfig = null, CameraManager camera = null, HitStopManager hitStop = null, bool enableJustAvoid = true)
+     {
+         if (_initialized) return;
+@@ -112,6 +113,7 @@
+         if (enableJustAvoid && (audio != null || vfxConfig != null)) PrepareJustAvoid(shader);
+     }
+ 
++    /// <summary>元のMeshと骨を共有するEnemy用の光オーバーレイを準備し、元Materialを差し替えず命中を表現する。</summary>
+     private void PrepareNormalHitFlash(Shader shader)
+     {
+         if (shader == null) return;
+@@ -134,6 +136,7 @@
+         }
+     }
+ 
++    /// <summary>攻撃種別と実時間の終了時刻を記録して通常被弾Flashを開始する。</summary>
+     private void BeginNormalHitFlash(bool heavy)
+     {
+         _normalFlashHeavy = heavy;
+@@ -141,6 +144,7 @@
+         _normalFlashUntil = Time.unscaledTime + _normalFlashLength;
+     }
+ 
++    /// <summary>元MeshのBlendShapeを追従し、攻撃種別に応じた光を減衰させて終了時に非表示にする。</summary>
+     private void UpdateNormalHitFlash()
+     {
+         if (_normalFlashMaterial == null) return;
+@@ -155,6 +159,7 @@
+         }
+     }
+ 
++    /// <summary>通常被弾の骨補正と光を解除し、大被弾・死亡へ持ち越さない。</summary>
+     public void CancelNormalHitReaction()
+     {
+         _enemyBoneReaction?.Clear();
+@@ -162,6 +167,7 @@
+         UpdateNormalHitFlash();
+     }
+ 
++    /// <summary>成功時の固定残像・Flash・任意Shockwaveに使用するMeshとMaterialを準備する。</summary>
+     private void PrepareJustAvoid(Shader shader)
+     {
+         if (shader != null)
+@@ -230,6 +236,8 @@
+         }
+     }
+ 
++    /// <summary>Meshのサブメッシュ数に合わせて同一Materialの参照配列を作る。</summary>
++    /// <returns>サブメッシュに割り当てるMaterial配列。</returns>
+     private Material[] RepeatedMaterial(Material material, int count)
+     {
+         var materials = new Material[count];
+@@ -239,6 +247,7 @@
+ 
+     /// <summary>成立通知から一度だけ呼ぶ。判定、ゲージ、スローには触れない。</summary>
+     public void PlayJustAvoidFeedback() => PlayJustAvoidFeedback(new DamageInfo(0, transform.position + Vector3.up, transform.forward, null, null));
++    /// <summary>既定の接触位置で共通の成功演出を要求する。成功判定や追撃受付は変更しない。</summary>
+     public void PlayJustAvoidFeedback(DamageInfo info)
+     {
+         if (!_initialized || !isActiveAndEnabled) return;
+@@ -288,6 +297,7 @@
+         UpdateJustAvoid();
+     }
+ 
++    /// <summary>成功からの実経過時間に応じて残像・Flash・Shockwaveを減衰し、終了後に表示を解除する。</summary>
+     private void UpdateJustAvoid()
+     {
+         if (!_justAvoidPlaying) return;
+@@ -321,6 +331,7 @@
+         if (elapsed >= Mathf.Max(_afterImageDuration, Mathf.Max(_flashDuration, shockwaveDuration))) StopJustAvoid();
+     }
+ 
++    /// <summary>Shockwaveの粒子を停止・消去して表示オブジェクトを非表示にする。</summary>
+     private void StopShockwave()
+     {
+         if (_shockwaveRoot == null || !_shockwaveRoot.activeSelf) return;
+@@ -329,6 +340,7 @@
+         _shockwaveRoot.SetActive(false);
+     }
+ 
++    /// <summary>回避用の残像とFlash、Shockwaveを停止する。新しい成功の色・音の時計は別の所有者が管理する。</summary>
+     private void StopJustAvoid()
+     {
+         _justAvoidPlaying = false;
+@@ -363,6 +375,7 @@
+     [SerializeField, Range(.12f, .16f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
+     private float _justAvoidCounterHitStop = .14f;
+ 
++    /// <summary>攻撃情報または既定の被弾で、音・HitStop・接触VFXと必要な骨反応を開始する。</summary>
+     public void Hit(DamageInfo info, bool useBoneReaction = true)
+     {
+         if (!_initialized || !isActiveAndEnabled) return;
+@@ -406,6 +419,7 @@
+         _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint);
+     }
+ 
++    /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
+     private void PrepareContactFeedback()
+     {
+         _contactPulse = new ContactPulse(gameObject.layer);
+@@ -437,6 +451,7 @@
+             }
+         }
+     }
++    /// <summary>再利用する命中Prefabを接触位置へ配置し、攻撃種別に応じた粒子量と速度で再生する。</summary>
+     private void PlayHitVFX(DamageInfo info)
+     {
+         if (_hitRoots == null) return;
+@@ -476,6 +491,8 @@
+             particle.Play(false);
+         }
+     }
++    /// <summary>元のParticleカーブを保持しながら指定倍率を反映する。</summary>
++    /// <returns>倍率を反映した粒子用カーブ。</returns>
+     private static ParticleSystem.MinMaxCurve ScaleHitCurve(ParticleSystem.MinMaxCurve value, float scale)
+     {
+         if (value.mode == ParticleSystemCurveMode.Constant) value.constant *= scale;
+@@ -485,12 +502,14 @@
+         return value;
+     }
+ 
++    /// <summary>指定スロットの粒子を停止・消去し、命中表示を非表示にする。</summary>
+     private void StopHitVFX(int i)
+     {
+         foreach (var particle in _hitParticles[i]) if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+         _hitRoots[i].SetActive(false);
+     }
+ 
++    /// <summary>前フレームの骨補正を除去し、被弾・回避・接触演出の終了時刻と表示状態を更新する。</summary>
+     private void Update() 
+     { 
+         RemoveOffset(); 
+@@ -503,6 +522,7 @@
+                 if (_hitRoots[i].activeSelf && Time.unscaledTime - _hitStarted[i] >= _vfxConfig.HitVFXDuration) StopHitVFX(i);
+     }
+ 
++    /// <summary>Animator更新後の姿勢へキャラクター別の被弾補正を重ねる。Enemyの通常反応は死亡・大被弾で解除する。</summary>
+     private void LateUpdate()
+     {
+         if (_enemyOwner != null)
+@@ -553,6 +573,7 @@
+             if (_renderers[i] != null) _renderers[i].sharedMaterials = visible ? _glow[i] : _original[i];
+     }
+ 
++    /// <summary>回避・命中・骨補正を停止してMaterialと表示状態を通常へ戻す。</summary>
+     private void OnDisable()
+     {
+         _justAvoidContrast?.Cancel();
+@@ -565,6 +586,7 @@
+         Refresh();
+     }
+ 
++    /// <summary>生成したFlash・残像・ParticleオブジェクトとMesh・Materialを解放する。</summary>
+     private void OnDestroy() 
+     { 
+         _enemyBoneReaction?.Clear();
+@@ -595,6 +617,7 @@
+     private readonly Material material;
+     private readonly Mesh mesh;
+     private int next;
++    /// <summary>接触Flash用Mesh・Materialと固定数の表示スロットを準備する。</summary>
+     public ContactPulse(int layer)
+     {
+         var shader = Resources.Load<Shader>("ContactFlash");
+@@ -616,6 +639,7 @@
+             renderers[i].receiveShadows = false; objects[i].SetActive(false);
+         }
+     }
++    /// <summary>次の再利用スロットを接触位置へ配置し、サイズ・色・実時間の寿命を設定する。</summary>
+     public void Play(Vector3 position, Vector3 direction, float size, float duration, float strength, Color? tint = null)
+     {
+         if (objects == null) return;
+@@ -627,6 +651,7 @@
+         tints[i] = tint ?? new Color(.86f, .95f, 1f);
+         objects[i].SetActive(true); Update();
+     }
++    /// <summary>有効な接触Flashの実時間に応じて透明度を下げ、寿命を過ぎたスロットを非表示にする。</summary>
+     public void Update()
+     {
+         if (objects == null) return;
+@@ -640,7 +665,9 @@
+             renderers[i].SetPropertyBlock(block);
+         }
+     }
++    /// <summary>接触Flashの全スロットを即座に非表示にする。</summary>
+     public void Stop() { if (objects != null) foreach (var obj in objects) if (obj != null) obj.SetActive(false); }
++    /// <summary>接触Flashの表示オブジェクトと所有するMesh・Materialを解放する。</summary>
+     public void Dispose()
+     {
+         if (objects != null) foreach (var obj in objects) if (obj != null) Object.Destroy(obj);
+--- a/Assets/Mock/Scripts/Feedback/CombatLog.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatLog.cs
+@@ -1,6 +1,8 @@
+ using System.Diagnostics;
++/// <summary>戦闘の診断ログを条件付きで出力する。リリース時の不要なログ呼び出しを抑える。</summary>
+ public static class CombatLog
+ {
++    /// <summary>戦闘診断用の文字列をUnity Consoleへ出力する。条件付きコンパイルで不要な呼び出しを省く。</summary>
+     [Conditional("KATSURO_COMBAT_LOG")]
+     public static void Trace(object message) => UnityEngine.Debug.Log(message);
+ }
+--- a/Assets/Mock/Scripts/Feedback/DamageNumbers.cs
++++ b/Assets/Mock/Scripts/Feedback/DamageNumbers.cs
+@@ -27,13 +27,17 @@
+     private bool[] criticalHit;
+     private bool _initialized;
+     private bool _presentationSuppressed;
++    /// <summary>勝利などの演出中に新しいダメージ数値の表示を抑制する。</summary>
+     public void SetPresentationSuppressed(bool suppressed) => _presentationSuppressed = suppressed;
++    /// <summary>使用カメラを接続し、配置済みuGUIテンプレートから表示プールを一度だけ準備する。</summary>
+     public void Init(Camera camera)
+     {
+         if (_initialized) return;
+         if (camera != null) _camera = camera;
+         _initialized = Initialize();
+     }
++    /// <summary>参照を検証し、通常・Criticalの数値ラベルを固定数生成して非表示で待機させる。</summary>
++    /// <returns>表示プールを使用可能になった場合はtrue。</returns>
+     private bool Initialize()
+     {
+         if (normal != null) return true;
+@@ -65,11 +69,13 @@
+         }
+         return true;
+     }
++    /// <summary>有効な正のダメージだけを表示し、演出による抑制中は表示要求を無視する。</summary>
+     public void Show(Vector3 position, float amount, bool isCritical)
+     {
+         if (!_initialized || _presentationSuppressed || !isActiveAndEnabled || amount <= 0) return;
+         Display(position, amount, isCritical);
+     }
++    /// <summary>Critical種別に応じた再利用ラベルへ数値を設定し、位置と表示寿命を初期化する。</summary>
+     private void Display(Vector3 position, float amount, bool isCritical)
+     {
+         int index = next;
+@@ -86,12 +92,15 @@
+         label.gameObject.SetActive(true);
+         PositionLabel(index, 0);
+     }
++    /// <summary>Inspectorの範囲内で数値の画面上の位置ずれを生成する。</summary>
++    /// <returns>各軸の指定範囲内のランダムOffset。</returns>
+     private Vector2 CreateRandomOffset()
+     {
+         // 上昇中に文字が揺れないよう、ランダムなずれは命中時に一度だけ決める。
+         return Vector2.Scale(Random.insideUnitCircle,
+             new Vector2(Mathf.Abs(_randomOffsetRange.x), Mathf.Abs(_randomOffsetRange.y)));
+     }
++    /// <summary>実時間でラベルの浮上・透明度・寿命を更新し、期限を過ぎた表示をプールへ戻す。</summary>
+     private void LateUpdate()
+     {
+         if (active == null) return;
+@@ -106,6 +115,7 @@
+             PositionLabel(i, age);
+         }
+     }
++    /// <summary>ワールド命中位置をCanvasへ投影し、上昇とOffsetを加えてラベルを配置する。</summary>
+     private void PositionLabel(int index, float age)
+     {
+         var label = active[index];
+@@ -121,6 +131,7 @@
+             point.y + _screenOffset.y + offset.y + randomOffset.y, 0);
+         label.alpha = opacity[index] * (1f - age / Mathf.Max(.05f, _lifetime));
+     }
++    /// <summary>使用中の数値ラベルを非表示にして、停止後に表示が取り残されないようにする。</summary>
+     private void OnDisable()
+     {
+         if (active == null) return;
+--- a/Assets/Mock/Scripts/Feedback/EnemyBoneHitReaction.cs
++++ b/Assets/Mock/Scripts/Feedback/EnemyBoneHitReaction.cs
+@@ -20,6 +20,7 @@
+     public bool IsActive => _active;
+     public float Elapsed => _elapsed;
+ 
++    /// <summary>Humanoidの上半身の骨を取得し、通常被弾を分散する重みと遅延を準備する。</summary>
+     public EnemyBoneHitReaction(Transform root, Animator animator)
+     {
+         _root = root;
+@@ -41,6 +42,8 @@
+             _bones.Add(new BoneOffset { Bone = bone, Weight = weight, Delay = delay });
+     }
+ 
++    /// <summary>攻撃者から離れる水平衝撃方向を求め、Enemyのローカル座標へ変換する。</summary>
++    /// <returns>通常被弾の傾きに使用するローカル衝撃方向。</returns>
+     public static Vector3 GetLocalImpulse(Transform root, DamageInfo info)
+     {
+         Vector3 away = info.Instigator != null ? root.position - info.Instigator.transform.position : Vector3.zero;
+@@ -51,6 +54,7 @@
+         return root.InverseTransformDirection(away.normalized);
+     }
+ 
++    /// <summary>命中方向と攻撃角度から骨補正の目標を設定する。再被弾は現在値から接続して補正を累積しない。</summary>
+     public void Begin(DamageInfo info, float angle, float duration, float attackScale)
+     {
+         _continuing = _active;
+@@ -62,6 +66,8 @@
+         _active = _bones.Count > 0;
+     }
+ 
++    /// <summary>衝撃初期の立ち上がりと後半の減衰を持つ骨反応の重みを計算する。</summary>
++    /// <returns>被弾経過時間に対応する0から1の重み。</returns>
+     public static float Envelope(float age, float duration)
+     {
+         if (age < 0f || age >= duration) return 0f;
+@@ -70,6 +76,7 @@
+         return 1f - Mathf.SmoothStep(0f, 1f, (age - peak) / (duration - peak));
+     }
+ 
++    /// <summary>Animator速度を掛けた時間で骨反応を進め、HitStop中は進行を止める。</summary>
+     public void Tick(float deltaTime, float animatorSpeed)
+     {
+         if (!_active) return;
+@@ -77,6 +84,7 @@
+         if (_elapsed >= _duration + .020f) Clear();
+     }
+ 
++    /// <summary>Animatorが更新した基準姿勢へ重み付き骨回転を重ね、次の更新で除去する姿勢を記録する。</summary>
+     public void Apply()
+     {
+         // Also makes repeated LateUpdate/Hit calls safe when Animator did not evaluate.
+@@ -97,6 +105,7 @@
+         }
+     }
+ 
++    /// <summary>前回の補正姿勢が残っている骨だけ基準姿勢へ戻し、新しく評価されたAnimator姿勢を保護する。</summary>
+     public void RemoveOffsets()
+     {
+         foreach (var bone in _bones)
+@@ -108,6 +117,7 @@
+         }
+     }
+ 
++    /// <summary>全骨の補正を除去し、通常被弾の目標・時計・所有状態を消去する。</summary>
+     public void Clear()
+     {
+         RemoveOffsets();
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs
+@@ -2,6 +2,7 @@
+ using UnityEngine.Rendering;
+ using UnityEngine.SceneManagement;
+ 
++/// <summary>ジャスト回避成功時だけ専用Volumeで世界をモノクロ化し、BGM Duckを同時に開始する。</summary>
+ [DisallowMultipleComponent, RequireComponent(typeof(CameraManager))]
+ public sealed class JustAvoidContrast : MonoBehaviour
+ {
+@@ -12,6 +13,7 @@
+     private JustAvoidEnvelope _envelope;
+     private AudioManager _audio;
+     private bool _blocked;
++    /// <summary>勝利・敗北が優先中でなければ、現在値から回避用モノクロとBGM Duckを同時に開始する。</summary>
+     public void Play(AudioManager audio)
+     {
+         if (!isActiveAndEnabled || _blocked || (FinalBlowManager.Instance != null && FinalBlowManager.Instance.IsPlaying)) return;
+@@ -21,24 +23,32 @@
+         _audio?.PlayJustAvoidDuck();
+         Update();
+     }
++    /// <summary>実時間の包絡線を専用Volume重みへ反映し、指定時間後に通常表示へ戻す。</summary>
+     private void Update()
+     {
+         if (_volume != null) _volume.weight = _envelope.Evaluate(Time.unscaledTime, _enter, _hold, _restore);
+     }
++    /// <summary>専用Volumeと回避用BGM Duckを即解除する。BGMの再生状態は変更しない。</summary>
+     public void Cancel()
+     {
+         _envelope.Reset();
+         if (_volume != null) _volume.weight = 0;
+         _audio?.CancelJustAvoidDuck();
+     }
++    /// <summary>アクティブScene変更時に回避用の色と音を通常へ戻す。</summary>
+     private void SceneChanged(Scene previous, Scene next) => Cancel();
++    /// <summary>SceneのUnload時に取り残された回避演出を解除する。</summary>
+     private void SceneUnloaded(Scene scene) => Cancel();
++    /// <summary>戦闘・Pause以外の進行状態では演出を解除し、新しい回避演出の開始を拒否する。</summary>
+     private void GameStateChanged(GameManager.GameState state)
+     {
+         _blocked = state != GameManager.GameState.InGame && state != GameManager.GameState.Pause;
+         if (_blocked) Cancel();
+     }
++    /// <summary>Scene変更とゲーム進行の通知を購読して中断時の復帰を保証する。</summary>
+     private void OnEnable() { SceneManager.activeSceneChanged += SceneChanged; SceneManager.sceneUnloaded += SceneUnloaded; GameManager.OnGameStateChanged += GameStateChanged; }
++    /// <summary>Scene・進行通知を解除し、回避演出の色と音を戻す。</summary>
+     private void OnDisable() { SceneManager.activeSceneChanged -= SceneChanged; SceneManager.sceneUnloaded -= SceneUnloaded; GameManager.OnGameStateChanged -= GameStateChanged; Cancel(); }
++    /// <summary>破棄時に回避用Volumeと音量倍率を通常へ戻す。</summary>
+     private void OnDestroy() => Cancel();
+ }
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidEnvelope.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidEnvelope.cs
+@@ -1,12 +1,23 @@
+ using UnityEngine;
+ 
+ // Restart from the current value; recovery always uses real time supplied by the owner.
++/// <summary>現在値から開始できる移行・保持・復帰の包絡線。時間の取得と適用先は呼び出し側が担当する。</summary>
+ public struct JustAvoidEnvelope
+ {
+     private float _started, _from;
++    /// <summary>移行・保持・復帰の時計が有効な間はtrue。</summary>
+     public bool Playing { get; private set; }
++    /// <summary>現在の包絡線重み。ゼロが通常、1が最大効果。</summary>
+     public float Value { get; private set; }
++    /// <summary>現在の包絡線値を起点として移行・保持・復帰の時計を再開始する。</summary>
++    /// <param name="now">移行開始の基準となる実時刻。</param>
+     public void Begin(float now) { _from = Value; _started = now; Playing = true; }
++    /// <summary>指定実時刻の重みを計算し、全区間の終了時には自動的に状態をリセットする。</summary>
++    /// <returns>移行・保持・復帰に対応する0から1の値。</returns>
++    /// <param name="now">開始時と同じ時計の実時刻。</param>
++    /// <param name="enter">最大効果へ移行する実時間秒数。</param>
++    /// <param name="hold">最大効果を保持する実時間秒数。</param>
++    /// <param name="restore">通常へ戻る実時間秒数。</param>
+     public float Evaluate(float now, float enter, float hold, float restore)
+     {
+         if (!Playing) return Value;
+@@ -19,5 +30,6 @@
+         else Reset();
+         return Value;
+     }
++    /// <summary>包絡線の再生状態を解除し、適用量をゼロへ戻す。</summary>
+     public void Reset() { Playing = false; Value = 0; }
+ }
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs
+@@ -15,6 +15,7 @@
+     private float _started;
+     private bool _playing;
+ 
++    /// <summary>成功地点と設定を保持して実時間の歪みを開始し、AfterPostProcessのCustom Passを登録する。</summary>
+     public void Play(Vector3 worldPosition, Vector3 bodyCenter, VFXConfig config)
+     {
+         if (!Application.isPlaying || !isActiveAndEnabled || _material == null ||
+@@ -30,12 +31,14 @@
+         CustomPassVolume.RegisterGlobalCustomPass(CustomPassInjectionPoint.AfterPostProcess, _pass);
+     }
+ 
++    /// <summary>設定が無効化された場合や実時間の寿命終了時に歪みPassを解除する。</summary>
+     private void Update()
+     {
+         if (_playing && (_config == null || !_config.ScreenDistortionEnable ||
+             Time.unscaledTime - _started >= Mathf.Max(.01f, _config.DistortionDuration))) Stop();
+     }
+ 
++    /// <summary>自身が登録したGlobal Custom Passを解除し、歪みの再生状態を終了する。</summary>
+     private void Stop()
+     {
+         if (_playing && _pass != null)
+@@ -43,15 +46,21 @@
+         _playing = false;
+     }
+ 
++    /// <summary>Global Custom Passを解除して画面複製用のRTリソースを解放する。</summary>
+     private void OnDisable() { Stop(); _pass?.ReleaseResources(); }
++    /// <summary>歪みPassと所有する描画リソースを破棄時に解放する。</summary>
+     private void OnDestroy() { Stop(); _pass?.ReleaseResources(); }
+ 
++    /// <summary>命中点を画面へ投影し、使用できなければ身体中心を代替として使用する。</summary>
++    /// <returns>画面内の有効な中心を求められた場合はtrue。</returns>
+     public static bool TryProjectCenter(Camera camera, Vector3 hitPoint, Vector3 bodyCenter, out Vector2 center)
+     {
+         center = default;
+         return camera != null && (TryProject(camera, hitPoint, out center) || TryProject(camera, bodyCenter, out center));
+     }
+ 
++    /// <summary>有限なワールド座標をViewportへ投影し、手前や画面外の値を除外する。</summary>
++    /// <returns>有効な画面内位置を求められた場合はtrue。</returns>
+     private static bool TryProject(Camera camera, Vector3 world, out Vector2 center)
+     {
+         center = default;
+@@ -63,6 +72,7 @@
+         return true;
+     }
+ 
++    /// <summary>出力カメラのPost Process後の画面を別RTへ複製し、成功地点から広がる歪みを描画する。</summary>
+     private sealed class DistortionPass : CustomPass
+     {
+         private readonly JustAvoidScreenDistortion _owner;
+@@ -76,6 +86,7 @@
+         private static readonly int Tint = Shader.PropertyToID("_EdgeTint");
+         protected override bool executeInSceneView => false;
+ 
++        /// <summary>歪みの所有者と描画バッファ設定を保持し、HDRPへの独立したPassを準備する。</summary>
+         public DistortionPass(JustAvoidScreenDistortion owner)
+         {
+             _owner = owner;
+@@ -84,6 +95,7 @@
+             targetDepthBuffer = TargetBuffer.None;
+         }
+ 
++        /// <summary>対象カメラの画面を別RTへコピーし、成功点から広がる輪状の歪みを実経過時間に応じて描く。</summary>
+         protected override void Execute(CustomPassContext ctx)
+         {
+             if (_owner == null || !_owner._playing || !Application.isPlaying ||
+@@ -118,7 +130,9 @@
+             CoreUtils.DrawFullScreen(ctx.cmd, _owner._material, _block, shaderPassId: 0);
+         }
+ 
++        /// <summary>Passが所有する画面複製用RTHandleを解放する。</summary>
+         public void ReleaseResources() { _source?.Release(); _source = null; }
++        /// <summary>HDRPがPassを片付ける際に所有するRTHandleを解放する。</summary>
+         protected override void Cleanup() => ReleaseResources();
+     }
+ }
+--- a/Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs
++++ b/Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs
+@@ -6,6 +6,8 @@
+     public const string AttackTag = "NormalAttack";
+     public const string ParameterPrefix = "AttackPhase_";
+ 
++    /// <summary>通常攻撃のBlend中に古いClipから届くEventを除外する。通常攻撃以外の既存Event受付は維持する。</summary>
++    /// <returns>現在または遷移先が所有する通常攻撃Event、または通常攻撃以外ならtrue。</returns>
+     public static bool AcceptGameplayEvent(Animator animator, AnimationEvent animationEvent)
+     {
+         // Counter and other existing clips keep their receivers and behavior.
+@@ -26,6 +28,8 @@
+     [SerializeField, Range(0f, 1f)] private float _slashEnd;
+     [SerializeField, Range(0f, 1f)] private float _recoveryStart;
+ 
++    /// <summary>Clipの正規化時刻から振りかぶり・斬撃・回復の速度倍率を選び、斬撃後は滑らかに補間する。</summary>
++    /// <returns>該当する攻撃段階の速度倍率。</returns>
+     public float EvaluateSpeed(float normalizedTime)
+     {
+         if (normalizedTime < _slashStart) return _windupSpeed;
+@@ -34,11 +38,13 @@
+         return Mathf.Lerp(_slashSpeed, _recoverySpeed, Mathf.SmoothStep(0f, 1f, t));
+     }
+ 
++    /// <summary>ベースLayerの攻撃Stateに割り当てた速度パラメータを通常倍率で初期化する。</summary>
+     public override void OnStateEnter(Animator animator, AnimatorStateInfo state, int layer)
+     {
+         if (layer == 0) SetSpeed(animator, 1f);
+     }
+ 
++    /// <summary>Blend中は通常倍率を保ち、単独再生中だけClip時刻に応じた専用速度を設定する。</summary>
+     public override void OnStateUpdate(Animator animator, AnimatorStateInfo state, int layer)
+     {
+         if (layer != 0) return;
+@@ -47,11 +53,13 @@
+         SetSpeed(animator, animator.IsInTransition(layer) ? 1f : EvaluateSpeed(state.normalizedTime));
+     }
+ 
++    /// <summary>終了したState自身の速度パラメータを戻し、次のコンボ段階のパラメータを保護する。</summary>
+     public override void OnStateExit(Animator animator, AnimatorStateInfo state, int layer)
+     {
+         if (layer == 0) SetSpeed(animator, 1f);
+     }
+ 
++    /// <summary>割り当て済みの専用Animatorパラメータだけに速度倍率を反映する。</summary>
+     private void SetSpeed(Animator animator, float speed)
+     {
+         if (!string.IsNullOrEmpty(_speedParameter)) animator.SetFloat(_speedParameter, speed);
+--- a/Assets/Mock/Scripts/Feedback/SwordTrail.cs
++++ b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+@@ -4,6 +4,7 @@
+ [DisallowMultipleComponent]
+ public sealed class SwordTrail : MonoBehaviour
+ {
++    /// <summary>通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。</summary>
+     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
+     [Header("刀身の軌跡")]
+     [SerializeField, Min(.01f)] private float _duration = .11f;
+@@ -47,11 +48,13 @@
+     private float previousTime, speedStrength;
+     private bool hasPrevious;
+ 
++    /// <summary>共有先を含む刀の軌跡を攻撃種別の持続時間・明るさへ切り替える。</summary>
+     public void SetStyle(AttackStyle value)
+     {
+         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value); return; }
+         style = value;
+     }
++    /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
+     public void SetActive(bool active)
+     {
+         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetActive(active); return; }
+@@ -59,6 +62,8 @@
+         emitting = active;
+         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; Sample(); }
+     }
++    /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
++    /// <returns>軌跡の描画リソースを使用可能になった場合はtrue。</returns>
+     public bool Init()
+     {
+         if (initialized) return true;
+@@ -81,6 +86,7 @@
+         initialized = true;
+         return true;
+     }
++    /// <summary>切先側の端点をワールド座標で記録し、所有者の移動を除いた刀の振り速度から表示強度を求める。</summary>
+     private void Sample()
+     {
+         Vector3 realBase = _bladeBase != null ? _bladeBase.position : transform.position;
+@@ -110,16 +116,19 @@
+         sampleWidths[count] = style == AttackStyle.Light ? 1f : style == AttackStyle.Heavy ? 1.04f : 1.08f;
+         count++;
+     }
++    /// <summary>履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。</summary>
+     private void RemoveOldest()
+     {
+         for (int i = 1; i < count; i++) CopySample(i, i - 1);
+         count--;
+     }
++    /// <summary>軌跡サンプルの端点・寿命・表示量を指定スロットへ複製する。</summary>
+     private void CopySample(int source, int destination)
+     {
+         bases[destination] = bases[source]; tips[destination] = tips[source]; times[destination] = times[source];
+         lifetimes[destination] = lifetimes[source]; strengths[destination] = strengths[source]; sampleWidths[destination] = sampleWidths[source];
+     }
++    /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
+     private void LateUpdate()
+     {
+         if (!initialized || mesh == null) return;
+@@ -152,6 +161,8 @@
+         mesh.SetTriangles(triangles, 0, (count - 1) * 6, 0);
+         mesh.RecalculateBounds();
+     }
++    /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
+     private void OnDisable() { emitting = false; count = 0; if (mesh != null) mesh.Clear(); }
++    /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
+     private void OnDestroy() { if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+ }
+--- a/Assets/Mock/Scripts/Feedback/VictoryContrast.cs
++++ b/Assets/Mock/Scripts/Feedback/VictoryContrast.cs
+@@ -16,11 +16,16 @@
+     /// <summary>指定した実時刻に対応するVolumeの重みを反映する。</summary>
+     /// <param name="now">Time.unscaledTimeと同じ基準の秒数。</param>
+     public void RenderAt(float now) { if (_volume != null) _volume.weight = _envelope.Evaluate(now, _enter, _hold, _restore); }
++    /// <summary>実時間で勝利専用モノクロの移行・保持・復帰を進める。</summary>
+     private void Update() => RenderAt(Time.unscaledTime);
+     /// <summary>勝利モノクロを即解除し、通常のVolume合成へ戻す。</summary>
+     public void Cancel() { _envelope.Reset(); if (_volume != null) _volume.weight = 0; }
++    /// <summary>Scene変更時に勝利用Volumeの重みをゼロへ戻す。</summary>
+     private void SceneChanged(Scene previous, Scene next) => Cancel();
++    /// <summary>Scene変更通知を購読してモノクロの持ち越しを防ぐ。</summary>
+     private void OnEnable() => SceneManager.activeSceneChanged += SceneChanged;
++    /// <summary>Scene購読を解除し、専用Volumeの重みを通常へ戻す。</summary>
+     private void OnDisable() { SceneManager.activeSceneChanged -= SceneChanged; Cancel(); }
++    /// <summary>破棄時に専用Volumeのモノクロを解除する。</summary>
+     private void OnDestroy() => Cancel();
+ }
+--- a/Assets/Mock/Scripts/Managers/AbilityManager.cs
++++ b/Assets/Mock/Scripts/Managers/AbilityManager.cs
+@@ -6,6 +6,7 @@
+ /// </summary>
+ public sealed class AbilityManager
+ {
++    /// <summary>移動状態とは独立して能力を継続するため、Context・各能力・HP・回避設定を保持する。</summary>
+     public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
+     {
+         _context = context;
+@@ -16,6 +17,7 @@
+         _stateConfig = stateConfig;
+     }
+ 
++    /// <summary>幽体化の開始・解除・開始失敗を呼び出し側へ伝える。</summary>
+     public enum GhostToggleResult
+     {
+         Began,
+@@ -70,6 +72,7 @@
+     }
+ 
+     /// <summary>ゴーストのトグル（開始 / 終了）を行う。結果を返す。</summary>
++    /// <returns>開始・解除・失敗を表す結果。</returns>
+     public GhostToggleResult ToggleGhost()
+     {
+         if (_ghost == null) return GhostToggleResult.Failed;
+@@ -100,6 +103,7 @@
+     /// <summary>
+     /// SelfSacrifice のトグル（開始 / 終了）。開始は現在HP比で許可されるかを確認してから行う。
+     /// </summary>
++    /// <returns>要求に応じて自傷能力を切り替えられた場合はtrue。</returns>
+     public bool ToggleSelfSacrifice()
+     {
+         var s = _selfSacrifice;
+@@ -123,6 +127,7 @@
+     /// <summary>
+     /// Heal のトグル（開始 / 終了）。開始時はデフォルトの回復速度を使用します。
+     /// </summary>
++    /// <returns>要求に応じて回復能力を切り替えられた場合はtrue。</returns>
+     public bool ToggleHeal()
+     {
+         var h = _healer;
+--- a/Assets/Mock/Scripts/Managers/AnimationSpeedController.cs
++++ b/Assets/Mock/Scripts/Managers/AnimationSpeedController.cs
+@@ -1,6 +1,7 @@
+ using UnityEngine;
+ 
+ //animator の再生速度を制御するための補助コンポーネント。
++/// <summary>基準速度・状態効果・実時間で期限切れになる一時倍率を合成し、Animator速度を更新する。</summary>
+ [DisallowMultipleComponent, RequireComponent(typeof(Animator))]
+ public sealed class AnimationSpeedController : MonoBehaviour
+ {
+@@ -11,6 +12,7 @@
+ 
+ 
+     private bool _initialized;
++    /// <summary>Animatorとその基準速度を一度だけ取得する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -18,13 +20,17 @@
+         animator = GetComponent<Animator>(); baseSpeed = animator.speed; 
+     }
+ 
+-    // <summary>アニメーションの再生速度を設定します。0 で停止、1 で通常速度、2 で倍速など。</summary>
++    // 状態効果と一時演出の速度は別々に保持する。
++    /// <summary>状態効果の持続倍率を更新し、基準速度と一時倍率を掛けてAnimatorへ反映する。</summary>
+     public void SetStatus(float multiplier)
+     { 
+         status = Mathf.Max(0f, multiplier); Refresh(); 
+     }
+ 
+-    // <summary>一時的にアニメーションの再生速度を設定します。0 で停止、1 で通常速度、2 で倍速など。</summary>
++    // HitStopの期限は実時間で管理する。
++    /// <summary>HitStopなどの一時速度と実時間の期限を設定し、現在の状態効果と合成する。</summary>
++    /// <param name="multiplier">基準速度と状態倍率へ掛ける一時倍率。</param>
++    /// <param name="seconds">実時間で計測する有効秒数。</param>
+     public void SetTemporary(float multiplier, float seconds)
+     {
+         temporary = Mathf.Max(0f, multiplier);
+@@ -38,6 +44,7 @@
+         temporary = 1f; expires = 0f; Refresh(); 
+     
+     }
++    /// <summary>実時間の期限を判定し、一時倍率の自動解除と合成速度の反映を行う。</summary>
+     private void Update() => Refresh();
+ 
+     /// <summary>アニメーションの再生速度を更新します。</summary>
+@@ -47,6 +54,7 @@
+         if (animator != null) animator.speed = baseSpeed * status * temporary;
+     }
+ 
++    /// <summary>持続・一時倍率と期限を解除し、Animatorを保存した基準速度へ戻す。</summary>
+     private void OnDisable()
+     {
+         status = temporary = 1f;
+--- a/Assets/Mock/Scripts/Managers/AudioManager.cs
++++ b/Assets/Mock/Scripts/Managers/AudioManager.cs
+@@ -2,6 +2,7 @@
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
++/// <summary>AudioManagerで参照する登録名とAudioClipを対応付ける。</summary>
+ [System.Serializable]
+ public class SoundData
+ {
+@@ -9,6 +10,7 @@
+     public AudioClip clip;   // 再生する AudioClip。
+ }
+ 
++/// <summary>複数BGMチャンネルとSEプールを管理する。BGM基準音量と一時的なDucking倍率を分離して保持する。</summary>
+ public class AudioManager : MonoBehaviour
+ {
+     public static AudioManager Instance { get; private set; }
+@@ -46,24 +48,30 @@
+     private readonly Dictionary<AudioSource, float> _bgmBaseVolumes = new();
+     private JustAvoidEnvelope _duckEnvelope;
+     private float _duckMultiplier = 1;
++    /// <summary>チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。</summary>
++    /// <returns>一時倍率を掛ける前のチャンネル音量。</returns>
+     private float BaseVolume(AudioSource source)
+     {
+         if (!_bgmBaseVolumes.TryGetValue(source, out float volume))
+             _bgmBaseVolumes[source] = volume = source.volume;
+         return volume;
+     }
++    /// <summary>チャンネルの基準音量を更新し、現在のDucking倍率を掛けた実音量を反映する。</summary>
+     private void SetBaseVolume(AudioSource source, float volume)
+     {
+         _bgmBaseVolumes[source] = volume;
+         source.volume = volume * _duckMultiplier;
+     }
++    /// <summary>現在の音量包絡線から回避用Duckingを再開始し、連続成功でも倍率を累積しない。</summary>
+     public void PlayJustAvoidDuck()
+     {
+         if (!isActiveAndEnabled) return;
+         UpdateDuck(Time.unscaledTime);
+         _duckEnvelope.Begin(Time.unscaledTime);
+     }
++    /// <summary>回避用Duckingを実時間で進め、各BGMの基準音量に倍率を掛けて反映する。</summary>
+     private void Update() => UpdateDuck(Time.unscaledTime);
++    /// <summary>指定実時刻からDucking倍率を求め、SEに触れず全BGMチャンネルへ適用する。</summary>
+     private void UpdateDuck(float now)
+     {
+         _duckMultiplier = Mathf.Lerp(1, _justAvoidDuckVolume,
+@@ -71,19 +79,25 @@
+         if (bgmSources != null) foreach (var source in bgmSources)
+             if (source != null) source.volume = BaseVolume(source) * _duckMultiplier;
+     }
++    /// <summary>一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。</summary>
+     public void CancelJustAvoidDuck() { _duckEnvelope.Reset(); UpdateDuck(Time.unscaledTime); }
++    /// <summary>Scene切り替え時に回避用Duckingを解除する。</summary>
+     private void SceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next) => CancelJustAvoidDuck();
++    /// <summary>SceneのUnload時に一時Duckingを通常音量へ戻す。</summary>
+     private void SceneUnloaded(UnityEngine.SceneManagement.Scene scene) => CancelJustAvoidDuck();
++    /// <summary>勝利・敗北・Titleなど戦闘外へ移った場合にDuckingを解除する。</summary>
+     private void GameStateChanged(GameManager.GameState state)
+     {
+         if (state != GameManager.GameState.InGame && state != GameManager.GameState.Pause) CancelJustAvoidDuck();
+     }
++    /// <summary>Sceneとゲーム進行の中断通知を購読する。</summary>
+     private void OnEnable()
+     {
+         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
+         UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SceneUnloaded;
+         GameManager.OnGameStateChanged += GameStateChanged;
+     }
++    /// <summary>中断通知の購読を解除し、一時Duckingを通常倍率へ戻す。</summary>
+     private void OnDisable()
+     {
+         UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= SceneChanged;
+@@ -91,6 +105,7 @@
+         GameManager.OnGameStateChanged -= GameStateChanged;
+         CancelJustAvoidDuck();
+     }
++    /// <summary>共有AudioManagerを確立し、ListenerのLowPass参照とBGM・SEプールを一度だけ準備する。</summary>
+     public void Init(AudioListener listener)
+     {
+         if (Instance != null && Instance != this)
+@@ -123,6 +138,7 @@
+         }
+     }
+ 
++    /// <summary>BGMチャンネル、登録名のClip辞書とSEプールを初期化する。</summary>
+     private void InitializeAudioManager()
+     {
+         // BGM 用 AudioSource を準備する（複数チャンネル対応）。
+@@ -153,6 +169,7 @@
+         CreateSFXPool();
+     }
+ 
++    /// <summary>既存の単一参照を複数チャンネルへ引き継ぎ、BGM Sourceがなければ先頭チャンネルを生成する。</summary>
+     private void EnsureBGMSources()
+     {
+         // bgmSources リストを保証し、既存の単一 bgmSource が割り当てられている場合はそれを利用する。
+@@ -178,6 +195,7 @@
+         }
+     }
+ 
++    /// <summary>設定数のBGMチャンネルを確保し、SEから独立したAudioSourceを生成する。</summary>
+     private void CreateBgmChannels()
+     {
+         while (bgmSources.Count < Mathf.Max(3, _bgmChannelCount))
+@@ -191,11 +209,14 @@
+         }
+     }
+ 
++    /// <summary>負のチャンネルを先頭へ補正して対応するBGM Sourceを取得する。</summary>
++    /// <returns>指定チャンネルのSource。範囲外ならnull。</returns>
+     private AudioSource GetBgmSource(int channel)
+     {
+         channel = Mathf.Max(0, channel);
+         return bgmSources != null && channel < bgmSources.Count ? bgmSources[channel] : null;
+     }
++    /// <summary>以前のSEプールを片付け、指定Prefabから上限内の再利用Sourceを生成する。</summary>
+     private void CreateSFXPool()
+     {
+         // 既存のプールを破棄してから再生成する。
+@@ -223,6 +244,7 @@
+     }
+ 
+ 
++    /// <summary>指定チャンネルへClipと基準音量を設定してループ再生する。同一Clip・基準音量で再生中なら継続する。</summary>
+     public void PlayBGM(AudioClip clip, int channel = 0, float volume = 1f)
+     {
+         if (clip == null) return;
+@@ -457,6 +479,7 @@
+         }
+     }
+ 
++    /// <summary>一時音量を解除し、自身が共有インスタンスの場合は参照を消去する。</summary>
+     private void OnDestroy()
+     {
+         CancelJustAvoidDuck();
+--- a/Assets/Mock/Scripts/Managers/DistanceManager.cs
++++ b/Assets/Mock/Scripts/Managers/DistanceManager.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>距離管理用に残されている拡張枠。現在は距離計測・通知の処理を持たない。</summary>
+ public class DistanceManager : MonoBehaviour
+ {
+     // コンポーネント生成後、最初の更新処理より前に一度だけ呼ばれる。
+--- a/Assets/Mock/Scripts/Managers/FinalBlowManager.cs
++++ b/Assets/Mock/Scripts/Managers/FinalBlowManager.cs
+@@ -28,6 +28,7 @@
+     [SerializeField, Min(0f)] private float _textDelay = 2.12f;
+     private CancellationTokenSource _sequenceCancellation;
+     private bool _isPlaying;
++    /// <summary>Final Blowが制御権を持っている間はtrue。回避など低優先演出の開始抑制に使用する。</summary>
+     public bool IsPlaying => _isPlaying;
+ 
+     private GameManager _game;
+@@ -36,6 +37,7 @@
+     private LoadSceneManager _loader;
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。</summary>
+     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
+     {
+         if (_initialized) return;
+@@ -57,6 +59,7 @@
+         }
+     }
+ 
++    /// <summary>重複開始を防いで回避の色と音を解除し、勝利用モノクロ・UI・決着シーケンスを開始する。</summary>
+     public void StartFinalBlow()
+     {
+         if (_isPlaying || _sequenceCancellation != null || !isActiveAndEnabled || _enemyController == null || _player == null) return;
+@@ -70,6 +73,7 @@
+         DoFinalBlow().Forget();
+     }
+ 
++    /// <summary>HitStopとBGM停止から専用カメラ、納刀、討伐、既存Scene Fadeへ実時間で進め、中断時も一時状態を片付ける。</summary>
+     private async UniTask DoFinalBlow()
+     {
+         var source = _sequenceCancellation;
+@@ -102,17 +106,20 @@
+         }
+     }
+ 
++    /// <summary>開始基準の実時刻までUpdateで待機し、TimeScaleに左右されずキャンセルを受け付ける。</summary>
+     private static async UniTask WaitUntil(float started, float seconds, CancellationToken token)
+     {
+         while (Time.unscaledTime - started < seconds) await UniTask.Yield(PlayerLoopTiming.Update, token);
+         token.ThrowIfCancellationRequested();
+     }
+ 
++    /// <summary>進行中の非同期演出をキャンセルし、勝利UI・Volume・カメラを復元する。</summary>
+     public void CancelPresentation()
+     {
+         _sequenceCancellation?.Cancel();
+         Cleanup();
+     }
++    /// <summary>演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。</summary>
+     private void Cleanup()
+     {
+         _cameraFeedback?.GetComponent<VictoryContrast>()?.Cancel();
+@@ -125,7 +132,9 @@
+         _isPlaying = false;
+         // Victoryの入力停止はGameManagerが所有する。演出Cleanupで再有効化しない。
+     }
++    /// <summary>勝利シーケンスを中断して表示とカメラ・Volumeを片付ける。</summary>
+     private void OnDisable() => CancelPresentation();
++    /// <summary>勝利演出を中断し、自身が共有インスタンスなら参照を消去する。</summary>
+     private void OnDestroy()
+     {
+         CancelPresentation();
+--- a/Assets/Mock/Scripts/Managers/GameManager.cs
++++ b/Assets/Mock/Scripts/Managers/GameManager.cs
+@@ -11,6 +11,7 @@
+ {
+     public static GameManager Instance { get; private set; }
+ 
++    /// <summary>Title・戦闘・勝利・敗北・Pauseの進行段階を識別し、入力と音声の切り替えに使用する。</summary>
+     public enum GameState
+     {
+         Title,
+@@ -54,6 +55,7 @@
+     [SerializeField] private GameState _state = GameState.Title;
+     private LockOnCamera _lockOnCamera;
+ 
++    /// <summary>ゲーム進行管理の共有インスタンスを確立し、重複を破棄してカーソルを戦闘向けに固定する。</summary>
+     private void Awake()
+     {
+         if (Instance == null)
+@@ -70,24 +72,28 @@
+         Cursor.visible = false;
+     }
+ 
++    /// <summary>Sceneの依存先を接続し、既存の戦闘開始状態へ切り替える。</summary>
+     private void Start()
+     {
+         Init();
+         SetGameState(GameState.InGame);
+     }
+ 
++    /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
+     private void OnDestroy()
+     {
+         if (Instance == this) Instance = null;
+     }
+ 
+     public PlayerController Player => _playerController;
++    /// <summary>戦闘状態と有効なランが両方成立している場合だけtrue。死亡後の入力・AI更新を遮断する。</summary>
+     public bool IsCombatActive => _state == GameState.InGame && RunSession.Active;
+ 
+     private readonly SceneInitialization _scene = new SceneInitialization();
+     private AudioManager _audio;
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>Sceneの共有ManagerとPlayer・Enemy・カメラの依存先を一度だけ組み立てる。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -139,11 +145,13 @@
+         OnGameStateChanged?.Invoke(newState);
+     }
+ 
++    /// <summary>既存のゲーム状態切り替えを通して入力とBGMを戦闘用へ切り替える。</summary>
+     public void StartGame()
+     {
+         SetGameState(GameState.InGame);
+     }
+ 
++    /// <summary>進行中のランだけを勝利として完了し、Victory状態とその通知を確定する。</summary>
+     public void WinGame()
+     {
+         if (!RunSession.Active) return;
+@@ -151,6 +159,7 @@
+         SetGameState(GameState.Victory);
+     }
+ 
++    /// <summary>進行中のランだけを敗北として完了し、Defeat状態とその通知を確定する。</summary>
+     public void LoseGame()
+     {
+         if (!RunSession.Active) return;
+--- a/Assets/Mock/Scripts/Managers/GlobalFader.cs
++++ b/Assets/Mock/Scripts/Managers/GlobalFader.cs
+@@ -15,6 +15,7 @@
+     [SerializeField, Min(0f)] private float duration = 1f;
+ 
+     private bool _initialized;
++    /// <summary>永続する共有Faderとオーバーレイを準備し、重複オブジェクトを除去する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -34,6 +35,7 @@
+         fadeImage.gameObject.SetActive(false);
+     }
+ 
++    /// <summary>自身が共有Faderの場合に共有参照を解除する。</summary>
+     private void OnDestroy()
+     {
+         if (Instance == this) Instance = null;
+@@ -73,6 +75,8 @@
+         fadeImage.raycastTarget = true;
+     }
+ 
++    /// <summary>遷移先を検証し、実時間の暗転後にSceneを読み込んで再表示する。多重遷移は開始しない。</summary>
++    /// <returns>暗転・Scene読み込み・再表示の完了を待機するタスク。</returns>
+     public async UniTask FadeToScene(string sceneName)
+     {
+         if (IsTransitioning) return;
+@@ -103,6 +107,7 @@
+         }
+     }
+ 
++    /// <summary>指定不透明度へ実時間で補間し、破棄によるキャンセルを受け付ける。</summary>
+     private async UniTask FadeAlpha(float target, CancellationToken token)
+     {
+         float start = fadeImage.color.a;
+@@ -119,6 +124,7 @@
+         SetAlpha(target);
+     }
+ 
++    /// <summary>暗転用Imageを黒のまま指定不透明度へ設定する。</summary>
+     private void SetAlpha(float alpha)
+     {
+         fadeImage.color = new Color(0f, 0f, 0f, alpha);
+--- a/Assets/Mock/Scripts/Managers/HitStopManager.cs
++++ b/Assets/Mock/Scripts/Managers/HitStopManager.cs
+@@ -1,6 +1,7 @@
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
++/// <summary>登録済み対象のAnimationSpeedControllerへ実時間期限の停止・減速を要求する。TimeScaleは変更しない。</summary>
+ public class HitStopManager : MonoBehaviour
+ {
+     public static HitStopManager Instance { get; private set; }
+@@ -12,6 +13,7 @@
+     public float HitStopTime => _hitStopTime;
+     public float LastHitStopTime => _lastHitStopTime;
+     private readonly Dictionary<GameObject, AnimationSpeedController[]> _targets = new();
++    /// <summary>対象階層の速度制御を初期化し、子オブジェクトからも同じ対象へ停止を要求できるよう登録する。</summary>
+     public void RegisterTarget(GameObject owner)
+     {
+         if (owner == null) return;
+@@ -25,6 +27,7 @@
+     }
+     private readonly List<AnimationSpeedController> affected = new();
+     private bool _initialized;
++    /// <summary>永続する共有HitStopManagerを確立し、重複を除去する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -33,8 +36,15 @@
+         Instance = this;
+         DontDestroyOnLoad(gameObject);
+     }
++    /// <summary>登録済みの対象へ指定実時間の完全停止を要求する。TimeScaleは変更しない。</summary>
++    /// <param name="durationRealtime">完全停止する実時間秒数。</param>
++    /// <param name="targets">あらかじめRegisterTargetで登録した対象またはその子。</param>
+     public void PlayHitStop(float durationRealtime = .06f, params GameObject[] targets)
+         => PlayHitStopSlow(durationRealtime, 0f, targets);
++    /// <summary>登録済み対象のAnimatorへ一時速度を設定し、終了時の解除対象として保持する。</summary>
++    /// <param name="durationRealtime">一時倍率の実時間の有効秒数。</param>
++    /// <param name="slowSpeed">一時的なAnimator速度倍率。ゼロなら完全停止。</param>
++    /// <param name="targets">登録済みの停止・減速対象。</param>
+     public void PlayHitStopSlow(float durationRealtime, float slowSpeed, params GameObject[] targets)
+     {
+         if (!isActiveAndEnabled || targets == null) return;
+@@ -52,10 +62,12 @@
+         }
+ 
+     }
++    /// <summary>自身が影響を与えた速度制御の一時倍率を全解除する。</summary>
+     private void OnDisable()
+     {
+         foreach (var speed in affected) if (speed != null) speed.ClearTemporary();
+         affected.Clear();
+     }
++    /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
+     private void OnDestroy() { if (Instance == this) Instance = null; }
+ }
+--- a/Assets/Mock/Scripts/Managers/LoadSceneManager.cs
++++ b/Assets/Mock/Scripts/Managers/LoadSceneManager.cs
+@@ -1,6 +1,7 @@
+ using Cysharp.Threading.Tasks;
+ using UnityEngine;
+ 
++/// <summary>共有FaderへScene遷移を委譲し、必要なら指定時間の待機後に遷移する。</summary>
+ public class LoadSceneManager : MonoBehaviour
+ {
+     public static LoadSceneManager Instance { get; private set; }
+@@ -17,6 +18,7 @@
+         _fader.FadeToScene(sceneName).Forget();
+     }
+ 
++    /// <summary>指定した実時間の待機後に共有Faderへ遷移を要求する。所有者の破棄で待機を中断する。</summary>
+     public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
+     {
+         await UniTask.Delay(Mathf.Max(0, waitTime), ignoreTimeScale: true,
+@@ -26,6 +28,7 @@
+ 
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>共有インスタンスとFaderを一度だけ接続する。</summary>
+     public void Init(GlobalFader fader)
+     {
+         if (_initialized) return;
+@@ -43,6 +46,7 @@
+         }
+     }
+ 
++    /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
+     private void OnDestroy()
+     {
+         if (Instance == this) Instance = null;
+--- a/Assets/Mock/Scripts/Managers/PlayerDeadManager.cs
++++ b/Assets/Mock/Scripts/Managers/PlayerDeadManager.cs
+@@ -54,6 +54,7 @@
+     private LoadSceneManager _loader;
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>敗北演出の依存先と共有インスタンスを接続し、既存Volume・暗転・死亡文字を初期化する。</summary>
+     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
+     {
+         if (_initialized) return;
+@@ -71,6 +72,7 @@
+         }
+     }
+ 
++    /// <summary>敗北用暗転オーバーレイとVignette参照を準備し、死亡文字を非表示で待機させる。</summary>
+     private void InitPresentation()
+     {
+         CreateVignetteOverlay();
+@@ -284,6 +286,7 @@
+         }
+     }
+ 
++    /// <summary>現在のVignette強度と滑らかさから目標値へ実時間で補間する。</summary>
+     private async UniTask FadeVignette(float intensity, float smoothness, float duration)
+     {
+         float start = _vignette.intensity.value;
+@@ -303,6 +306,7 @@
+         _vignette.smoothness.value = smoothness;
+     }
+ 
++    /// <summary>共有参照、文字Tween、生成MaterialとLowPassを解除し、敗北の音声補正を持ち越さない。</summary>
+     private void OnDestroy()
+     {
+         if (Instance != this) return;
+--- a/Assets/Mock/Scripts/Managers/SceneInitialization.cs
++++ b/Assets/Mock/Scripts/Managers/SceneInitialization.cs
+@@ -11,6 +11,7 @@
+     public PlayerDeadManager PlayerDead { get; private set; }
+     private bool _initialized;
+ 
++    /// <summary>配置済みの共有Managerを依存順に初期化し、SceneのControllerへ渡す参照を保持する。</summary>
+     public void Init(GameManager game = null)
+     {
+         if (_initialized) return;
+@@ -39,11 +40,13 @@
+         InitAll<RunHUD>(x => x.Init(Fader));
+     }
+ 
++    /// <summary>Title用の文字演出へTitleManagerと共有Faderを接続する。</summary>
+     public void InitTitleTexts(TitleManager title)
+     {
+         InitAll<TitleText>(x => x.Init(title, Fader));
+     }
+ 
++    /// <summary>初期化時だけ有効な同型コンポーネントを収集し、指定の接続処理を各対象へ適用する。</summary>
+     private void InitAll<T>(System.Action<T> initialize) where T : MonoBehaviour
+     {
+         // シーン開始時にだけ配置済みの対象を収集する。実際の処理中には検索しない。
+--- a/Assets/Mock/Scripts/Managers/TitleManager.cs
++++ b/Assets/Mock/Scripts/Managers/TitleManager.cs
+@@ -16,12 +16,14 @@
+     private bool _isTransitioning = false;
+     [SerializeField] private RunSetupUI _setup;
+ 
++    /// <summary>配置済みのTitle用依存先とBGMを初期化する。</summary>
+     private void Start() => Init();
+ 
+     private readonly SceneInitialization _scene = new SceneInitialization();
+     private AudioManager _audio;
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>共有Managerとラン設定画面を接続し、Titleの表示・音声を一度だけ準備する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -37,6 +39,7 @@
+         }
+     }
+ 
++    /// <summary>遷移中・設定画面表示中を除き、キーボードなどの開始入力を受け付ける。</summary>
+     private void Update()
+     {
+         if (_isTransitioning || (_setup != null && _setup.IsOpen)) return;
+--- a/Assets/Mock/Scripts/Player/AnimationEvents/AnimationEventStream.cs
++++ b/Assets/Mock/Scripts/Player/AnimationEvents/AnimationEventStream.cs
+@@ -35,11 +35,13 @@
+ 
+     public IObservable<AnimationEventType> OnEvent => _subject;
+ 
++    /// <summary>Animation Eventの種類を購読中のPlayer状態管理へ通知する。</summary>
+     public void Publish(AnimationEventType eventType)
+     {
+         _subject.OnNext(eventType);
+     }
+ 
++    /// <summary>通知を完了し、Subjectの購読リソースを解放する。</summary>
+     public void Dispose()
+     {
+         _subject.OnCompleted();
+--- a/Assets/Mock/Scripts/Player/InputBuffer.cs
++++ b/Assets/Mock/Scripts/Player/InputBuffer.cs
+@@ -1,6 +1,7 @@
+ using UnityEngine;
+ using UnityEngine.InputSystem;
+ 
++/// <summary>PlayerInputから行動別InputActionを取得し、コンポーネントの有効状態に合わせて入力受付を切り替える。</summary>
+ [RequireComponent(typeof(PlayerInput))]
+ public class InputBuffer : MonoBehaviour
+ {
+@@ -31,9 +32,12 @@
+     private InputAction _healAction;
+     private InputAction _sprintAction;
+ 
++    /// <summary>行動別InputActionを有効にして入力受付を再開する。</summary>
+     private void OnEnable() => SetActionsEnabled(true);
++    /// <summary>行動別InputActionを無効にし、停止中のゲームへ入力を渡さない。</summary>
+     private void OnDisable() => SetActionsEnabled(false);
+ 
++    /// <summary>保持している移動・攻撃・能力・カメラの入力Actionをまとめて切り替える。</summary>
+     private void SetActionsEnabled(bool value)
+     {
+         SetActionEnabled(_moveAction, value);
+@@ -46,6 +50,7 @@
+         SetActionEnabled(_sprintAction, value);
+     }
+ 
++    /// <summary>未取得Actionを無視し、有効化または無効化を適用する。</summary>
+     private static void SetActionEnabled(InputAction action, bool value)
+     {
+         if (action == null) return;
+@@ -54,6 +59,7 @@
+     }
+ 
+     private bool _initialized;
++    /// <summary>PlayerInputから必要な名前付きActionを一度だけ取得する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+--- a/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
++++ b/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
+@@ -12,8 +12,10 @@
+     private int _stateHash;
+     private bool _finished, _contacted;
+ 
++    /// <summary>速度パラメータを操作するAnimatorを同じオブジェクトから取得する。</summary>
+     private void Awake() => _animator = GetComponent<Animator>();
+ 
++    /// <summary>追撃Stateの所有権を記録し、命中・終了フラグと振りかぶり速度を初期化する。</summary>
+     public void BeginCounter(int stateHash)
+     {
+         if (_animator == null) _animator = GetComponent<Animator>();
+@@ -22,32 +24,40 @@
+         _animator.SetFloat(SpeedHash, _counterWindupSpeed);
+     }
+ 
++    /// <summary>終了したStateが現在の追撃所有者の場合だけ速度を戻す。連続追撃へのBlendを保護する。</summary>
+     public void ExitCounter(int stateHash)
+     {
+         // 追撃1から追撃2へBlendした場合、出ていくStateが新Stateの倍率を消さない。
+         if (_stateHash == stateHash) ResetSpeed();
+     }
+ 
++    /// <summary>現在の追撃Clipからの有効Eventであれば、振りかぶりから斬撃速度へ切り替える。</summary>
+     public void AnimEvent_JustAvoidCounterSlash(AnimationEvent animationEvent)
+     {
+         if (!AcceptEvent(animationEvent) || _finished || _contacted) return;
+         _animator.SetFloat(SpeedHash, _counterSlashSpeed);
+     }
+ 
++    /// <summary>現在の追撃ClipからのEventだけを受け付けて速度倍率を通常へ戻す。</summary>
+     public void AnimEvent_JustAvoidCounterResetSpeed(AnimationEvent animationEvent)
+     {
+         if (AcceptEvent(animationEvent)) ResetSpeed();
+     }
+ 
+     // 既存終了Eventも受け取り、Clip追加Eventが省略された場合にも復帰する。
++    /// <summary>追撃の終了Eventで速度倍率を解除し、Clip側の追加Eventがなくても復帰させる。</summary>
+     public void AnimEvent_OnAttackFinished(AnimationEvent animationEvent)
+     {
+         if (AcceptEvent(animationEvent)) ResetSpeed();
+     }
+ 
++    /// <summary>Event発生元のStateと現在の追撃所有者が一致するか検証する。</summary>
++    /// <returns>現在の追撃Stateから届いた有効Eventならtrue。</returns>
+     private bool AcceptEvent(AnimationEvent animationEvent) => _stateHash != 0 &&
+         animationEvent.animatorStateInfo.fullPathHash == _stateHash && IsCurrentCounter();
+ 
++    /// <summary>現在または遷移先のAnimator Stateが所有中の追撃か確認する。</summary>
++    /// <returns>有効なAnimatorで追撃タグとStateハッシュが一致すればtrue。</returns>
+     private bool IsCurrentCounter()
+     {
+         if (_animator == null || !_animator.isActiveAndEnabled) return false;
+@@ -63,6 +73,7 @@
+         _animator.SetFloat(SpeedHash, 1f);
+     }
+ 
++    /// <summary>追撃の所有権を消去し、Animatorの専用速度パラメータを1へ戻す。</summary>
+     public void ResetSpeed()
+     {
+         _finished = true;
+@@ -71,9 +82,11 @@
+         if (_animator != null && _animator.runtimeAnimatorController != null) _animator.SetFloat(SpeedHash, 1f);
+     }
+ 
++    /// <summary>追撃Stateから離れた場合の取り残された速度倍率を解除する。</summary>
+     private void LateUpdate()
+     {
+         if (_stateHash != 0 && !IsCurrentCounter()) ResetSpeed();
+     }
++    /// <summary>停止時に追撃速度を通常倍率へ戻す。</summary>
+     private void OnDisable() => ResetSpeed();
+ }
+--- a/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs
++++ b/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs
+@@ -3,12 +3,14 @@
+ /// <summary>タグ付き追撃Stateの入退場だけを通知する。</summary>
+ public sealed class JustAvoidCounterSpeedState : StateMachineBehaviour
+ {
++    /// <summary>ベースLayerの追撃State開始を通知し、そのStateに速度制御の所有権を渡す。</summary>
+     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+     {
+         if (layerIndex == 0 && stateInfo.IsTag(PlayerAttacker.JustAvoidCounterTag))
+             animator.GetComponent<JustAvoidCounterAnimation>()?.BeginCounter(stateInfo.fullPathHash);
+     }
+ 
++    /// <summary>ベースLayerの終了Stateを通知し、所有者に一致する追撃速度だけを解除する。</summary>
+     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+     {
+         if (layerIndex == 0) animator.GetComponent<JustAvoidCounterAnimation>()?.ExitCounter(stateInfo.fullPathHash);
+--- a/Assets/Mock/Scripts/Player/PlayerAction/AbilityBase.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/AbilityBase.cs
+@@ -17,17 +17,20 @@
+     private readonly ReactiveProperty<bool> _isActiveRx = new ReactiveProperty<bool>(false);
+     private readonly Subject<float> _consumedSubject = new Subject<float>();
+ 
++    /// <summary>ゲージと能力コスト設定を保持し、ゲージ未指定の能力生成を拒否する。</summary>
+     private protected AbilityBase(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+     {
+         _skillGauge = gauge ?? throw new ArgumentNullException(nameof(gauge));
+         _costConfig = costConfig;
+     }
+ 
++    /// <summary>能力の有効状態をReactivePropertyへ反映して購読者に通知する。</summary>
+     private protected void SetActive(bool active)
+     {
+         _isActiveRx.Value = active;
+     }
+ 
++    /// <summary>能力が消費または進行した量を通知し、HP処理などを外部の購読者へ委譲する。</summary>
+     private protected void PublishConsumed(float value)
+     {
+         _consumedSubject.OnNext(value);
+@@ -35,10 +38,13 @@
+ 
+     public bool IsActive => _isActiveRx.Value;
+ 
++    /// <summary>能力の有効フラグを解除する。派生能力は終了時の追加処理を拡張できる。</summary>
+     public virtual void End() => SetActive(false);
+ 
++    /// <summary>派生能力が時間経過による消費・終了判定を実装するための更新フック。基底では状態を変更しない。</summary>
+     public virtual void Tick(float deltaTime) { }
+ 
++    /// <summary>能力通知を完了し、購読・消費通知・有効状態のReactiveリソースを解放する。</summary>
+     public void Dispose()
+     {
+         _consumedSubject.OnCompleted();
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public sealed class PlayerAttacker : IDisposable
+ {
++    /// <summary>Animator、武器、攻撃設定と所有者を保持し、命中処理に必要な依存先を接続する。</summary>
+     public PlayerAttacker(PlayerAnimationController animController, AnimationName animName,
+         PlayerWeapon playerWeapon, PlayerStatus status, PlayerPassiveBuffSet passiveBuffSet,
+         Transform ownerTransform, PlayerResource playerResource = null)
+@@ -60,6 +61,7 @@
+     private readonly HashSet<IDamageable> _hitTargets = new();
+     private float _currentClipDamage;
+ 
++    /// <summary>ゲーム進行とHitStopの参照を一度だけ接続する。</summary>
+     public void Init(GameManager game, HitStopManager hitStop)
+     {
+         if (_initialized) return;
+@@ -109,7 +111,9 @@
+         CombatLog.Trace($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
+     }
+ 
++    /// <summary>弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。</summary>
+     public void PlayLightAttack() => PlayLightAttack(0, false);
++    /// <summary>弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。</summary>
+     public void PlayLightAttack(int comboStep) => PlayLightAttack(comboStep, false);
+ 
+     /// <summary>ロックオン有無に応じたライト攻撃アニメを再生する。</summary>
+@@ -124,7 +128,9 @@
+         PlayAttackTrigger(_animName?.LightAttack, comboStep);
+     }
+ 
++    /// <summary>強攻撃の段階を記録し、その段階の固定ダメージとAnimatorトリガーを設定する。</summary>
+     public void PlayStrongAttack() => PlayStrongAttack(0);
++    /// <summary>強攻撃の段階を記録し、その段階の固定ダメージとAnimatorトリガーを設定する。</summary>
+     public void PlayStrongAttack(int comboStep)
+     {
+         _currentIsStrongAttack = true;
+@@ -134,6 +140,7 @@
+         PlayAttackTrigger(_animName?.StrongAttack, comboStep);
+     }
+ 
++    /// <summary>強攻撃の種別と段階を記録して共通のトリガー処理へ渡す。</summary>
+     public void PlayStrongAttackInternal(int comboStep)
+     {
+         _currentIsStrongAttack = true;
+@@ -171,6 +178,7 @@
+         _passiveBuffSet = passiveBuffSet;
+     }
+ 
++    /// <summary>追撃速度と武器の命中購読を解除し、保持している命中対象を消去する。</summary>
+     public void Dispose()
+     {
+         _ownerAnimator?.GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
+@@ -179,6 +187,7 @@
+         _isHitboxActive = false;
+     }
+ 
++    /// <summary>攻撃トリガー名を検証してコンボ段階をAnimatorへ渡し、命中管理を次の攻撃へ切り替える。</summary>
+     private void PlayAttackTrigger(string triggerName, int comboStep)
+     {
+         if (string.IsNullOrEmpty(triggerName))
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerGhost.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerGhost.cs
+@@ -3,12 +3,15 @@
+ /// <summary>ボタンを押している間は幽体化する。開始時のゲージ不足では、延長できない短時間の幽体化を行う。</summary>
+ public sealed class PlayerGhost : AbilityBase
+ {
++    /// <summary>幽体化に使用するゲージと開始・継続コスト設定を基底能力へ渡す。</summary>
+     public PlayerGhost(SkillGauge gauge, SkillGaugeCostConfig costConfig = null) : base(gauge, costConfig) { }
+     private float _briefRemaining;
+     private float _cooldownRemaining;
+     private bool _brief;
+     public bool IsGhosting => IsActive;
+     public bool IsBrief => _brief;
++    /// <summary>再使用待ちを確認し、開始コストが足りなければ短時間の幽体化として開始する。</summary>
++    /// <returns>幽体化を新しく開始できた場合はtrue。</returns>
+     public bool TryBegin()
+     {
+         if (IsActive || _cooldownRemaining > 0f) return false;
+@@ -22,6 +25,7 @@
+         SetActive(true);
+         return true;
+     }
++    /// <summary>幽体化を終了し、有効だった場合は再使用待ちを設定して短時間モードを解除する。</summary>
+     public override void End()
+     {
+         if (IsActive) _cooldownRemaining = Mathf.Max(0.01f, GameplayRules.Current.GhostCooldown);
+@@ -29,6 +33,7 @@
+         _briefRemaining = 0f;
+         _brief = false;
+     }
++    /// <summary>再使用待ちと短時間モードを進め、通常モードでは継続コスト不足で幽体化を終了する。</summary>
+     public override void Tick(float deltaTime)
+     {
+         if (deltaTime <= 0f) return;
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerHeal.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerHeal.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public sealed class PlayerHeal : AbilityBase
+ {
++    /// <summary>回復能力のゲージ・移動処理・消費設定を接続する。</summary>
+     public PlayerHeal(SkillGauge gauge, PlayerMover playerMover, SkillGaugeCostConfig costConfig = null)
+         : base(gauge, costConfig)
+     {
+@@ -22,6 +23,8 @@
+     /// チャネリング回復を開始する。percentPerSecond は「秒あたりの回復率(%)」。
+     /// 0 以下だと開始に失敗します。
+     /// </summary>
++    /// <param name="percentPerSecond">最大HPを毎秒何パーセント回復するか。1は1%/秒。</param>
++    /// <returns>正の回復率と使用可能なゲージで回復を開始できた場合はtrue。</returns>
+     public bool TryBegin(float percentPerSecond)
+     {
+         if (percentPerSecond <= 0f) return false;
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerMover.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerMover.cs
+@@ -2,8 +2,10 @@
+ using System.Threading;
+ using UnityEngine;
+ 
++/// <summary>移動入力・旋回・Rigidbody移動と攻撃Root Motionの物理反映を担当する。攻撃や能力の選択は行わない。</summary>
+ public class PlayerMover
+ {
++    /// <summary>移動設定・Rigidbody・PlayerとEnemyのTransform・Animatorを保持する。</summary>
+     public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
+         , Transform cameraPosition, PlayerAnimationController animationController, float attackRootMotionScale = 1f)
+     {
+@@ -34,6 +36,7 @@
+     private Vector3 _pendingAttackRootMotion;
+     public bool IsUsingAttackRootMotion { get; private set; }
+ 
++    /// <summary>攻撃Root Motionの受付を開始し、前の攻撃の移動量を消去する。</summary>
+     public void BeginAttackRootMotion()
+     {
+         if (IsUsingAttackRootMotion) return;
+@@ -41,12 +44,14 @@
+         _pendingAttackRootMotion = Vector3.zero;
+         StopAttackVelocity();
+     }
++    /// <summary>攻撃Root Motionの受付と蓄積量を解除し、適用していた攻撃速度を停止する。</summary>
+     public void EndAttackRootMotion()
+     {
+         _pendingAttackRootMotion = Vector3.zero;
+         if (IsUsingAttackRootMotion) StopAttackVelocity();
+         IsUsingAttackRootMotion = false;
+     }
++    /// <summary>再生中の攻撃から水平移動量を蓄積する。HitStop中の移動は蓄積しない。</summary>
+     public void QueueAttackRootMotion(Vector3 delta, bool animationRunning)
+     {
+         if (!IsUsingAttackRootMotion) return;
+@@ -54,6 +59,7 @@
+         delta.y = 0f;
+         _pendingAttackRootMotion += delta * _attackRootMotionScale;
+     }
++    /// <summary>蓄積した攻撃移動量を衝突で制限し、物理フレームのRigidbody速度へ変換する。</summary>
+     public void FixedUpdateAttackRootMotion(bool animationRunning)
+     {
+         if (!IsUsingAttackRootMotion) return;
+@@ -63,11 +69,13 @@
+         Vector3 velocity = delta / Time.fixedDeltaTime;
+         _rb.linearVelocity = new Vector3(velocity.x, _rb.linearVelocity.y, velocity.z);
+     }
++    /// <summary>自身が適用した攻撃速度を停止し、垂直方向の速度を保持する。</summary>
+     private void StopAttackVelocity()
+     {
+         if (_rb != null && !_rb.isKinematic) _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+     }
+ 
++    /// <summary>入力に応じた移動速度・方向と表示用Animator値を更新する。</summary>
+     public void Update()
+     {
+         UpdateDirection();
+@@ -79,6 +87,7 @@
+         
+     }
+ 
++    /// <summary>攻撃Root Motionが優先されていなければ、通常移動と旋回を物理フレームで反映する。</summary>
+     public void FixedUpdate()
+     {
+         if (IsUsingAttackRootMotion) return;
+@@ -87,16 +96,19 @@
+         SpeedControll();
+     }
+ 
++    /// <summary>次の移動更新に使用する平面入力を保持する。</summary>
+     public void OnMove(Vector2 input)
+     {
+         _currentInput = input;
+     }
+ 
++    /// <summary>通常移動速度とDash速度の選択に使用するフラグを切り替える。</summary>
+     public void SetSprint(bool isSprinting)
+     {
+         _isSprinting = isSprinting;
+     }
+ 
++    /// <summary>Lock-On状態と対象方向を保持し、移動・旋回の基準へ反映する。</summary>
+     public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
+     {
+         _isLockOn = isLockOn;
+@@ -107,6 +119,7 @@
+             : Vector3.zero;
+     }
+ 
++    /// <summary>移動入力と水平移動速度を止め、静止状態のAnimator値へ戻す。</summary>
+     public void MoveStop()
+     {
+         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+@@ -117,10 +130,12 @@
+         }
+     }
+ 
++    /// <summary>抜刀状態を記録し、移動時に使用する姿勢と速度の選択へ反映する。</summary>
+     public void SetDrawingSword(bool value)=> IsDrawnSword = value;
+ 
+     /// <summary>指定ターゲットの方向を見る。</summary>
+ 
++    /// <returns>対象方向への補間旋回が終了するまで待機するタスク。</returns>
+     public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
+     {
+         if (_enemyPosition == null || _playerPosition == null) return;
+@@ -147,12 +162,15 @@
+         _playerPosition.rotation = target;
+     }
+ 
++    /// <summary>移動速度をAnimatorへ渡すための値に換算する。</summary>
++    /// <returns>現在の移動速度に対応するAnimator値。</returns>
+     private float ReturnVelocity()
+     {
+         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+         return velXZ.magnitude;
+     }
+ 
++    /// <summary>カメラとLock-On方向を基準に、入力からワールドの移動方向を求める。</summary>
+     private void UpdateDirection()
+     {
+         // カメラ基準の前後・左右を水平面に投影し、入力からワールド方向を求める。
+@@ -189,6 +207,7 @@
+         _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
+     }
+ 
++    /// <summary>水平移動方向と速度をRigidbodyへ反映し、垂直速度を維持する。</summary>
+     private void Movement()
+     {
+         if (_moveDirection.sqrMagnitude < 0.001f)
+@@ -204,6 +223,8 @@
+         _rb.AddForce(acceleration, ForceMode.Acceleration);
+     }
+ 
++    /// <summary>静止・歩行・Dashなど現在の入力と状態から目標速度を選ぶ。</summary>
++    /// <returns>移動状態に対応する目標速度。</returns>
+     private float ResolveTargetSpeed()
+     {
+         if (_isLockOn)
+@@ -214,6 +235,7 @@
+         return _isSprinting ? _playerStatus.UnLockSprintSpeed : _playerStatus.UnLockWalkSpeed;
+     }
+ 
++    /// <summary>移動またはLock-Onの向きへPlayerを補間旋回させる。</summary>
+     private void UpdateRotation()
+     {
+         if (_lookDirection.sqrMagnitude > 0.1f)
+@@ -225,6 +247,7 @@
+     }
+ 
+ 
++    /// <summary>目標速度に向けて加減速し、急激な速度切り替えを抑える。</summary>
+     private void SpeedControll()
+     {
+         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
+@@ -243,6 +266,8 @@
+         }
+     }
+ 
++    /// <summary>ワールド移動方向をPlayerローカルの二軸値へ変換してAnimatorへ渡す。</summary>
++    /// <returns>移動方向を表す二軸値。</returns>
+     private Vector2 ReturnVector()
+     {
+         Vector2 animInput = Vector2.zero;
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerSelfSacrifice.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerSelfSacrifice.cs
+@@ -6,6 +6,7 @@
+ /// </summary>
+ public sealed class PlayerSelfSacrifice : AbilityBase
+ {
++    /// <summary>自傷能力が使用するゲージとコスト設定を基底能力へ渡す。</summary>
+     public PlayerSelfSacrifice(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+         : base(gauge, costConfig)
+     {
+@@ -21,6 +22,7 @@
+     /// - 最小許容比率は設定 (SkillGaugeCostConfig.SelfSacrificeMinHpRatio) に従います。
+     /// </summary>
+     /// <param name="currentHpRatio">現在 HP 割合（0..1）。</param>
++    /// <returns>HP割合が開始しきい値より高く、ゲージが残っている場合はtrue。</returns>
+     public bool CanBegin(float currentHpRatio)
+     {
+         if (currentHpRatio <= 0f) return false;
+@@ -43,12 +45,9 @@
+         base.End();
+     }
+ 
+-    /// <summary>
+-    /// 毎フレームの進行処理：
+-    /// - 継続コスト (ゲージ) を消費できれば PublishConsumed(deltaTime) で購読者へ経過秒を通知します（購読者側で HP を減らす）。
+-    /// - ゲージ不足なら自動終了します。
+-    /// </summary>
++    /// <summary>自傷の継続ゲージ消費へ掛ける追加倍率。HPの消費は通知先が担当する。</summary>
+     public float CostMultiplier { get; set; } = 1f;
++    /// <summary>継続ゲージを消費し、成功時は経過秒を購読者へ渡してHP消費を委譲する。ゲージ不足なら終了する。</summary>
+     public override void Tick(float deltaTime)
+     {
+         if (!IsActive || deltaTime <= 0f) return;
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerSprint.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerSprint.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public sealed class PlayerSprint : AbilityBase
+ {
++    /// <summary>Dashの開始・継続消費で使用するゲージとコスト設定を保持する。</summary>
+     public PlayerSprint(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
+         : base(gauge, costConfig)
+     {
+--- a/Assets/Mock/Scripts/Player/PlayerAnimationController.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAnimationController.cs
+@@ -59,10 +59,8 @@
+         _animator?.SetInteger(parameterName, value);
+     }
+ 
+-    /// <summary>
+-    /// Animator 参照を取得する。
+-    /// </summary>
+     private bool _initialized;
++    /// <summary>Animatorを取得し、移動パラメータのハッシュを一度だけ初期化する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+--- a/Assets/Mock/Scripts/Player/PlayerController.cs
++++ b/Assets/Mock/Scripts/Player/PlayerController.cs
+@@ -16,21 +16,27 @@
+     [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
+     private Animator _rootMotionAnimator;
+     private int _attackAnimationHash;
++    /// <summary>戦闘可能なときだけ攻撃Stateのハッシュを記録し、MoverのRoot Motion受付を開始する。</summary>
++    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
+     public void BeginAnimationAttackRootMotion(int stateHash)
+     {
+         if (!CanFight) { StopAttackRootMotion(); return; }
+         _attackAnimationHash = stateHash;
+         _stateContext?.Mover?.BeginAttackRootMotion();
+     }
++    /// <summary>終了Stateが現在の所有者に一致する場合だけ攻撃Root Motionを停止する。</summary>
++    /// <param name="stateHash">終了したStateのfullPathHash。別Stateの終了では所有権を解除しない。</param>
+     public void EndAnimationAttackRootMotion(int stateHash)
+     {
+         if (_attackAnimationHash == stateHash) StopAttackRootMotion();
+     }
++    /// <summary>攻撃Stateの所有権とMoverの保留移動・攻撃速度を解除する。</summary>
+     public void StopAttackRootMotion()
+     {
+         _attackAnimationHash = 0;
+         _stateContext?.Mover?.EndAttackRootMotion();
+     }
++    /// <summary>所有中の攻撃Stateの水平移動をMoverへ渡す。戦闘終了や別Stateへの遷移では受付を解除する。</summary>
+     private void OnAnimatorMove()
+     {
+         if (!CanFight) { StopAttackRootMotion(); return; }
+@@ -39,6 +45,7 @@
+         if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
+         _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
+     }
++    /// <summary>無効化時に保留中の攻撃Root Motionを消去する。</summary>
+     private void OnDisable() => StopAttackRootMotion();
+ 
+     [Header("PlayerStatus")]
+@@ -84,6 +91,7 @@
+     public bool IsInvulnerable => (_stateContext?.IsGhostMode ?? false) || (_playerResource != null && Time.time < _playerResource.InvulnerableUntil);
+     private bool CanFight => _playerResource != null && !_playerResource.IsDead
+         && (_game == null || _game.IsCombatActive);
++    /// <summary>能力・攻撃・演出を終了させ、復活後の通常移動状態へ戻す。</summary>
+     private void OnRevived()
+     {
+         _stateMachine.ChangeState(PlayerStateId.Locomotion);
+@@ -104,13 +112,17 @@
+     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
+     /// </summary>
+     public VFXConfig FeedbackConfig => _vfxConfig;
++    /// <summary>幽体化の表示状態をCombatFeedbackへ渡す。</summary>
+     public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
+     private GameManager _game;
+     private AudioManager _audio;
+     private CombatFeedback _combatFeedback;
++    /// <summary>バフ用BGMを専用の第2チャンネルへ要求する。</summary>
+     public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
++    /// <summary>バフ用の第2BGMチャンネルを停止する。</summary>
+     public void StopBuffAudio() => _audio?.StopBGM(2);
+     private bool _initialized;
++    /// <summary>入力・状態・移動・能力・武器・表示の依存先を組み立て、必要な通知を購読する。</summary>
+     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
+         , CameraManager cameraManager, LockOnCamera lockOnCamera, GameManager game, AudioManager audio, HitStopManager hitStop, PlayerDeadManager playerDead, LoadSceneManager loader)
+     {
+@@ -232,6 +244,7 @@
+         if (!CanFight) StopAttackRootMotion();
+     }
+ 
++    /// <summary>Root Motionと入力購読を停止し、Playerが所有する状態・能力・武器のリソースを解放する。</summary>
+     private void OnDestroy()
+     {
+         StopAttackRootMotion();
+@@ -259,6 +272,7 @@
+         _animationEventStream = null;
+     }
+ 
++    /// <summary>Inspector変更の刀判定を反映し、戦闘可能な間だけ状態と能力のフレーム更新を進める。</summary>
+     private void Update()
+     {
+         if (_weaponHitboxes != null && _appliedHitboxPadding != _weaponHitboxPadding)
+@@ -282,6 +296,7 @@
+         _stateMachine?.Update(Time.deltaTime);
+     }
+ 
++    /// <summary>戦闘可能な間だけ攻撃Root Motionと現在状態の物理更新を進める。</summary>
+     private void FixedUpdate()
+     {
+         if (!CanFight) { StopAttackRootMotion(); return; }
+@@ -289,6 +304,7 @@
+         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
+     }
+ 
++    /// <summary>自傷能力から受けた経過秒を最大HPの割合へ換算し、音を重ねずHP消費へ反映する。</summary>
+     private void HandleSelfSacrificeTick(float deltaSeconds)
+     {
+         // deltaSeconds：このフレームの経過秒（Ability が通知）
+@@ -323,6 +339,7 @@
+         }
+     }
+ 
++    /// <summary>回復能力から通知された割合をPlayerResourceのHP回復へ反映する。</summary>
+     private void HandleHealTick(float healedPercent)
+     {
+         // healedPercent は "このフレームで回復した割合 (%)"（Ability が通知）
+@@ -361,6 +378,7 @@
+         inputBuffer.SprintAction.canceled -= OnSprint;
+     }
+ 
++    /// <summary>移動入力の開始・変更・解除を読み取り、解除時はゼロ入力を状態管理へ渡す。</summary>
+     private void OnMove(InputAction.CallbackContext context)
+     {
+         Vector2 currentInput = context.ReadValue<Vector2>();
+@@ -372,6 +390,7 @@
+         _stateMachine?.HandleMove(currentInput);
+     }
+ 
++    /// <summary>有効な弱攻撃開始入力で抜刀状態を確認し、現在状態の攻撃・コンボ受付へ渡す。</summary>
+     private void OnLightAttackAction(InputAction.CallbackContext context)
+     {
+         if (!context.started || !_canAttack)
+@@ -396,6 +415,7 @@
+         _stateMachine?.HandleLightAttack();
+     }
+ 
++    /// <summary>有効な強攻撃開始入力で抜刀状態を確認し、現在状態の強攻撃・コンボ受付へ渡す。</summary>
+     private void OnStrongAttackAction(InputAction.CallbackContext context)
+     {
+         if (!context.started || !_canAttack)
+@@ -415,6 +435,7 @@
+         _stateMachine?.HandleStrongAttack();
+     }
+ 
++    /// <summary>幽体化能力の開始・解除を入力に応じて処理し、状態と表示を接続する。</summary>
+     private void OnGhostAction(InputAction.CallbackContext context)
+     {
+         if (context.started)
+@@ -437,6 +458,7 @@
+         }
+     }
+ 
++    /// <summary>自傷能力の開始・解除結果を状態管理とバフ表示へ反映する。</summary>
+     private void OnSelfSacrificeAction(InputAction.CallbackContext context)
+     {
+         if (context.started)
+@@ -456,6 +478,7 @@
+         }
+     }
+ 
++    /// <summary>回復能力の開始・解除を入力に応じて要求し、対応するPlayer状態へ通知する。</summary>
+     private void OnHeal(InputAction.CallbackContext context)
+     {
+         if (context.started)
+@@ -479,6 +502,7 @@
+         }
+     }
+ 
++    /// <summary>Dash入力の開始と解除を現在状態へ転送する。</summary>
+     private void OnSprint(InputAction.CallbackContext context)
+     {
+         if (context.started)
+@@ -551,6 +575,7 @@
+         _animationEventStream?.Publish(AnimationEventType.SwordDrawCompleted);
+     }
+ 
++    /// <summary>抜刀ClipのEventに合わせ、使用中の刀モデルを表示して納刀側モデルを隠す。</summary>
+     public void AnimaEvent_OnSordDrawWeapon()
+     {
+         //武器の見た目を表示する。
+@@ -558,6 +583,7 @@
+         _playerStartWeapon.SetActive(false);
+     }
+ 
++    /// <summary>納刀ClipのEventに合わせ、使用中の刀モデルを隠して鞘側モデルへ切り替える。</summary>
+     public void AnimEvent_OnSwordSheathing()
+     {
+         //武器の見た目を非表示にする。
+@@ -566,6 +592,7 @@
+     }
+ 
+     //アニメーションイベント：ジャスト回避アニメーション開始時。
++    /// <summary>ジャスト回避Clip開始Eventで専用Animator Boolを有効にする。</summary>
+     public void AnimEvent_OnJustAvoidStarted()
+     {
+         if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+@@ -577,6 +604,7 @@
+     }
+ 
+     //アニメーションイベント：ジャスト回避アニメーション終了時
++    /// <summary>ジャスト回避Clip終了Eventで専用Animator Boolを解除する。</summary>
+     public void AnimEvent_OnJustAvoidFinished()
+     {
+         if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+@@ -587,6 +615,7 @@
+         }
+     }
+ 
++    /// <summary>Clipが指定した登録名のSEをAudioManagerへ要求する。</summary>
+     public void AnimEvent_OnSoundEffect(string soundName)
+     {
+         _audio?.PlaySE(soundName);
+--- a/Assets/Mock/Scripts/Player/PlayerResource.cs
++++ b/Assets/Mock/Scripts/Player/PlayerResource.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public class PlayerResource : IDisposable
+ {
++    /// <summary>最大HPと現在HPの通知を初期化し、能力コストや死亡処理で使う依存先を保持する。</summary>
+     public PlayerResource(PlayerStatus status,PlayerAnimationController animController)
+     {
+         _maxHp = status != null ? status.MaxHealth : 100f;
+@@ -38,6 +39,7 @@
+     private PlayerDeadManager _playerDead;
+     private LoadSceneManager _loader;
+     private bool _initialized;
++    /// <summary>ゲーム進行・Audio・死亡演出・遷移先を一度だけ接続する。</summary>
+     public void Init(GameManager game, AudioManager audio, PlayerDeadManager playerDead, LoadSceneManager loader)
+     {
+         if (_initialized) return;
+@@ -81,6 +83,7 @@
+         }
+     }
+ 
++    /// <summary>残機があればHPと無敵時間を復元する。残機がなければ死亡を確定し、敗北演出または遷移を要求する。</summary>
+     public void PlayerDeath()
+     {
+         if (_dead) return;
+@@ -107,6 +110,7 @@
+         }
+     }
+ 
++    /// <summary>HP変更通知に使用したReactivePropertyを解放する。</summary>
+     public void Dispose()
+     {
+         _hpRx?.Dispose();
+--- a/Assets/Mock/Scripts/Player/PlayerWeapon.cs
++++ b/Assets/Mock/Scripts/Player/PlayerWeapon.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public sealed class PlayerWeapon
+ {
++    /// <summary>刀の判定Colliderと自己衝突を無視するCollider一覧を保持する。</summary>
+     public PlayerWeapon(Collider[] weaponColliders, Collider[] ignoreColliders = null)
+     {
+         _weaponColliders = weaponColliders;
+@@ -20,7 +21,9 @@
+     private readonly Dictionary<Collider, SwordTrail> _trails = new();
+     private readonly Dictionary<BoxCollider, Vector3> _authoredSizes = new();
+     private bool _initialized;
++    /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
+     public void Init() => Init(Vector3.zero);
++    /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
+     public void Init(Vector3 padding)
+     {
+         if (_initialized) return;
+@@ -55,6 +58,7 @@
+     /// <summary>ヒットボックスを無効化する。</summary>
+     public void DisableHitbox() => SetHitboxActive(false);
+ 
++    /// <summary>保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。</summary>
+     public void SetTrailStyle(SwordTrail.AttackStyle style)
+     {
+         foreach (var trail in _trails.Values) trail.SetStyle(style);
+@@ -88,9 +92,12 @@
+         }
+     }
+ 
++    /// <summary>初期化時に保存した刀判定Relayを列挙する。</summary>
++    /// <returns>登録済みの命中通知Relay。</returns>
+     private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
+ 
+     /// <summary>対象に最も近い刀の判定部分から、接触面の位置を求める。</summary>
++    /// <returns>刀の判定形状と対象の近接点から求めた接触位置。</returns>
+     public Vector3 GetContactPoint(Collider target)
+     {
+         Vector3 point = target.bounds.center;
+@@ -107,6 +114,7 @@
+     }
+ 
+     /// <summary>接触点と同じ最寄りの刀から、血飛沫用の移動方向を取得する。</summary>
++    /// <returns>直近の刀の振りから求めた斬撃方向。取得できなければ対象との方向。</returns>
+     public Vector3 GetSlashDirection(Collider target)
+     {
+         float nearest = float.PositiveInfinity;
+@@ -123,6 +131,7 @@
+         return direction;
+     }
+ 
++    /// <summary>刀Colliderと軌跡の受付をまとめて切り替え、判定区間と表示区間を対応させる。</summary>
+     private void SetHitboxActive(bool isActive)
+     {
+         if (_weaponColliders == null)
+@@ -142,6 +151,7 @@
+         }
+     }
+ 
++    /// <summary>指定された自己Colliderとの衝突を刀Colliderごとに無視する。</summary>
+     private void SetupIgnoreCollisions()
+     {
+         if (_weaponColliders == null || _ignoreColliders == null) return;
+--- a/Assets/Mock/Scripts/Player/SkillGauge.cs
++++ b/Assets/Mock/Scripts/Player/SkillGauge.cs
+@@ -60,6 +60,7 @@
+     /// 指定量だけゲージを消費し、成功すれば true を返します。失敗時はゲージを変更しません。
+     /// </summary>
+     /// <param name="amount">消費量（負値は 0 扱い）。</param>
++    /// <returns>必要量を消費できた場合はtrue。</returns>
+     public bool TryConsume(float amount)
+     {
+         amount = Mathf.Max(0f, amount);
+--- a/Assets/Mock/Scripts/Player/StateMachine/PlayerState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/PlayerState.cs
+@@ -6,6 +6,7 @@
+ /// </summary>
+ public abstract class PlayerState
+ {
++    /// <summary>状態が共有するContextと遷移先のステートマシンを保持する。</summary>
+     protected PlayerState(PlayerStateContext context, PlayerStateMachine stateMachine)
+     {
+         Context = context;
+--- a/Assets/Mock/Scripts/Player/StateMachine/PlayerStateContext.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/PlayerStateContext.cs
+@@ -8,6 +8,7 @@
+ /// </summary>
+ public sealed class PlayerStateContext : IDisposable
+ {
++    /// <summary>状態処理が使用するController・Mover・能力・設定などの依存先を保持する。</summary>
+     public PlayerStateContext(PlayerController controller, PlayerResource playerResource, SkillGauge skillGauge, PlayerStatus status
+         , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
+         , PlayerHeal healer, LockOnCamera lockOnCamera, PlayerStateConfig stateConfig, PlayerAttacker attacker
+--- a/Assets/Mock/Scripts/Player/StateMachine/PlayerStateId.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/PlayerStateId.cs
+@@ -1,3 +1,4 @@
++/// <summary>Playerの移動・攻撃・Dash・能力状態をステートマシン内で識別する。</summary>
+ public enum PlayerStateId
+ {
+     Locomotion,
+--- a/Assets/Mock/Scripts/Player/StateMachine/PlayerStateMachine.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/PlayerStateMachine.cs
+@@ -13,6 +13,7 @@
+     private readonly CompositeDisposable _animationEventSubscriptions = new();
+     private PlayerState _currentState;
+ 
++    /// <summary>共有Contextを保持し、各Player状態とAnimation Event購読を準備する。</summary>
+     public PlayerStateMachine(PlayerStateContext context)
+     {
+         Context = context;
+@@ -35,6 +36,7 @@
+     /// <summary>ステート間で共有される依存情報。</summary>
+     public PlayerStateContext Context { get; }
+ 
++    /// <summary>Combo受付と攻撃終了の通知を現在状態へ転送する購読を登録する。</summary>
+     private void SubscribeAnimationEvents()
+     {
+         var stream = Context?.AnimationEvents;
+@@ -59,6 +61,7 @@
+             .AddTo(_animationEventSubscriptions);
+     }
+ 
++    /// <summary>Animation Eventなどの購読を解除し、破棄後の状態呼び出しを防ぐ。</summary>
+     public void Dispose()
+     {
+         _currentState?.Exit();
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs
+@@ -8,6 +8,7 @@
+ /// </summary>
+ public abstract class PlayerAttackState : PlayerState
+ {
++    /// <summary>共通の攻撃状態にContext・遷移管理とClip未設定時の攻撃時間を渡す。</summary>
+     protected PlayerAttackState(PlayerStateContext context, PlayerStateMachine stateMachine, float attackDuration)
+         : base(context, stateMachine)
+     {
+@@ -195,6 +196,8 @@
+     /// <summary>次段に進める余地があるか判定する。</summary>
+     private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
+ 
++    /// <summary>現在または遷移先の通常攻撃Clipが終端前か確認し、時間による早期終了を抑える。</summary>
++    /// <returns>通常攻撃タグを持つStateが再生途中ならtrue。</returns>
+     private bool IsNormalAttackStillPlaying()
+     {
+         if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerDashState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerDashState.cs
+@@ -1,7 +1,9 @@
+ using UnityEngine;
+ 
++/// <summary>Dash中の移動とゲージ消費を進め、解除や攻撃入力に応じて次のPlayer状態へ移る。</summary>
+ public sealed class PlayerDashState : PlayerState
+ {
++    /// <summary>Dash状態から移動・ゲージ・状態遷移を操作するための共有Contextを保持する。</summary>
+     public PlayerDashState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine)
+     {
+@@ -11,6 +13,7 @@
+ 
+     public override PlayerStateId Id => PlayerStateId.Dash;
+ 
++    /// <summary>Dash能力を開始してMoverを高速移動へ切り替える。</summary>
+     public override void Enter()
+     {
+         // スプリント開始要求（内部でゲージチェックを行う）
+@@ -24,12 +27,14 @@
+         }
+     }
+ 
++    /// <summary>Dash能力と高速移動フラグを解除する。</summary>
+     public override void Exit()
+     {
+         Context.Sprint.End();
+         Context.Mover.SetSprint(false);
+     }
+ 
++    /// <summary>Dash中の移動を更新し、Dash能力が終了したら通常移動へ戻る。</summary>
+     public override void Update(float deltaTime)
+     {
+         Context.Mover.Update();
+@@ -41,11 +46,13 @@
+         }
+     }
+ 
++    /// <summary>Dash中のRigidbody移動をMoverの物理更新へ委譲する。</summary>
+     public override void FixedUpdate(float deltaTime)
+     {
+         Context.Mover.FixedUpdate();
+     }
+ 
++    /// <summary>Dash解除入力で通常移動状態へ戻る。</summary>
+     public override void OnSprintCanceled()
+     {
+         // 入力で解除された場合は即座にダッシュ停止して戻る
+@@ -53,6 +60,7 @@
+         StateMachine.ChangeState(PlayerStateId.Locomotion);
+     }
+ 
++    /// <summary>攻撃依存先がある場合にDashから弱攻撃状態へ移る。</summary>
+     public override void OnLightAttack()
+     {
+         if (CanAttack)
+@@ -61,6 +69,7 @@
+         }
+     }
+ 
++    /// <summary>攻撃依存先がある場合にDashから強攻撃状態へ移る。</summary>
+     public override void OnStrongAttack()
+     {
+         if (CanAttack)
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerGhostState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerGhostState.cs
+@@ -1,10 +1,13 @@
+ using UnityEngine;
+ 
++/// <summary>幽体化中の移動・見た目・回避受付を管理し、解除や攻撃に応じて状態を切り替える。</summary>
+ public class PlayerGhostState : PlayerState
+ {
++    /// <summary>幽体化状態が使用する能力・表示・遷移管理のContextを保持する。</summary>
+     public PlayerGhostState(PlayerStateContext context, PlayerStateMachine stateMachine) : base(context, stateMachine) { }
+     public override PlayerStateId Id => PlayerStateId.Ghost;
+     private float _justRemaining;
++    /// <summary>幽体化能力の有効性を確認し、見た目と短時間のジャスト回避受付を開始する。</summary>
+     public override void Enter()
+     {
+         if (Context.Ghost == null || !Context.Ghost.IsActive)
+@@ -18,6 +21,7 @@
+         Context.SetJustAvoidWindow(_justRemaining > 0f);
+         Context.Controller.SetGhostVisual(true);
+     }
++    /// <summary>幽体化能力・回避受付・表示を解除して通常姿勢へ戻す。</summary>
+     public override void Exit()
+     {
+         Context.Ghost?.End();
+@@ -25,6 +29,7 @@
+         Context.SetJustAvoidWindow(false);
+         Context.Controller.SetGhostVisual(false);
+     }
++    /// <summary>移動と回避受付時間を進め、幽体化能力が終了したら通常移動へ戻る。</summary>
+     public override void Update(float deltaTime)
+     {
+         Context.Mover.Update();
+@@ -32,8 +37,12 @@
+         if (_justRemaining <= 0f) Context.SetJustAvoidWindow(false);
+         if (!Context.Ghost.IsGhosting) StateMachine.ChangeState(PlayerStateId.Locomotion);
+     }
++    /// <summary>幽体化中の移動をMoverの物理更新へ委譲する。</summary>
+     public override void FixedUpdate(float deltaTime) => Context.Mover.FixedUpdate();
++    /// <summary>解除入力で幽体化状態を終了し、通常移動へ戻る。</summary>
+     public override void OnGhostCanceled() => StateMachine.ChangeState(PlayerStateId.Locomotion);
++    /// <summary>幽体化から弱攻撃へ状態を切り替える。</summary>
+     public override void OnLightAttack() => StateMachine.ChangeState(PlayerStateId.LightAttack);
++    /// <summary>幽体化から強攻撃へ状態を切り替える。</summary>
+     public override void OnStrongAttack() => StateMachine.ChangeState(PlayerStateId.StrongAttack);
+ }
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerHealState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerHealState.cs
+@@ -7,6 +7,7 @@
+ /// </summary>
+ public class PlayerHealState : PlayerState
+ {
++    /// <summary>回復能力と移動・表示を扱うための共有Contextを保持する。</summary>
+     public PlayerHealState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine)
+     {
+@@ -14,6 +15,7 @@
+ 
+     public override PlayerStateId Id => PlayerStateId.Heal;
+ 
++    /// <summary>回復能力を確認して回復中の表示・移動状態を開始する。</summary>
+     public override void Enter()
+     {
+         if (Context?.Healer == null)
+@@ -31,12 +33,14 @@
+         Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectHeal);
+     }
+ 
++    /// <summary>回復能力と能力用の表示を終了する。</summary>
+     public override void Exit()
+     {
+         Context.Healer?.End();
+         Context?.CharacterEffect?.StopEffect_CharacterEffect();
+     }
+ 
++    /// <summary>回復中の移動を更新し、能力が終了したら通常移動へ戻る。</summary>
+     public override void Update(float deltaTime)
+     {
+         Context.Mover.Update();
+@@ -48,6 +52,7 @@
+         }
+     }
+ 
++    /// <summary>入力解除で回復能力を終了させる。</summary>
+     public override void OnHealCanceled()
+     {
+         Context.Healer?.End();
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerLightAttackState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerLightAttackState.cs
+@@ -5,6 +5,7 @@
+ /// </summary>
+ public sealed class PlayerLightAttackState : PlayerAttackState
+ {
++    /// <summary>弱攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。</summary>
+     public PlayerLightAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine, context?.StateConfig?.GetLightAttackDuration() ?? 0.8f)
+     {
+@@ -14,6 +15,7 @@
+ 
+     public override PlayerStateId Id => PlayerStateId.LightAttack;
+ 
++    /// <summary>攻撃開始時のLock-On種別を固定して、共通の弱攻撃・コンボ進行を開始する。</summary>
+     public override void Enter()
+     {
+         _isLockOnCombo = Context?.IsLockOn ?? false;
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerLocomotionState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerLocomotionState.cs
+@@ -1,7 +1,9 @@
+ using UnityEngine;
+ 
++/// <summary>通常移動の更新をMoverへ委譲し、能力や攻撃の入力で対応するPlayer状態へ移る。</summary>
+ public sealed class PlayerLocomotionState : PlayerState
+ {
++    /// <summary>通常移動と各行動の開始に使用する共有Contextを保持する。</summary>
+     public PlayerLocomotionState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine)
+     {
+@@ -11,21 +13,25 @@
+ 
+     public override PlayerStateId Id => PlayerStateId.Locomotion;
+ 
++    /// <summary>前の状態から持ち越したDash速度フラグを解除する。</summary>
+     public override void Enter()
+     {
+         Context.Mover.SetSprint(false);
+     }
+ 
++    /// <summary>通常移動の入力・方向・速度更新をMoverへ委譲する。</summary>
+     public override void Update(float deltaTime)
+     {
+         Context.Mover.Update();
+     }
+ 
++    /// <summary>通常移動のRigidbody反映をMoverへ委譲する。</summary>
+     public override void FixedUpdate(float deltaTime)
+     {
+         Context.Mover.FixedUpdate();
+     }
+ 
++    /// <summary>Dash能力が開始可能な場合だけDash状態へ移る。</summary>
+     public override void OnSprintStarted()
+     {
+         if (Context.Sprint.CanDash)
+@@ -34,21 +40,25 @@
+         }
+     }
+ 
++    /// <summary>幽体化の開始要求を対応する状態へ渡す。</summary>
+     public override void OnGhostStarted()
+     {
+         StateMachine.ChangeState(PlayerStateId.Ghost);
+     }
+ 
++    /// <summary>自傷能力を扱う状態へ移る。</summary>
+     public override void OnSelfSacrificeStarted()
+     {
+         StateMachine.ChangeState(PlayerStateId.SelfSacrifice);
+     }
+ 
++    /// <summary>回復能力を扱う状態へ移る。</summary>
+     public override void OnHealStarted()
+     {
+         StateMachine.ChangeState(PlayerStateId.Heal);
+     }
+ 
++    /// <summary>攻撃依存先が存在する場合に弱攻撃状態へ移る。</summary>
+     public override void OnLightAttack()
+     {
+         if (CanAttack)
+@@ -57,6 +67,7 @@
+         }
+     }
+ 
++    /// <summary>攻撃依存先が存在する場合に強攻撃状態へ移る。</summary>
+     public override void OnStrongAttack()
+     {
+         if (CanAttack)
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerSelfSacrificeState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerSelfSacrificeState.cs
+@@ -8,6 +8,7 @@
+ /// </summary>
+ public class PlayerSelfSacrificeState : PlayerState
+ {
++    /// <summary>自傷能力の継続・表示と状態遷移で使用するContextを保持する。</summary>
+     public PlayerSelfSacrificeState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine)
+     {
+@@ -17,6 +18,7 @@
+ 
+     private IDisposable _selfSacrificeActiveDisp;
+ 
++    /// <summary>自傷能力を確認し、能力中の移動・表示を準備する。</summary>
+     public override void Enter()
+     {
+         if (Context?.SelfSacrifice == null)
+@@ -56,6 +58,7 @@
+         }
+     }
+ 
++    /// <summary>自傷能力の寿命はAbilityManagerに任せ、攻撃への遷移でも効果を継続させる。</summary>
+     public override void Exit()
+     {
+         // SelfSacrifice は AbilityManager 側で管理しているため、
+@@ -63,6 +66,7 @@
+         // 終了は入力キャンセルやゲージ枯渇など Ability 側の判定で行う。
+     }
+ 
++    /// <summary>移動を更新し、自傷能力が終了したら通常移動へ戻る。</summary>
+     public override void Update(float deltaTime)
+     {
+         Context.Mover.Update();
+@@ -73,6 +77,7 @@
+         }
+     }
+ 
++    /// <summary>自傷能力・バフ表示・専用音声を入力解除で終了する。</summary>
+     public override void OnSelfSacrificeCanceled()
+     {
+         Context.SelfSacrifice?.End();
+@@ -80,17 +85,20 @@
+         Context.Controller.StopBuffAudio();
+     }
+ 
++    /// <summary>自傷能力を継続したまま弱攻撃状態へ移る。</summary>
+     public override void OnLightAttack()
+     {
+         // 攻撃は SelfSacrifice 中でも可能にする（SelfSacrifice は Exit で自動的に End される）
+         StateMachine.ChangeState(PlayerStateId.LightAttack);
+     }
+ 
++    /// <summary>自傷能力を継続したまま強攻撃状態へ移る。</summary>
+     public override void OnStrongAttack()
+     {
+         StateMachine.ChangeState(PlayerStateId.StrongAttack);
+     }
+ 
++    /// <summary>自傷中もMoverへ物理更新を委譲して移動を維持する。</summary>
+     public override void FixedUpdate(float deltaTime)
+     {
+         // 物理更新は Mover 側で行う（移動を有効にするため必須）
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerStrongAttackState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerStrongAttackState.cs
+@@ -5,6 +5,7 @@
+ /// </summary>
+ public sealed class PlayerStrongAttackState : PlayerAttackState
+ {
++    /// <summary>強攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。</summary>
+     public PlayerStrongAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
+         : base(context, stateMachine, context?.StateConfig?.GetStrongAttackDuration() ?? 1.0f)
+     {
+--- a/Assets/Mock/Scripts/Player/WeaponHitboxRelay.cs
++++ b/Assets/Mock/Scripts/Player/WeaponHitboxRelay.cs
+@@ -27,6 +27,7 @@
+         }
+     }
+ 
++    /// <summary>有効な刀Colliderの位置差を記録して接触時の斬撃方向に使用する。無効時は前回サンプルを破棄する。</summary>
+     private void LateUpdate()
+     {
+         if (_ownerCollider == null || !_ownerCollider.enabled)
+@@ -70,6 +71,7 @@
+     }
+ 
+     private bool _initialized;
++    /// <summary>所有Colliderを取得し、命中通知用Triggerとして一度だけ初期化する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -77,6 +79,7 @@
+         AssignColliderAndForceTrigger();
+     }
+ 
++    /// <summary>Editorでコンポーネントを追加した際に所有ColliderをTriggerへ設定する。</summary>
+     private void Reset()
+     {
+         AssignColliderAndForceTrigger();
+@@ -92,6 +95,7 @@
+         }
+     }
+ 
++    /// <summary>有効な判定区間だけ接触Colliderを登録済み購読者へ通知する。</summary>
+     private void OnTriggerEnter(Collider other)
+     {
+         if (!enabled || !gameObject.activeInHierarchy)
+--- a/Assets/Mock/Scripts/Progression/GameplayRules.cs
++++ b/Assets/Mock/Scripts/Progression/GameplayRules.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>装備倍率、残機、HP依存の能力倍率などラン全体の調整値を提供する設定。</summary>
+ [CreateAssetMenu(menuName = "Katsuro/Gameplay Rules")]
+ public sealed class GameplayRules : ScriptableObject
+ {
+@@ -35,7 +36,16 @@
+             return _instance;
+         }
+     }
++    /// <summary>HP割合に応じて低HP時と満HP時のゲージ回復倍率を補間する。</summary>
++    /// <returns>0以上のゲージ自然回復倍率。</returns>
++    /// <param name="hp">現在HPの最大HPに対する0から1の割合。</param>
+     public float Regen(float hp) => Mathf.Max(0f, Mathf.Lerp(LowHpRegenMultiplier, FullHpRegenMultiplier, Mathf.Clamp01(hp)));
++    /// <summary>HP割合に応じて低HP時と満HP時の自傷消費倍率を補間する。</summary>
++    /// <returns>0以上の自傷コスト倍率。</returns>
++    /// <param name="hp">現在HPの最大HPに対する0から1の割合。</param>
+     public float SelfCost(float hp) => Mathf.Max(0f, Mathf.Lerp(LowHpSelfCostMultiplier, FullHpSelfCostMultiplier, Mathf.Clamp01(hp)));
++    /// <summary>HP割合に応じてジャスト回避受付時間の倍率を補間する。</summary>
++    /// <returns>0以上の回避受付倍率。</returns>
++    /// <param name="hp">現在HPの最大HPに対する0から1の割合。</param>
+     public float AvoidWindow(float hp) => Mathf.Max(0f, Mathf.Lerp(LowHpAvoidMultiplier, FullHpAvoidMultiplier, Mathf.Clamp01(hp)));
+ }
+--- a/Assets/Mock/Scripts/Progression/RunSession.cs
++++ b/Assets/Mock/Scripts/Progression/RunSession.cs
+@@ -1,6 +1,7 @@
+ using System;
+ using UnityEngine;
+ 
++/// <summary>勝利した挑戦者の名前・装備選択・所要時間を保存し、次回の対戦相手へ引き継ぐデータ。</summary>
+ [Serializable]
+ public sealed class ChampionTrace
+ {
+@@ -32,11 +33,18 @@
+     public static string SaveError { get; private set; }
+     public static readonly string[] AttackNames = { "剛力", "吸魂", "窮地" };
+     public static readonly string[] DefenseNames = { "堅守", "霊衣", "息吹" };
++    /// <summary>選択した攻撃装備の倍率や低HP効果を現在の調整値から説明文へ変換する。</summary>
++    /// <returns>攻撃装備の日本語説明。</returns>
+     public static string AttackDescription(int id) => id == 0 ? $"与ダメージ ×{GameplayRules.Current.PowerAttack:0.##}" : id == 1 ? $"命中時のゲージ回復 ×{GameplayRules.Current.SoulHitGain:0.##}" : $"低HPほど追加威力（最大 +{GameplayRules.Current.DesperationBonus * 100:0}%）";
++    /// <summary>選択した防御装備の被ダメージ・幽体化コスト・回復効果を説明文へ変換する。</summary>
++    /// <returns>防御装備の日本語説明。</returns>
+     public static string DefenseDescription(int id) => id == 0 ? $"被ダメージ ×{GameplayRules.Current.GuardDamage:0.##}" : id == 1 ? $"幽霊化の開始・継続消費 ×{GameplayRules.Current.SpiritCost:0.##}" : $"ゲージ自然回復 ×{GameplayRules.Current.BreathRegen:0.##}";
+ 
++    /// <summary>新しい実行セッション開始時にランの状態・前回相手・結果・保存エラーを消去する。</summary>
+     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+     private static void Reset() { Active = false; Opponent = null; Result = null; SaveError = null; }
++    /// <summary>名前から制御文字とタグ記号を除き、長さを制限して空の場合は既定名を使用する。</summary>
++    /// <returns>表示と保存に使用する整形済みの名前。</returns>
+     public static string CleanName(string name)
+     {
+         name = (name ?? "").Trim();
+@@ -44,6 +52,8 @@
+         if (name.Length > 16) name = name.Substring(0, 16);
+         return string.IsNullOrWhiteSpace(name) ? "挑戦者" : name;
+     }
++    /// <summary>PlayerPrefsの勝者データを読み込み、欠損や不正な保存値の場合は相手なしとして扱う。</summary>
++    /// <returns>検証済みの勝者データ。保存がない・不正な場合はnull。</returns>
+     public static ChampionTrace ReadChampion()
+     {
+         try
+@@ -57,6 +67,7 @@
+         }
+         catch (Exception) { return null; }
+     }
++    /// <summary>名前と装備選択を検証して残機・相手・開始時刻を初期化し、新しいランを有効にする。</summary>
+     public static void Begin(string name, int attack, int defense)
+     {
+         PlayerName = CleanName(name);
+@@ -67,13 +78,17 @@
+         StartedAt = Time.unscaledTime;
+         Result = null; SaveError = null; Active = true;
+     }
++    /// <summary>ラン未開始の場合だけ、保持している名前と装備で開始する。</summary>
+     public static void EnsureRun() { if (!Active) Begin(PlayerName, Attack, Defense); }
++    /// <summary>有効なランの残機を一つ減らし、復活可能かを返す。</summary>
++    /// <returns>消費後に残機があり復活可能ならtrue。</returns>
+     public static bool ConsumeLife()
+     {
+         if (!Active) return false;
+         Lives = Mathf.Max(0, Lives - 1);
+         return Lives > 0;
+     }
++    /// <summary>有効なランを一度だけ完了し、勝利時は名前・装備・実所要時間を次回相手として保存する。</summary>
+     public static void Complete(bool victory)
+     {
+         if (!Active) return;
+@@ -84,11 +99,15 @@
+         try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(champion)); PlayerPrefs.Save(); }
+         catch (Exception error) { SaveError = "痕跡を保存できませんでした"; Result = "討伐成功（痕跡の保存に失敗）"; Debug.LogException(error); }
+     }
++    /// <summary>攻撃装備と現在HP割合からPlayerの与ダメージ倍率を求める。</summary>
++    /// <returns>現在の装備・HPに対応する与ダメージ倍率。</returns>
+     public static float DamageMultiplier(float hp) => Attack == 0 ? GameplayRules.Current.PowerAttack : Attack == 2 ? 1f + (1f - Mathf.Clamp01(hp)) * GameplayRules.Current.DesperationBonus : 1f;
+     public static float IncomingMultiplier => Defense == 0 ? GameplayRules.Current.GuardDamage : 1f;
+     public static float GhostCostMultiplier => Defense == 1 ? GameplayRules.Current.SpiritCost : 1f;
+     public static float RegenMultiplier => Defense == 2 ? GameplayRules.Current.BreathRegen : 1f;
+     public static float HitGainMultiplier => Attack == 1 ? GameplayRules.Current.SoulHitGain : 1f;
++    /// <summary>前回勝者の攻撃装備とEnemyのHP割合から継承された攻撃倍率を求める。</summary>
++    /// <returns>Enemyの与ダメージ倍率。継承相手がなければ1。</returns>
+     public static float EnemyDamage(float hp)
+     {
+         if (Opponent == null) return 1f;
+--- a/Assets/Mock/Scripts/StatusEffect/IStatusEffectReceiver.cs
++++ b/Assets/Mock/Scripts/StatusEffect/IStatusEffectReceiver.cs
+@@ -1,19 +1,20 @@
++/// <summary>状態効果の付与・解除・存在確認を受け付ける契約。効果の進行方法は実装側が定義する。</summary>
+ public interface IStatusEffectReceiver
+ {
+     /// <summary>
+     /// 受け取った効果インスタンスをリストに追加、または既存と合成する。
+     /// </summary>
+-    /// <param name="instance"></param>
++    /// <param name="instance">効果定義と付与元を保持した効果インスタンス。</param>
+     void ApplyStatusEffect(StatusEffectInstance instance);
+     /// <summary>
+-    /// 既存効果がある場合はスタックポリシーに従って処理。
++    /// 指定IDの効果を解除する。重複方針の適用は付与側が担当する。
+     /// </summary>
+-    /// <param name="id"></param>
++    /// <param name="id">状態効果定義の識別子。</param>
+     void RemoveStatusEffect(string id);
+     /// <summary>
+     /// 指定 ID の効果が存在するかどうかを返す。
+     /// </summary>
+-    /// <param name="id"></param>
+-    /// <returns></returns>
++    /// <param name="id">状態効果定義の識別子。</param>
++    /// <returns>指定IDの効果が適用中ならtrue。</returns>
+     bool HasStatusEffect(string id);
+ }
+--- a/Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs
++++ b/Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>状態効果のID、持続・重複方式とステータス倍率を定義する共有データ。</summary>
+ [CreateAssetMenu(fileName = "StatusEffectDef", menuName = "ScriptableObjects/StatusEffect/StatusEffectDef")]
+ public class StatusEffectDef : ScriptableObject
+ {
+@@ -32,6 +33,7 @@
+     /// </summary>
+     public GameObject VfxPrefab => _vfxPrefab;
+ 
++    /// <summary>同じ状態効果の再付与時に、更新・加算などどの重複処理を行うか識別する。</summary>
+     public enum StackPolicy
+     {
+         Refresh,
+--- a/Assets/Mock/Scripts/StatusEffect/StatusEffectInstance.cs
++++ b/Assets/Mock/Scripts/StatusEffect/StatusEffectInstance.cs
+@@ -1,5 +1,6 @@
+ using UnityEngine;
+ 
++/// <summary>付与された効果の定義・残り時間・スタック数を個別に保持するランタイムデータ。</summary>
+ public class StatusEffectInstance
+ {
+     public StatusEffectDef Def { get; }
+@@ -8,6 +9,7 @@
+     public GameObject Source { get; }
+     public GameObject Vfx { get; set; }
+ 
++    /// <summary>効果定義と付与元を保持し、残り時間・一段階のスタックと未生成VFXを初期化する。</summary>
+     public StatusEffectInstance(StatusEffectDef def, GameObject source)
+     {
+         Def = def;
+--- a/Assets/Mock/Scripts/StatusEffect/StatusEffectManager.cs
++++ b/Assets/Mock/Scripts/StatusEffect/StatusEffectManager.cs
+@@ -1,12 +1,12 @@
+ using System.Collections.Generic;
+ using UnityEngine;
+ 
+-[RequireComponent(typeof(Animator))]
+ /// <summary>
+ /// ステータス効果の管理コンポーネント。
+ /// 敵オブジェクトにアタッチされ、適用された効果の残り時間やスタック管理、
+ /// アニメータ／NavMeshAgent への速度乗算反映、VFX の生成・破棄を行います。
+ /// </summary>
++[RequireComponent(typeof(Animator))]
+ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
+ {
+     // 現在適用中の効果インスタンス一覧
+@@ -19,6 +19,7 @@
+     private AnimationSpeedController _speed;
+ 
+     private bool _initialized;
++    /// <summary>AnimatorとAgentを取得し、基準移動速度と合成用の速度制御を一度だけ接続する。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -30,6 +31,7 @@
+         if (_animator != null) { _speed = _animator.GetComponent<AnimationSpeedController>(); _speed?.Init(); }
+     }
+ 
++    /// <summary>効果の残り時間を進め、期限切れのVFXを除去して倍率の変更を再計算する。</summary>
+     private void Update()
+     {
+         // 各効果の残り時間を減算し、期限切れは解除する。
+@@ -52,6 +54,7 @@
+         if (changed) RecalculateModifiers();
+     }
+ 
++    /// <summary>同じIDの効果を定義の更新・置換・加算方式で合成し、新規の場合はVFXを生成して倍率を反映する。</summary>
+     public void ApplyStatusEffect(StatusEffectInstance instance)
+     {
+         // 受け取った効果インスタンスをリストに追加、または既存と合成する
+@@ -91,7 +94,7 @@
+     /// <summary>
+     ///     指定した ID のステータス効果を解除する。存在しない場合は何もしない。
+     /// </summary>
+-    /// <param name="id"></param>
++    /// <param name="id">状態効果定義の識別子。</param>
+     public void RemoveStatusEffect(string id)
+     {
+         for (int i = _effects.Count - 1; i >= 0; --i)
+@@ -108,13 +111,14 @@
+     /// <summary>
+     ///   指定した ID のステータス効果が現在適用中かどうかを返す。
+     /// </summary>
+-    /// <param name="id"></param>
+-    /// <returns></returns>
++    /// <param name="id">状態効果定義の識別子。</param>
++    /// <returns>指定IDの効果が適用中ならtrue。</returns>
+     public bool HasStatusEffect(string id)
+     {
+         return _effects.Exists(e => e.Def.Id == id);
+     }
+ 
++    /// <summary>全効果とVFXを解除し、Animator倍率とAgent移動速度を基準へ戻す。</summary>
+     private void OnDisable()
+     {
+         foreach (var effect in _effects) if (effect.Vfx != null) Destroy(effect.Vfx);
+--- a/Assets/Mock/Scripts/UI/BossBarSilhouette.cs
++++ b/Assets/Mock/Scripts/UI/BossBarSilhouette.cs
+@@ -13,6 +13,7 @@
+         new Vector2(.982f,.73f),new Vector2(1,.60f),new Vector2(1,.15f),
+         new Vector2(.981f,0),new Vector2(.019f,0)
+     };
++    /// <summary>通常の四角形Imageを指定輪郭の三角形群へ置き換え、バーの装飾外側を描画しない。</summary>
+     public override void ModifyMesh(VertexHelper vh)
+     {
+         if (!IsActive() || vh.currentVertCount!=4 || _outline==null || _outline.Length<3) return;
+@@ -23,6 +24,7 @@
+         foreach(var point in _outline) Add(vh,bottom,top,point);
+         for(int i=0;i<_outline.Length;i++)vh.AddTriangle(0,i+1,(i+1)%_outline.Length+1);
+     }
++    /// <summary>輪郭の正規化座標から元Imageの位置とUVを補間し、描画頂点を追加する。</summary>
+     private static void Add(VertexHelper vh,UIVertex bottom,UIVertex top,Vector2 point)
+     {
+         var vertex=bottom;
+--- a/Assets/Mock/Scripts/UI/DamageTrailGauge.cs
++++ b/Assets/Mock/Scripts/UI/DamageTrailGauge.cs
+@@ -11,6 +11,7 @@
+     private bool _initialized;
+     private float _target, _catchupAt;
+ 
++    /// <summary>現在ゲージを即時更新する。減少時だけ遅延追従を予約し、回復・初期化時は遅延ゲージも一致させる。</summary>
+     public void SetNormalized(float value)
+     {
+         value = Mathf.Clamp01(value);
+@@ -25,8 +26,10 @@
+         _initialized = true;
+     }
+ 
++    /// <summary>TimeScaleに依存せず遅延ゲージの追従を進める。</summary>
+     private void Update() => Tick(Time.unscaledTime, Time.unscaledDeltaTime);
+ 
++    /// <summary>待機時間が終わった遅延ゲージを現在値へ指定速度で近づける。</summary>
+     private void Tick(float now, float deltaTime)
+     {
+         if (!_initialized || _trailFill == null || now < _catchupAt) return;
+@@ -34,6 +37,7 @@
+             Mathf.Max(.01f, _catchupPerSecond) * Mathf.Max(0, deltaTime));
+     }
+ 
++    /// <summary>遅延表示を現在値へ揃えて待機時刻を解除する。</summary>
+     private void OnDisable()
+     {
+         if (_initialized && _trailFill != null) _trailFill.fillAmount = _target;
+--- a/Assets/Mock/Scripts/UI/EquipmentOptionSelection.cs
++++ b/Assets/Mock/Scripts/UI/EquipmentOptionSelection.cs
+@@ -6,6 +6,7 @@
+ [RequireComponent(typeof(Toggle))]
+ public sealed class EquipmentOptionSelection : MonoBehaviour, ISelectHandler
+ {
++    /// <summary>方向入力で選択された有効なToggleをオンにして装備選択へ反映する。</summary>
+     public void OnSelect(BaseEventData eventData)
+     {
+         var option = GetComponent<Toggle>();
+--- a/Assets/Mock/Scripts/UI/FinalBlowPresentation.cs
++++ b/Assets/Mock/Scripts/UI/FinalBlowPresentation.cs
+@@ -28,6 +28,7 @@
+     private float _started, _flashDuration, _textDelay, _textDuration;
+     private bool _playing;
+ 
++    /// <summary>元の文字・HUD状態を保存し、Flash・黒帯・討伐表示の実時間タイムラインを開始する。</summary>
+     public void Begin(TMP_Text text, float flashDuration, float textDelay, float textDuration)
+     {
+         if (_playing) ResetPresentation();
+@@ -55,9 +56,12 @@
+         RenderAt(0);
+     }
+ 
++    /// <summary>勝利UIが進行中の間だけ、開始からの実経過時間で表示を更新する。</summary>
+     private void Update() { if (_playing) RenderAt(Time.unscaledTime - _started); }
+ 
+     // Edit Modeでタイムラインを検証できるよう、時計と描画を分ける。
++    /// <summary>指定経過秒でFlash、HUD非表示、黒帯と討伐文字の素早い出現・Scaleの落ち着きを反映する。</summary>
++    /// <param name="elapsed">勝利UI開始からの実経過秒数。</param>
+     public void RenderAt(float elapsed)
+     {
+         if (!_playing) return;
+@@ -81,6 +85,7 @@
+         }
+     }
+ 
++    /// <summary>画面高の比率を使って上下黒帯のAnchorを移動し、解像度に依存せず出現させる。</summary>
+     private void SetLetterbox(float progress)
+     {
+         // Anchorで画面高の割合を指定。画面外の同じ高さからSlideさせる。
+@@ -98,6 +103,7 @@
+         }
+     }
+ 
++    /// <summary>Flashと黒帯を解除し、保存したHUD・文字の色・Scale・有効状態を復元する。</summary>
+     public void ResetPresentation()
+     {
+         if (_whiteFlash != null) _whiteFlash.alpha = 0;
+@@ -118,6 +124,8 @@
+             _text.gameObject.SetActive(_savedTextActive);
+         }
+     }
++    /// <summary>勝利UIを解除して停止前のHUDと文字状態を復元する。</summary>
+     private void OnDisable() => ResetPresentation();
++    /// <summary>勝利UIが保持した一時表示を解除して元の状態へ戻す。</summary>
+     private void OnDestroy() => ResetPresentation();
+ }
+--- a/Assets/Mock/Scripts/UI/PlayerHUDPresenter.cs
++++ b/Assets/Mock/Scripts/UI/PlayerHUDPresenter.cs
+@@ -58,6 +58,7 @@
+             _view.SetSkillNormalized(_skillNormalizedReactive.Value);
+         }
+ 
++        /// <summary>現在HPを最大HPで正規化してViewへ渡す。最大HPが無効ならゼロ表示にする。</summary>
+         private void UpdateHp(float hp)
+         {
+             var norm = _maxHp > 0f ? hp / _maxHp : 0f;
+--- a/Assets/Mock/Scripts/UI/PlayerHUDView.cs
++++ b/Assets/Mock/Scripts/UI/PlayerHUDView.cs
+@@ -16,6 +16,7 @@
+         private float _targetHp;
+         private float _catchupAt;
+ 
++        /// <summary>現在HPを即反映し、減少時は赤いダメージ履歴を遅延追従させる。回復時は両表示を揃える。</summary>
+         public void SetHpNormalized(float normalized)
+         {
+             normalized = Mathf.Clamp01(normalized);
+@@ -34,8 +35,10 @@
+             _initialized = true;
+         }
+ 
++        /// <summary>HPの遅延表示を実時間で進め、HitStop中もUIの追従を維持する。</summary>
+         private void Update() => TickDamageTrail(Time.unscaledTime, Time.unscaledDeltaTime);
+ 
++        /// <summary>減少後の待機時間を過ぎた赤いゲージを現在HPへ指定速度で近づける。</summary>
+         private void TickDamageTrail(float now, float deltaTime)
+         {
+             if (!_initialized || _damageFill == null || now < _catchupAt) return;
+@@ -43,11 +46,13 @@
+                 Mathf.Max(.01f, _damageCatchupPerSecond) * Mathf.Max(0, deltaTime));
+         }
+ 
++        /// <summary>スキルゲージ値を0から1へ制限してImageの充填量へ反映する。</summary>
+         public void SetSkillNormalized(float normalized)
+         {
+             if (_skillFill != null) _skillFill.fillAmount = Mathf.Clamp01(normalized);
+         }
+ 
++        /// <summary>HPの遅延表示を現在値へ揃え、待機時刻をリセットする。</summary>
+         private void OnDisable()
+         {
+             if (_damageFill != null && _initialized) _damageFill.fillAmount = _targetHp;
+--- a/Assets/Mock/Scripts/UI/RunHUD.cs
++++ b/Assets/Mock/Scripts/UI/RunHUD.cs
+@@ -25,10 +25,12 @@
+     [SerializeField] private TMP_Text _ghostStatus;
+     private float _nextRefresh;
+     private bool _presentationControlsVisibility;
++    /// <summary>勝利演出などの表示所有者から、通常のラン情報を表示してよいか切り替える。</summary>
+     public void SetPresentationVisibility(bool controlled) => _presentationControlsVisibility = controlled;
+ 
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>共有Faderを接続し、配置済みのラン情報表示を一度だけ初期化する。</summary>
+     public void Init(GlobalFader fader)
+     {
+         if (_initialized) return;
+@@ -42,6 +44,7 @@
+         }
+     }
+ 
++    /// <summary>ランの残機・相手・結果などを表示し、演出による非表示指定を優先する。</summary>
+     private void LateUpdate()
+     {
+         bool visible = RunSession.Active && _player != null
+@@ -67,6 +70,7 @@
+             + (player.IsInvulnerable ? "  無敵" : ""));
+     }
+ 
++    /// <summary>参照があり文字列が変わった場合だけTMPテキストを更新する。</summary>
+     private static void SetLabel(TMP_Text label, string value)
+     {
+         if (label != null && label.text != value) label.text = value;
+--- a/Assets/Mock/Scripts/UI/RunSetupUI.cs
++++ b/Assets/Mock/Scripts/UI/RunSetupUI.cs
+@@ -20,6 +20,7 @@
+     private TitleManager _title;
+     private int _attack, _defense, _openedFrame;
+     private bool _initialized;
++    /// <summary>装備Toggleと開始Buttonの通知を一度だけ接続し、初期状態では設定画面を隠す。</summary>
+     public void Init()
+     {
+         if (_initialized) return;
+@@ -37,6 +38,7 @@
+         }
+         _startButton.onClick.AddListener(Confirm);
+     }
++    /// <summary>保存中の名前・装備・前回勝者を表示し、操作可能な設定画面とUI選択を開始する。</summary>
+     public void Open(TitleManager title)
+     {
+         _title = title;
+@@ -59,11 +61,13 @@
+         Cursor.visible = true;
+         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_attackOptions[_attack].gameObject);
+     }
++    /// <summary>現在選択中の攻撃・防御装備の効果説明を更新する。</summary>
+     private void RefreshDescriptions()
+     {
+         _attackDescription.text = RunSession.AttackDescription(_attack);
+         _defenseDescription.text = RunSession.DefenseDescription(_defense);
+     }
++    /// <summary>画面を開いた同フレームの入力を除外し、選択内容でランを開始してTitleの遷移を要求する。</summary>
+     public void Confirm()
+     {
+         // 画面を開いたときの入力で、そのまま決定されないようにする。
+@@ -75,6 +79,7 @@
+         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+         _title.BeginConfiguredGame();
+     }
++    /// <summary>設定パネルの不透明度と入力・Raycast受付をまとめて切り替える。</summary>
+     private void SetVisible(bool value)
+     {
+         _panel.alpha = value ? 1f : 0f;
+--- a/Assets/Mock/Scripts/UI/TitleText.cs
++++ b/Assets/Mock/Scripts/UI/TitleText.cs
+@@ -16,6 +16,7 @@
+     private TitleManager _title;
+     private GlobalFader _fader;
+     private bool _initialized;
++    /// <summary>TitleとFaderを接続し、有効な文字表示なら実時間の点滅を開始する。</summary>
+     public void Init(TitleManager title, GlobalFader fader)
+     {
+         if (_initialized) return;
+@@ -25,7 +26,9 @@
+         if (isActiveAndEnabled) StartPulse();
+     }
+ 
++    /// <summary>初期化済みのTitle文字に点滅Tweenを再開する。</summary>
+     private void OnEnable() { if (_initialized) StartPulse(); }
++    /// <summary>文字のFadeと待機を繰り返すTweenを実時間更新で組み立てる。</summary>
+     private void StartPulse()
+     {
+         if (_text == null) return;
+@@ -37,12 +40,14 @@
+         _pulse.SetLoops(-1);
+     }
+ 
++    /// <summary>所有する点滅Tweenを停止して参照を解除する。</summary>
+     private void OnDisable()
+     {
+         _pulse?.Kill();
+         _pulse = null;
+     }
+ 
++    /// <summary>多重遷移を防ぎ、TitleManagerの設定画面または既存のゲーム開始処理を要求する。</summary>
+     public void OnStartButton()
+     {
+         if (_isTransitioning) return;
+@@ -56,6 +61,7 @@
+         StartGame().Forget();
+     }
+ 
++    /// <summary>共有FaderでGameSceneへ遷移し、成功・中断にかかわらず遷移中フラグを解除する。</summary>
+     private async UniTask StartGame()
+     {
+         try { await _fader.FadeToScene(_gameSceneName); }

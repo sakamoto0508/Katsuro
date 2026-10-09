@@ -6,6 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Toggle))]
 public sealed class EquipmentOptionSelection : MonoBehaviour, ISelectHandler
 {
+    /// <summary>方向入力で選択された有効なToggleをオンにして装備選択へ反映する。</summary>
     public void OnSelect(BaseEventData eventData)
     {
         var option = GetComponent<Toggle>();

@@ -2,8 +2,10 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>Enemyの最大HPと現在HPを保持して変更を通知する。死亡演出とAI停止はControllerに任せる。</summary>
 public class EnemyHealth : IDisposable
 {
+    /// <summary>基礎HPにラン継承倍率を適用し、現在HPのReactive通知を初期化する。</summary>
     public EnemyHealth(EnemyStuts status)
     {
         _maxHp = status != null ? status.EnemyMaxHealth * RunSession.EnemyHealth : 100f * RunSession.EnemyHealth;
@@ -39,6 +41,7 @@ public class EnemyHealth : IDisposable
         _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
     }
 
+    /// <summary>EnemyのHP通知に使用するReactivePropertyを解放する。</summary>
     public void Dispose()
     {
         _hpRx?.Dispose();

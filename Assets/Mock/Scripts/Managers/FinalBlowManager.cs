@@ -12,22 +12,48 @@ public class FinalBlowManager : MonoBehaviour
 {
     public static FinalBlowManager Instance { get; private set; }
 
+    /// <summary>Final Blow開始時に再生するEnemy死亡SEの登録名設定。</summary>
+    [UnityEngine.Tooltip("Final Blow開始時に再生するEnemy死亡SEの登録名設定。")]
     [SerializeField] private AudioConfig _audioConfig;
+    /// <summary>勝利時に納刀・一時速度解除を要求するPlayer参照。</summary>
+    [UnityEngine.Tooltip("勝利時に納刀・一時速度解除を要求するPlayer参照。")]
     [SerializeField] private PlayerController _player;
+    /// <summary>最後のHitStopと一時速度解除の対象Enemy参照。</summary>
+    [UnityEngine.Tooltip("最後のHitStopと一時速度解除の対象Enemy参照。")]
     [SerializeField] private EnemyController _enemyController;
+    /// <summary>最終Hitの停止・スローを維持する時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("最終Hitの停止・スローを維持する時間（実時間の秒）。")]
     [SerializeField] private float _phase1HitStop = 0.2f;
+    /// <summary>最終Hitの白Flashの継続時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("最終Hitの白Flashの継続時間（実時間の秒）。")]
     [SerializeField, Range(.08f, .12f)] private float _whiteFlashDuration = .10f;
+    /// <summary>納刀開始からScene Fade開始まで。納刀Clip 2.07秒を見せる。</summary>
     [Tooltip("納刀開始からScene Fade開始まで。納刀Clip 2.07秒を見せる。")]
     [SerializeField, Min(0f)] private float _phase2Duration = 2.3f;
+    /// <summary>納刀後に表示する討伐文字のTMP参照。</summary>
+    [UnityEngine.Tooltip("納刀後に表示する討伐文字のTMP参照。")]
     [SerializeField] private TextMeshProUGUI _finalBlowText;
-    [SerializeField] private float _finalBlowTextFadeIn = .35f;
+    /// <summary>討伐文字のFadeとScale演出の時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("討伐文字のFadeとScale演出の時間（実時間の秒）。")]
+    [SerializeField] private float _finalBlowTextFadeIn = .22f;
+    /// <summary>白Flash・HUD・黒帯・討伐文字を進行させるUI演出コンポーネント。</summary>
+    [UnityEngine.Tooltip("白Flash・HUD・黒帯・討伐文字を進行させるUI演出コンポーネント。")]
     [SerializeField] private FinalBlowPresentation _presentation;
+    /// <summary>勝利専用構図・FOV・モノクロの開始と解除を要求するCameraManager参照。</summary>
+    [UnityEngine.Tooltip("勝利専用構図・FOV・モノクロの開始と解除を要求するCameraManager参照。")]
     [SerializeField] private CameraManager _cameraFeedback;
+    /// <summary>最終Hitから勝利カメラとFOVの寄りを始めるまでの時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("最終Hitから勝利カメラとFOVの寄りを始めるまでの時間（実時間の秒）。")]
     [SerializeField, Min(0f)] private float _cameraPushDelay = .18f;
+    /// <summary>最終Hitから納刀Triggerを要求するまでの時間（実時間の秒）。カメラDelay以上で開始する。</summary>
+    [UnityEngine.Tooltip("最終Hitから納刀Triggerを要求するまでの時間（実時間の秒）。カメラDelay以上で開始する。")]
     [SerializeField, Min(0f)] private float _sheathingDelay = .8f;
-    [SerializeField, Min(0f)] private float _textDelay = 1.05f;
+    /// <summary>最終Hitから討伐文字を表示するまでの時間（実時間の秒）。納刀の見せ場に合わせる。</summary>
+    [UnityEngine.Tooltip("最終Hitから討伐文字を表示するまでの時間（実時間の秒）。納刀の見せ場に合わせる。")]
+    [SerializeField, Min(0f)] private float _textDelay = 2.12f;
     private CancellationTokenSource _sequenceCancellation;
     private bool _isPlaying;
+    /// <summary>Final Blowが制御権を持っている間はtrue。回避など低優先演出の開始抑制に使用する。</summary>
     public bool IsPlaying => _isPlaying;
 
     private GameManager _game;
@@ -36,6 +62,7 @@ public class FinalBlowManager : MonoBehaviour
     private LoadSceneManager _loader;
     private GlobalFader _fader;
     private bool _initialized;
+    /// <summary>勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。</summary>
     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
         if (_initialized) return;
@@ -57,18 +84,21 @@ public class FinalBlowManager : MonoBehaviour
         }
     }
 
+    /// <summary>重複開始を防いで回避の色と音を解除し、勝利用モノクロ・UI・決着シーケンスを開始する。</summary>
     public void StartFinalBlow()
     {
         if (_isPlaying || _sequenceCancellation != null || !isActiveAndEnabled || _enemyController == null || _player == null) return;
         _isPlaying = true;
         _cameraFeedback?.GetComponent<JustAvoidContrast>()?.Cancel();
         _audio?.CancelJustAvoidDuck();
+        _cameraFeedback?.GetComponent<VictoryContrast>()?.Begin();
         _sequenceCancellation = new CancellationTokenSource();
         if (_presentation != null) _presentation.Begin(_finalBlowText, _whiteFlashDuration, _textDelay, _finalBlowTextFadeIn);
         _game?.WinGame();
         DoFinalBlow().Forget();
     }
 
+    /// <summary>HitStopとBGM停止から専用カメラ、納刀、討伐、既存Scene Fadeへ実時間で進め、中断時も一時状態を片付ける。</summary>
     private async UniTask DoFinalBlow()
     {
         var source = _sequenceCancellation;
@@ -101,19 +131,23 @@ public class FinalBlowManager : MonoBehaviour
         }
     }
 
+    /// <summary>開始基準の実時刻までUpdateで待機し、TimeScaleに左右されずキャンセルを受け付ける。</summary>
     private static async UniTask WaitUntil(float started, float seconds, CancellationToken token)
     {
         while (Time.unscaledTime - started < seconds) await UniTask.Yield(PlayerLoopTiming.Update, token);
         token.ThrowIfCancellationRequested();
     }
 
+    /// <summary>進行中の非同期演出をキャンセルし、勝利UI・Volume・カメラを復元する。</summary>
     public void CancelPresentation()
     {
         _sequenceCancellation?.Cancel();
         Cleanup();
     }
+    /// <summary>演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。</summary>
     private void Cleanup()
     {
+        _cameraFeedback?.GetComponent<VictoryContrast>()?.Cancel();
         if (_presentation != null) _presentation.ResetPresentation();
         if (_cameraFeedback != null) _cameraFeedback.StopFinalBlowFeedback();
         if (_finalBlowText != null) _finalBlowText.DOKill();
@@ -123,7 +157,9 @@ public class FinalBlowManager : MonoBehaviour
         _isPlaying = false;
         // Victoryの入力停止はGameManagerが所有する。演出Cleanupで再有効化しない。
     }
+    /// <summary>勝利シーケンスを中断して表示とカメラ・Volumeを片付ける。</summary>
     private void OnDisable() => CancelPresentation();
+    /// <summary>勝利演出を中断し、自身が共有インスタンスなら参照を消去する。</summary>
     private void OnDestroy()
     {
         CancelPresentation();

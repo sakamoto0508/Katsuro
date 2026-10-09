@@ -1,0 +1,3 @@
+PASS saved scene timing, text reveal/settle/reset, independent profiles and protected Just Avoid/HitStop settings.
+PASS monochrome clock/auto recovery/cancel; native Cinemachine override lifecycle, side pose, upper-body aim, disabled Brain restoration.
+Compile errors=0. Native saved settings re-read. Play Mode not entered; runtime input/render/audio/AI and actual scene transition unverified.

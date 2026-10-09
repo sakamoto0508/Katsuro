@@ -11,10 +11,15 @@ public class GlobalFader : MonoBehaviour
     public static GlobalFader Instance { get; private set; }
     public bool IsTransitioning { get; private set; }
 
+    /// <summary>Scene切り替え時に画面を覆うFade用Image。Alphaで暗転を制御する。</summary>
+    [UnityEngine.Tooltip("Scene切り替え時に画面を覆うFade用Image。Alphaで暗転を制御する。")]
     [SerializeField] private Image fadeImage;
+    /// <summary>Scene切り替えの暗転・明転それぞれの時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("Scene切り替えの暗転・明転それぞれの時間（実時間の秒）。")]
     [SerializeField, Min(0f)] private float duration = 1f;
 
     private bool _initialized;
+    /// <summary>永続する共有Faderとオーバーレイを準備し、重複オブジェクトを除去する。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -34,6 +39,7 @@ public class GlobalFader : MonoBehaviour
         fadeImage.gameObject.SetActive(false);
     }
 
+    /// <summary>自身が共有Faderの場合に共有参照を解除する。</summary>
     private void OnDestroy()
     {
         if (Instance == this) Instance = null;
@@ -73,6 +79,8 @@ public class GlobalFader : MonoBehaviour
         fadeImage.raycastTarget = true;
     }
 
+    /// <summary>遷移先を検証し、実時間の暗転後にSceneを読み込んで再表示する。多重遷移は開始しない。</summary>
+    /// <returns>暗転・Scene読み込み・再表示の完了を待機するタスク。</returns>
     public async UniTask FadeToScene(string sceneName)
     {
         if (IsTransitioning) return;
@@ -103,6 +111,7 @@ public class GlobalFader : MonoBehaviour
         }
     }
 
+    /// <summary>指定不透明度へ実時間で補間し、破棄によるキャンセルを受け付ける。</summary>
     private async UniTask FadeAlpha(float target, CancellationToken token)
     {
         float start = fadeImage.color.a;
@@ -119,6 +128,7 @@ public class GlobalFader : MonoBehaviour
         SetAlpha(target);
     }
 
+    /// <summary>暗転用Imageを黒のまま指定不透明度へ設定する。</summary>
     private void SetAlpha(float alpha)
     {
         fadeImage.color = new Color(0f, 0f, 0f, alpha);

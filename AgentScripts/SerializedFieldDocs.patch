@@ -1,0 +1,2018 @@
+--- a/Assets/Mock/Scripts/Camera/CameraManager.cs
++++ b/Assets/Mock/Scripts/Camera/CameraManager.cs
+@@ -8,9 +8,15 @@
+ {
+     /// <summary>描画補正とHDRP Passの対象になるSceneの出力カメラ。</summary>
+     public Camera OutputCamera => _outputCamera;
++    /// <summary>命中時の揺れを発生させるCinemachine Impulse Source。</summary>
++    [UnityEngine.Tooltip("命中時の揺れを発生させるCinemachine Impulse Source。")]
+     [SerializeField] private CinemachineImpulseSource _combatImpulse;
++    /// <summary>Final Blow中に加える画角の差（度）。負数で画角を狭めて寄りを強調する。</summary>
++    [UnityEngine.Tooltip("Final Blow中に加える画角の差（度）。負数で画角を狭めて寄りを強調する。")]
+     [Header("Final Blow")]
+     [SerializeField, Range(-6f, -3f)] private float _finalBlowFOVOffset = -4f;
++    /// <summary>Final Blowの画角が寄るまでの時間（秒）。</summary>
++    [UnityEngine.Tooltip("Final Blowの画角が寄るまでの時間（秒）。")]
+     [SerializeField, Range(.3f, .6f)] private float _finalBlowPushDuration = .42f;
+     private InputBuffer _inputBuffer;
+     private LockOnCamera _lookOnCamera;
+--- a/Assets/Mock/Scripts/Camera/VictoryCameraRig.cs
++++ b/Assets/Mock/Scripts/Camera/VictoryCameraRig.cs
+@@ -5,11 +5,23 @@
+ [DisallowMultipleComponent]
+ public sealed class VictoryCameraRig : MonoBehaviour
+ {
++    /// <summary>勝利中だけOverrideで使用する専用CinemachineCamera。通常時は無効にして待機する。</summary>
++    [UnityEngine.Tooltip("勝利中だけOverrideで使用する専用CinemachineCamera。通常時は無効にして待機する。")]
+     [SerializeField] private CinemachineCamera _camera;
++    /// <summary>勝利カメラが開始位置から納刀構図へ移る時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("勝利カメラが開始位置から納刀構図へ移る時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _moveDuration = .55f;
++    /// <summary>Player背面から側面へ回り込む角度（度）。腕と刀が見える構図を調整する。</summary>
++    [UnityEngine.Tooltip("Player背面から側面へ回り込む角度（度）。腕と刀が見える構図を調整する。")]
+     [SerializeField, Range(45, 110)] private float _sideAngle = 85;
++    /// <summary>Player位置から勝利カメラの注視点までの高さ（Unity単位）。</summary>
++    [UnityEngine.Tooltip("Player位置から勝利カメラの注視点までの高さ（Unity単位）。")]
+     [SerializeField, Min(.1f)] private float _lookHeight = 1.15f;
++    /// <summary>Playerの右方向への注視点のずらし量（Unity単位）。画面内の配置を調整する。</summary>
++    [UnityEngine.Tooltip("Playerの右方向への注視点のずらし量（Unity単位）。画面内の配置を調整する。")]
+     [SerializeField, Range(-.5f, .5f)] private float _horizontalFraming = .18f;
++    /// <summary>勝利カメラのSphereCastで障害物として扱うLayer。Player・Enemy自身は除外する。</summary>
++    [UnityEngine.Tooltip("勝利カメラのSphereCastで障害物として扱うLayer。Player・Enemy自身は除外する。")]
+     [SerializeField] private LayerMask _obstacles = ~0;
+     private Transform _player;
+     private Camera _output;
+--- a/Assets/Mock/Scripts/Config/AnimationName.cs
++++ b/Assets/Mock/Scripts/Config/AnimationName.cs
+@@ -4,37 +4,85 @@
+ [CreateAssetMenu(fileName = "AnimName", menuName = "ScriptableObjects/Player/AnimName")]
+ public class AnimationName : ScriptableObject
+ {
++    /// <summary>移動速度をAnimatorへ渡すFloatパラメータ名。</summary>
+     public string MoveVelocity => _moveVelocity;
++    /// <summary>移動方向の左右成分をAnimatorへ渡すFloatパラメータ名。</summary>
+     public string MoveVectorX => _moveVectorX;
++    /// <summary>移動方向の前後成分をAnimatorへ渡すFloatパラメータ名。</summary>
+     public string MoveVectorY => _moveVectorY;
++    /// <summary>抜刀中の状態をAnimatorへ伝えるパラメータ名。Controller側と一致させる。</summary>
+     public string IsDrawingSword => _isDrawingSword;
++    /// <summary>Lock-On状態をAnimatorへ伝えるBoolパラメータ名。</summary>
+     public string IsLockOn => _isLockOn;
++    /// <summary>通常Light攻撃を開始するAnimator Trigger名。</summary>
+     public string LightAttack => _lightAttack;
++    /// <summary>通常Heavy攻撃を開始するAnimator Trigger名。</summary>
+     public string StrongAttack => _strongAttack;
++    /// <summary>Just Avoid成功後の追撃を開始するAnimator Trigger名。</summary>
+     public string JustAvoidAttack => _justAvoidAttack;
++    /// <summary>攻撃のコンボ段階を指定するAnimator Intパラメータ名。</summary>
+     public string ComboStep => _comboStep;
++    /// <summary>バックステップを開始するAnimator Trigger名。</summary>
+     public string BackStep => _backStep;
++    /// <summary>刀を抜いている状態をAnimatorへ伝えるBoolパラメータ名。</summary>
+     public string IsSwordDrawn => _isSwordDrawn;
++    /// <summary>Just Avoid成功演出を開始するAnimator Trigger名。</summary>
+     public string JustAvoid => _justAvoid;
++    /// <summary>Just Avoid受付状態をAnimatorへ伝えるパラメータ名。</summary>
+     public string JustAvoidWindow => _justAvoidWindow;
++    /// <summary>Enemy死亡アニメーションを開始するAnimator Trigger名。</summary>
+     public string EnemyDead => _enemyDead;
++    /// <summary>Player死亡アニメーションを開始するAnimator Trigger名。</summary>
+     public string PlayerDead => _playerDead;
++    /// <summary>勝利時の納刀アニメーションを開始するAnimator Trigger名。</summary>
+     public string SwordSheathing => _swordSheathing;
+ 
++    /// <summary>移動速度をAnimatorへ渡すFloatパラメータ名。</summary>
++    [UnityEngine.Tooltip("移動速度をAnimatorへ渡すFloatパラメータ名。")]
+     [SerializeField] private string _moveVelocity = "MoveVelocity";
++    /// <summary>移動方向の左右成分をAnimatorへ渡すFloatパラメータ名。</summary>
++    [UnityEngine.Tooltip("移動方向の左右成分をAnimatorへ渡すFloatパラメータ名。")]
+     [SerializeField] private string _moveVectorX = "MoveVectorX";
++    /// <summary>移動方向の前後成分をAnimatorへ渡すFloatパラメータ名。</summary>
++    [UnityEngine.Tooltip("移動方向の前後成分をAnimatorへ渡すFloatパラメータ名。")]
+     [SerializeField] private string _moveVectorY = "MoveVectorY";
++    /// <summary>抜刀中の状態をAnimatorへ伝えるパラメータ名。Controller側と一致させる。</summary>
++    [UnityEngine.Tooltip("抜刀中の状態をAnimatorへ伝えるパラメータ名。Controller側と一致させる。")]
+     [SerializeField] private string _isDrawingSword = "";
++    /// <summary>Lock-On状態をAnimatorへ伝えるBoolパラメータ名。</summary>
++    [UnityEngine.Tooltip("Lock-On状態をAnimatorへ伝えるBoolパラメータ名。")]
+     [SerializeField] private string _isLockOn = "";
++    /// <summary>通常Light攻撃を開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("通常Light攻撃を開始するAnimator Trigger名。")]
+     [SerializeField] private string _lightAttack = "";
++    /// <summary>通常Heavy攻撃を開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("通常Heavy攻撃を開始するAnimator Trigger名。")]
+     [SerializeField] private string _strongAttack = "";
++    /// <summary>Just Avoid成功後の追撃を開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功後の追撃を開始するAnimator Trigger名。")]
+     [SerializeField] private string _justAvoidAttack = "";
++    /// <summary>攻撃のコンボ段階を指定するAnimator Intパラメータ名。</summary>
++    [UnityEngine.Tooltip("攻撃のコンボ段階を指定するAnimator Intパラメータ名。")]
+     [SerializeField] private string _comboStep = "ComboStep";
++    /// <summary>バックステップを開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("バックステップを開始するAnimator Trigger名。")]
+     [SerializeField] private string _backStep = "BackStep";
++    /// <summary>刀を抜いている状態をAnimatorへ伝えるBoolパラメータ名。</summary>
++    [UnityEngine.Tooltip("刀を抜いている状態をAnimatorへ伝えるBoolパラメータ名。")]
+     [SerializeField] private string _isSwordDrawn = "IsSwordDrawn";
++    /// <summary>Just Avoid成功演出を開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功演出を開始するAnimator Trigger名。")]
+     [SerializeField] private string _justAvoid = "JustAvoid";
++    /// <summary>Just Avoid受付状態をAnimatorへ伝えるパラメータ名。</summary>
++    [UnityEngine.Tooltip("Just Avoid受付状態をAnimatorへ伝えるパラメータ名。")]
+     [SerializeField] private string _justAvoidWindow = "JustAvoidWindow";
++    /// <summary>Enemy死亡アニメーションを開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("Enemy死亡アニメーションを開始するAnimator Trigger名。")]
+     [SerializeField] private string _enemyDead = "EnemyDead";
++    /// <summary>Player死亡アニメーションを開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("Player死亡アニメーションを開始するAnimator Trigger名。")]
+     [SerializeField] private string _playerDead = "PlayerDead";
++    /// <summary>勝利時の納刀アニメーションを開始するAnimator Trigger名。</summary>
++    [UnityEngine.Tooltip("勝利時の納刀アニメーションを開始するAnimator Trigger名。")]
+     [SerializeField] private string _swordSheathing = "SwordSheathing";
+ }
+--- a/Assets/Mock/Scripts/Config/AudioConfig.cs
++++ b/Assets/Mock/Scripts/Config/AudioConfig.cs
+@@ -5,26 +5,55 @@
+ /// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
+ public class AudioConfig : ScriptableObject
+ {
++    /// <summary>ゲーム開始操作で再生するSEの登録名。</summary>
+     public string StartSE => _startSE;
++    /// <summary>タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。</summary>
+     public string TitleBGM => _titleBGM;
++    /// <summary>戦闘中に再生するBGMの登録名。</summary>
+     public string InGameBGM => _inGameBGM;
++    /// <summary>攻撃時に再生するSEの登録名。</summary>
+     public string AttackSound => _attackSound;
++    /// <summary>被弾時に再生する共通SEの登録名。</summary>
+     public string HitSound => _hitSound;
++    /// <summary>Player死亡時に再生するSEの登録名。</summary>
+     public string PlayerDeadSound => _plaeyrDeadSound;
++    /// <summary>Final Blow開始時に再生するEnemy死亡SEの登録名。</summary>
+     public string EnemyDeadSound => _enemyDeadSound;
++    /// <summary>通常Light命中時にAudioManagerのSE一覧から検索する登録名。</summary>
+     public string LightHitSound => _lightHitSound;
++    /// <summary>通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。</summary>
+     public string HeavyHitSound => _heavyHitSound;
++    /// <summary>通常Light命中時にAudioManagerのSE一覧から検索する登録名。</summary>
++    [UnityEngine.Tooltip("通常Light命中時にAudioManagerのSE一覧から検索する登録名。")]
+     [SerializeField] private string _lightHitSound = "Damage";
++    /// <summary>通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。</summary>
++    [UnityEngine.Tooltip("通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。")]
+     [SerializeField] private string _heavyHitSound = "Damage";
++    /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>
+     public string JustAvoidSound => _justAvoidSound;
++    /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>
+     [Tooltip("AudioManagerのSEリストに登録した名前。空欄なら再生しない。")]
+     [SerializeField] private string _justAvoidSound;
+ 
++    /// <summary>タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。</summary>
++    [UnityEngine.Tooltip("タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。")]
+     [SerializeField] private string _titleBGM = "TitleBGM";
++    /// <summary>ゲーム開始操作で再生するSEの登録名。</summary>
++    [UnityEngine.Tooltip("ゲーム開始操作で再生するSEの登録名。")]
+     [SerializeField] private string _startSE = "StartSE";
++    /// <summary>戦闘中に再生するBGMの登録名。</summary>
++    [UnityEngine.Tooltip("戦闘中に再生するBGMの登録名。")]
+     [SerializeField] private string _inGameBGM = "InGameBGM";
++    /// <summary>攻撃時に再生するSEの登録名。</summary>
++    [UnityEngine.Tooltip("攻撃時に再生するSEの登録名。")]
+     [SerializeField] private string _attackSound = "Attack";
++    /// <summary>被弾時に再生する共通SEの登録名。</summary>
++    [UnityEngine.Tooltip("被弾時に再生する共通SEの登録名。")]
+     [SerializeField] private string _hitSound = "Hit";
++    /// <summary>Player死亡時に再生するSEの登録名。</summary>
++    [UnityEngine.Tooltip("Player死亡時に再生するSEの登録名。")]
+     [SerializeField] private string _plaeyrDeadSound = "PlayerDead";
++    /// <summary>Final Blow開始時に再生するEnemy死亡SEの登録名。</summary>
++    [UnityEngine.Tooltip("Final Blow開始時に再生するEnemy死亡SEの登録名。")]
+     [SerializeField] private string _enemyDeadSound = "EnemyDead";  
+ }
+--- a/Assets/Mock/Scripts/Config/CameraConfig.cs
++++ b/Assets/Mock/Scripts/Config/CameraConfig.cs
+@@ -4,32 +4,65 @@
+ [CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
+ public class CameraConfig : ScriptableObject
+ {
++    /// <summary>追従カメラとPlayerの基準水平距離（Unity単位）。</summary>
+     public float CameraDistance => _cameraDistance;
++    /// <summary>Player位置からの追従カメラの基準高さ（Unity単位）。</summary>
+     public float CameraHeight => _cameraHeight;
++    /// <summary>カメラ位置の追従補間係数。大きいほど目標位置へ速く追従する。</summary>
+     public float PositionSmooth => _positionSmooth;
++    /// <summary>カメラ回転の追従補間係数。大きいほど目標方向へ速く追従する。</summary>
+     public float RotationSmooth => _rotationSmooth;
++    /// <summary>Player位置から注視点までの高さ（Unity単位）。</summary>
+     public float LookAtHeight => _lookAtHeight;
++    /// <summary>カメラ障害物判定のSphereCast半径（Unity単位）。</summary>
+     public float CameraCollisionRadius => _cameraCollisionRadius;
+ 
++    /// <summary>Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
++    [UnityEngine.Tooltip("Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。")]
+     [Header("戦闘フィードバック")]
+     [SerializeField, Range(0f, .15f)] private float _lightHitCameraStrength = .025f;
++    /// <summary>Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
++    [UnityEngine.Tooltip("Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。")]
+     [SerializeField, Range(0f, .15f)] private float _heavyHitCameraStrength = .055f;
++    /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
++    [UnityEngine.Tooltip("命中時カメラ衝撃の継続時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _cameraDuration = .12f;
++    /// <summary>Just Avoid成功時に加える画角の差（度）。正数で広く、負数で狭くなる。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時に加える画角の差（度）。正数で広く、負数で狭くなる。")]
+     [SerializeField, Range(-3f, 3f)] private float _justAvoidFOVOffset = 1.5f;
++    /// <summary>Just Avoidの画角演出を往復させる時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoidの画角演出を往復させる時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _justAvoidFOVDuration = .18f;
++    /// <summary>Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
+     public float LightHitCameraStrength => _lightHitCameraStrength;
++    /// <summary>Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
+     public float HeavyHitCameraStrength => _heavyHitCameraStrength;
++    /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
+     public float CameraDuration => _cameraDuration;
++    /// <summary>Just Avoid成功時に加える画角の差（度）。正数で広く、負数で狭くなる。</summary>
+     public float JustAvoidFOVOffset => _justAvoidFOVOffset;
++    /// <summary>Just Avoidの画角演出を往復させる時間（秒）。</summary>
+     public float JustAvoidFOVDuration => _justAvoidFOVDuration;
+ 
++    /// <summary>追従カメラとPlayerの基準水平距離（Unity単位）。</summary>
++    [UnityEngine.Tooltip("追従カメラとPlayerの基準水平距離（Unity単位）。")]
+     [Header("Lockon Camera Settings")]
+     [SerializeField] private float _cameraDistance = 4.5f;
++    /// <summary>Player位置からの追従カメラの基準高さ（Unity単位）。</summary>
++    [UnityEngine.Tooltip("Player位置からの追従カメラの基準高さ（Unity単位）。")]
+     [SerializeField] private float _cameraHeight = 2.0f;
++    /// <summary>カメラ位置の追従補間係数。大きいほど目標位置へ速く追従する。</summary>
++    [UnityEngine.Tooltip("カメラ位置の追従補間係数。大きいほど目標位置へ速く追従する。")]
+     [SerializeField] private float _positionSmooth = 10f;
++    /// <summary>カメラ回転の追従補間係数。大きいほど目標方向へ速く追従する。</summary>
++    [UnityEngine.Tooltip("カメラ回転の追従補間係数。大きいほど目標方向へ速く追従する。")]
+     [SerializeField] private float _rotationSmooth = 12f;
++    /// <summary>Player位置から注視点までの高さ（Unity単位）。</summary>
++    [UnityEngine.Tooltip("Player位置から注視点までの高さ（Unity単位）。")]
+     [SerializeField] private float _lookAtHeight = 1.2f;
+ 
++    /// <summary>カメラ障害物判定のSphereCast半径（Unity単位）。</summary>
++    [UnityEngine.Tooltip("カメラ障害物判定のSphereCast半径（Unity単位）。")]
+     [Header("obstacle")]
+     [SerializeField] private float _cameraCollisionRadius = 0.3f;
+ }
+--- a/Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs
++++ b/Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs
+@@ -4,12 +4,16 @@
+ [CreateAssetMenu(fileName = "JustAvoidBuffConfig", menuName = "ScriptableObjects/Player/JustAvoidBuffConfig")]
+ public sealed class JustAvoidBuffConfig : ScriptableObject
+ {
++    /// <summary>1スタックあたりの攻撃倍率加算（例: 0.05 = +5% / stack）</summary>
+     [Tooltip("1スタックあたりの攻撃倍率加算（例: 0.05 = +5% / stack）")]
+     [SerializeField, Min(0f)] private float _damageMultiplierPerStack = 0.05f;
+ 
++    /// <summary>スタックの最大数（これを超える分は無視）</summary>
+     [Tooltip("スタックの最大数（これを超える分は無視）")]
+     [SerializeField, Min(0)] private int _maxStacks = 5;
+ 
++    /// <summary>1スタックあたりの攻撃倍率加算（例: 0.05 = +5% / stack）</summary>
+     public float DamageMultiplierPerStack => _damageMultiplierPerStack;
++    /// <summary>スタックの最大数（これを超える分は無視）</summary>
+     public int MaxStacks => _maxStacks;
+ }
+--- a/Assets/Mock/Scripts/Config/LowHpBuffTable.cs
++++ b/Assets/Mock/Scripts/Config/LowHpBuffTable.cs
+@@ -13,19 +13,25 @@
+     [Serializable]
+     public sealed class Tier
+     {
++        /// <summary>この割合以下のときに該当する (0..1)。例: 0.25 = 25%</summary>
+         [Tooltip("この割合以下のときに該当する (0..1)。例: 0.25 = 25%")]
+         [Range(0f, 1f)] public float HpBelowRatio = 1f;
+ 
++        /// <summary>ダメージに掛ける乗算倍率（例: 1.10 = +10%）</summary>
+         [Tooltip("ダメージに掛ける乗算倍率（例: 1.10 = +10%）")]
+         public float DamageMultiplier = 1f;
+ 
++        /// <summary>スキルゲージ回復ボーナス（割合加算、例: 0.05 = +5%）</summary>
+         [Tooltip("スキルゲージ回復ボーナス（割合加算、例: 0.05 = +5%）")]
+         public float SkillGaugeRegenBonus = 0f;
+ 
++        /// <summary>表示用ラベル（任意）。</summary>
+         [Tooltip("表示用ラベル（任意）。")]
+         public string Label;
+     }
+ 
++    /// <summary>HP比率に応じて選ぶ低HPボーナスの段階一覧。</summary>
++    [UnityEngine.Tooltip("HP比率に応じて選ぶ低HPボーナスの段階一覧。")]
+     [SerializeField] private List<Tier> _tiers = new();
+ 
+     /// <summary>登録済みティア（Inspector 順序をそのまま保持）。</summary>
+--- a/Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs
++++ b/Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs
+@@ -7,7 +7,10 @@
+ /// <summary>Player装備の攻撃倍率・加算威力と命中時Effectをまとめる設定。</summary>
+ public class PlayerPassiveBuffSet : ScriptableObject
+ {
++    /// <summary>装備による攻撃倍率・固定加算威力・任意の命中Effectの一覧。</summary>
+     public IReadOnlyList<PassiveBuffEntry> Buffs => _buffs;
++    /// <summary>装備による攻撃倍率・固定加算威力・任意の命中Effectの一覧。</summary>
++    [UnityEngine.Tooltip("装備による攻撃倍率・固定加算威力・任意の命中Effectの一覧。")]
+     [SerializeField] private List<PassiveBuffEntry> _buffs = new();
+ 
+     /// <summary>登録済みパッシブを積算した乗算ダメージ係数。</summary>
+@@ -59,8 +62,16 @@
+     /// <summary>ヒット時に再生するエフェクトのプレハブ（任意）。</summary>
+     public GameObject OnHitEffectPrefab => _onHitEffectPrefab;
+ 
++    /// <summary>Inspector上で装備ボーナスを識別する表示用ラベル。</summary>
++    [UnityEngine.Tooltip("Inspector上で装備ボーナスを識別する表示用ラベル。")]
+     [SerializeField] private string _label = "PassiveBuff";
++    /// <summary>この装備の与ダメージ倍率。1で補正なし。他の装備倍率と乗算する。</summary>
++    [UnityEngine.Tooltip("この装備の与ダメージ倍率。1で補正なし。他の装備倍率と乗算する。")]
+     [SerializeField, Min(0f)] private float _attackPowerMultiplier = 1f;
++    /// <summary>この装備が加える固定攻撃力。他の装備の加算値と合算する。</summary>
++    [UnityEngine.Tooltip("この装備が加える固定攻撃力。他の装備の加算値と合算する。")]
+     [SerializeField] private float _flatAttackBonus;
++    /// <summary>この装備の命中時に使うEffect Prefab参照。未設定も許容する。</summary>
++    [UnityEngine.Tooltip("この装備の命中時に使うEffect Prefab参照。未設定も許容する。")]
+     [SerializeField] private GameObject _onHitEffectPrefab;
+ }
+--- a/Assets/Mock/Scripts/Config/PlayerStateConfig.cs
++++ b/Assets/Mock/Scripts/Config/PlayerStateConfig.cs
+@@ -5,10 +5,17 @@
+ [System.Serializable]
+ public class AttackClipList
+ {
++    /// <summary>コンボ段階順のAnimation Clip一覧。段階番号に対応する要素を再生する。</summary>
++    [UnityEngine.Tooltip("コンボ段階順のAnimation Clip一覧。段階番号に対応する要素を再生する。")]
+     [SerializeField] private List<AnimationClip> _clips = new();
++    /// <summary>段階ごとの追加コンボ受付開始までの遅延（秒）。未設定・負数は代替値を使う。</summary>
++    [UnityEngine.Tooltip("段階ごとの追加コンボ受付開始までの遅延（秒）。未設定・負数は代替値を使う。")]
+     [SerializeField] private List<float> _comboWindowDelaySeconds = new();
++    /// <summary>段階ごとの固定ダメージ。未設定なら代替値を使い、設定済みのゼロ・負数はそのまま返す。</summary>
++    [UnityEngine.Tooltip("段階ごとの固定ダメージ。未設定なら代替値を使い、設定済みのゼロ・負数はそのまま返す。")]
+     [SerializeField] private List<float> _clipFlatDamage = new();
+ 
++    /// <summary>コンボ段階順のAnimation Clip一覧。段階番号に対応する要素を再生する。</summary>
+     public IReadOnlyList<AnimationClip> Clips => _clips;
+ 
+     /// <summary>段階番号を有効範囲へ制限してClipを取得する。未設定ならnullを返す。</summary>
+@@ -137,23 +144,45 @@
+     /// <returns>指定段階の追撃時間。</returns>
+     public float GetJustAvoidAttackDuration(int comboIndex = 0) => _justAvoidAttackClips.GetDuration(comboIndex, 0.9f);
+ 
++    /// <summary>PlayerStatus未設定時に使うスキルゲージの代替最大値。</summary>
++    [UnityEngine.Tooltip("PlayerStatus未設定時に使うスキルゲージの代替最大値。")]
+     [Header("Skill Gauge")]
+     [SerializeField, Min(1f)] private float _maxSkillGauge = 100f;
++    /// <summary>PlayerStatus未設定時に使うスキルゲージの代替自然回復量（ゲージ単位/秒）。</summary>
++    [UnityEngine.Tooltip("PlayerStatus未設定時に使うスキルゲージの代替自然回復量（ゲージ単位/秒）。")]
+     [SerializeField, Min(0f)] private float _skillGaugeRecoveryPerSecond = 10f;
+ 
++    /// <summary>回避開始後のJust Avoid判定を受け付ける時間（秒）。</summary>
++    [UnityEngine.Tooltip("回避開始後のJust Avoid判定を受け付ける時間（秒）。")]
+     [Header("Avoid")]
+     [SerializeField, Min(0.01f)] private float _justAvoidTime = 0.2f;
++    /// <summary>幽体化の旧表示色設定。現在の体色演出はCombatFeedbackのGhost Tintを使用する。</summary>
++    [UnityEngine.Tooltip("幽体化の旧表示色設定。現在の体色演出はCombatFeedbackのGhost Tintを使用する。")]
+     [SerializeField] private Color _ghostColor = Color.gray;
++    /// <summary>幽体化の旧透明度設定（0〜1）。現在の体色演出はCombatFeedbackのGhost TintのAlphaを使用する。</summary>
++    [UnityEngine.Tooltip("幽体化の旧透明度設定（0〜1）。現在の体色演出はCombatFeedbackのGhost TintのAlphaを使用する。")]
+     [SerializeField, Range(0f, 1f)] private float _alpha = 0.7f;
+ 
++    /// <summary>Lightの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。</summary>
++    [UnityEngine.Tooltip("Lightの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。")]
+     [Header("Combo Window Timing")]
+     [SerializeField, Min(0f)] private float _defaultLightComboWindowDelay = 0.05f;
++    /// <summary>Heavyの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。</summary>
++    [UnityEngine.Tooltip("Heavyの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。")]
+     [SerializeField, Min(0f)] private float _defaultStrongComboWindowDelay = 0.1f;
+ 
++    /// <summary>非Lock-On時のLightコンボClip・受付遅延・固定ダメージ設定。</summary>
++    [UnityEngine.Tooltip("非Lock-On時のLightコンボClip・受付遅延・固定ダメージ設定。")]
+     [Header("Attack Clips")]
+     [SerializeField] private AttackClipList _lightAttackClips = new();
++    /// <summary>Lock-On時のLightコンボ設定。未設定時は通常Light設定を使う。</summary>
++    [UnityEngine.Tooltip("Lock-On時のLightコンボ設定。未設定時は通常Light設定を使う。")]
+     [SerializeField] private AttackClipList _lockOnLightAttackClips = new();
++    /// <summary>HeavyコンボのClip・受付遅延・固定ダメージ設定。</summary>
++    [UnityEngine.Tooltip("HeavyコンボのClip・受付遅延・固定ダメージ設定。")]
+     [SerializeField] private AttackClipList _strongAttackClips = new();
++    /// <summary>Just Avoid追撃のClip・受付遅延・固定ダメージ設定。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃のClip・受付遅延・固定ダメージ設定。")]
+     [SerializeField] private AttackClipList _justAvoidAttackClips = new();
+ 
+     /// <summary>Lock-On用Clipの存在を確認し、実際に使用する弱攻撃リストを選ぶ。</summary>
+--- a/Assets/Mock/Scripts/Config/PlayerStatus.cs
++++ b/Assets/Mock/Scripts/Config/PlayerStatus.cs
+@@ -31,21 +31,37 @@
+     /// <summary>バフモード（Buff Mode）時のゲージ消費（1秒あたり）。</summary>
+     public float BuffGaugePerSecond => _buffGaugePerSecond;
+ 
++    /// <summary>疾走中の毎秒ゲージ消費量（ゲージ単位/秒）。</summary>
++    [UnityEngine.Tooltip("疾走中の毎秒ゲージ消費量（ゲージ単位/秒）。")]
+     [Header("Dash")]
+     [SerializeField, Min(0f)] private float _dashPerSecond = 25f;
+ 
++    /// <summary>幽体化を開始した瞬間に消費するゲージ量（ゲージ単位）。</summary>
++    [UnityEngine.Tooltip("幽体化を開始した瞬間に消費するゲージ量（ゲージ単位）。")]
+     [Header("Ghost / Evasion")]
+     [SerializeField, Min(0f)] private float _ghostActivationCost = 20f;
++    /// <summary>幽体化を継続する毎秒ゲージ消費量（ゲージ単位/秒）。</summary>
++    [UnityEngine.Tooltip("幽体化を継続する毎秒ゲージ消費量（ゲージ単位/秒）。")]
+     [SerializeField, Min(0f)] private float _ghostPerSecondCost = 5f;
+ 
++    /// <summary>自傷中の毎秒ゲージ消費量（ゲージ単位/秒）。HP消費とは別に支払う。</summary>
++    [UnityEngine.Tooltip("自傷中の毎秒ゲージ消費量（ゲージ単位/秒）。HP消費とは別に支払う。")]
+     [Header("Self Sacrifice")]
+     [SerializeField, Min(0f)] private float _selfSacrificeGaugePerSecond = 10f;
++    /// <summary>自傷を継続できるHP比率の下限。0〜1で最大HPに対する比率。</summary>
++    [UnityEngine.Tooltip("自傷を継続できるHP比率の下限。0〜1で最大HPに対する比率。")]
+     [SerializeField, Range(0f, 1f)] private float _selfSacrificeMinHpRatio = 0.1f;
++    /// <summary>自傷で毎秒失う最大HPの割合（%/秒）。1で最大HPの1%を毎秒失う。</summary>
++    [UnityEngine.Tooltip("自傷で毎秒失う最大HPの割合（%/秒）。1で最大HPの1%を毎秒失う。")]
+     [SerializeField, Min(0f)] private float _selfSacrificeDamagePercentPerSecond = 1f;
+ 
++    /// <summary>最大HPを1%回復するために消費するゲージ量（ゲージ単位/1%）。</summary>
++    [UnityEngine.Tooltip("最大HPを1%回復するために消費するゲージ量（ゲージ単位/1%）。")]
+     [Header("Heal")]
+     [SerializeField, Min(0f)] private float _healGaugePerPercent = 2f;
+ 
++    /// <summary>バフ用の毎秒ゲージ消費設定。使用する行動側から参照するための値。</summary>
++    [UnityEngine.Tooltip("バフ用の毎秒ゲージ消費設定。使用する行動側から参照するための値。")]
+     [Header("Buff Mode")]
+     [SerializeField, Min(0f)] private float _buffGaugePerSecond = 8f;
+ }
+@@ -121,34 +137,76 @@
+     /// </summary>
+     public JustAvoidBuffConfig JustAvoidBuffConfig => _justAvoidBuffConfig;
+ 
++    /// <summary>Playerの初期残機設定。Runの進行ではRunSessionの残機を使用する。</summary>
++    [UnityEngine.Tooltip("Playerの初期残機設定。Runの進行ではRunSessionの残機を使用する。")]
+     [Header("Basic Status")]
+     [SerializeField] private int _life = 3;
++    /// <summary>Playerの最大HP。体力初期化とHP比率計算の基準。</summary>
++    [UnityEngine.Tooltip("Playerの最大HP。体力初期化とHP比率計算の基準。")]
+     [SerializeField] private int _maxHealth = 100;
++    /// <summary>Playerの基準攻撃力。攻撃Clipや装備・バフのダメージ計算で参照する。</summary>
++    [UnityEngine.Tooltip("Playerの基準攻撃力。攻撃Clipや装備・バフのダメージ計算で参照する。")]
+     [SerializeField] private float _attackPower = 10f;
+ 
++    /// <summary>納刀中の通常移動速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("納刀中の通常移動速度（Unity単位/秒）。")]
+     [Header("Movement")]
+     [SerializeField] private float _noWeaponMoveSpeed = 5f;
++    /// <summary>納刀中の疾走速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("納刀中の疾走速度（Unity単位/秒）。")]
+     [SerializeField] private float _noWeaponSprintSpeed = 8f;
++    /// <summary>抜刀・非Lock-On時の歩行速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("抜刀・非Lock-On時の歩行速度（Unity単位/秒）。")]
+     [SerializeField] private float _unLockWalkSpeed = 5f;
++    /// <summary>抜刀・非Lock-On時の疾走速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("抜刀・非Lock-On時の疾走速度（Unity単位/秒）。")]
+     [SerializeField] private float _unLockSprintSpeed = 6f;
++    /// <summary>Lock-On中の歩行速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("Lock-On中の歩行速度（Unity単位/秒）。")]
+     [SerializeField] private float _lockOnWalkSpeed = 3f;
++    /// <summary>Lock-On中の疾走速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("Lock-On中の疾走速度（Unity単位/秒）。")]
+     [SerializeField] private float _lockOnSprintSpeed = 5f;
++    /// <summary>Playerが移動方向へ向く回転補間係数。大きいほど素早く向きを合わせる。</summary>
++    [UnityEngine.Tooltip("Playerが移動方向へ向く回転補間係数。大きいほど素早く向きを合わせる。")]
+     [SerializeField] private float _rotationSmoothness = 0.25f;
++    /// <summary>通常移動で目標速度へ近づける加速係数。</summary>
++    [UnityEngine.Tooltip("通常移動で目標速度へ近づける加速係数。")]
+     [SerializeField] private float _acceleration = 5f;
++    /// <summary>移動入力がなくなったときに速度を落とす減速係数。</summary>
++    [UnityEngine.Tooltip("移動入力がなくなったときに速度を落とす減速係数。")]
+     [SerializeField] private float _breakForce = 0.9f;
+ 
++    /// <summary>Playerスキルゲージの最大値。初期化時に使用する。</summary>
++    [UnityEngine.Tooltip("Playerスキルゲージの最大値。初期化時に使用する。")]
+     [Header("Skill Gauge")]
+     [SerializeField, Min(1f)] private float _maxSkillGauge = 100f;
++    /// <summary>ゲージ消費行動の受付制限に使う正規化閾値。0〜1で最大ゲージに対する比率。</summary>
++    [UnityEngine.Tooltip("ゲージ消費行動の受付制限に使う正規化閾値。0〜1で最大ゲージに対する比率。")]
+     [SerializeField, Range(0f, 1f)] private float _skillGaugeLockoutThresholdNormalized = 0.25f;
++    /// <summary>スキルゲージの基準自然回復量（ゲージ単位/秒）。</summary>
++    [UnityEngine.Tooltip("スキルゲージの基準自然回復量（ゲージ単位/秒）。")]
+     [SerializeField, Min(0f)] private float _skillGaugePassiveRecoveryPerSecond = 10f;
++    /// <summary>攻撃命中時の基本ゲージ回復量（ゲージ単位）。</summary>
++    [UnityEngine.Tooltip("攻撃命中時の基本ゲージ回復量（ゲージ単位）。")]
+     [SerializeField, Min(0f)] private float _skillGaugeOnAttackGain = 5f;
++    /// <summary>回避時の基本ゲージ回復量（ゲージ単位）。</summary>
++    [UnityEngine.Tooltip("回避時の基本ゲージ回復量（ゲージ単位）。")]
+     [SerializeField, Min(0f)] private float _skillGaugeOnAvoidGain = 5f;
++    /// <summary>Just Avoid成功時に追加するゲージ回復量（ゲージ単位）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時に追加するゲージ回復量（ゲージ単位）。")]
+     [SerializeField, Min(0f)] private float _skillGaugeOnJustAvoidBonus = 10f;
++    /// <summary>疾走・幽体化・自傷・回復などのゲージ消費設定。</summary>
++    [UnityEngine.Tooltip("疾走・幽体化・自傷・回復などのゲージ消費設定。")]
+     [SerializeField] private SkillGaugeCostConfig _skillGaugeCost;
+ 
++    /// <summary>現在HP比率に応じた攻撃倍率・ゲージ回復補正の参照表。</summary>
++    [UnityEngine.Tooltip("現在HP比率に応じた攻撃倍率・ゲージ回復補正の参照表。")]
+     [Header("Low HP Buff")]
+     [SerializeField] private LowHpBuffTable _lowHpBuffTable;
+ 
++    /// <summary>Just Avoid成功の累積攻撃ボーナスと最大スタックの設定。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功の累積攻撃ボーナスと最大スタックの設定。")]
+     [Header("Just-Avoid / Buffs")]
+     [SerializeField] private JustAvoidBuffConfig _justAvoidBuffConfig;
+ }
+--- a/Assets/Mock/Scripts/Config/SceneNameConfig.cs
++++ b/Assets/Mock/Scripts/Config/SceneNameConfig.cs
+@@ -5,9 +5,15 @@
+ /// <summary>TitleとGameの遷移先名を共有し、呼び出し側の文字列重複を避ける設定。</summary>
+ public class SceneNameConfig : ScriptableObject
+ {
++    /// <summary>タイトルへ戻る際にロードするScene名。Build設定のScene名と一致させる。</summary>
+     public string TitleScene => _titleScene;
++    /// <summary>戦闘開始時にロードするScene名。Build設定のScene名と一致させる。</summary>
+     public string GameScene => _gameScene;
+ 
++    /// <summary>タイトルへ戻る際にロードするScene名。Build設定のScene名と一致させる。</summary>
++    [UnityEngine.Tooltip("タイトルへ戻る際にロードするScene名。Build設定のScene名と一致させる。")]
+     [SerializeField] private string _titleScene = "TitleScene";
++    /// <summary>戦闘開始時にロードするScene名。Build設定のScene名と一致させる。</summary>
++    [UnityEngine.Tooltip("戦闘開始時にロードするScene名。Build設定のScene名と一致させる。")]
+     [SerializeField] private string _gameScene = "GameScene";
+ }
+--- a/Assets/Mock/Scripts/Config/VFXConfig.cs
++++ b/Assets/Mock/Scripts/Config/VFXConfig.cs
+@@ -4,69 +4,148 @@
+ [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
+ public class VFXConfig : ScriptableObject
+ {
++    /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
+     [Header("Just Avoid / Screen Distortion")]
+     [SerializeField] private bool _screenDistortionEnable = true;
++    /// <summary>Just Avoid画面歪みが消えるまでの時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid画面歪みが消えるまでの時間（秒）。")]
+     [SerializeField, Range(.1f, .18f)] private float _distortionDuration = .14f;
++    /// <summary>画面高さを1とした最終半径。画面の隅まで届く半径は自動で保証する。</summary>
+     [Tooltip("画面高さを1とした最終半径。画面の隅まで届く半径は自動で保証する。")]
+     [SerializeField, Min(.1f)] private float _distortionMaxRadius = 1.15f;
++    /// <summary>拡大速度の曲線。大きいほど最初に速く広がる。</summary>
+     [Tooltip("拡大速度の曲線。大きいほど最初に速く広がる。")]
+     [SerializeField, Range(1f, 3f)] private float _distortionRadiusSpeed = 1.6f;
++    /// <summary>画面歪みのリング幅。画面UVを基準にした値。</summary>
++    [UnityEngine.Tooltip("画面歪みのリング幅。画面UVを基準にした値。")]
+     [SerializeField, Range(.005f, .08f)] private float _distortionRingWidth = .03f;
++    /// <summary>リング付近の画面UVをずらす強さ。大きいほど歪みが強くなる。</summary>
++    [UnityEngine.Tooltip("リング付近の画面UVをずらす強さ。大きいほど歪みが強くなる。")]
+     [SerializeField, Range(0f, .02f)] private float _distortionStrength = .006f;
++    /// <summary>画面歪みに重ねるノイズの強さ。</summary>
++    [UnityEngine.Tooltip("画面歪みに重ねるノイズの強さ。")]
+     [SerializeField, Range(0f, .004f)] private float _distortionNoiseStrength = .001f;
++    /// <summary>画面歪みのノイズの細かさを調整する倍率。</summary>
++    [UnityEngine.Tooltip("画面歪みのノイズの細かさを調整する倍率。")]
+     [SerializeField, Range(1f, 60f)] private float _distortionNoiseScale = 24f;
++    /// <summary>画面歪みの減衰曲線の指数。消え方の速さを調整する。</summary>
++    [UnityEngine.Tooltip("画面歪みの減衰曲線の指数。消え方の速さを調整する。")]
+     [SerializeField, Range(.5f, 4f)] private float _distortionFadePower = 1.5f;
++    /// <summary>画面歪みの縁に加える色。</summary>
++    [UnityEngine.Tooltip("画面歪みの縁に加える色。")]
+     [SerializeField] private Color _distortionEdgeTint = new Color(.9f, .95f, 1f, 1f);
++    /// <summary>画面歪みの縁色を加える強さ。</summary>
++    [UnityEngine.Tooltip("画面歪みの縁色を加える強さ。")]
+     [SerializeField, Range(0f, .05f)] private float _distortionEdgeTintStrength;
++    /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
+     public bool ScreenDistortionEnable => _screenDistortionEnable;
++    /// <summary>Just Avoid画面歪みが消えるまでの時間（秒）。</summary>
+     public float DistortionDuration => _distortionDuration;
++    /// <summary>画面高さを1とした最終半径。画面の隅まで届く半径は自動で保証する。</summary>
+     public float DistortionMaxRadius => _distortionMaxRadius;
++    /// <summary>拡大速度の曲線。大きいほど最初に速く広がる。</summary>
+     public float DistortionRadiusSpeed => _distortionRadiusSpeed;
++    /// <summary>画面歪みのリング幅。画面UVを基準にした値。</summary>
+     public float DistortionRingWidth => _distortionRingWidth;
++    /// <summary>リング付近の画面UVをずらす強さ。大きいほど歪みが強くなる。</summary>
+     public float DistortionStrength => _distortionStrength;
++    /// <summary>画面歪みに重ねるノイズの強さ。</summary>
+     public float DistortionNoiseStrength => _distortionNoiseStrength;
++    /// <summary>画面歪みのノイズの細かさを調整する倍率。</summary>
+     public float DistortionNoiseScale => _distortionNoiseScale;
++    /// <summary>画面歪みの減衰曲線の指数。消え方の速さを調整する。</summary>
+     public float DistortionFadePower => _distortionFadePower;
++    /// <summary>画面歪みの縁に加える色。</summary>
+     public Color DistortionEdgeTint => _distortionEdgeTint;
++    /// <summary>画面歪みの縁色を加える強さ。</summary>
+     public float DistortionEdgeTintStrength => _distortionEdgeTintStrength;
++    /// <summary>薄い円形衝撃波のParticleSystem Prefab。未設定なら衝撃波のみ省略。自動破棄スクリプトは付けない。</summary>
+     [Header("ジャスト回避")]
+     [Tooltip("薄い円形衝撃波のParticleSystem Prefab。未設定なら衝撃波のみ省略。自動破棄スクリプトは付けない。")]
+     [SerializeField] private GameObject _justAvoidShockwavePrefab;
++    /// <summary>従来Particle Shockwaveの寿命（秒）。旧演出互換の設定。</summary>
++    [UnityEngine.Tooltip("従来Particle Shockwaveの寿命（秒）。旧演出互換の設定。")]
+     [SerializeField, Min(.01f)] private float _shockwaveDuration = .25f;
++    /// <summary>従来Particle Shockwaveの有効設定。画面歪みとは別の旧演出設定。</summary>
++    [UnityEngine.Tooltip("従来Particle Shockwaveの有効設定。画面歪みとは別の旧演出設定。")]
+     [SerializeField] private bool _shockwaveEnable;
++    /// <summary>従来Particle Shockwaveの強度設定。</summary>
++    [UnityEngine.Tooltip("従来Particle Shockwaveの強度設定。")]
+     [SerializeField, Range(0f, 1f)] private float _shockwaveStrength = .2f;
++    /// <summary>従来Particle Shockwaveのサイズ倍率。</summary>
++    [UnityEngine.Tooltip("従来Particle Shockwaveのサイズ倍率。")]
+     [SerializeField, Min(.01f)] private float _shockwaveSize = .5f;
++    /// <summary>追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。</summary>
+     [Header("命中")]
+     [Tooltip("追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。")]
+     [SerializeField] private GameObject _hitVFX;
++    /// <summary>命中VFXの再生後に片付けるまでの時間（秒）。</summary>
++    [UnityEngine.Tooltip("命中VFXの再生後に片付けるまでの時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _hitVFXDuration = .32f;
++    /// <summary>強攻撃の粒子数倍率。PrefabのBurst数を基準に毎回適用する。</summary>
+     [Tooltip("強攻撃の粒子数倍率。PrefabのBurst数を基準に毎回適用する。")]
+     [SerializeField, Range(1f, 1.6f)] private float _heavyHitVFXAmount = 1.45f;
++    /// <summary>Heavy命中VFXの粒子の広がり補正。</summary>
++    [UnityEngine.Tooltip("Heavy命中VFXの粒子の広がり補正。")]
+     [SerializeField, Range(1f, 1.3f)] private float _heavyHitVFXSpread = 1.15f;
++    /// <summary>Heavy命中VFXの粒子サイズ補正。</summary>
++    [UnityEngine.Tooltip("Heavy命中VFXの粒子サイズ補正。")]
+     [SerializeField, Range(1f, 1.2f)] private float _heavyHitVFXSize = 1.1f;
++    /// <summary>Heavy命中VFXオブジェクト全体のScale倍率。</summary>
++    [UnityEngine.Tooltip("Heavy命中VFXオブジェクト全体のScale倍率。")]
+     [SerializeField, Range(1f, 1.4f)] private float _heavyHitVFXScale = 1.3f;
++    /// <summary>Heavy命中VFXの粒子速度補正。</summary>
++    [UnityEngine.Tooltip("Heavy命中VFXの粒子速度補正。")]
+     [SerializeField, Range(1f, 1.3f)] private float _heavyHitVFXSpeed = 1.2f;
++    /// <summary>Heavy命中VFXオブジェクト全体のScale倍率。</summary>
+     public float HeavyHitVFXScale => _heavyHitVFXScale;
++    /// <summary>Heavy命中VFXの粒子速度補正。</summary>
+     public float HeavyHitVFXSpeed => _heavyHitVFXSpeed;
++    /// <summary>強攻撃の粒子数倍率。PrefabのBurst数を基準に毎回適用する。</summary>
+     public float HeavyHitVFXAmount => _heavyHitVFXAmount;
++    /// <summary>Heavy命中VFXの粒子の広がり補正。</summary>
+     public float HeavyHitVFXSpread => _heavyHitVFXSpread;
++    /// <summary>Heavy命中VFXの粒子サイズ補正。</summary>
+     public float HeavyHitVFXSize => _heavyHitVFXSize;
++    /// <summary>Just Avoid追撃命中VFXの粒子速度補正。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃命中VFXの粒子速度補正。")]
+     [Header("Just Avoid Counter / Blood")]
+     [SerializeField, Range(1f, 1.4f)] private float _counterHitVFXSpeed = 1.3f;
++    /// <summary>Just Avoid追撃命中VFXの粒子サイズ補正。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃命中VFXの粒子サイズ補正。")]
+     [SerializeField, Range(1f, 1.2f)] private float _counterHitVFXSize = 1.05f;
++    /// <summary>Just Avoid追撃命中VFXの粒子速度補正。</summary>
+     public float CounterHitVFXSpeed => _counterHitVFXSpeed;
++    /// <summary>Just Avoid追撃命中VFXの粒子サイズ補正。</summary>
+     public float CounterHitVFXSize => _counterHitVFXSize;
++    /// <summary>追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。</summary>
+     public GameObject HitVFX => _hitVFX;
++    /// <summary>命中VFXの再生後に片付けるまでの時間（秒）。</summary>
+     public float HitVFXDuration => _hitVFXDuration;
++    /// <summary>従来Particle Shockwaveの有効設定。画面歪みとは別の旧演出設定。</summary>
+     public bool ShockwaveEnable => _shockwaveEnable;
++    /// <summary>従来Particle Shockwaveの強度設定。</summary>
+     public float ShockwaveStrength => _shockwaveStrength;
++    /// <summary>従来Particle Shockwaveのサイズ倍率。</summary>
+     public float ShockwaveSize => _shockwaveSize;
++    /// <summary>薄い円形衝撃波のParticleSystem Prefab。未設定なら衝撃波のみ省略。自動破棄スクリプトは付けない。</summary>
+     public GameObject JustAvoidShockwavePrefab => _justAvoidShockwavePrefab;
++    /// <summary>従来Particle Shockwaveの寿命（秒）。旧演出互換の設定。</summary>
+     public float ShockwaveDuration => _shockwaveDuration;
++    /// <summary>CharacterEffectに登録した回復Effectの再生名。</summary>
+     public string PlayEffectHeal => _playEffectHeal;
++    /// <summary>CharacterEffectに登録した幽体化Effectの再生名。</summary>
+     public string PlayEffectGhost => _playEffectGhost;
++    /// <summary>CharacterEffectに登録したバフEffectの再生名。</summary>
+     public string PlayEffectBuff => _playEffectBuff;
++    /// <summary>CharacterEffectに登録した回復Effectの再生名。</summary>
++    [UnityEngine.Tooltip("CharacterEffectに登録した回復Effectの再生名。")]
+     [SerializeField] private string _playEffectHeal;
++    /// <summary>CharacterEffectに登録した幽体化Effectの再生名。</summary>
++    [UnityEngine.Tooltip("CharacterEffectに登録した幽体化Effectの再生名。")]
+     [SerializeField] private string _playEffectGhost;
++    /// <summary>CharacterEffectに登録したバフEffectの再生名。</summary>
++    [UnityEngine.Tooltip("CharacterEffectに登録したバフEffectの再生名。")]
+     [SerializeField] private string _playEffectBuff;
+ }
+--- a/Assets/Mock/Scripts/Enemy/EnemyController.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyController.cs
+@@ -13,29 +13,51 @@
+     /// </summary>
+     public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
+ 
++    /// <summary>EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。</summary>
++    [UnityEngine.Tooltip("EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。")]
+     [Header("Enemy Status")]
+     [SerializeField] private EnemyStuts _enemyStuts;
++    /// <summary>Enemy Animatorのパラメータ名を共有する設定参照。</summary>
++    [UnityEngine.Tooltip("Enemy Animatorのパラメータ名を共有する設定参照。")]
+     [SerializeField] private AnimationName _animName;
+ 
++    /// <summary>Enemyの武器攻撃判定Collider。Animation Eventと死亡処理でON/OFFする。</summary>
++    [UnityEngine.Tooltip("Enemyの武器攻撃判定Collider。Animation Eventと死亡処理でON/OFFする。")]
+     [Header("Weapon")]
+     [SerializeField] private Collider[] _enemyWeaponColliders;
++    /// <summary>Player武器との接触を調整するために参照するCollider一覧。</summary>
++    [UnityEngine.Tooltip("Player武器との接触を調整するために参照するCollider一覧。")]
+     [SerializeField] private Collider[] _playerWeaponColliders;
+ 
++    /// <summary>Enemy本体のAnimator。攻撃・移動・死亡・Root Motionの状態を取得する。</summary>
++    [UnityEngine.Tooltip("Enemy本体のAnimator。攻撃・移動・死亡・Root Motionの状態を取得する。")]
+     [Header("Attack")]
+     [SerializeField] private Animator _animator;
++    /// <summary>行動種類に対応する攻撃Trigger・Damageの設定一覧。</summary>
++    [UnityEngine.Tooltip("行動種類に対応する攻撃Trigger・Damageの設定一覧。")]
+     [SerializeField] private EnemyAttackData[] _attackData;
+ 
++    /// <summary>距離帯別の行動候補・抽選重みを定義したAI設定。</summary>
++    [UnityEngine.Tooltip("距離帯別の行動候補・抽選重みを定義したAI設定。")]
+     [Header("AI")]
+     [SerializeField] private EnemyDecisionConfig _decisionConfig;
++    /// <summary>後退行動でPlayerから離れる目標距離（Unity単位）。</summary>
++    [UnityEngine.Tooltip("後退行動でPlayerから離れる目標距離（Unity単位）。")]
+     [SerializeField] private float _stepBackDistance = 2f;
+ 
++    /// <summary>Enemyの登録済み見た目Effectを再生するコンポーネント参照。</summary>
++    [UnityEngine.Tooltip("Enemyの登録済み見た目Effectを再生するコンポーネント参照。")]
+     [SerializeField] private CharacterEffect _characterEffect;
++    /// <summary>旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。</summary>
++    [UnityEngine.Tooltip("旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。")]
+     [SerializeField] private int _enemyDeadDelay = 2000;
+ 
+     private EnemyAnimationController _enemyAnimController;
+     private EnemyHealth _health;
+     private EnemyAttacker _attacker;
+     private EnemyMover _mover;
++    /// <summary>Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
++    [UnityEngine.Tooltip("Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
+     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
+     private int _attackAnimationHash;
+     /// <summary>Root Motionを所有する攻撃Stateが記録されているか。通常被弾の表示量の調整に使用する。</summary>
+--- a/Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs
++++ b/Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs
+@@ -4,5 +4,7 @@
+ /// <summary>InspectorでEnemyAttackDataのサンプル参照一覧を保持する補助コンポーネント。攻撃の実行処理は持たない。</summary>
+ public class SampleEnemyAttacks　: MonoBehaviour 
+ {
++    /// <summary>Enemy攻撃設定のサンプル参照一覧。各要素にEnemyAttackDataを割り当てる。</summary>
++    [UnityEngine.Tooltip("Enemy攻撃設定のサンプル参照一覧。各要素にEnemyAttackDataを割り当てる。")]
+     public EnemyAttackData[] attacks;
+ }
+--- a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+@@ -6,31 +6,62 @@
+ {
+     [Header("Ghost shimmer")]
+     /// <summary> ゴースト表示時の色。 </summary>
++    [UnityEngine.Tooltip("幽体化中の体色と透明度。")]
+     [SerializeField] private Color _ghostTint = new Color(.66f, .78f, .8f, .35f);
+     /// <summary>
+     /// ゴースト表示時の揺れの大きさ。値が大きいほど揺れが大きくなる。
+     /// </summary>
++    [UnityEngine.Tooltip("幽体化中の輪郭の揺れ幅。大きいほど揺れが目立つ。")]
+     [SerializeField, Range(0f, .03f)] private float _ghostSway = .009f;
+     /// <summary>
+     /// ゴースト表示時の流れる速度。値が大きいほど流れが速くなる。
+     /// </summary>
++    [UnityEngine.Tooltip("幽体化の輪郭を流す速度倍率。")]
+     [SerializeField, Range(.1f, 4f)] private float _ghostFlowSpeed = 1.2f;
++    /// <summary>Just Avoid成功時の固定残像を表示する時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の固定残像を表示する時間（秒）。")]
+     [Header("ジャスト回避")]
+     [SerializeField, Min(.01f)] private float _afterImageDuration = .3f;
++    /// <summary>Just Avoid成功時の残像Flashの継続時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の残像Flashの継続時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _flashDuration = .15f;
++    /// <summary>Just Avoid成功時の固定残像の色と初期透明度。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の固定残像の色と初期透明度。")]
+     [SerializeField] private Color _afterImageTint = new Color(.75f, .9f, 1f, .3f);
++    /// <summary>Just Avoid成功時の残像Flashの色と初期透明度。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の残像Flashの色と初期透明度。")]
+     [SerializeField] private Color _flashTint = new Color(.85f, .95f, 1f, .65f);
++    /// <summary>命中時に体へ加えるFlashの継続時間（秒）。</summary>
++    [UnityEngine.Tooltip("命中時に体へ加えるFlashの継続時間（秒）。")]
+     [Header("接触フィードバック")]
+     [SerializeField, Min(.01f)] private float _hitFlashDuration = .09f;
++    /// <summary>Just Avoid成功時の小さなFlashの継続時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の小さなFlashの継続時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _justAvoidFlashDuration = .09f;
++    /// <summary>Just Avoid成功時の小さなFlashのサイズ（Unity単位）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時の小さなFlashのサイズ（Unity単位）。")]
+     [SerializeField, Min(.01f)] private float _justAvoidFlashSize = .35f;
++    /// <summary>通常Light命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。</summary>
++    [UnityEngine.Tooltip("通常Light命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。")]
+     [SerializeField, Range(0f, 20f)] private float _lightReactionAngle = 5f;
++    /// <summary>通常Heavy命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。</summary>
++    [UnityEngine.Tooltip("通常Heavy命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。")]
+     [SerializeField, Range(0f, 25f)] private float _heavyReactionAngle = 10f;
++    /// <summary>通常命中の局所的な体の反応時間（秒）。</summary>
++    [UnityEngine.Tooltip("通常命中の局所的な体の反応時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _reactionDuration = .18f;
++    /// <summary>Enemyが通常Heavyを受けた際の局所反応時間（秒）。</summary>
++    [UnityEngine.Tooltip("Enemyが通常Heavyを受けた際の局所反応時間（秒）。")]
+     [Header("Enemy normal hit presentation only")]
+     [SerializeField, Range(.18f, .25f)] private float _enemyHeavyReactionDuration = .22f;
++    /// <summary>Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。</summary>
++    [UnityEngine.Tooltip("Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。")]
+     [SerializeField, Range(.3f, 1f)] private float _enemyAttackReactionScale = .55f;
++    /// <summary>EnemyへLightが命中した際の体Flashの強さ。</summary>
++    [UnityEngine.Tooltip("EnemyへLightが命中した際の体Flashの強さ。")]
+     [SerializeField, Range(0f, .5f)] private float _enemyLightFlashStrength = .18f;
++    /// <summary>EnemyへHeavyが命中した際の体Flashの強さ。</summary>
++    [UnityEngine.Tooltip("EnemyへHeavyが命中した際の体Flashの強さ。")]
+     [SerializeField, Range(0f, .5f)] private float _enemyHeavyFlashStrength = .28f;
+     private EnemyController _enemyOwner;
+     private EnemyAnimationController _enemyAnimation;
+@@ -40,6 +71,8 @@
+     private Material _normalFlashMaterial;
+     private float _normalFlashUntil, _normalFlashLength;
+     private bool _normalFlashHeavy;
++    /// <summary>Just Avoid成功時に体へ加えるFlashの強さ。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時に体へ加えるFlashの強さ。")]
+     [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
+     private Vector3 _reactionEuler;
+     private CameraManager _cameraFeedback;
+--- a/Assets/Mock/Scripts/Feedback/DamageNumbers.cs
++++ b/Assets/Mock/Scripts/Feedback/DamageNumbers.cs
+@@ -4,18 +4,37 @@
+ /// <summary>シーンに配置したキャンバスと文字テンプレートを使い、戦闘前に一度だけ表示用プールを準備する。</summary>
+ public sealed class DamageNumbers : MonoBehaviour
+ {
++    /// <summary>ダメージ数字のUIを生成・配置する親RectTransform。</summary>
++    [UnityEngine.Tooltip("ダメージ数字のUIを生成・配置する親RectTransform。")]
+     [Header("uGUI references")]
+     [SerializeField] private RectTransform _container;
++    /// <summary>通常命中のダメージ数字に使うTMPテンプレート。</summary>
++    [UnityEngine.Tooltip("通常命中のダメージ数字に使うTMPテンプレート。")]
+     [SerializeField] private TMP_Text _normalTemplate;
++    /// <summary>強い命中のダメージ数字に使う必須TMPテンプレート。通常用と両方割り当てる。</summary>
++    [UnityEngine.Tooltip("強い命中のダメージ数字に使う必須TMPテンプレート。通常用と両方割り当てる。")]
+     [SerializeField] private TMP_Text _criticalTemplate;
++    /// <summary>命中のワールド位置を画面座標へ変換するCamera。</summary>
++    [UnityEngine.Tooltip("命中のワールド位置を画面座標へ変換するCamera。")]
+     [SerializeField] private Camera _camera;
++    /// <summary>ダメージ数字を表示して消すまでの時間（秒）。</summary>
++    [UnityEngine.Tooltip("ダメージ数字を表示して消すまでの時間（秒）。")]
+     [Header("Motion")]
+     [SerializeField, Min(.05f)] private float _lifetime = .85f;
++    /// <summary>命中位置へ加えるワールド座標の表示ずらし（Unity単位）。</summary>
++    [UnityEngine.Tooltip("命中位置へ加えるワールド座標の表示ずらし（Unity単位）。")]
+     [SerializeField] private Vector3 _worldOffset = new Vector3(0, 1.85f, 0);
++    /// <summary>画面へ投影した後に加えるUI座標の表示ずらし。</summary>
++    [UnityEngine.Tooltip("画面へ投影した後に加えるUI座標の表示ずらし。")]
+     [SerializeField] private Vector2 _screenOffset;
+-    [Tooltip("Random offset range in UI local units. Set both values to zero to disable.")]
++    /// <summary>数字の表示位置に加えるランダムなずらし幅（UIローカル単位）。両成分を0にすると無効。</summary>
++    [Tooltip("数字の表示位置に加えるランダムなずらし幅（UIローカル単位）。両成分を0にすると無効。")]
+     [SerializeField] private Vector2 _randomOffsetRange = new Vector2(24f, 12f);
++    /// <summary>数字の投影元ワールド位置が上昇する速度（Unity単位/秒）。その位置を毎フレーム画面へ投影する。</summary>
++    [UnityEngine.Tooltip("数字の投影元ワールド位置が上昇する速度（Unity単位/秒）。その位置を毎フレーム画面へ投影する。")]
+     [SerializeField] private float _riseSpeed = .8f;
++    /// <summary>初期化時に用意するダメージ数字のプール数。</summary>
++    [UnityEngine.Tooltip("初期化時に用意するダメージ数字のプール数。")]
+     [SerializeField, Range(1, 128)] private int _poolSize = 32;
+     private TMP_Text[] normal, critical;
+     private TMP_Text[] active;
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs
+@@ -6,9 +6,17 @@
+ [DisallowMultipleComponent, RequireComponent(typeof(CameraManager))]
+ public sealed class JustAvoidContrast : MonoBehaviour
+ {
++    /// <summary>Just Avoid成功専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。")]
+     [SerializeField] private Volume _volume;
++    /// <summary>Just Avoid成功から完全モノクロへ移行する時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功から完全モノクロへ移行する時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _enter = .02f;
++    /// <summary>完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。</summary>
++    [UnityEngine.Tooltip("完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。")]
+     [SerializeField, Min(0)] private float _hold = .08f;
++    /// <summary>完全モノクロから元の色へ戻す時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("完全モノクロから元の色へ戻す時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _restore = .20f;
+     private JustAvoidEnvelope _envelope;
+     private AudioManager _audio;
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs
+@@ -7,6 +7,8 @@
+ [DisallowMultipleComponent, RequireComponent(typeof(CameraManager))]
+ public sealed class JustAvoidScreenDistortion : MonoBehaviour
+ {
++    /// <summary>Just Avoid画面歪みのCustom Pass描画に使うMaterial参照。</summary>
++    [UnityEngine.Tooltip("Just Avoid画面歪みのCustom Pass描画に使うMaterial参照。")]
+     [SerializeField] private Material _material;
+     private CameraManager _manager;
+     private DistortionPass _pass;
+--- a/Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs
++++ b/Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs
+@@ -20,12 +20,26 @@
+         }
+         return animationEvent.animatorStateInfo.fullPathHash == current.fullPathHash;
+     }
++    /// <summary>この攻撃State専用のAnimator速度Floatパラメータ名。他のコンボ段階と共有しない。</summary>
++    [UnityEngine.Tooltip("この攻撃State専用のAnimator速度Floatパラメータ名。他のコンボ段階と共有しない。")]
+     [SerializeField] private string _speedParameter;
++    /// <summary>振りかぶり区間のアニメーション速度倍率。1でClip本来の速度。</summary>
++    [UnityEngine.Tooltip("振りかぶり区間のアニメーション速度倍率。1でClip本来の速度。")]
+     [SerializeField, Range(.5f, 1.5f)] private float _windupSpeed = .95f;
++    /// <summary>斬撃区間のアニメーション速度倍率。1でClip本来の速度。</summary>
++    [UnityEngine.Tooltip("斬撃区間のアニメーション速度倍率。1でClip本来の速度。")]
+     [SerializeField, Range(.5f, 1.5f)] private float _slashSpeed = 1.15f;
++    /// <summary>攻撃後の回復区間のアニメーション速度倍率。1でClip本来の速度。</summary>
++    [UnityEngine.Tooltip("攻撃後の回復区間のアニメーション速度倍率。1でClip本来の速度。")]
+     [SerializeField, Range(.5f, 1.5f)] private float _recoverySpeed = 1f;
++    /// <summary>斬撃速度へ切り替えるClipの正規化時刻（0〜1）。</summary>
++    [UnityEngine.Tooltip("斬撃速度へ切り替えるClipの正規化時刻（0〜1）。")]
+     [SerializeField, Range(0f, 1f)] private float _slashStart;
++    /// <summary>斬撃区間が終わるClipの正規化時刻（0〜1）。ここから回復速度へ補間する。</summary>
++    [UnityEngine.Tooltip("斬撃区間が終わるClipの正規化時刻（0〜1）。ここから回復速度へ補間する。")]
+     [SerializeField, Range(0f, 1f)] private float _slashEnd;
++    /// <summary>回復速度への補間が完了するClipの正規化時刻（0〜1）。</summary>
++    [UnityEngine.Tooltip("回復速度への補間が完了するClipの正規化時刻（0〜1）。")]
+     [SerializeField, Range(0f, 1f)] private float _recoveryStart;
+ 
+     /// <summary>Clipの正規化時刻から振りかぶり・斬撃・回復の速度倍率を選び、斬撃後は滑らかに補間する。</summary>
+--- a/Assets/Mock/Scripts/Feedback/SwordTrail.cs
++++ b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+@@ -6,26 +6,56 @@
+ {
+     /// <summary>通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。</summary>
+     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
++    /// <summary>通常攻撃の刀軌跡を残す時間（秒）。</summary>
++    [UnityEngine.Tooltip("通常攻撃の刀軌跡を残す時間（秒）。")]
+     [Header("刀身の軌跡")]
+     [SerializeField, Min(.01f)] private float _duration = .11f;
++    /// <summary>刀身の根元を示すTransform。刃先との間を軌跡の幅として使う。</summary>
++    [UnityEngine.Tooltip("刀身の根元を示すTransform。刃先との間を軌跡の幅として使う。")]
+     [SerializeField] private Transform _bladeBase;
++    /// <summary>刀の刃先を示すTransform。刀身の軌跡の外側を生成する。</summary>
++    [UnityEngine.Tooltip("刀の刃先を示すTransform。刀身の軌跡の外側を生成する。")]
+     [SerializeField] private Transform _tip;
++    /// <summary>実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。</summary>
+     [Tooltip("実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。")]
+     [SerializeField, Range(0f, 1f)] private float _bladeTrailStart = .48f;
++    /// <summary>同じ刀の複数Colliderは、代表となるSwordTrailを共有する。</summary>
+     [Tooltip("同じ刀の複数Colliderは、代表となるSwordTrailを共有する。")]
+     [SerializeField] private SwordTrail _sharedTrail;
++    /// <summary>刀軌跡を描画するMaterial参照。未設定なら対応ShaderからMaterialを生成する。</summary>
++    [UnityEngine.Tooltip("刀軌跡を描画するMaterial参照。未設定なら対応ShaderからMaterialを生成する。")]
+     [SerializeField] private Material _trailMaterial;
++    /// <summary>通常攻撃の軌跡の明るさ倍率。</summary>
++    [UnityEngine.Tooltip("通常攻撃の軌跡の明るさ倍率。")]
+     [SerializeField, Range(0f, 2f)] private float _brightness = .8f;
++    /// <summary>時間経過で軌跡を消すFade曲線の指数。</summary>
++    [UnityEngine.Tooltip("時間経過で軌跡を消すFade曲線の指数。")]
+     [SerializeField, Min(.1f)] private float _fade = 1.5f;
++    /// <summary>刀軌跡の基準色と透明度。</summary>
++    [UnityEngine.Tooltip("刀軌跡の基準色と透明度。")]
+     [SerializeField] private Color _color = new Color(.78f, .9f, 1f, .32f);
++    /// <summary>軌跡を出し始める刀の最低速度（Unity単位/秒）。低速の三角形を抑える。</summary>
++    [UnityEngine.Tooltip("軌跡を出し始める刀の最低速度（Unity単位/秒）。低速の三角形を抑える。")]
+     [Header("振りの速度 / 攻撃差")]
+     [SerializeField, Min(0f)] private float _minimumSpeed = 3.5f;
++    /// <summary>軌跡の表示強度が最大になる刀の速度（Unity単位/秒）。</summary>
++    [UnityEngine.Tooltip("軌跡の表示強度が最大になる刀の速度（Unity単位/秒）。")]
+     [SerializeField, Min(.1f)] private float _fullSpeed = 16f;
++    /// <summary>Heavy攻撃の刀軌跡を残す時間（秒）。</summary>
++    [UnityEngine.Tooltip("Heavy攻撃の刀軌跡を残す時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _heavyDuration = .13f;
++    /// <summary>Just Avoid追撃の刀軌跡を残す時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃の刀軌跡を残す時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _counterDuration = .15f;
++    /// <summary>通常の明るさへ掛けるHeavy攻撃の追加倍率。</summary>
++    [UnityEngine.Tooltip("通常の明るさへ掛けるHeavy攻撃の追加倍率。")]
+     [SerializeField, Range(1f, 2f)] private float _heavyBrightness = 1.18f;
++    /// <summary>通常の明るさへ掛けるJust Avoid追撃の追加倍率。</summary>
++    [UnityEngine.Tooltip("通常の明るさへ掛けるJust Avoid追撃の追加倍率。")]
+     [SerializeField, Range(1f, 2f)] private float _counterBrightness = 1.35f;
+     // 旧Prefabの幅設定を保持する。端点未設定の場合だけ使う。
++    /// <summary>刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。</summary>
++    [UnityEngine.Tooltip("刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。")]
+     [SerializeField, HideInInspector] private float _width = .045f;
+     private const int Capacity = 40;
+     private readonly Vector3[] bases = new Vector3[Capacity], tips = new Vector3[Capacity];
+--- a/Assets/Mock/Scripts/Feedback/VictoryContrast.cs
++++ b/Assets/Mock/Scripts/Feedback/VictoryContrast.cs
+@@ -6,9 +6,17 @@
+ [DisallowMultipleComponent]
+ public sealed class VictoryContrast : MonoBehaviour
+ {
++    /// <summary>勝利専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。</summary>
++    [UnityEngine.Tooltip("勝利専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。")]
+     [SerializeField] private Volume _volume;
++    /// <summary>勝利から完全モノクロへ移行する時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("勝利から完全モノクロへ移行する時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _enter = .04f;
++    /// <summary>完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。</summary>
++    [UnityEngine.Tooltip("完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。")]
+     [SerializeField, Min(0)] private float _hold = 2.08f;
++    /// <summary>完全モノクロから元の色へ戻す時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("完全モノクロから元の色へ戻す時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _restore = .45f;
+     private JustAvoidEnvelope _envelope;
+     /// <summary>現在の重みから勝利用モノクロを開始する。時間倍率や共有Profileには書き込まない。</summary>
+--- a/Assets/Mock/Scripts/Managers/AudioManager.cs
++++ b/Assets/Mock/Scripts/Managers/AudioManager.cs
+@@ -6,7 +6,11 @@
+ [System.Serializable]
+ public class SoundData
+ {
++    /// <summary>AudioManagerからClipを検索する登録名。AudioConfigやAnimation Eventの指定名と一致させる。</summary>
++    [UnityEngine.Tooltip("AudioManagerからClipを検索する登録名。AudioConfigやAnimation Eventの指定名と一致させる。")]
+     public string name;      // サウンドの名前（識別用）。
++    /// <summary>この登録名で再生するAudioClip。</summary>
++    [UnityEngine.Tooltip("この登録名で再生するAudioClip。")]
+     public AudioClip clip;   // 再生する AudioClip。
+ }
+ 
+@@ -14,23 +18,42 @@
+ public class AudioManager : MonoBehaviour
+ {
+     public static AudioManager Instance { get; private set; }
++    /// <summary>タイトル・戦闘・命中などの再生登録名を共有する設定。</summary>
+     public AudioConfig AudioConfig => _audioConfig; 
+ 
++    /// <summary>単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。</summary>
++    [UnityEngine.Tooltip("単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。")]
+     [Header("BGM 用 AudioSource")]
+     [SerializeField] private AudioSource bgmSource;
++    /// <summary>BGMを再生するAudioSource一覧。各チャンネルの基準音量へ一時Ducking倍率を掛ける。</summary>
++    [UnityEngine.Tooltip("BGMを再生するAudioSource一覧。各チャンネルの基準音量へ一時Ducking倍率を掛ける。")]
+     [Header("BGM 用 AudioSources (複数チャンネル対応)")]
+     [SerializeField] private List<AudioSource> bgmSources = new List<AudioSource>();
++    /// <summary>SEプールを生成するAudioSource Prefab。SE再生用のSource設定を引き継ぐ。</summary>
++    [UnityEngine.Tooltip("SEプールを生成するAudioSource Prefab。SE再生用のSource設定を引き継ぐ。")]
+     [Header("SE 用 AudioSource (Prefab)")]
+     [SerializeField] private AudioSource sfxSourcePrefab;
++    /// <summary>BGMの登録名とAudioClipの対応一覧。登録名からClipを検索する。</summary>
++    [UnityEngine.Tooltip("BGMの登録名とAudioClipの対応一覧。登録名からClipを検索する。")]
+     [Header("BGM リスト")]
+     [SerializeField] private List<SoundData> bgmList = new List<SoundData>();
++    /// <summary>SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。</summary>
++    [UnityEngine.Tooltip("SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。")]
+     [Header("SE リスト")]
+     [SerializeField] private List<SoundData> seList = new List<SoundData>();
++    /// <summary>初期化時に用意するSE用AudioSource数。</summary>
++    [UnityEngine.Tooltip("初期化時に用意するSE用AudioSource数。")]
+     [Header("SFX プールサイズ")]
+     [SerializeField] private int sfxPoolSize = 10;
++    /// <summary>SE用AudioSourceプールの最大数。同時再生で増やせる上限。</summary>
++    [UnityEngine.Tooltip("SE用AudioSourceプールの最大数。同時再生で増やせる上限。")]
+     [SerializeField, Min(1)] private int maxSfxPoolSize = 32;
++    /// <summary>タイトル・戦闘・命中などの再生登録名を共有する設定。</summary>
++    [UnityEngine.Tooltip("タイトル・戦闘・命中などの再生登録名を共有する設定。")]
+     [Header("オーディオ設定")]
+     [SerializeField] private AudioConfig _audioConfig;
++    /// <summary>敗北演出のローパスを適用するAudioListener参照。</summary>
++    [UnityEngine.Tooltip("敗北演出のローパスを適用するAudioListener参照。")]
+     [SerializeField] private AudioListener _audioListener;
+ 
+     private Dictionary<string, AudioClip> _bgmDict = new Dictionary<string, AudioClip>();
+@@ -38,12 +61,22 @@
+     private List<AudioSource> _sfxPool = new List<AudioSource>();
+ 
+     private AudioLowPassFilter _lowPass;
++    /// <summary>初期化で確保するBGMチャンネル数。複数BGMの切り替えに使用する。</summary>
++    [UnityEngine.Tooltip("初期化で確保するBGMチャンネル数。複数BGMの切り替えに使用する。")]
+     [SerializeField, Min(3)] private int _bgmChannelCount = 3;
+     private bool _initialized;
++    /// <summary>Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。")]
+     [Header("Just Avoid BGM Duck (unscaled seconds)")]
+     [SerializeField, Range(0, 1)] private float _justAvoidDuckVolume = .25f;
++    /// <summary>BGMが一時音量へ下がる時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("BGMが一時音量へ下がる時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _justAvoidDuckEnter = .03f;
++    /// <summary>Just Avoidの一時BGM音量を保持する時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoidの一時BGM音量を保持する時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _justAvoidDuckHold = .10f;
++    /// <summary>BGMが基準音量へ戻る時間（実時間の秒）。停止済みBGMを再開しない。</summary>
++    [UnityEngine.Tooltip("BGMが基準音量へ戻る時間（実時間の秒）。停止済みBGMを再開しない。")]
+     [SerializeField, Min(0)] private float _justAvoidDuckRestore = .18f;
+     private readonly Dictionary<AudioSource, float> _bgmBaseVolumes = new();
+     private JustAvoidEnvelope _duckEnvelope;
+--- a/Assets/Mock/Scripts/Managers/FinalBlowManager.cs
++++ b/Assets/Mock/Scripts/Managers/FinalBlowManager.cs
+@@ -12,19 +12,44 @@
+ {
+     public static FinalBlowManager Instance { get; private set; }
+ 
++    /// <summary>Final Blow開始時に再生するEnemy死亡SEの登録名設定。</summary>
++    [UnityEngine.Tooltip("Final Blow開始時に再生するEnemy死亡SEの登録名設定。")]
+     [SerializeField] private AudioConfig _audioConfig;
++    /// <summary>勝利時に納刀・一時速度解除を要求するPlayer参照。</summary>
++    [UnityEngine.Tooltip("勝利時に納刀・一時速度解除を要求するPlayer参照。")]
+     [SerializeField] private PlayerController _player;
++    /// <summary>最後のHitStopと一時速度解除の対象Enemy参照。</summary>
++    [UnityEngine.Tooltip("最後のHitStopと一時速度解除の対象Enemy参照。")]
+     [SerializeField] private EnemyController _enemyController;
++    /// <summary>最終Hitの停止・スローを維持する時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("最終Hitの停止・スローを維持する時間（実時間の秒）。")]
+     [SerializeField] private float _phase1HitStop = 0.2f;
++    /// <summary>最終Hitの白Flashの継続時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("最終Hitの白Flashの継続時間（実時間の秒）。")]
+     [SerializeField, Range(.08f, .12f)] private float _whiteFlashDuration = .10f;
++    /// <summary>納刀開始からScene Fade開始まで。納刀Clip 2.07秒を見せる。</summary>
+     [Tooltip("納刀開始からScene Fade開始まで。納刀Clip 2.07秒を見せる。")]
+     [SerializeField, Min(0f)] private float _phase2Duration = 2.3f;
++    /// <summary>納刀後に表示する討伐文字のTMP参照。</summary>
++    [UnityEngine.Tooltip("納刀後に表示する討伐文字のTMP参照。")]
+     [SerializeField] private TextMeshProUGUI _finalBlowText;
++    /// <summary>討伐文字のFadeとScale演出の時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("討伐文字のFadeとScale演出の時間（実時間の秒）。")]
+     [SerializeField] private float _finalBlowTextFadeIn = .22f;
++    /// <summary>白Flash・HUD・黒帯・討伐文字を進行させるUI演出コンポーネント。</summary>
++    [UnityEngine.Tooltip("白Flash・HUD・黒帯・討伐文字を進行させるUI演出コンポーネント。")]
+     [SerializeField] private FinalBlowPresentation _presentation;
++    /// <summary>勝利専用構図・FOV・モノクロの開始と解除を要求するCameraManager参照。</summary>
++    [UnityEngine.Tooltip("勝利専用構図・FOV・モノクロの開始と解除を要求するCameraManager参照。")]
+     [SerializeField] private CameraManager _cameraFeedback;
++    /// <summary>最終Hitから勝利カメラとFOVの寄りを始めるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("最終Hitから勝利カメラとFOVの寄りを始めるまでの時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float _cameraPushDelay = .18f;
++    /// <summary>最終Hitから納刀Triggerを要求するまでの時間（実時間の秒）。カメラDelay以上で開始する。</summary>
++    [UnityEngine.Tooltip("最終Hitから納刀Triggerを要求するまでの時間（実時間の秒）。カメラDelay以上で開始する。")]
+     [SerializeField, Min(0f)] private float _sheathingDelay = .8f;
++    /// <summary>最終Hitから討伐文字を表示するまでの時間（実時間の秒）。納刀の見せ場に合わせる。</summary>
++    [UnityEngine.Tooltip("最終Hitから討伐文字を表示するまでの時間（実時間の秒）。納刀の見せ場に合わせる。")]
+     [SerializeField, Min(0f)] private float _textDelay = 2.12f;
+     private CancellationTokenSource _sequenceCancellation;
+     private bool _isPlaying;
+--- a/Assets/Mock/Scripts/Managers/GameManager.cs
++++ b/Assets/Mock/Scripts/Managers/GameManager.cs
+@@ -24,34 +24,68 @@
+     // ゲーム状態遷移時に購読できるイベント
+     public static event Action<GameState> OnGameStateChanged;
+ 
++    /// <summary>Player入力通知と戦闘中の入力受付を管理する参照。</summary>
++    [UnityEngine.Tooltip("Player入力通知と戦闘中の入力受付を管理する参照。")]
+     [Header("Player")]
+     [SerializeField] private InputBuffer _inputBuffer;
++    /// <summary>初期化時にカメラとEnemyへ渡すPlayerの位置参照。</summary>
++    [UnityEngine.Tooltip("初期化時にカメラとEnemyへ渡すPlayerの位置参照。")]
+     [SerializeField] private Transform _playerPosition;
++    /// <summary>Playerの初期化・入力・戦闘状態を管理する参照。</summary>
++    [UnityEngine.Tooltip("Playerの初期化・入力・戦闘状態を管理する参照。")]
+     [SerializeField] private PlayerController _playerController;
++    /// <summary>PlayerのAnimation Event・パラメータ制御の参照。</summary>
++    [UnityEngine.Tooltip("PlayerのAnimation Event・パラメータ制御の参照。")]
+     [SerializeField] private PlayerAnimationController _playerAnimationController;
+ 
++    /// <summary>Playerと関連処理で使うAnimatorパラメータ名の設定。</summary>
++    [UnityEngine.Tooltip("Playerと関連処理で使うAnimatorパラメータ名の設定。")]
+     [Header("Config")]
+     [SerializeField] private AnimationName _animationName;
++    /// <summary>通常追従・Lock-On・命中カメラの調整値。</summary>
++    [UnityEngine.Tooltip("通常追従・Lock-On・命中カメラの調整値。")]
+     [SerializeField] private CameraConfig _cameraConfig;
++    /// <summary>タイトル・戦闘・効果音の登録名設定。</summary>
++    [UnityEngine.Tooltip("タイトル・戦闘・効果音の登録名設定。")]
+     [SerializeField] private AudioConfig _audioConfig;
+ 
++    /// <summary>Lock-Onカメラが注視するEnemyの位置参照。</summary>
++    [UnityEngine.Tooltip("Lock-Onカメラが注視するEnemyの位置参照。")]
+     [Header("Enemy")]
+     [SerializeField] private Transform _enemyPosition;
++    /// <summary>Enemyの初期化と戦闘終了処理を管理する参照。</summary>
++    [UnityEngine.Tooltip("Enemyの初期化と戦闘終了処理を管理する参照。")]
+     [SerializeField] private EnemyController _enemyController;
+ 
++    /// <summary>通常・Lock-On・勝利カメラの制御を接続する参照。</summary>
++    [UnityEngine.Tooltip("通常・Lock-On・勝利カメラの制御を接続する参照。")]
+     [Header("Camera")]
+     [SerializeField] private CameraManager _cameraManager;
++    /// <summary>画面に描画する出力Camera。入力の向きやUI投影にも使用する。</summary>
++    [UnityEngine.Tooltip("画面に描画する出力Camera。入力の向きやUI投影にも使用する。")]
+     [SerializeField] private Camera _camera;
++    /// <summary>通常戦闘のCinemachineCamera参照。</summary>
++    [UnityEngine.Tooltip("通常戦闘のCinemachineCamera参照。")]
+     [SerializeField] private CinemachineCamera _cinemachineCamera;
++    /// <summary>Lock-On用CinemachineCameraの設定参照。</summary>
++    [UnityEngine.Tooltip("Lock-On用CinemachineCameraの設定参照。")]
+     [SerializeField] private CinemachineCamera _cinemachineLockOncamera;
+ 
++    /// <summary>戦闘終了時などのSceneロードを接続する参照。</summary>
++    [UnityEngine.Tooltip("戦闘終了時などのSceneロードを接続する参照。")]
+     [Header("Scene")]
+     [SerializeField] private LoadSceneManager _loadSceneManager;
++    /// <summary>命中時ダメージ数字を表示するコンポーネント参照。</summary>
++    [UnityEngine.Tooltip("命中時ダメージ数字を表示するコンポーネント参照。")]
+     [SerializeField] private DamageNumbers _damageNumbers;
+ 
++    /// <summary>GameManagerがBGM再生を要求する際の基準音量。0で無音、1で最大。</summary>
++    [UnityEngine.Tooltip("GameManagerがBGM再生を要求する際の基準音量。0で無音、1で最大。")]
+     [SerializeField] private float _soundVolume = 0.3f;
+ 
+ 
++    /// <summary>現在のゲーム進行状態。タイトル・戦闘・勝利・敗北の入力受付と演出を分ける。</summary>
++    [UnityEngine.Tooltip("現在のゲーム進行状態。タイトル・戦闘・勝利・敗北の入力受付と演出を分ける。")]
+     [SerializeField] private GameState _state = GameState.Title;
+     private LockOnCamera _lockOnCamera;
+ 
+@@ -85,6 +119,7 @@
+         if (Instance == this) Instance = null;
+     }
+ 
++    /// <summary>Playerの初期化・入力・戦闘状態を管理する参照。</summary>
+     public PlayerController Player => _playerController;
+     /// <summary>戦闘状態と有効なランが両方成立している場合だけtrue。死亡後の入力・AI更新を遮断する。</summary>
+     public bool IsCombatActive => _state == GameState.InGame && RunSession.Active;
+--- a/Assets/Mock/Scripts/Managers/GlobalFader.cs
++++ b/Assets/Mock/Scripts/Managers/GlobalFader.cs
+@@ -11,7 +11,11 @@
+     public static GlobalFader Instance { get; private set; }
+     public bool IsTransitioning { get; private set; }
+ 
++    /// <summary>Scene切り替え時に画面を覆うFade用Image。Alphaで暗転を制御する。</summary>
++    [UnityEngine.Tooltip("Scene切り替え時に画面を覆うFade用Image。Alphaで暗転を制御する。")]
+     [SerializeField] private Image fadeImage;
++    /// <summary>Scene切り替えの暗転・明転それぞれの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("Scene切り替えの暗転・明転それぞれの時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float duration = 1f;
+ 
+     private bool _initialized;
+--- a/Assets/Mock/Scripts/Managers/HitStopManager.cs
++++ b/Assets/Mock/Scripts/Managers/HitStopManager.cs
+@@ -5,12 +5,22 @@
+ public class HitStopManager : MonoBehaviour
+ {
+     public static HitStopManager Instance { get; private set; }
++    /// <summary>通常Light命中のHitStop時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("通常Light命中のHitStop時間（実時間の秒）。")]
+     [SerializeField] private float _hitStopTime = .05f;
++    /// <summary>最終Hit用に公開するHitStop時間設定（実時間の秒）。FinalBlowManagerには専用時間設定もある。</summary>
++    [UnityEngine.Tooltip("最終Hit用に公開するHitStop時間設定（実時間の秒）。FinalBlowManagerには専用時間設定もある。")]
+     [SerializeField] private float _lastHitStopTime = .2f;
++    /// <summary>通常Heavy命中のHitStop時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("通常Heavy命中のHitStop時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float _heavyHitStop = .075f;
++    /// <summary>通常Light命中のHitStop時間（実時間の秒）。</summary>
+     public float LightHitStop => _hitStopTime;
++    /// <summary>通常Heavy命中のHitStop時間（実時間の秒）。</summary>
+     public float HeavyHitStop => _heavyHitStop;
++    /// <summary>通常Light命中のHitStop時間（実時間の秒）。</summary>
+     public float HitStopTime => _hitStopTime;
++    /// <summary>最終Hit用に公開するHitStop時間設定（実時間の秒）。FinalBlowManagerには専用時間設定もある。</summary>
+     public float LastHitStopTime => _lastHitStopTime;
+     private readonly Dictionary<GameObject, AnimationSpeedController[]> _targets = new();
+     /// <summary>対象階層の速度制御を初期化し、子オブジェクトからも同じ対象へ停止を要求できるよう登録する。</summary>
+--- a/Assets/Mock/Scripts/Managers/LoadSceneManager.cs
++++ b/Assets/Mock/Scripts/Managers/LoadSceneManager.cs
+@@ -6,8 +6,11 @@
+ {
+     public static LoadSceneManager Instance { get; private set; }
+ 
++    /// <summary>タイトルと戦闘Sceneのロード名を共有する設定参照。</summary>
+     public SceneNameConfig SceneNameConfig => _sceneNameConfig;
+ 
++    /// <summary>タイトルと戦闘Sceneのロード名を共有する設定参照。</summary>
++    [UnityEngine.Tooltip("タイトルと戦闘Sceneのロード名を共有する設定参照。")]
+     [SerializeField] private SceneNameConfig _sceneNameConfig;
+ 
+     /// <summary>
+--- a/Assets/Mock/Scripts/Managers/PlayerDeadManager.cs
++++ b/Assets/Mock/Scripts/Managers/PlayerDeadManager.cs
+@@ -16,28 +16,60 @@
+ {
+     public static PlayerDeadManager Instance { get; private set; }
+ 
++    /// <summary>敗北時の死亡Triggerとスローの対象Player参照。</summary>
++    [UnityEngine.Tooltip("敗北時の死亡Triggerとスローの対象Player参照。")]
+     [SerializeField] private PlayerController _playerController;
++    /// <summary>敗北時のスローを適用するEnemy参照。</summary>
++    [UnityEngine.Tooltip("敗北時のスローを適用するEnemy参照。")]
+     [SerializeField] private EnemyController _enemyController;
+     // ヴィネットのフェードイン時間（秒）
++    /// <summary>敗北時の画面周辺の赤みと暗さが立ち上がる時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("敗北時の画面周辺の赤みと暗さが立ち上がる時間（実時間の秒）。")]
+     [SerializeField] private float _vignetteFadeIn = 0.25f;
+     // ヴィネットの色（赤みを帯びた色を想定）
++    /// <summary>敗北用の画面周辺オーバーレイの色。</summary>
++    [UnityEngine.Tooltip("敗北用の画面周辺オーバーレイの色。")]
+     [SerializeField] private Color _vignetteColor = new Color(0.4f, 0f, 0f, 0.0f);
+     // ヴィネットの最大アルファ
++    /// <summary>敗北用オーバーレイの最大不透明度。0で透明、1で不透明。</summary>
++    [UnityEngine.Tooltip("敗北用オーバーレイの最大不透明度。0で透明、1で不透明。")]
+     [SerializeField] private float _vignetteMaxAlpha = 0.6f;
+     // 全体スローの継続時間（秒）
++    /// <summary>敗北時のAnimatorスローを維持する時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("敗北時のAnimatorスローを維持する時間（実時間の秒）。")]
+     [SerializeField] private float _slowDuration = 1.2f;
+     // 全体スロー時に適用する再生速度（0..1、1が通常速度）
++    /// <summary>敗北時のAnimator速度倍率。0で停止、1で通常速度。TimeScaleは変更しない。</summary>
++    [UnityEngine.Tooltip("敗北時のAnimator速度倍率。0で停止、1で通常速度。TimeScaleは変更しない。")]
+     [SerializeField] private float _slowSpeed = 0.4f;
+     // 崩れ後の無音継続時間（秒）
++    /// <summary>敗北のスロー後、全Audioを停止して待つ時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("敗北のスロー後、全Audioを停止して待つ時間（実時間の秒）。")]
+     [SerializeField] private float _silenceDuration = 0.5f;
+     // ローパスのカットオフ周波数（Hz）: 値を下げるほど音がこもる
++    /// <summary>敗北時のローパスのカットオフ周波数（Hz）。低いほど音がこもる。</summary>
++    [UnityEngine.Tooltip("敗北時のローパスのカットオフ周波数（Hz）。低いほど音がこもる。")]
+     [SerializeField] private float _lowPassCutoff = 800f;
++    /// <summary>敗北時にVignetteを制御するHDRP Volume参照。</summary>
++    [UnityEngine.Tooltip("敗北時にVignetteを制御するHDRP Volume参照。")]
+     [SerializeField] private Volume _volume;
++    /// <summary>旧補間時間設定（秒）。現行の敗北演出では直接参照しない。</summary>
++    [UnityEngine.Tooltip("旧補間時間設定（秒）。現行の敗北演出では直接参照しない。")]
+     [SerializeField] private float _smoothTime = 0.1f;
++    /// <summary>敗北時のHDRP Vignetteの目標強度。</summary>
++    [UnityEngine.Tooltip("敗北時のHDRP Vignetteの目標強度。")]
+     [SerializeField] private float _intensity = 0.45f;
++    /// <summary>敗北時のHDRP Vignetteの縁の滑らかさ。0〜1。</summary>
++    [UnityEngine.Tooltip("敗北時のHDRP Vignetteの縁の滑らかさ。0〜1。")]
+     [SerializeField, Range(0f, 1f)] private float _smoothness = 0.5f;
++    /// <summary>敗北時に表示する死亡文字のTMP参照。</summary>
++    [UnityEngine.Tooltip("敗北時に表示する死亡文字のTMP参照。")]
+     [SerializeField] private TextMeshProUGUI _deadText;
++    /// <summary>死亡文字が不透明になるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("死亡文字が不透明になるまでの時間（実時間の秒）。")]
+     [SerializeField] private float _deadTextFadeIn = 2f;
++    /// <summary>死亡文字のFadeに適用するDOTweenの補間曲線。</summary>
++    [UnityEngine.Tooltip("死亡文字のFadeに適用するDOTweenの補間曲線。")]
+     [SerializeField] private Ease _ease = Ease.InQuint;
+ 
+     private GameObject _overlay;
+--- a/Assets/Mock/Scripts/Managers/TitleManager.cs
++++ b/Assets/Mock/Scripts/Managers/TitleManager.cs
+@@ -9,11 +9,19 @@
+ /// </summary>
+ public class TitleManager : MonoBehaviour
+ {
++    /// <summary>タイトルBGMと開始SEの登録名設定。</summary>
++    [UnityEngine.Tooltip("タイトルBGMと開始SEの登録名設定。")]
+     [SerializeField] private AudioConfig _audioConfig;
++    /// <summary>開始後にロードする戦闘Scene名の設定。</summary>
++    [UnityEngine.Tooltip("開始後にロードする戦闘Scene名の設定。")]
+     [SerializeField] private SceneNameConfig _sceneNameConfig;
++    /// <summary>開始操作からScene切り替えまでの待機時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("開始操作からScene切り替えまでの待機時間（実時間の秒）。")]
+     [SerializeField] private float _transitionDelay = 2f;
+ 
+     private bool _isTransitioning = false;
++    /// <summary>名前・装備選択を開くRun設定画面の参照。</summary>
++    [UnityEngine.Tooltip("名前・装備選択を開くRun設定画面の参照。")]
+     [SerializeField] private RunSetupUI _setup;
+ 
+     /// <summary>配置済みのTitle用依存先とBGMを初期化する。</summary>
+--- a/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
++++ b/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
+@@ -6,7 +6,11 @@
+ {
+     public const string SpeedParameter = "JustAvoidCounterSpeed";
+     private static readonly int SpeedHash = Animator.StringToHash(SpeedParameter);
++    /// <summary>Just Avoid追撃の振りかぶり区間のAnimator速度倍率。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃の振りかぶり区間のAnimator速度倍率。")]
+     [SerializeField, Range(.7f, .85f)] private float _counterWindupSpeed = .78f;
++    /// <summary>Just Avoid追撃の斬撃区間のAnimator速度倍率。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃の斬撃区間のAnimator速度倍率。")]
+     [SerializeField, Range(1f, 1.15f)] private float _counterSlashSpeed = 1.10f;
+     private Animator _animator;
+     private int _stateHash;
+--- a/Assets/Mock/Scripts/Player/PlayerAnimationController.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAnimationController.cs
+@@ -6,7 +6,10 @@
+ [RequireComponent(typeof(Animator))]
+ public class PlayerAnimationController : MonoBehaviour
+ {
++    /// <summary>Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。</summary>
+     public AnimationName AnimName => _animName;
++    /// <summary>Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。</summary>
++    [UnityEngine.Tooltip("Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。")]
+     [SerializeField] private AnimationName _animName;
+     private Animator _animator;
+     private int _moveVelocityHash;
+--- a/Assets/Mock/Scripts/Player/PlayerController.cs
++++ b/Assets/Mock/Scripts/Player/PlayerController.cs
+@@ -12,6 +12,8 @@
+ public class PlayerController : MonoBehaviour, IDamageable
+ {
+     public PlayerAnimationController AnimController => _animationController;
++    /// <summary>Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
++    [UnityEngine.Tooltip("Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
+     [Header("Attack Root Motion")]
+     [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
+     private Animator _rootMotionAnimator;
+@@ -48,29 +50,54 @@
+     /// <summary>無効化時に保留中の攻撃Root Motionを消去する。</summary>
+     private void OnDisable() => StopAttackRootMotion();
+ 
++    /// <summary>抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。</summary>
++    [UnityEngine.Tooltip("抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。")]
+     [Header("PlayerStatus")]
+     [SerializeField] private MeshRenderer _playerWeapon;
++    /// <summary>納刀中の刀の見た目を切り替えるGameObject参照。</summary>
++    [UnityEngine.Tooltip("納刀中の刀の見た目を切り替えるGameObject参照。")]
+     [SerializeField] private GameObject _playerStartWeapon;
++    /// <summary>Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。</summary>
++    [UnityEngine.Tooltip("Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。")]
+     [SerializeField] private Collider[] _weaponColliders;
++    /// <summary>プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。</summary>
+     [Tooltip("プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。")]
+     [SerializeField] private Vector3 _weaponHitboxPadding = new Vector3(.08f, .02f, .08f);
+     private PlayerWeapon _weaponHitboxes;
+     private Vector3 _appliedHitboxPadding;
++    /// <summary>接触調整で参照するEnemy武器のCollider一覧。</summary>
++    [UnityEngine.Tooltip("接触調整で参照するEnemy武器のCollider一覧。")]
+     [SerializeField] private Collider[] _enemyWeaponColliders;
+ 
++    /// <summary>PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。</summary>
++    [UnityEngine.Tooltip("PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。")]
+     [Header("ScriptableObject")]
+     [SerializeField] private PlayerStatus _playerStatus;
++    /// <summary>Player Animatorのパラメータ名を共有する設定。</summary>
++    [UnityEngine.Tooltip("Player Animatorのパラメータ名を共有する設定。")]
+     [SerializeField] private AnimationName _animationName;
++    /// <summary>Playerの回避受付時間・幽体化・コンボClipの設定。</summary>
++    [UnityEngine.Tooltip("Playerの回避受付時間・幽体化・コンボClipの設定。")]
+     [SerializeField] private PlayerStateConfig _playerStateConfig;
++    /// <summary>装備による攻撃倍率・加算威力・命中Effectの設定。</summary>
++    [UnityEngine.Tooltip("装備による攻撃倍率・加算威力・命中Effectの設定。")]
+     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
++    /// <summary>命中・Just Avoid・回復・バフなどの見た目演出設定。</summary>
++    [UnityEngine.Tooltip("命中・Just Avoid・回復・バフなどの見た目演出設定。")]
+     [SerializeField] private VFXConfig _vfxConfig;
+ 
++    /// <summary>Just Avoid成功時に適用するスロー状態効果の定義。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功時に適用するスロー状態効果の定義。")]
+     [Header("Status Effects")]
+     [SerializeField] private StatusEffectDef _justAvoidSlowDef;
+ 
+     // デバッグ用：入力を通して攻撃が可能かを制御。
++    /// <summary>攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。</summary>
++    [UnityEngine.Tooltip("攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。")]
+     [SerializeField] private bool _canAttack;
+     // 表示・状態・仲介を分離したゲーム内表示。
++    /// <summary>PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。</summary>
++    [UnityEngine.Tooltip("PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。")]
+     [Header("UI")]
+     [SerializeField] private PlayerHUDView _playerHudView;
+     private PlayerHUDPresenter _playerHudPresenter;
+--- a/Assets/Mock/Scripts/Progression/GameplayRules.cs
++++ b/Assets/Mock/Scripts/Progression/GameplayRules.cs
+@@ -4,27 +4,67 @@
+ [CreateAssetMenu(menuName = "Katsuro/Gameplay Rules")]
+ public sealed class GameplayRules : ScriptableObject
+ {
++    /// <summary>新しいRunを開始したときの残機数。</summary>
++    [UnityEngine.Tooltip("新しいRunを開始したときの残機数。")]
+     [Min(1)] public int StartingLives = 2;
++    /// <summary>復活後にダメージを無効化する時間（秒）。</summary>
++    [UnityEngine.Tooltip("復活後にダメージを無効化する時間（秒）。")]
+     [Min(0)] public float ReviveInvulnerability = 2f;
++    /// <summary>短い幽体化回避を維持する時間（秒）。</summary>
++    [UnityEngine.Tooltip("短い幽体化回避を維持する時間（秒）。")]
+     [Min(0.01f)] public float ShortGhostDuration = 0.08f;
++    /// <summary>幽体化回避を再使用できるまでの時間（秒）。</summary>
++    [UnityEngine.Tooltip("幽体化回避を再使用できるまでの時間（秒）。")]
+     [Min(0.01f)] public float GhostCooldown = 0.35f;
++    /// <summary>Just Avoid成功で得る攻撃ボーナスの有効時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid成功で得る攻撃ボーナスの有効時間（秒）。")]
+     [Min(0)] public float JustBuffDuration = 8f;
++    /// <summary>満HP時の自然ゲージ回復倍率。低HP時の倍率からHP比率で補間する。</summary>
++    [UnityEngine.Tooltip("満HP時の自然ゲージ回復倍率。低HP時の倍率からHP比率で補間する。")]
+     public float FullHpRegenMultiplier = 1.5f;
++    /// <summary>HP比率が0のときの自然ゲージ回復倍率。満HP時の倍率まで補間する。</summary>
++    [UnityEngine.Tooltip("HP比率が0のときの自然ゲージ回復倍率。満HP時の倍率まで補間する。")]
+     public float LowHpRegenMultiplier = 0.5f;
++    /// <summary>満HP時の自傷ゲージ消費倍率。低HP時の倍率から補間する。</summary>
++    [UnityEngine.Tooltip("満HP時の自傷ゲージ消費倍率。低HP時の倍率から補間する。")]
+     public float FullHpSelfCostMultiplier = 0.5f;
++    /// <summary>HP比率が0のときの自傷ゲージ消費倍率。満HP時の倍率まで補間する。</summary>
++    [UnityEngine.Tooltip("HP比率が0のときの自傷ゲージ消費倍率。満HP時の倍率まで補間する。")]
+     public float LowHpSelfCostMultiplier = 1f;
++    /// <summary>満HP時のJust Avoid受付時間倍率。低HP時の倍率から補間する。</summary>
++    [UnityEngine.Tooltip("満HP時のJust Avoid受付時間倍率。低HP時の倍率から補間する。")]
+     public float FullHpAvoidMultiplier = 1.5f;
++    /// <summary>HP比率が0のときのJust Avoid受付時間倍率。満HP時の倍率まで補間する。</summary>
++    [UnityEngine.Tooltip("HP比率が0のときのJust Avoid受付時間倍率。満HP時の倍率まで補間する。")]
+     public float LowHpAvoidMultiplier = 0.75f;
++    /// <summary>攻撃装備「剛力」の与ダメージ倍率。1で補正なし。</summary>
++    [UnityEngine.Tooltip("攻撃装備「剛力」の与ダメージ倍率。1で補正なし。")]
+     [Header("Equipment multipliers")]
+     [Min(0)] public float PowerAttack = 1.2f;
++    /// <summary>攻撃装備「吸魂」の命中時ゲージ回復倍率。1で補正なし。</summary>
++    [UnityEngine.Tooltip("攻撃装備「吸魂」の命中時ゲージ回復倍率。1で補正なし。")]
+     [Min(0)] public float SoulHitGain = 2f;
++    /// <summary>攻撃装備「窮地」の最大追加ダメージ倍率。HPが低いほど増え、0.35で最大35%増。</summary>
++    [UnityEngine.Tooltip("攻撃装備「窮地」の最大追加ダメージ倍率。HPが低いほど増え、0.35で最大35%増。")]
+     [Min(0)] public float DesperationBonus = 0.35f;
++    /// <summary>防御装備「堅守」の被ダメージ倍率。0.8で通常の80%。</summary>
++    [UnityEngine.Tooltip("防御装備「堅守」の被ダメージ倍率。0.8で通常の80%。")]
+     [Range(0, 1)] public float GuardDamage = 0.8f;
++    /// <summary>防御装備「霊衣」の幽体化開始・継続ゲージ消費倍率。</summary>
++    [UnityEngine.Tooltip("防御装備「霊衣」の幽体化開始・継続ゲージ消費倍率。")]
+     [Range(0, 1)] public float SpiritCost = 0.7f;
++    /// <summary>防御装備「息吹」の自然ゲージ回復倍率。</summary>
++    [UnityEngine.Tooltip("防御装備「息吹」の自然ゲージ回復倍率。")]
+     [Min(0)] public float BreathRegen = 1.3f;
++    /// <summary>前回勝者が「吸魂」の場合に継承Enemyへ適用する攻撃倍率。</summary>
++    [UnityEngine.Tooltip("前回勝者が「吸魂」の場合に継承Enemyへ適用する攻撃倍率。")]
+     [Header("Inherited boss equivalents")]
+     [Min(0)] public float SoulBossDamage = 1.1f;
++    /// <summary>前回勝者が「霊衣」の場合に継承Enemyへ適用する移動速度倍率。</summary>
++    [UnityEngine.Tooltip("前回勝者が「霊衣」の場合に継承Enemyへ適用する移動速度倍率。")]
+     [Min(0)] public float SpiritBossSpeed = 1.1f;
++    /// <summary>前回勝者が「息吹」の場合に継承Enemyへ適用する最大HP倍率。</summary>
++    [UnityEngine.Tooltip("前回勝者が「息吹」の場合に継承Enemyへ適用する最大HP倍率。")]
+     [Min(0)] public float BreathBossHealth = 1.2f;
+     private static GameplayRules _instance;
+     public static GameplayRules Current
+--- a/Assets/Mock/Scripts/Progression/RunSession.cs
++++ b/Assets/Mock/Scripts/Progression/RunSession.cs
+@@ -5,10 +5,20 @@
+ [Serializable]
+ public sealed class ChampionTrace
+ {
++    /// <summary>保存した勝者データの形式バージョン。ロード時に互換性を判定する。</summary>
++    [UnityEngine.Tooltip("保存した勝者データの形式バージョン。ロード時に互換性を判定する。")]
+     public int Version = 1;
++    /// <summary>次のRunの相手として引き継ぐ前回勝者の名前。</summary>
++    [UnityEngine.Tooltip("次のRunの相手として引き継ぐ前回勝者の名前。")]
+     public string Name;
++    /// <summary>前回勝者の攻撃装備番号。AttackNamesの要素番号に対応する。</summary>
++    [UnityEngine.Tooltip("前回勝者の攻撃装備番号。AttackNamesの要素番号に対応する。")]
+     public int Attack;
++    /// <summary>前回勝者の防御装備番号。DefenseNamesの要素番号に対応する。</summary>
++    [UnityEngine.Tooltip("前回勝者の防御装備番号。DefenseNamesの要素番号に対応する。")]
+     public int Defense;
++    /// <summary>前回勝者がクリアまでに要した時間（秒）。</summary>
++    [UnityEngine.Tooltip("前回勝者がクリアまでに要した時間（秒）。")]
+     public float ClearSeconds;
+ }
+ 
+--- a/Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs
++++ b/Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs
+@@ -41,11 +41,25 @@
+         Stack
+     }
+ 
++    /// <summary>状態効果を識別するID。同じIDの追加時にStackPolicyで扱いを決める。</summary>
++    [UnityEngine.Tooltip("状態効果を識別するID。同じIDの追加時にStackPolicyで扱いを決める。")]
+     [SerializeField] private string _id = "Slow";
++    /// <summary>状態効果の有効時間（秒）。経過後に解除する。</summary>
++    [UnityEngine.Tooltip("状態効果の有効時間（秒）。経過後に解除する。")]
+     [SerializeField] private float _duration = 2f;
++    /// <summary>状態効果中の移動速度倍率。1で補正なし。</summary>
++    [UnityEngine.Tooltip("状態効果中の移動速度倍率。1で補正なし。")]
+     [SerializeField, Range(0f, 1f)] private float _speedMultiplier = 0.5f;
++    /// <summary>状態効果中のAnimator速度倍率。HitStopの一時倍率とは別に合成する。</summary>
++    [UnityEngine.Tooltip("状態効果中のAnimator速度倍率。HitStopの一時倍率とは別に合成する。")]
+     [SerializeField, Range(0f, 2f)] private float _animationSpeedMultiplier = 0.5f;
++    /// <summary>同じ状態効果を重ねられる最大スタック数。</summary>
++    [UnityEngine.Tooltip("同じ状態効果を重ねられる最大スタック数。")]
+     [SerializeField, Min(1)] private int _maxStacks = 1;
++    /// <summary>同じIDの状態効果を追加した際の更新・加算・置換の方針。</summary>
++    [UnityEngine.Tooltip("同じIDの状態効果を追加した際の更新・加算・置換の方針。")]
+     [SerializeField] private StackPolicy _stacking = StackPolicy.Refresh;
++    /// <summary>状態効果中に表示する任意のVFX Prefab。未設定ならVFXを生成しない。</summary>
++    [UnityEngine.Tooltip("状態効果中に表示する任意のVFX Prefab。未設定ならVFXを生成しない。")]
+     [SerializeField] private GameObject _vfxPrefab;
+ }
+--- a/Assets/Mock/Scripts/UI/BossBarSilhouette.cs
++++ b/Assets/Mock/Scripts/UI/BossBarSilhouette.cs
+@@ -5,6 +5,8 @@
+ [RequireComponent(typeof(Image))]
+ public sealed class BossBarSilhouette : BaseMeshEffect
+ {
++    /// <summary>ボスHPバーの輪郭を作る正規化座標の頂点一覧。RectTransformの大きさへ変換して描画する。</summary>
++    [UnityEngine.Tooltip("ボスHPバーの輪郭を作る正規化座標の頂点一覧。RectTransformの大きさへ変換して描画する。")]
+     [SerializeField] private Vector2[] _outline = {
+         new Vector2(0,.15f),new Vector2(0,.60f),new Vector2(.018f,.73f),
+         new Vector2(.455f,.73f),new Vector2(.469f,.78f),new Vector2(.479f,.90f),
+--- a/Assets/Mock/Scripts/UI/DamageTrailGauge.cs
++++ b/Assets/Mock/Scripts/UI/DamageTrailGauge.cs
+@@ -4,9 +4,17 @@
+ /// <summary>ゲージの充填率だけを更新する。画像の色・素材・配置は画面側の設定を維持する。</summary>
+ public sealed class DamageTrailGauge : MonoBehaviour
+ {
++    /// <summary>現在値を即時反映する手前のゲージImage。Filled方式で使用する。</summary>
++    [UnityEngine.Tooltip("現在値を即時反映する手前のゲージImage。Filled方式で使用する。")]
+     [SerializeField] private Image _currentFill;
++    /// <summary>ダメージ前の値から遅れて追従する奥のゲージImage。</summary>
++    [UnityEngine.Tooltip("ダメージ前の値から遅れて追従する奥のゲージImage。")]
+     [SerializeField] private Image _trailFill;
++    /// <summary>ダメージ追従ゲージが減り始めるまでの待機時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("ダメージ追従ゲージが減り始めるまでの待機時間（実時間の秒）。")]
+     [SerializeField, Min(0)] private float _delay = .25f;
++    /// <summary>追従ゲージが現在値へ近づく速度（正規化ゲージ量/秒）。大きいほど速く追従する。</summary>
++    [UnityEngine.Tooltip("追従ゲージが現在値へ近づく速度（正規化ゲージ量/秒）。大きいほど速く追従する。")]
+     [SerializeField, Min(.01f)] private float _catchupPerSecond = .65f;
+     private bool _initialized;
+     private float _target, _catchupAt;
+--- a/Assets/Mock/Scripts/UI/FinalBlowPresentation.cs
++++ b/Assets/Mock/Scripts/UI/FinalBlowPresentation.cs
+@@ -4,20 +4,53 @@
+ /// <summary>決着のUIだけをunscaled timeで描画する。HUDのHP更新・戦闘状態には触れない。</summary>
+ public sealed class FinalBlowPresentation : MonoBehaviour
+ {
++    /// <summary>最終Hitで白Flashを表示するCanvasGroup。Alphaで強さを制御する。</summary>
++    [UnityEngine.Tooltip("最終Hitで白Flashを表示するCanvasGroup。Alphaで強さを制御する。")]
+     [SerializeField] private CanvasGroup _whiteFlash;
+-    [SerializeField] private RectTransform _letterboxTop, _letterboxBottom;
++    /// <summary>勝利中に画面上へ出す黒帯のRectTransform。</summary>
++    [UnityEngine.Tooltip("勝利中に画面上へ出す黒帯のRectTransform。")]
++    [SerializeField] private RectTransform _letterboxTop;
++    /// <summary>勝利中に画面下へ出す黒帯のRectTransform。</summary>
++    [UnityEngine.Tooltip("勝利中に画面下へ出す黒帯のRectTransform。")]
++    [SerializeField] private RectTransform _letterboxBottom;
++    /// <summary>勝利中にFade OutするHUDのCanvasGroup一覧。</summary>
++    [UnityEngine.Tooltip("勝利中にFade OutするHUDのCanvasGroup一覧。")]
+     [SerializeField] private CanvasGroup[] _hudGroups;
++    /// <summary>通常HUD更新と勝利演出の表示制御を調停するRunHUD一覧。</summary>
++    [UnityEngine.Tooltip("通常HUD更新と勝利演出の表示制御を調停するRunHUD一覧。")]
+     [SerializeField] private RunHUD[] _hudVisibilityOwners;
++    /// <summary>勝利中に新しいダメージ数字を抑制する表示コンポーネント。</summary>
++    [UnityEngine.Tooltip("勝利中に新しいダメージ数字を抑制する表示コンポーネント。")]
+     [SerializeField] private DamageNumbers _damageNumbers;
++    /// <summary>最終Hit白Flashの最大Alpha。0で透明、1で不透明。</summary>
++    [UnityEngine.Tooltip("最終Hit白Flashの最大Alpha。0で透明、1で不透明。")]
+     [SerializeField, Range(0f, 1f)] private float _flashStrength = .8f;
++    /// <summary>勝利開始から白Flashを出すまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("勝利開始から白Flashを出すまでの時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float _flashDelay = .02f;
++    /// <summary>勝利開始からHUDを消し始めるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("勝利開始からHUDを消し始めるまでの時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float _hudFadeDelay = .12f;
++    /// <summary>HUDのFade Outにかける時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("HUDのFade Outにかける時間（実時間の秒）。")]
+     [SerializeField, Range(.15f, .3f)] private float _hudFadeDuration = .23f;
++    /// <summary>勝利開始から上下黒帯を出し始めるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("勝利開始から上下黒帯を出し始めるまでの時間（実時間の秒）。")]
+     [SerializeField, Min(0f)] private float _letterboxDelay = .15f;
++    /// <summary>上下黒帯が目標高さになるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("上下黒帯が目標高さになるまでの時間（実時間の秒）。")]
+     [SerializeField, Range(.18f, .3f)] private float _letterboxDuration = .25f;
++    /// <summary>各黒帯の目標高さ。親画面の高さに対する比率。</summary>
++    [UnityEngine.Tooltip("各黒帯の目標高さ。親画面の高さに対する比率。")]
+     [SerializeField, Range(.07f, .1f)] private float _letterboxHeight = .08f;
++    /// <summary>討伐文字が現れる瞬間のScale倍率。元のScaleを基準にする。</summary>
++    [UnityEngine.Tooltip("討伐文字が現れる瞬間のScale倍率。元のScaleを基準にする。")]
+     [SerializeField, Range(.8f, 1f)] private float _textStartScale = .9f;
++    /// <summary>討伐文字が素早く拡大したときの最大Scale倍率。その後元のScaleへ戻す。</summary>
++    [UnityEngine.Tooltip("討伐文字が素早く拡大したときの最大Scale倍率。その後元のScaleへ戻す。")]
+     [SerializeField, Range(1f, 1.08f)] private float _textOvershootScale = 1.025f;
++    /// <summary>討伐表示時間のうち最初の拡大・Fadeに使う割合。残りの時間でScaleを落ち着かせる。</summary>
++    [UnityEngine.Tooltip("討伐表示時間のうち最初の拡大・Fadeに使う割合。残りの時間でScaleを落ち着かせる。")]
+     [SerializeField, Range(.3f, .8f)] private float _textRiseFraction = .55f;
+     private TMP_Text _text;
+     private Color _savedTextColor;
+--- a/Assets/Mock/Scripts/UI/PlayerHUDView.cs
++++ b/Assets/Mock/Scripts/UI/PlayerHUDView.cs
+@@ -6,11 +6,21 @@
+     /// <summary>空ゲージの上に赤い遅延ダメージ、その上に緑の現在体力を重ねて表示する。</summary>
+     public class PlayerHUDView : MonoBehaviour, IKatsuroPlayerHUDView
+     {
++        /// <summary>Playerの現在HPを即時反映するゲージImage。</summary>
++        [UnityEngine.Tooltip("Playerの現在HPを即時反映するゲージImage。")]
+         [SerializeField] private Image _hpFill;
++        /// <summary>ダメージ前のHPから遅れて減る追従ゲージImage。</summary>
++        [UnityEngine.Tooltip("ダメージ前のHPから遅れて減る追従ゲージImage。")]
+         [SerializeField] private Image _damageFill;
++        /// <summary>Playerのスキルゲージ比率を反映するImage。</summary>
++        [UnityEngine.Tooltip("Playerのスキルゲージ比率を反映するImage。")]
+         [SerializeField] private Image _skillFill;
++        /// <summary>HPダメージ後に追従ゲージが減り始めるまでの時間（実時間の秒）。</summary>
++        [UnityEngine.Tooltip("HPダメージ後に追従ゲージが減り始めるまでの時間（実時間の秒）。")]
+         [Header("Damage trail (unscaled seconds)")]
+         [SerializeField, Min(0f)] private float _damageDelay = .25f;
++        /// <summary>HP追従ゲージの減少速度（正規化ゲージ量/秒）。</summary>
++        [UnityEngine.Tooltip("HP追従ゲージの減少速度（正規化ゲージ量/秒）。")]
+         [SerializeField, Min(.01f)] private float _damageCatchupPerSecond = .65f;
+         private bool _initialized;
+         private float _targetHp;
+--- a/Assets/Mock/Scripts/UI/RunHUD.cs
++++ b/Assets/Mock/Scripts/UI/RunHUD.cs
+@@ -5,23 +5,53 @@
+ /// <summary>シーンに配置したゲーム内表示の文字を更新する。表示要素の生成や配置変更は行わない。</summary>
+ public sealed class RunHUD : MonoBehaviour
+ {
++    /// <summary>HP・スキルゲージ・無敵・Just Avoidボーナスを表示するPlayer参照。</summary>
++    [UnityEngine.Tooltip("HP・スキルゲージ・無敵・Just Avoidボーナスを表示するPlayer参照。")]
+     [SerializeField] private PlayerController _player;
++    /// <summary>ボスHP比率を取得するEnemy参照。</summary>
++    [UnityEngine.Tooltip("ボスHP比率を取得するEnemy参照。")]
+     [SerializeField] private EnemyController _enemy;
++    /// <summary>ボスHPを直接反映するImage。EnemyGauge未設定時に使用する。</summary>
++    [UnityEngine.Tooltip("ボスHPを直接反映するImage。EnemyGauge未設定時に使用する。")]
+     [SerializeField] private Image _enemyHpFill;
++    /// <summary>ボスHPと遅延ダメージを表示するゲージ。設定時は直接Fillより優先する。</summary>
++    [UnityEngine.Tooltip("ボスHPと遅延ダメージを表示するゲージ。設定時は直接Fillより優先する。")]
+     [SerializeField] private DamageTrailGauge _enemyGauge;
++    /// <summary>残機を表すImage一覧。先頭から残機数だけ点灯色にする。</summary>
++    [UnityEngine.Tooltip("残機を表すImage一覧。先頭から残機数だけ点灯色にする。")]
+     [Header("Life orbs (lit slots equal remaining lives)")]
+     [UnityEngine.Serialization.FormerlySerializedAs("_lifeSeals")]
+     [SerializeField] private Image[] _lifeOrbs = new Image[0];
++    /// <summary>残っている命の表示色。</summary>
++    [UnityEngine.Tooltip("残っている命の表示色。")]
+     [SerializeField] private Color _lifeActiveColor = Color.white;
++    /// <summary>消費済みの命の表示色。</summary>
++    [UnityEngine.Tooltip("消費済みの命の表示色。")]
+     [SerializeField] private Color _lifeEmptyColor = new Color(.16f, .16f, .16f, .8f);
++    /// <summary>Run HUD全体の表示Alphaを制御するCanvasGroup。</summary>
++    [UnityEngine.Tooltip("Run HUD全体の表示Alphaを制御するCanvasGroup。")]
+     [SerializeField] private CanvasGroup _visibility;
++    /// <summary>現在の挑戦者名を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("現在の挑戦者名を表示するTMPテキスト。")]
+     [Header("Scene labels (move each Rect Transform to adjust layout)")]
+     [SerializeField] private TMP_Text _challenger;
++    /// <summary>前回勝者または初期相手の名前を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("前回勝者または初期相手の名前を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _opponent;
++    /// <summary>Playerの現在HPを数値で表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("Playerの現在HPを数値で表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _health;
++    /// <summary>現在の残機数を文字で表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("現在の残機数を文字で表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _lives;
++    /// <summary>選択した攻撃装備・防御装備の名前を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("選択した攻撃装備・防御装備の名前を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _equipment;
++    /// <summary>Playerの現在スキルゲージを数値で表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("Playerの現在スキルゲージを数値で表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _skill;
++    /// <summary>Just Avoidボーナスの倍率・残り時間と無敵状態を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("Just Avoidボーナスの倍率・残り時間と無敵状態を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _ghostStatus;
+     private float _nextRefresh;
+     private bool _presentationControlsVisibility;
+--- a/Assets/Mock/Scripts/UI/RunSetupUI.cs
++++ b/Assets/Mock/Scripts/UI/RunSetupUI.cs
+@@ -6,15 +6,35 @@
+ /// <summary>シーンに配置して使用する画面表示。配置・文字・見た目はプレハブで設定する。</summary>
+ public sealed class RunSetupUI : MonoBehaviour
+ {
++    /// <summary>名前・装備選択画面全体の表示と入力受付を切り替えるCanvasGroup。</summary>
++    [UnityEngine.Tooltip("名前・装備選択画面全体の表示と入力受付を切り替えるCanvasGroup。")]
+     [SerializeField] private CanvasGroup _panel;
++    /// <summary>新しいRunの挑戦者名を入力するTMP Input Field。</summary>
++    [UnityEngine.Tooltip("新しいRunの挑戦者名を入力するTMP Input Field。")]
+     [SerializeField] private TMP_InputField _nameInput;
++    /// <summary>攻撃装備を選ぶToggle一覧。配列順をRunSession.AttackNamesに合わせる。</summary>
++    [UnityEngine.Tooltip("攻撃装備を選ぶToggle一覧。配列順をRunSession.AttackNamesに合わせる。")]
+     [SerializeField] private Toggle[] _attackOptions;
++    /// <summary>防御装備を選ぶToggle一覧。配列順をRunSession.DefenseNamesに合わせる。</summary>
++    [UnityEngine.Tooltip("防御装備を選ぶToggle一覧。配列順をRunSession.DefenseNamesに合わせる。")]
+     [SerializeField] private Toggle[] _defenseOptions;
++    /// <summary>選択中の攻撃装備の効果説明を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("選択中の攻撃装備の効果説明を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _attackDescription;
++    /// <summary>選択中の防御装備の効果説明を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("選択中の防御装備の効果説明を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _defenseDescription;
++    /// <summary>前回勝者と継承装備の説明を表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("前回勝者と継承装備の説明を表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _opponent;
++    /// <summary>残機・復活・勝者継承ルールを表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("残機・復活・勝者継承ルールを表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _rules;
++    /// <summary>前回の勝敗結果と保存エラーを表示するTMPテキスト。</summary>
++    [UnityEngine.Tooltip("前回の勝敗結果と保存エラーを表示するTMPテキスト。")]
+     [SerializeField] private TMP_Text _result;
++    /// <summary>入力した名前と装備でRunを確定し、戦闘を開始するButton。</summary>
++    [UnityEngine.Tooltip("入力した名前と装備でRunを確定し、戦闘を開始するButton。")]
+     [SerializeField] private Button _startButton;
+     public bool IsOpen { get; private set; }
+     private TitleManager _title;
+--- a/Assets/Mock/Scripts/UI/TitleText.cs
++++ b/Assets/Mock/Scripts/UI/TitleText.cs
+@@ -6,10 +6,20 @@
+ /// <summary>タイトル文字を明滅させる。シーン遷移はキーボード・パッド入力と共通の処理を使う。</summary>
+ public class TitleText : MonoBehaviour
+ {
++    /// <summary>タイトル画面で点滅FadeするTMP文字参照。</summary>
++    [UnityEngine.Tooltip("タイトル画面で点滅FadeするTMP文字参照。")]
+     [SerializeField] private TextMeshProUGUI _text;
++    /// <summary>タイトル文字が現れるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("タイトル文字が現れるまでの時間（実時間の秒）。")]
+     [SerializeField] private float _fadeInDuration = 1.0f;
++    /// <summary>タイトル文字が消えるまでの時間（実時間の秒）。</summary>
++    [UnityEngine.Tooltip("タイトル文字が消えるまでの時間（実時間の秒）。")]
+     [SerializeField] private float _fadeOutDuration = 1.0f;
++    /// <summary>タイトル文字のFadeに使用するDOTween補間曲線。</summary>
++    [UnityEngine.Tooltip("タイトル文字のFadeに使用するDOTween補間曲線。")]
+     [SerializeField] private Ease _ease = Ease.InOutSine;
++    /// <summary>TitleManager未設定時の代替開始処理でロードするScene名。通常はTitleManagerへ委譲する。</summary>
++    [UnityEngine.Tooltip("TitleManager未設定時の代替開始処理でロードするScene名。通常はTitleManagerへ委譲する。")]
+     [SerializeField] private string _gameSceneName = "GameScene";
+     private Sequence _pulse;
+     private bool _isTransitioning;
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
+@@ -4,18 +4,33 @@
+ [RequireComponent(typeof(Animator))]
+ public class EnemyAnimationController : MonoBehaviour
+ {
++    /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
+     public AnimationName AnimName => _animName;
++    /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
++    [UnityEngine.Tooltip("Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。")]
+     [SerializeField] private AnimationName _animName;
+     private Animator _animator;
+     private int _moveVelocityHash;
+     private int _moveVectorXHash;
+     private int _moveVectorYHash;
++    /// <summary>Just Avoid追撃の大きなHitReactionを再生するAnimator Layer名。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃の大きなHitReactionを再生するAnimator Layer名。")]
+     [Header("Hit Reaction")]
+     [SerializeField] private string _reactionLayerName = "HitReaction";
++    /// <summary>Light用の大Reaction時間設定（秒）。通常Lightでは大Reactionを要求しない仕様。</summary>
++    [UnityEngine.Tooltip("Light用の大Reaction時間設定（秒）。通常Lightでは大Reactionを要求しない仕様。")]
+     [SerializeField, Range(.15f, .3f)] private float _lightHitDuration = .24f;
++    /// <summary>Just Avoid追撃の大Reactionを維持する時間（秒）。</summary>
++    [UnityEngine.Tooltip("Just Avoid追撃の大Reactionを維持する時間（秒）。")]
+     [SerializeField, Range(.3f, .5f)] private float _heavyHitDuration = .4f;
++    /// <summary>Light用Reaction Layer Weight。通常Lightでは大Reactionを要求しない仕様。</summary>
++    [UnityEngine.Tooltip("Light用Reaction Layer Weight。通常Lightでは大Reactionを要求しない仕様。")]
+     [SerializeField, Range(0f, 1f)] private float _lightHitWeight = .6f;
++    /// <summary>大Reactionへ入る短いBlend時間（秒）。Poseの急変を抑える。</summary>
++    [UnityEngine.Tooltip("大Reactionへ入る短いBlend時間（秒）。Poseの急変を抑える。")]
+     [SerializeField, Range(.05f, .12f)] private float _reactionBlendIn = .08f;
++    /// <summary>大Reactionから通常状態へ戻すBlend時間（秒）。</summary>
++    [UnityEngine.Tooltip("大Reactionから通常状態へ戻すBlend時間（秒）。")]
+     [SerializeField, Range(.05f, .12f)] private float _reactionBlendOut = .08f;
+     private static readonly string[] HitDirections = { "Front", "Back", "Left", "Right" };
+     private int _reactionLayer = -1;
+--- a/Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs
++++ b/Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs
+@@ -4,19 +4,40 @@
+ [CreateAssetMenu(menuName = "Enemy/AttackData", fileName = "EnemyAttackData")]
+ public class EnemyAttackData : ScriptableObject
+ {
++    /// <summary>この攻撃設定を使うEnemy行動の種類。</summary>
+     public EnemyActionType ActionType => _actionType;
++    /// <summary>この行動を開始するAnimator Trigger名。Controllerのパラメータと一致させる。</summary>
+     public string AnimatorTrigger => _animatorTrigger;
++    /// <summary>この行動の基準ダメージ。攻撃開始時に武器へ渡す。</summary>
+     public float Damage => _damage;
++    /// <summary>行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。</summary>
+     public float Range => _range;
++    /// <summary>有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。</summary>
+     public int HitboxIndex => _hitboxIndex;
++    /// <summary>Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
+     public float HitboxEnableDelay => _hitboxEnableDelay;
++    /// <summary>Hitbox無効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
+     public float HitboxDisableDelay => _hitboxDisableDelay;
+ 
++    /// <summary>この攻撃設定を使うEnemy行動の種類。</summary>
++    [UnityEngine.Tooltip("この攻撃設定を使うEnemy行動の種類。")]
+     [SerializeField] private EnemyActionType _actionType;
++    /// <summary>この行動を開始するAnimator Trigger名。Controllerのパラメータと一致させる。</summary>
++    [UnityEngine.Tooltip("この行動を開始するAnimator Trigger名。Controllerのパラメータと一致させる。")]
+     [SerializeField] private string _animatorTrigger;
++    /// <summary>この行動の基準ダメージ。攻撃開始時に武器へ渡す。</summary>
++    [UnityEngine.Tooltip("この行動の基準ダメージ。攻撃開始時に武器へ渡す。")]
+     [SerializeField] private float _damage;
++    /// <summary>行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。</summary>
++    [UnityEngine.Tooltip("行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。")]
+     [SerializeField] private float _range;
++    /// <summary>有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。</summary>
++    [UnityEngine.Tooltip("有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。")]
+     [SerializeField] private int _hitboxIndex;
++    /// <summary>Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
++    [UnityEngine.Tooltip("Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。")]
+     [SerializeField] private float _hitboxEnableDelay;
++    /// <summary>Hitbox無効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
++    [UnityEngine.Tooltip("Hitbox無効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。")]
+     [SerializeField] private float _hitboxDisableDelay;
+ }
+--- a/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs
+@@ -4,21 +4,42 @@
+ [CreateAssetMenu(fileName = "EnemyDecisionConfig", menuName = "ScriptableObjects/Enemy/DecisionConfig")]
+ public class EnemyDecisionConfig : ScriptableObject
+ {
++    /// <summary>遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。</summary>
++    [UnityEngine.Tooltip("遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。")]
+     [Header("Distance thresholds")]
+     public float FarDistance = 12f;
++    /// <summary>近距離行動候補へ切り替えるPlayerとの距離（Unity単位）。</summary>
++    [UnityEngine.Tooltip("近距離行動候補へ切り替えるPlayerとの距離（Unity単位）。")]
+     public float NearDistance = 3f;
++    /// <summary>Wait行動で様子を見る時間（秒）。</summary>
++    [UnityEngine.Tooltip("Wait行動で様子を見る時間（秒）。")]
+     public float ObserveSeconds = 1.5f;
++    /// <summary>行動中に距離条件などを再検討する間隔（秒）。短いほど頻繁に判断する。</summary>
++    [UnityEngine.Tooltip("行動中に距離条件などを再検討する間隔（秒）。短いほど頻繁に判断する。")]
+     public float ReconsiderInterval = 0.5f;
+ 
+     [Header("Weights")]
+     // 互換性を維持するために残している旧形式の重み設定。
++    /// <summary>旧形式のWarp攻撃の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式のWarp攻撃の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightWarpAttack = 10f;
++    /// <summary>旧形式の接近行動の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式の接近行動の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightApproach = 30f;
++    /// <summary>旧形式の突進行動の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式の突進行動の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightRush = 30f;
++    /// <summary>旧形式の待機行動の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式の待機行動の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightObserve = 20f;
++    /// <summary>旧形式の斬撃行動の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式の斬撃行動の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightSlash = 50f;
++    /// <summary>旧形式の後退行動の抽選重み。現行は距離帯別Candidates一覧を使う。</summary>
++    [UnityEngine.Tooltip("旧形式の後退行動の抽選重み。現行は距離帯別Candidates一覧を使う。")]
+     public float WeightBackstep = 20f;
+     
++    /// <summary>直前に実行した行動の重みを何倍にするか（0 = 完全に除外、1 = 変化なし）</summary>
+     [Header("Behavior")]
+     [Range(0f, 1f), Tooltip("直前に実行した行動の重みを何倍にするか（0 = 完全に除外、1 = 変化なし）")]
+     public float RepeatPenalty = 0.25f;
+@@ -27,10 +48,15 @@
+     [System.Serializable]
+     public struct ActionWeight
+     {
++        /// <summary>この抽選候補が実行するEnemy行動の種類。</summary>
++        [UnityEngine.Tooltip("この抽選候補が実行するEnemy行動の種類。")]
+         public EnemyActionType Action;
++        /// <summary>この候補の抽選重み。大きいほど選ばれやすく、直前行動にはRepeatPenaltyを掛ける。</summary>
++        [UnityEngine.Tooltip("この候補の抽選重み。大きいほど選ばれやすく、直前行動にはRepeatPenaltyを掛ける。")]
+         public float Weight;
+     }
+ 
++    /// <summary>候補: 遠距離用の行動リストと重み</summary>
+     [Header("Decision Candidates (Inspector editable lists)")]
+     [Tooltip("候補: 遠距離用の行動リストと重み")]
+     public ActionWeight[] FarCandidates = new ActionWeight[]
+@@ -39,6 +65,7 @@
+         new ActionWeight{ Action = EnemyActionType.Approach, Weight = 30f }
+     };
+ 
++    /// <summary>候補: 中距離用の行動リストと重み</summary>
+     [Tooltip("候補: 中距離用の行動リストと重み")]
+     public ActionWeight[] MidCandidates = new ActionWeight[]
+     {
+@@ -47,6 +74,7 @@
+         new ActionWeight{ Action = EnemyActionType.Wait, Weight = 20f }
+     };
+ 
++    /// <summary>候補: 近距離用の行動リストと重み</summary>
+     [Tooltip("候補: 近距離用の行動リストと重み")]
+     public ActionWeight[] NearCandidates = new ActionWeight[]
+     {
+--- a/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs
++++ b/Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs
+@@ -17,25 +17,55 @@
+     /// <summary> 回転の滑らかさ /// </summary>
+     public float RotateSmoothTime => _rotateSmoothTime;
+ 
++    /// <summary>Enemy武器を初期化する基準攻撃力。行動別Damageを使う場合はその値が優先される。</summary>
++    [UnityEngine.Tooltip("Enemy武器を初期化する基準攻撃力。行動別Damageを使う場合はその値が優先される。")]
+     [SerializeField] private float _enemyPower = 10f;
++    /// <summary>Enemyの最大HP。体力初期化とHP比率の基準。</summary>
++    [UnityEngine.Tooltip("Enemyの最大HP。体力初期化とHP比率の基準。")]
+     [SerializeField] private float _enemyMaxHealth = 100f;
+ 
++    /// <summary>追跡開始距離の基礎設定（Unity単位）。距離帯別の行動判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("追跡開始距離の基礎設定（Unity単位）。距離帯別の行動判断はEnemyDecisionConfigを使用する。")]
+     [Header("Chase Settings")]
+     [SerializeField] private float _chaseStartDistance = 10f;   // 追跡開始距離
++    /// <summary>Playerへ近づく際のNavMeshAgent停止距離（Unity単位）。</summary>
++    [UnityEngine.Tooltip("Playerへ近づく際のNavMeshAgent停止距離（Unity単位）。")]
+     [SerializeField] private float _stopDistance = 2.0f;        // 攻撃想定距離
++    /// <summary>追跡中にNavMeshAgentの目的地を更新する間隔（秒）。</summary>
++    [UnityEngine.Tooltip("追跡中にNavMeshAgentの目的地を更新する間隔（秒）。")]
+     [SerializeField] private float _destinationUpdateInterval = 0.2f;
+ 
++    /// <summary>旧形式の遠距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の遠距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。")]
+     [Header("Decision Weights")]
+     [SerializeField] public float FarDistance = 12f;
++    /// <summary>旧形式の近距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の近距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float NearDistance = 3f;
++    /// <summary>旧形式の様子見時間（秒）。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の様子見時間（秒）。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float ObserveSeconds = 1.5f;
+ 
++    /// <summary>旧形式の背後Warp行動の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の背後Warp行動の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightWarpBehind = 10f;
++    /// <summary>旧形式の接近行動の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の接近行動の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightApproach = 30f;
++    /// <summary>旧形式の突進行動の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の突進行動の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightRush = 30f;
++    /// <summary>旧形式の様子見行動の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の様子見行動の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightObserve = 20f;
++    /// <summary>旧形式の近接攻撃の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の近接攻撃の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightMelee = 50f;
++    /// <summary>旧形式の後退行動の重み。現行の判断はEnemyDecisionConfigを使用する。</summary>
++    [UnityEngine.Tooltip("旧形式の後退行動の重み。現行の判断はEnemyDecisionConfigを使用する。")]
+     [SerializeField] public float WeightBackstep = 20f;
++    /// <summary>旧回転補間の時間設定（秒）。Smooth旋回はTurnSpeedによる角速度制御を使う。</summary>
++    [UnityEngine.Tooltip("旧回転補間の時間設定（秒）。Smooth旋回はTurnSpeedによる角速度制御を使う。")]
+     [SerializeField] private float _rotateSmoothTime = 0.1f;
+ 
+     /// <summary>Enemyの旋回をAgent任せ、対象へ即時旋回、手動補間のいずれで行うか識別する。</summary>
+@@ -46,8 +76,11 @@
+         Smooth      // XZ 平面で滑らかに回転する（TurnSpeed を使用）
+     }
+ 
++    /// <summary>Enemyの向きの制御方式。Agent任せ・即時旋回・角速度で滑らかに旋回から選ぶ。</summary>
++    [UnityEngine.Tooltip("Enemyの向きの制御方式。Agent任せ・即時旋回・角速度で滑らかに旋回から選ぶ。")]
+     [Header("Rotation")]
+     public RotationControlMode RotationMode = RotationControlMode.Smooth;
++    /// <summary>回転の速度（Smooth モード時の最大角速度、度/秒）</summary>
+     [Tooltip("回転の速度（Smooth モード時の最大角速度、度/秒）")]
+     public float TurnSpeed = 360f;
+ }

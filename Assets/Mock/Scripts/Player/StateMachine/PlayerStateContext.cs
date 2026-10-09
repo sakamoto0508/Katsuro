@@ -8,6 +8,7 @@ using UniRx;
 /// </summary>
 public sealed class PlayerStateContext : IDisposable
 {
+    /// <summary>状態処理が使用するController・Mover・能力・設定などの依存先を保持する。</summary>
     public PlayerStateContext(PlayerController controller, PlayerResource playerResource, SkillGauge skillGauge, PlayerStatus status
         , PlayerMover mover, PlayerSprint sprint, PlayerGhost playerGhost, PlayerSelfSacrifice selfSacrifice
         , PlayerHeal healer, LockOnCamera lockOnCamera, PlayerStateConfig stateConfig, PlayerAttacker attacker

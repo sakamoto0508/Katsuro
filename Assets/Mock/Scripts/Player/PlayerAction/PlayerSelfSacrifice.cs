@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerSelfSacrifice : AbilityBase
 {
+    /// <summary>自傷能力が使用するゲージとコスト設定を基底能力へ渡す。</summary>
     public PlayerSelfSacrifice(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
         : base(gauge, costConfig)
     {
@@ -21,6 +22,7 @@ public sealed class PlayerSelfSacrifice : AbilityBase
     /// - 最小許容比率は設定 (SkillGaugeCostConfig.SelfSacrificeMinHpRatio) に従います。
     /// </summary>
     /// <param name="currentHpRatio">現在 HP 割合（0..1）。</param>
+    /// <returns>HP割合が開始しきい値より高く、ゲージが残っている場合はtrue。</returns>
     public bool CanBegin(float currentHpRatio)
     {
         if (currentHpRatio <= 0f) return false;
@@ -43,12 +45,9 @@ public sealed class PlayerSelfSacrifice : AbilityBase
         base.End();
     }
 
-    /// <summary>
-    /// 毎フレームの進行処理：
-    /// - 継続コスト (ゲージ) を消費できれば PublishConsumed(deltaTime) で購読者へ経過秒を通知します（購読者側で HP を減らす）。
-    /// - ゲージ不足なら自動終了します。
-    /// </summary>
+    /// <summary>自傷の継続ゲージ消費へ掛ける追加倍率。HPの消費は通知先が担当する。</summary>
     public float CostMultiplier { get; set; } = 1f;
+    /// <summary>継続ゲージを消費し、成功時は経過秒を購読者へ渡してHP消費を委譲する。ゲージ不足なら終了する。</summary>
     public override void Tick(float deltaTime)
     {
         if (!IsActive || deltaTime <= 0f) return;

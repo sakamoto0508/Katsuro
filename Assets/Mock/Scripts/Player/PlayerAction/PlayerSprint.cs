@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerSprint : AbilityBase
 {
+    /// <summary>Dashの開始・継続消費で使用するゲージとコスト設定を保持する。</summary>
     public PlayerSprint(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
         : base(gauge, costConfig)
     {

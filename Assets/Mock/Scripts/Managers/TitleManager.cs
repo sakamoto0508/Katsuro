@@ -9,19 +9,29 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class TitleManager : MonoBehaviour
 {
+    /// <summary>タイトルBGMと開始SEの登録名設定。</summary>
+    [UnityEngine.Tooltip("タイトルBGMと開始SEの登録名設定。")]
     [SerializeField] private AudioConfig _audioConfig;
+    /// <summary>開始後にロードする戦闘Scene名の設定。</summary>
+    [UnityEngine.Tooltip("開始後にロードする戦闘Scene名の設定。")]
     [SerializeField] private SceneNameConfig _sceneNameConfig;
+    /// <summary>開始操作からScene切り替えまでの待機時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("開始操作からScene切り替えまでの待機時間（実時間の秒）。")]
     [SerializeField] private float _transitionDelay = 2f;
 
     private bool _isTransitioning = false;
+    /// <summary>名前・装備選択を開くRun設定画面の参照。</summary>
+    [UnityEngine.Tooltip("名前・装備選択を開くRun設定画面の参照。")]
     [SerializeField] private RunSetupUI _setup;
 
+    /// <summary>配置済みのTitle用依存先とBGMを初期化する。</summary>
     private void Start() => Init();
 
     private readonly SceneInitialization _scene = new SceneInitialization();
     private AudioManager _audio;
     private GlobalFader _fader;
     private bool _initialized;
+    /// <summary>共有Managerとラン設定画面を接続し、Titleの表示・音声を一度だけ準備する。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -37,6 +47,7 @@ public class TitleManager : MonoBehaviour
         }
     }
 
+    /// <summary>遷移中・設定画面表示中を除き、キーボードなどの開始入力を受け付ける。</summary>
     private void Update()
     {
         if (_isTransitioning || (_setup != null && _setup.IsOpen)) return;

@@ -2,8 +2,10 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 
+/// <summary>移動入力・旋回・Rigidbody移動と攻撃Root Motionの物理反映を担当する。攻撃や能力の選択は行わない。</summary>
 public class PlayerMover
 {
+    /// <summary>移動設定・Rigidbody・PlayerとEnemyのTransform・Animatorを保持する。</summary>
     public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
         , Transform cameraPosition, PlayerAnimationController animationController, float attackRootMotionScale = 1f)
     {
@@ -34,6 +36,7 @@ public class PlayerMover
     private Vector3 _pendingAttackRootMotion;
     public bool IsUsingAttackRootMotion { get; private set; }
 
+    /// <summary>攻撃Root Motionの受付を開始し、前の攻撃の移動量を消去する。</summary>
     public void BeginAttackRootMotion()
     {
         if (IsUsingAttackRootMotion) return;
@@ -41,12 +44,14 @@ public class PlayerMover
         _pendingAttackRootMotion = Vector3.zero;
         StopAttackVelocity();
     }
+    /// <summary>攻撃Root Motionの受付と蓄積量を解除し、適用していた攻撃速度を停止する。</summary>
     public void EndAttackRootMotion()
     {
         _pendingAttackRootMotion = Vector3.zero;
         if (IsUsingAttackRootMotion) StopAttackVelocity();
         IsUsingAttackRootMotion = false;
     }
+    /// <summary>再生中の攻撃から水平移動量を蓄積する。HitStop中の移動は蓄積しない。</summary>
     public void QueueAttackRootMotion(Vector3 delta, bool animationRunning)
     {
         if (!IsUsingAttackRootMotion) return;
@@ -54,6 +59,7 @@ public class PlayerMover
         delta.y = 0f;
         _pendingAttackRootMotion += delta * _attackRootMotionScale;
     }
+    /// <summary>蓄積した攻撃移動量を衝突で制限し、物理フレームのRigidbody速度へ変換する。</summary>
     public void FixedUpdateAttackRootMotion(bool animationRunning)
     {
         if (!IsUsingAttackRootMotion) return;
@@ -63,11 +69,13 @@ public class PlayerMover
         Vector3 velocity = delta / Time.fixedDeltaTime;
         _rb.linearVelocity = new Vector3(velocity.x, _rb.linearVelocity.y, velocity.z);
     }
+    /// <summary>自身が適用した攻撃速度を停止し、垂直方向の速度を保持する。</summary>
     private void StopAttackVelocity()
     {
         if (_rb != null && !_rb.isKinematic) _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
     }
 
+    /// <summary>入力に応じた移動速度・方向と表示用Animator値を更新する。</summary>
     public void Update()
     {
         UpdateDirection();
@@ -79,6 +87,7 @@ public class PlayerMover
         
     }
 
+    /// <summary>攻撃Root Motionが優先されていなければ、通常移動と旋回を物理フレームで反映する。</summary>
     public void FixedUpdate()
     {
         if (IsUsingAttackRootMotion) return;
@@ -87,16 +96,19 @@ public class PlayerMover
         SpeedControll();
     }
 
+    /// <summary>次の移動更新に使用する平面入力を保持する。</summary>
     public void OnMove(Vector2 input)
     {
         _currentInput = input;
     }
 
+    /// <summary>通常移動速度とDash速度の選択に使用するフラグを切り替える。</summary>
     public void SetSprint(bool isSprinting)
     {
         _isSprinting = isSprinting;
     }
 
+    /// <summary>Lock-On状態と対象方向を保持し、移動・旋回の基準へ反映する。</summary>
     public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
     {
         _isLockOn = isLockOn;
@@ -107,6 +119,7 @@ public class PlayerMover
             : Vector3.zero;
     }
 
+    /// <summary>移動入力と水平移動速度を止め、静止状態のAnimator値へ戻す。</summary>
     public void MoveStop()
     {
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
@@ -117,10 +130,12 @@ public class PlayerMover
         }
     }
 
+    /// <summary>抜刀状態を記録し、移動時に使用する姿勢と速度の選択へ反映する。</summary>
     public void SetDrawingSword(bool value)=> IsDrawnSword = value;
 
     /// <summary>指定ターゲットの方向を見る。</summary>
 
+    /// <returns>対象方向への補間旋回が終了するまで待機するタスク。</returns>
     public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
     {
         if (_enemyPosition == null || _playerPosition == null) return;
@@ -147,12 +162,15 @@ public class PlayerMover
         _playerPosition.rotation = target;
     }
 
+    /// <summary>移動速度をAnimatorへ渡すための値に換算する。</summary>
+    /// <returns>現在の移動速度に対応するAnimator値。</returns>
     private float ReturnVelocity()
     {
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         return velXZ.magnitude;
     }
 
+    /// <summary>カメラとLock-On方向を基準に、入力からワールドの移動方向を求める。</summary>
     private void UpdateDirection()
     {
         // カメラ基準の前後・左右を水平面に投影し、入力からワールド方向を求める。
@@ -189,6 +207,7 @@ public class PlayerMover
         _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
     }
 
+    /// <summary>水平移動方向と速度をRigidbodyへ反映し、垂直速度を維持する。</summary>
     private void Movement()
     {
         if (_moveDirection.sqrMagnitude < 0.001f)
@@ -204,6 +223,8 @@ public class PlayerMover
         _rb.AddForce(acceleration, ForceMode.Acceleration);
     }
 
+    /// <summary>静止・歩行・Dashなど現在の入力と状態から目標速度を選ぶ。</summary>
+    /// <returns>移動状態に対応する目標速度。</returns>
     private float ResolveTargetSpeed()
     {
         if (_isLockOn)
@@ -214,6 +235,7 @@ public class PlayerMover
         return _isSprinting ? _playerStatus.UnLockSprintSpeed : _playerStatus.UnLockWalkSpeed;
     }
 
+    /// <summary>移動またはLock-Onの向きへPlayerを補間旋回させる。</summary>
     private void UpdateRotation()
     {
         if (_lookDirection.sqrMagnitude > 0.1f)
@@ -225,6 +247,7 @@ public class PlayerMover
     }
 
 
+    /// <summary>目標速度に向けて加減速し、急激な速度切り替えを抑える。</summary>
     private void SpeedControll()
     {
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
@@ -243,6 +266,8 @@ public class PlayerMover
         }
     }
 
+    /// <summary>ワールド移動方向をPlayerローカルの二軸値へ変換してAnimatorへ渡す。</summary>
+    /// <returns>移動方向を表す二軸値。</returns>
     private Vector2 ReturnVector()
     {
         Vector2 animInput = Vector2.zero;

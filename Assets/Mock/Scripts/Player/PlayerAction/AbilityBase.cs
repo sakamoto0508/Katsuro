@@ -17,17 +17,20 @@ public class AbilityBase : IDisposable
     private readonly ReactiveProperty<bool> _isActiveRx = new ReactiveProperty<bool>(false);
     private readonly Subject<float> _consumedSubject = new Subject<float>();
 
+    /// <summary>ゲージと能力コスト設定を保持し、ゲージ未指定の能力生成を拒否する。</summary>
     private protected AbilityBase(SkillGauge gauge, SkillGaugeCostConfig costConfig = null)
     {
         _skillGauge = gauge ?? throw new ArgumentNullException(nameof(gauge));
         _costConfig = costConfig;
     }
 
+    /// <summary>能力の有効状態をReactivePropertyへ反映して購読者に通知する。</summary>
     private protected void SetActive(bool active)
     {
         _isActiveRx.Value = active;
     }
 
+    /// <summary>能力が消費または進行した量を通知し、HP処理などを外部の購読者へ委譲する。</summary>
     private protected void PublishConsumed(float value)
     {
         _consumedSubject.OnNext(value);
@@ -35,10 +38,13 @@ public class AbilityBase : IDisposable
 
     public bool IsActive => _isActiveRx.Value;
 
+    /// <summary>能力の有効フラグを解除する。派生能力は終了時の追加処理を拡張できる。</summary>
     public virtual void End() => SetActive(false);
 
+    /// <summary>派生能力が時間経過による消費・終了判定を実装するための更新フック。基底では状態を変更しない。</summary>
     public virtual void Tick(float deltaTime) { }
 
+    /// <summary>能力通知を完了し、購読・消費通知・有効状態のReactiveリソースを解放する。</summary>
     public void Dispose()
     {
         _consumedSubject.OnCompleted();

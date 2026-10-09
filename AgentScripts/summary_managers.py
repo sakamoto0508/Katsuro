@@ -1,0 +1,72 @@
+import json
+from pathlib import Path
+p=Path('AgentScripts/summary_catalog.json');c=json.loads(p.read_text(encoding='utf-8'))
+rows='''
+AbilityManager.AbilityManager=移動状態とは独立して能力を継続するため、Context・各能力・HP・回避設定を保持する。
+AnimationSpeedController.Init=Animatorとその基準速度を一度だけ取得する。
+AnimationSpeedController.SetStatus=状態効果の持続倍率を更新し、基準速度と一時倍率を掛けてAnimatorへ反映する。
+AnimationSpeedController.SetTemporary=HitStopなどの一時速度と実時間の期限を設定し、現在の状態効果と合成する。
+AnimationSpeedController.Update=実時間の期限を判定し、一時倍率の自動解除と合成速度の反映を行う。
+AnimationSpeedController.OnDisable=持続・一時倍率と期限を解除し、Animatorを保存した基準速度へ戻す。
+AudioManager.BaseVolume=チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。|一時倍率を掛ける前のチャンネル音量。
+AudioManager.SetBaseVolume=チャンネルの基準音量を更新し、現在のDucking倍率を掛けた実音量を反映する。
+AudioManager.PlayJustAvoidDuck=現在の音量包絡線から回避用Duckingを再開始し、連続成功でも倍率を累積しない。
+AudioManager.Update=回避用Duckingを実時間で進め、各BGMの基準音量に倍率を掛けて反映する。
+AudioManager.UpdateDuck=指定実時刻からDucking倍率を求め、SEに触れず全BGMチャンネルへ適用する。
+AudioManager.CancelJustAvoidDuck=一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。
+AudioManager.SceneChanged=Scene切り替え時に回避用Duckingを解除する。
+AudioManager.SceneUnloaded=SceneのUnload時に一時Duckingを通常音量へ戻す。
+AudioManager.GameStateChanged=勝利・敗北・Titleなど戦闘外へ移った場合にDuckingを解除する。
+AudioManager.OnEnable=Sceneとゲーム進行の中断通知を購読する。
+AudioManager.OnDisable=中断通知の購読を解除し、一時Duckingを通常倍率へ戻す。
+AudioManager.Init=共有AudioManagerを確立し、ListenerのLowPass参照とBGM・SEプールを一度だけ準備する。
+AudioManager.InitializeAudioManager=BGMチャンネル、登録名のClip辞書とSEプールを初期化する。
+AudioManager.EnsureBGMSources=既存の単一参照を複数チャンネルへ引き継ぎ、BGM Sourceがなければ先頭チャンネルを生成する。
+AudioManager.CreateBgmChannels=設定数のBGMチャンネルを確保し、SEから独立したAudioSourceを生成する。
+AudioManager.GetBgmSource=負のチャンネルを先頭へ補正して対応するBGM Sourceを取得する。|指定チャンネルのSource。範囲外ならnull。
+AudioManager.CreateSFXPool=以前のSEプールを片付け、指定Prefabから上限内の再利用Sourceを生成する。
+AudioManager.PlayBGM=指定チャンネルへClipと基準音量を設定してループ再生する。同一Clip・基準音量で再生中なら継続する。
+AudioManager.OnDestroy=一時音量を解除し、自身が共有インスタンスの場合は参照を消去する。
+FinalBlowManager.Init=勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。
+FinalBlowManager.StartFinalBlow=重複開始を防いで回避の色と音を解除し、勝利用モノクロ・UI・決着シーケンスを開始する。
+FinalBlowManager.DoFinalBlow=HitStopとBGM停止から専用カメラ、納刀、討伐、既存Scene Fadeへ実時間で進め、中断時も一時状態を片付ける。
+FinalBlowManager.WaitUntil=開始基準の実時刻までUpdateで待機し、TimeScaleに左右されずキャンセルを受け付ける。
+FinalBlowManager.CancelPresentation=進行中の非同期演出をキャンセルし、勝利UI・Volume・カメラを復元する。
+FinalBlowManager.Cleanup=演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。
+FinalBlowManager.OnDisable=勝利シーケンスを中断して表示とカメラ・Volumeを片付ける。
+FinalBlowManager.OnDestroy=勝利演出を中断し、自身が共有インスタンスなら参照を消去する。
+GameManager.Awake=ゲーム進行管理の共有インスタンスを確立し、重複を破棄してカーソルを戦闘向けに固定する。
+GameManager.Start=Sceneの依存先を接続し、既存の戦闘開始状態へ切り替える。
+GameManager.OnDestroy=自身が共有インスタンスの場合に参照を解除する。
+GameManager.Init=Sceneの共有ManagerとPlayer・Enemy・カメラの依存先を一度だけ組み立てる。
+GameManager.StartGame=既存のゲーム状態切り替えを通して入力とBGMを戦闘用へ切り替える。
+GameManager.WinGame=進行中のランだけを勝利として完了し、Victory状態とその通知を確定する。
+GameManager.LoseGame=進行中のランだけを敗北として完了し、Defeat状態とその通知を確定する。
+GlobalFader.Init=永続する共有Faderとオーバーレイを準備し、重複オブジェクトを除去する。
+GlobalFader.OnDestroy=自身が共有Faderの場合に共有参照を解除する。
+GlobalFader.FadeToScene=遷移先を検証し、実時間の暗転後にSceneを読み込んで再表示する。多重遷移は開始しない。
+GlobalFader.FadeAlpha=指定不透明度へ実時間で補間し、破棄によるキャンセルを受け付ける。
+GlobalFader.SetAlpha=暗転用Imageを黒のまま指定不透明度へ設定する。
+HitStopManager.RegisterTarget=対象階層の速度制御を初期化し、子オブジェクトからも同じ対象へ停止を要求できるよう登録する。
+HitStopManager.Init=永続する共有HitStopManagerを確立し、重複を除去する。
+HitStopManager.PlayHitStop=登録済みの対象へ指定実時間の完全停止を要求する。TimeScaleは変更しない。
+HitStopManager.PlayHitStopSlow=登録済み対象のAnimatorへ一時速度を設定し、終了時の解除対象として保持する。
+HitStopManager.OnDisable=自身が影響を与えた速度制御の一時倍率を全解除する。
+HitStopManager.OnDestroy=自身が共有インスタンスの場合に参照を解除する。
+LoadSceneManager.LoadSceneAsync=指定した実時間の待機後に共有Faderへ遷移を要求する。所有者の破棄で待機を中断する。
+LoadSceneManager.Init=共有インスタンスとFaderを一度だけ接続する。
+LoadSceneManager.OnDestroy=自身が共有インスタンスの場合に参照を解除する。
+PlayerDeadManager.Init=敗北演出の依存先と共有インスタンスを接続し、既存Volume・暗転・死亡文字を初期化する。
+PlayerDeadManager.InitPresentation=敗北用暗転オーバーレイとVignette参照を準備し、死亡文字を非表示で待機させる。
+PlayerDeadManager.FadeVignette=現在のVignette強度と滑らかさから目標値へ実時間で補間する。
+PlayerDeadManager.OnDestroy=共有参照、文字Tween、生成MaterialとLowPassを解除し、敗北の音声補正を持ち越さない。
+SceneInitialization.Init=配置済みの共有Managerを依存順に初期化し、SceneのControllerへ渡す参照を保持する。
+SceneInitialization.InitTitleTexts=Title用の文字演出へTitleManagerと共有Faderを接続する。
+SceneInitialization.InitAll=初期化時だけ有効な同型コンポーネントを収集し、指定の接続処理を各対象へ適用する。
+TitleManager.Start=配置済みのTitle用依存先とBGMを初期化する。
+TitleManager.Init=共有Managerとラン設定画面を接続し、Titleの表示・音声を一度だけ準備する。
+TitleManager.Update=遷移中・設定画面表示中を除き、キーボードなどの開始入力を受け付ける。
+'''
+for row in rows.strip().splitlines():
+ key,value=row.split('=',1);file,method=key.split('.',1);c.setdefault(file,{})[method]=value
+p.write_text(json.dumps(c,ensure_ascii=False,indent=2),encoding='utf-8')

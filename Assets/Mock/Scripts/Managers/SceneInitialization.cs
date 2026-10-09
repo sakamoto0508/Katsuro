@@ -11,6 +11,7 @@ public sealed class SceneInitialization
     public PlayerDeadManager PlayerDead { get; private set; }
     private bool _initialized;
 
+    /// <summary>配置済みの共有Managerを依存順に初期化し、SceneのControllerへ渡す参照を保持する。</summary>
     public void Init(GameManager game = null)
     {
         if (_initialized) return;
@@ -39,11 +40,13 @@ public sealed class SceneInitialization
         InitAll<RunHUD>(x => x.Init(Fader));
     }
 
+    /// <summary>Title用の文字演出へTitleManagerと共有Faderを接続する。</summary>
     public void InitTitleTexts(TitleManager title)
     {
         InitAll<TitleText>(x => x.Init(title, Fader));
     }
 
+    /// <summary>初期化時だけ有効な同型コンポーネントを収集し、指定の接続処理を各対象へ適用する。</summary>
     private void InitAll<T>(System.Action<T> initialize) where T : MonoBehaviour
     {
         // シーン開始時にだけ配置済みの対象を収集する。実際の処理中には検索しない。

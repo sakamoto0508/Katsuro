@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerAttacker : IDisposable
 {
+    /// <summary>Animator、武器、攻撃設定と所有者を保持し、命中処理に必要な依存先を接続する。</summary>
     public PlayerAttacker(PlayerAnimationController animController, AnimationName animName,
         PlayerWeapon playerWeapon, PlayerStatus status, PlayerPassiveBuffSet passiveBuffSet,
         Transform ownerTransform, PlayerResource playerResource = null)
@@ -40,8 +41,7 @@ public sealed class PlayerAttacker : IDisposable
     private readonly Animator _ownerAnimator;
     public const string JustAvoidCounterTag = "JustAvoidCounter";
 
-    // The existing Just Avoid branch is tagged in the Animator. Buff stacks and
-    // Heavy input cannot authorize a counter; transitioning out clears eligibility.
+    /// <summary>Just Avoid Counter Attack のアニメーション中かどうかを判定する。</summary>
     private bool IsJustAvoidCounterAttack => _ownerAnimator != null && _ownerAnimator.isActiveAndEnabled &&
         (_ownerAnimator.IsInTransition(0) ? _ownerAnimator.GetNextAnimatorStateInfo(0) : _ownerAnimator.GetCurrentAnimatorStateInfo(0)).IsTag(JustAvoidCounterTag);
     private readonly PlayerResource _playerResource;
@@ -60,6 +60,7 @@ public sealed class PlayerAttacker : IDisposable
     private readonly HashSet<IDamageable> _hitTargets = new();
     private float _currentClipDamage;
 
+    /// <summary>ゲーム進行とHitStopの参照を一度だけ接続する。</summary>
     public void Init(GameManager game, HitStopManager hitStop)
     {
         if (_initialized) return;
@@ -109,7 +110,9 @@ public sealed class PlayerAttacker : IDisposable
         CombatLog.Trace($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
     }
 
+    /// <summary>弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。</summary>
     public void PlayLightAttack() => PlayLightAttack(0, false);
+    /// <summary>弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。</summary>
     public void PlayLightAttack(int comboStep) => PlayLightAttack(comboStep, false);
 
     /// <summary>ロックオン有無に応じたライト攻撃アニメを再生する。</summary>
@@ -124,7 +127,9 @@ public sealed class PlayerAttacker : IDisposable
         PlayAttackTrigger(_animName?.LightAttack, comboStep);
     }
 
+    /// <summary>強攻撃の段階を記録し、その段階の固定ダメージとAnimatorトリガーを設定する。</summary>
     public void PlayStrongAttack() => PlayStrongAttack(0);
+    /// <summary>強攻撃の段階を記録し、その段階の固定ダメージとAnimatorトリガーを設定する。</summary>
     public void PlayStrongAttack(int comboStep)
     {
         _currentIsStrongAttack = true;
@@ -134,6 +139,7 @@ public sealed class PlayerAttacker : IDisposable
         PlayAttackTrigger(_animName?.StrongAttack, comboStep);
     }
 
+    /// <summary>強攻撃の種別と段階を記録して共通のトリガー処理へ渡す。</summary>
     public void PlayStrongAttackInternal(int comboStep)
     {
         _currentIsStrongAttack = true;
@@ -171,6 +177,7 @@ public sealed class PlayerAttacker : IDisposable
         _passiveBuffSet = passiveBuffSet;
     }
 
+    /// <summary>追撃速度と武器の命中購読を解除し、保持している命中対象を消去する。</summary>
     public void Dispose()
     {
         _ownerAnimator?.GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
@@ -179,6 +186,7 @@ public sealed class PlayerAttacker : IDisposable
         _isHitboxActive = false;
     }
 
+    /// <summary>攻撃トリガー名を検証してコンボ段階をAnimatorへ渡し、命中管理を次の攻撃へ切り替える。</summary>
     private void PlayAttackTrigger(string triggerName, int comboStep)
     {
         if (string.IsNullOrEmpty(triggerName))

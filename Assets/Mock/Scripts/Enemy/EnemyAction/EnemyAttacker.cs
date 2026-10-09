@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class EnemyAttacker : IDisposable
 {
+    /// <summary>Enemyの攻撃設定、武器、Animator、基礎威力と攻撃者を保持する。</summary>
     public EnemyAttacker(EnemyAnimationController aniController, EnemyAttackData[] attackData
         , EnemyWeapon[] weapons, EnemyStuts status, Transform owner)
     {
@@ -37,6 +38,7 @@ public class EnemyAttacker : IDisposable
     private bool _currentIsHeavy;
     private HitStopManager _hitStop;
     private bool _initialized;
+    /// <summary>命中時に使用するHitStopManagerを一度だけ接続する。</summary>
     public void Init(HitStopManager hitStop)
     {
         if (_initialized) return;
@@ -84,6 +86,8 @@ public class EnemyAttacker : IDisposable
         }
     }
 
+    /// <summary>指定行動に対応する攻撃設定を候補から選ぶ。</summary>
+    /// <returns>対応する攻撃設定。候補がなければnull。</returns>
     private EnemyAttackData FindData(EnemyActionType action)
     {
         if (_attackData == null) return null;
@@ -149,6 +153,7 @@ public class EnemyAttacker : IDisposable
         damageable.ApplyDamage(damageInfo);
     }
 
+    /// <summary>全武器の命中判定を停止し、自身が登録した命中通知ハンドラを解除する。</summary>
     public void Dispose()
     {
         DisableWeaponHitbox();

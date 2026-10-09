@@ -13,6 +13,7 @@ public sealed class PlayerStateMachine : IDisposable
     private readonly CompositeDisposable _animationEventSubscriptions = new();
     private PlayerState _currentState;
 
+    /// <summary>共有Contextを保持し、各Player状態とAnimation Event購読を準備する。</summary>
     public PlayerStateMachine(PlayerStateContext context)
     {
         Context = context;
@@ -35,6 +36,7 @@ public sealed class PlayerStateMachine : IDisposable
     /// <summary>ステート間で共有される依存情報。</summary>
     public PlayerStateContext Context { get; }
 
+    /// <summary>Combo受付と攻撃終了の通知を現在状態へ転送する購読を登録する。</summary>
     private void SubscribeAnimationEvents()
     {
         var stream = Context?.AnimationEvents;
@@ -59,6 +61,7 @@ public sealed class PlayerStateMachine : IDisposable
             .AddTo(_animationEventSubscriptions);
     }
 
+    /// <summary>Animation Eventなどの購読を解除し、破棄後の状態呼び出しを防ぐ。</summary>
     public void Dispose()
     {
         _currentState?.Exit();

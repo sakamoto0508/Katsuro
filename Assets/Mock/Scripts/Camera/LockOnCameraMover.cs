@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>ロックオン中に視点を手動制御する際のカメラ移動を行う。</summary>
 public class LockOnCameraMover
 {
+    /// <summary>追従対象とカメラ設定を保持し、Brainの有効状態に応じた追従先を準備する。</summary>
     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition,
         Transform enemyPosition, CinemachineCamera camera, CameraConfig config)
     {
@@ -24,6 +25,7 @@ public class LockOnCameraMover
     private Camera _mainCamera;
     private CinemachineBrain _brain;
 
+    /// <summary>有効なLock-On対象を向く位置と角度へ補間する。対象を失った場合はLock-Onを解除する。</summary>
     public void LateUpdate()
     {
         if (_lockOnCamera == null || !_lockOnCamera.IsLockOn) return;

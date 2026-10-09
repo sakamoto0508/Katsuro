@@ -6,7 +6,10 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
 {
+    /// <summary>Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。</summary>
     public AnimationName AnimName => _animName;
+    /// <summary>Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。</summary>
+    [UnityEngine.Tooltip("Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。")]
     [SerializeField] private AnimationName _animName;
     private Animator _animator;
     private int _moveVelocityHash;
@@ -59,10 +62,8 @@ public class PlayerAnimationController : MonoBehaviour
         _animator?.SetInteger(parameterName, value);
     }
 
-    /// <summary>
-    /// Animator 参照を取得する。
-    /// </summary>
     private bool _initialized;
+    /// <summary>Animatorを取得し、移動パラメータのハッシュを一度だけ初期化する。</summary>
     public void Init()
     {
         if (_initialized) return;

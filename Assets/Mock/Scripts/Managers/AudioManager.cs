@@ -2,33 +2,58 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>AudioManagerで参照する登録名とAudioClipを対応付ける。</summary>
 [System.Serializable]
 public class SoundData
 {
+    /// <summary>AudioManagerからClipを検索する登録名。AudioConfigやAnimation Eventの指定名と一致させる。</summary>
+    [UnityEngine.Tooltip("AudioManagerからClipを検索する登録名。AudioConfigやAnimation Eventの指定名と一致させる。")]
     public string name;      // サウンドの名前（識別用）。
+    /// <summary>この登録名で再生するAudioClip。</summary>
+    [UnityEngine.Tooltip("この登録名で再生するAudioClip。")]
     public AudioClip clip;   // 再生する AudioClip。
 }
 
+/// <summary>複数BGMチャンネルとSEプールを管理する。BGM基準音量と一時的なDucking倍率を分離して保持する。</summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
+    /// <summary>タイトル・戦闘・命中などの再生登録名を共有する設定。</summary>
     public AudioConfig AudioConfig => _audioConfig; 
 
+    /// <summary>単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。</summary>
+    [UnityEngine.Tooltip("単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。")]
     [Header("BGM 用 AudioSource")]
     [SerializeField] private AudioSource bgmSource;
+    /// <summary>BGMを再生するAudioSource一覧。各チャンネルの基準音量へ一時Ducking倍率を掛ける。</summary>
+    [UnityEngine.Tooltip("BGMを再生するAudioSource一覧。各チャンネルの基準音量へ一時Ducking倍率を掛ける。")]
     [Header("BGM 用 AudioSources (複数チャンネル対応)")]
     [SerializeField] private List<AudioSource> bgmSources = new List<AudioSource>();
+    /// <summary>SEプールを生成するAudioSource Prefab。SE再生用のSource設定を引き継ぐ。</summary>
+    [UnityEngine.Tooltip("SEプールを生成するAudioSource Prefab。SE再生用のSource設定を引き継ぐ。")]
     [Header("SE 用 AudioSource (Prefab)")]
     [SerializeField] private AudioSource sfxSourcePrefab;
+    /// <summary>BGMの登録名とAudioClipの対応一覧。登録名からClipを検索する。</summary>
+    [UnityEngine.Tooltip("BGMの登録名とAudioClipの対応一覧。登録名からClipを検索する。")]
     [Header("BGM リスト")]
     [SerializeField] private List<SoundData> bgmList = new List<SoundData>();
+    /// <summary>SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。</summary>
+    [UnityEngine.Tooltip("SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。")]
     [Header("SE リスト")]
     [SerializeField] private List<SoundData> seList = new List<SoundData>();
+    /// <summary>初期化時に用意するSE用AudioSource数。</summary>
+    [UnityEngine.Tooltip("初期化時に用意するSE用AudioSource数。")]
     [Header("SFX プールサイズ")]
     [SerializeField] private int sfxPoolSize = 10;
+    /// <summary>SE用AudioSourceプールの最大数。同時再生で増やせる上限。</summary>
+    [UnityEngine.Tooltip("SE用AudioSourceプールの最大数。同時再生で増やせる上限。")]
     [SerializeField, Min(1)] private int maxSfxPoolSize = 32;
+    /// <summary>タイトル・戦闘・命中などの再生登録名を共有する設定。</summary>
+    [UnityEngine.Tooltip("タイトル・戦闘・命中などの再生登録名を共有する設定。")]
     [Header("オーディオ設定")]
     [SerializeField] private AudioConfig _audioConfig;
+    /// <summary>敗北演出のローパスを適用するAudioListener参照。</summary>
+    [UnityEngine.Tooltip("敗北演出のローパスを適用するAudioListener参照。")]
     [SerializeField] private AudioListener _audioListener;
 
     private Dictionary<string, AudioClip> _bgmDict = new Dictionary<string, AudioClip>();
@@ -36,34 +61,50 @@ public class AudioManager : MonoBehaviour
     private List<AudioSource> _sfxPool = new List<AudioSource>();
 
     private AudioLowPassFilter _lowPass;
+    /// <summary>初期化で確保するBGMチャンネル数。複数BGMの切り替えに使用する。</summary>
+    [UnityEngine.Tooltip("初期化で確保するBGMチャンネル数。複数BGMの切り替えに使用する。")]
     [SerializeField, Min(3)] private int _bgmChannelCount = 3;
     private bool _initialized;
+    /// <summary>Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。</summary>
+    [UnityEngine.Tooltip("Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。")]
     [Header("Just Avoid BGM Duck (unscaled seconds)")]
     [SerializeField, Range(0, 1)] private float _justAvoidDuckVolume = .25f;
+    /// <summary>BGMが一時音量へ下がる時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("BGMが一時音量へ下がる時間（実時間の秒）。")]
     [SerializeField, Min(0)] private float _justAvoidDuckEnter = .03f;
+    /// <summary>Just Avoidの一時BGM音量を保持する時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("Just Avoidの一時BGM音量を保持する時間（実時間の秒）。")]
     [SerializeField, Min(0)] private float _justAvoidDuckHold = .10f;
+    /// <summary>BGMが基準音量へ戻る時間（実時間の秒）。停止済みBGMを再開しない。</summary>
+    [UnityEngine.Tooltip("BGMが基準音量へ戻る時間（実時間の秒）。停止済みBGMを再開しない。")]
     [SerializeField, Min(0)] private float _justAvoidDuckRestore = .18f;
     private readonly Dictionary<AudioSource, float> _bgmBaseVolumes = new();
     private JustAvoidEnvelope _duckEnvelope;
     private float _duckMultiplier = 1;
+    /// <summary>チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。</summary>
+    /// <returns>一時倍率を掛ける前のチャンネル音量。</returns>
     private float BaseVolume(AudioSource source)
     {
         if (!_bgmBaseVolumes.TryGetValue(source, out float volume))
             _bgmBaseVolumes[source] = volume = source.volume;
         return volume;
     }
+    /// <summary>チャンネルの基準音量を更新し、現在のDucking倍率を掛けた実音量を反映する。</summary>
     private void SetBaseVolume(AudioSource source, float volume)
     {
         _bgmBaseVolumes[source] = volume;
         source.volume = volume * _duckMultiplier;
     }
+    /// <summary>現在の音量包絡線から回避用Duckingを再開始し、連続成功でも倍率を累積しない。</summary>
     public void PlayJustAvoidDuck()
     {
         if (!isActiveAndEnabled) return;
         UpdateDuck(Time.unscaledTime);
         _duckEnvelope.Begin(Time.unscaledTime);
     }
+    /// <summary>回避用Duckingを実時間で進め、各BGMの基準音量に倍率を掛けて反映する。</summary>
     private void Update() => UpdateDuck(Time.unscaledTime);
+    /// <summary>指定実時刻からDucking倍率を求め、SEに触れず全BGMチャンネルへ適用する。</summary>
     private void UpdateDuck(float now)
     {
         _duckMultiplier = Mathf.Lerp(1, _justAvoidDuckVolume,
@@ -71,19 +112,25 @@ public class AudioManager : MonoBehaviour
         if (bgmSources != null) foreach (var source in bgmSources)
             if (source != null) source.volume = BaseVolume(source) * _duckMultiplier;
     }
+    /// <summary>一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。</summary>
     public void CancelJustAvoidDuck() { _duckEnvelope.Reset(); UpdateDuck(Time.unscaledTime); }
+    /// <summary>Scene切り替え時に回避用Duckingを解除する。</summary>
     private void SceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next) => CancelJustAvoidDuck();
+    /// <summary>SceneのUnload時に一時Duckingを通常音量へ戻す。</summary>
     private void SceneUnloaded(UnityEngine.SceneManagement.Scene scene) => CancelJustAvoidDuck();
+    /// <summary>勝利・敗北・Titleなど戦闘外へ移った場合にDuckingを解除する。</summary>
     private void GameStateChanged(GameManager.GameState state)
     {
         if (state != GameManager.GameState.InGame && state != GameManager.GameState.Pause) CancelJustAvoidDuck();
     }
+    /// <summary>Sceneとゲーム進行の中断通知を購読する。</summary>
     private void OnEnable()
     {
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
         UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SceneUnloaded;
         GameManager.OnGameStateChanged += GameStateChanged;
     }
+    /// <summary>中断通知の購読を解除し、一時Duckingを通常倍率へ戻す。</summary>
     private void OnDisable()
     {
         UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= SceneChanged;
@@ -91,6 +138,7 @@ public class AudioManager : MonoBehaviour
         GameManager.OnGameStateChanged -= GameStateChanged;
         CancelJustAvoidDuck();
     }
+    /// <summary>共有AudioManagerを確立し、ListenerのLowPass参照とBGM・SEプールを一度だけ準備する。</summary>
     public void Init(AudioListener listener)
     {
         if (Instance != null && Instance != this)
@@ -123,6 +171,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>BGMチャンネル、登録名のClip辞書とSEプールを初期化する。</summary>
     private void InitializeAudioManager()
     {
         // BGM 用 AudioSource を準備する（複数チャンネル対応）。
@@ -153,6 +202,7 @@ public class AudioManager : MonoBehaviour
         CreateSFXPool();
     }
 
+    /// <summary>既存の単一参照を複数チャンネルへ引き継ぎ、BGM Sourceがなければ先頭チャンネルを生成する。</summary>
     private void EnsureBGMSources()
     {
         // bgmSources リストを保証し、既存の単一 bgmSource が割り当てられている場合はそれを利用する。
@@ -178,6 +228,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>設定数のBGMチャンネルを確保し、SEから独立したAudioSourceを生成する。</summary>
     private void CreateBgmChannels()
     {
         while (bgmSources.Count < Mathf.Max(3, _bgmChannelCount))
@@ -191,11 +242,14 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>負のチャンネルを先頭へ補正して対応するBGM Sourceを取得する。</summary>
+    /// <returns>指定チャンネルのSource。範囲外ならnull。</returns>
     private AudioSource GetBgmSource(int channel)
     {
         channel = Mathf.Max(0, channel);
         return bgmSources != null && channel < bgmSources.Count ? bgmSources[channel] : null;
     }
+    /// <summary>以前のSEプールを片付け、指定Prefabから上限内の再利用Sourceを生成する。</summary>
     private void CreateSFXPool()
     {
         // 既存のプールを破棄してから再生成する。
@@ -223,6 +277,7 @@ public class AudioManager : MonoBehaviour
     }
 
 
+    /// <summary>指定チャンネルへClipと基準音量を設定してループ再生する。同一Clip・基準音量で再生中なら継続する。</summary>
     public void PlayBGM(AudioClip clip, int channel = 0, float volume = 1f)
     {
         if (clip == null) return;
@@ -457,6 +512,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    /// <summary>一時音量を解除し、自身が共有インスタンスの場合は参照を消去する。</summary>
     private void OnDestroy()
     {
         CancelJustAvoidDuck();

@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerStrongAttackState : PlayerAttackState
 {
+    /// <summary>強攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。</summary>
     public PlayerStrongAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
         : base(context, stateMachine, context?.StateConfig?.GetStrongAttackDuration() ?? 1.0f)
     {

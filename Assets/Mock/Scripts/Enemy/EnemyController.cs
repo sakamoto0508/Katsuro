@@ -4,6 +4,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>Enemyの依存先を接続し、AI更新・命中・死亡・Animation Eventを統括する。死亡後の戦闘更新を遮断する。</summary>
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyController : MonoBehaviour, IDamageable
 {
@@ -12,49 +13,78 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
 
+    /// <summary>EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。</summary>
+    [UnityEngine.Tooltip("EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。")]
     [Header("Enemy Status")]
     [SerializeField] private EnemyStuts _enemyStuts;
+    /// <summary>Enemy Animatorのパラメータ名を共有する設定参照。</summary>
+    [UnityEngine.Tooltip("Enemy Animatorのパラメータ名を共有する設定参照。")]
     [SerializeField] private AnimationName _animName;
 
+    /// <summary>Enemyの武器攻撃判定Collider。Animation Eventと死亡処理でON/OFFする。</summary>
+    [UnityEngine.Tooltip("Enemyの武器攻撃判定Collider。Animation Eventと死亡処理でON/OFFする。")]
     [Header("Weapon")]
     [SerializeField] private Collider[] _enemyWeaponColliders;
+    /// <summary>Player武器との接触を調整するために参照するCollider一覧。</summary>
+    [UnityEngine.Tooltip("Player武器との接触を調整するために参照するCollider一覧。")]
     [SerializeField] private Collider[] _playerWeaponColliders;
 
+    /// <summary>Enemy本体のAnimator。攻撃・移動・死亡・Root Motionの状態を取得する。</summary>
+    [UnityEngine.Tooltip("Enemy本体のAnimator。攻撃・移動・死亡・Root Motionの状態を取得する。")]
     [Header("Attack")]
     [SerializeField] private Animator _animator;
+    /// <summary>行動種類に対応する攻撃Trigger・Damageの設定一覧。</summary>
+    [UnityEngine.Tooltip("行動種類に対応する攻撃Trigger・Damageの設定一覧。")]
     [SerializeField] private EnemyAttackData[] _attackData;
 
+    /// <summary>距離帯別の行動候補・抽選重みを定義したAI設定。</summary>
+    [UnityEngine.Tooltip("距離帯別の行動候補・抽選重みを定義したAI設定。")]
     [Header("AI")]
     [SerializeField] private EnemyDecisionConfig _decisionConfig;
+    /// <summary>後退行動でPlayerから離れる目標距離（Unity単位）。</summary>
+    [UnityEngine.Tooltip("後退行動でPlayerから離れる目標距離（Unity単位）。")]
     [SerializeField] private float _stepBackDistance = 2f;
 
+    /// <summary>Enemyの登録済み見た目Effectを再生するコンポーネント参照。</summary>
+    [UnityEngine.Tooltip("Enemyの登録済み見た目Effectを再生するコンポーネント参照。")]
     [SerializeField] private CharacterEffect _characterEffect;
+    /// <summary>旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。</summary>
+    [UnityEngine.Tooltip("旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。")]
     [SerializeField] private int _enemyDeadDelay = 2000;
 
     private EnemyAnimationController _enemyAnimController;
     private EnemyHealth _health;
     private EnemyAttacker _attacker;
     private EnemyMover _mover;
+    /// <summary>Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
+    [UnityEngine.Tooltip("Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
     private int _attackAnimationHash;
+    /// <summary>Root Motionを所有する攻撃Stateが記録されているか。通常被弾の表示量の調整に使用する。</summary>
     public bool IsAttackAnimationActive => _attackAnimationHash != 0;
+    /// <summary>戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。</summary>
+    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
     public void BeginAnimationAttackRootMotion(int stateHash)
     {
         if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
         _attackAnimationHash = stateHash;
         _mover?.BeginAttackRootMotion();
     }
+    /// <summary>終了Stateが攻撃移動の所有者に一致する場合だけ移動停止を解除する。</summary>
+    /// <param name="stateHash">終了したStateのfullPathHash。現在の所有者と一致する場合だけ解除する。</param>
     public void EndAnimationAttackRootMotion(int stateHash)
     {
         if (_attackAnimationHash != stateHash) return;
         _attackAnimationHash = 0;
         _mover?.ReleaseMovementAfterAttack();
     }
+    /// <summary>戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。</summary>
     private void FixedUpdate()
     {
         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
         _mover?.FixedUpdateAttackRootMotion();
     }
+    /// <summary>攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。</summary>
     private void OnDisable()
     {
         _attackAnimationHash = 0;
@@ -75,6 +105,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private bool _initialized;
     private bool _reactionInterruptedAttack;
 
+    /// <summary>EnemyのHP・AI・移動・武器・演出を作成し、ゲーム進行と命中通知を一度だけ接続する。</summary>
     public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader, CameraManager cameraManager = null, VFXConfig vfxConfig = null)
     {
         if (_initialized) return;
@@ -109,6 +140,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_characterEffect != null) _characterEffect.PlayEffect_CharacterEffect();
     }
 
+    /// <summary>生成直後の初期化を一フレーム待ってCharacterEffectを再生する。破棄時は待機をキャンセルする。</summary>
     private async UniTask PlayEffectNextFrame(string key)
     {
         // 生成したプレハブと視覚効果の初期化を待つため、1フレーム待機する。
@@ -133,6 +165,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// 公開: ダメージを適用するエントリポイント。DamageInfo を受け取り HP を減算します。
     /// </summary>
     // IDamageable インターフェース実装（正確なシグネチャ）
+    /// <summary>通常の命中情報をクリティカルなしの共通ダメージ処理へ渡す。</summary>
     public void ApplyDamage(DamageInfo info)
     {
         ApplyDamage(info, false);
@@ -180,6 +213,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary>Root Motionを終了し、武器購読とHP通知の所有リソースを解放する。</summary>
     private void OnDestroy()
     {
         _mover?.EndAttackRootMotion();
@@ -187,6 +221,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _health?.Dispose();
     }
 
+    /// <summary>戦闘中だけ被弾の復帰・AI判断・予約行動・移動を順に進める。死亡時は歩行表示を停止する。</summary>
     private void Update()
     {
         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.ResetLocomotionAnimation(); return; }
@@ -247,6 +282,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _mover?.Update();
     }
 
+    /// <summary>死亡を確定して攻撃・AI更新・移動を停止し、既存死亡ClipとFinal Blowまたは遷移を要求する。</summary>
     private void EnemyDead()
     {
         _combatFeedback?.CancelNormalHitReaction();
@@ -265,6 +301,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         else _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 2000).Forget();
     }
 
+    /// <summary>所有中の攻撃Stateの移動をMoverへ渡す。死亡・別Stateへの切り替えではRoot Motionを解除する。</summary>
     private void OnAnimatorMove()
     {
         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
@@ -326,6 +363,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _mover?.ReleaseMovementAfterAttack();
     }
 
+    /// <summary>有効な後退終了Eventで移動を再開し、AIへ行動完了を通知する。死亡・大被弾中は無視する。</summary>
     public void AnimEvent_OnStepBackFinished()
     {
         if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
@@ -336,6 +374,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _mover?.ReleaseMovementAfterAttack();
     }
 
+    /// <summary>Clipから指定されたSEを再生し、診断用の戦闘ログへ記録する。</summary>
     public void AnimEvent_OnSoundEffect(string soundName)
     {
         _audio?.PlaySE(soundName);

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>PlayerInputから行動別InputActionを取得し、コンポーネントの有効状態に合わせて入力受付を切り替える。</summary>
 [RequireComponent(typeof(PlayerInput))]
 public class InputBuffer : MonoBehaviour
 {
@@ -31,9 +32,12 @@ public class InputBuffer : MonoBehaviour
     private InputAction _healAction;
     private InputAction _sprintAction;
 
+    /// <summary>行動別InputActionを有効にして入力受付を再開する。</summary>
     private void OnEnable() => SetActionsEnabled(true);
+    /// <summary>行動別InputActionを無効にし、停止中のゲームへ入力を渡さない。</summary>
     private void OnDisable() => SetActionsEnabled(false);
 
+    /// <summary>保持している移動・攻撃・能力・カメラの入力Actionをまとめて切り替える。</summary>
     private void SetActionsEnabled(bool value)
     {
         SetActionEnabled(_moveAction, value);
@@ -46,6 +50,7 @@ public class InputBuffer : MonoBehaviour
         SetActionEnabled(_sprintAction, value);
     }
 
+    /// <summary>未取得Actionを無視し、有効化または無効化を適用する。</summary>
     private static void SetActionEnabled(InputAction action, bool value)
     {
         if (action == null) return;
@@ -54,6 +59,7 @@ public class InputBuffer : MonoBehaviour
     }
 
     private bool _initialized;
+    /// <summary>PlayerInputから必要な名前付きActionを一度だけ取得する。</summary>
     public void Init()
     {
         if (_initialized) return;

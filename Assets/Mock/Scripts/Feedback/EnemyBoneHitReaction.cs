@@ -20,6 +20,7 @@ public sealed class EnemyBoneHitReaction
     public bool IsActive => _active;
     public float Elapsed => _elapsed;
 
+    /// <summary>Humanoidの上半身の骨を取得し、通常被弾を分散する重みと遅延を準備する。</summary>
     public EnemyBoneHitReaction(Transform root, Animator animator)
     {
         _root = root;
@@ -41,6 +42,8 @@ public sealed class EnemyBoneHitReaction
             _bones.Add(new BoneOffset { Bone = bone, Weight = weight, Delay = delay });
     }
 
+    /// <summary>攻撃者から離れる水平衝撃方向を求め、Enemyのローカル座標へ変換する。</summary>
+    /// <returns>通常被弾の傾きに使用するローカル衝撃方向。</returns>
     public static Vector3 GetLocalImpulse(Transform root, DamageInfo info)
     {
         Vector3 away = info.Instigator != null ? root.position - info.Instigator.transform.position : Vector3.zero;
@@ -51,6 +54,7 @@ public sealed class EnemyBoneHitReaction
         return root.InverseTransformDirection(away.normalized);
     }
 
+    /// <summary>命中方向と攻撃角度から骨補正の目標を設定する。再被弾は現在値から接続して補正を累積しない。</summary>
     public void Begin(DamageInfo info, float angle, float duration, float attackScale)
     {
         _continuing = _active;
@@ -62,6 +66,8 @@ public sealed class EnemyBoneHitReaction
         _active = _bones.Count > 0;
     }
 
+    /// <summary>衝撃初期の立ち上がりと後半の減衰を持つ骨反応の重みを計算する。</summary>
+    /// <returns>被弾経過時間に対応する0から1の重み。</returns>
     public static float Envelope(float age, float duration)
     {
         if (age < 0f || age >= duration) return 0f;
@@ -70,6 +76,7 @@ public sealed class EnemyBoneHitReaction
         return 1f - Mathf.SmoothStep(0f, 1f, (age - peak) / (duration - peak));
     }
 
+    /// <summary>Animator速度を掛けた時間で骨反応を進め、HitStop中は進行を止める。</summary>
     public void Tick(float deltaTime, float animatorSpeed)
     {
         if (!_active) return;
@@ -77,6 +84,7 @@ public sealed class EnemyBoneHitReaction
         if (_elapsed >= _duration + .020f) Clear();
     }
 
+    /// <summary>Animatorが更新した基準姿勢へ重み付き骨回転を重ね、次の更新で除去する姿勢を記録する。</summary>
     public void Apply()
     {
         // Also makes repeated LateUpdate/Hit calls safe when Animator did not evaluate.
@@ -97,6 +105,7 @@ public sealed class EnemyBoneHitReaction
         }
     }
 
+    /// <summary>前回の補正姿勢が残っている骨だけ基準姿勢へ戻し、新しく評価されたAnimator姿勢を保護する。</summary>
     public void RemoveOffsets()
     {
         foreach (var bone in _bones)
@@ -108,6 +117,7 @@ public sealed class EnemyBoneHitReaction
         }
     }
 
+    /// <summary>全骨の補正を除去し、通常被弾の目標・時計・所有状態を消去する。</summary>
     public void Clear()
     {
         RemoveOffsets();

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public sealed class BossBarSilhouette : BaseMeshEffect
 {
+    /// <summary>ボスHPバーの輪郭を作る正規化座標の頂点一覧。RectTransformの大きさへ変換して描画する。</summary>
+    [UnityEngine.Tooltip("ボスHPバーの輪郭を作る正規化座標の頂点一覧。RectTransformの大きさへ変換して描画する。")]
     [SerializeField] private Vector2[] _outline = {
         new Vector2(0,.15f),new Vector2(0,.60f),new Vector2(.018f,.73f),
         new Vector2(.455f,.73f),new Vector2(.469f,.78f),new Vector2(.479f,.90f),
@@ -13,6 +15,7 @@ public sealed class BossBarSilhouette : BaseMeshEffect
         new Vector2(.982f,.73f),new Vector2(1,.60f),new Vector2(1,.15f),
         new Vector2(.981f,0),new Vector2(.019f,0)
     };
+    /// <summary>通常の四角形Imageを指定輪郭の三角形群へ置き換え、バーの装飾外側を描画しない。</summary>
     public override void ModifyMesh(VertexHelper vh)
     {
         if (!IsActive() || vh.currentVertCount!=4 || _outline==null || _outline.Length<3) return;
@@ -23,6 +26,7 @@ public sealed class BossBarSilhouette : BaseMeshEffect
         foreach(var point in _outline) Add(vh,bottom,top,point);
         for(int i=0;i<_outline.Length;i++)vh.AddTriangle(0,i+1,(i+1)%_outline.Length+1);
     }
+    /// <summary>輪郭の正規化座標から元Imageの位置とUVを補間し、描画頂点を追加する。</summary>
     private static void Add(VertexHelper vh,UIVertex bottom,UIVertex top,Vector2 point)
     {
         var vertex=bottom;

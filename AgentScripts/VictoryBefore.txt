@@ -1,0 +1,41 @@
+Brain {"MonoBehaviour":{"m_Enabled":true,"m_EditorHideFlags":0,"m_Name":"","m_EditorClassIdentifier":"Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain","ShowDebugText":false,"ShowCameraFrustum":true,"IgnoreTimeScale":false,"WorldUpOverride":{"instanceID":0},"ChannelMask":-1,"UpdateMethod":2,"BlendUpdateMethod":1,"LensModeOverride":{"Enabled":false,"DefaultMode":2},"DefaultBlend":{"Style":1,"Time":2.0,"CustomCurve":{"serializedVersion":"2","m_Curve":[],"m_PreInfinity":2,"m_PostInfinity":2,"m_RotationOrder":4}},"CustomBlends":{"instanceID":0}}}
+FinalBlow {"MonoBehaviour":{"m_Enabled":true,"m_EditorHideFlags":0,"m_Name":"","m_EditorClassIdentifier":"Assembly-CSharp::FinalBlowManager","_audioConfig":{"fileID":11400000,"guid":"01b6a76e3828a8543a849f7445b4bb22","type":2},"_player":{"instanceID":0},"_enemyController":{"instanceID":0},"_phase1HitStop":0.20000000298023225,"_whiteFlashDuration":0.10000000149011612,"_phase2Duration":2.299999952316284,"_finalBlowText":{"instanceID":0},"_finalBlowTextFadeIn":0.3499999940395355,"_presentation":{"instanceID":0},"_cameraFeedback":{"instanceID":0},"_cameraPushDelay":0.18000000715255738,"_sheathingDelay":0.800000011920929,"_textDelay":1.0499999523162842}}
+Presentation {"MonoBehaviour":{"m_Enabled":true,"m_EditorHideFlags":0,"m_Name":"","m_EditorClassIdentifier":"Assembly-CSharp::FinalBlowPresentation","_whiteFlash":{"instanceID":0},"_letterboxTop":{"instanceID":0},"_letterboxBottom":{"instanceID":0},"_hudGroups":[{"instanceID":0},{"instanceID":0}],"_hudVisibilityOwners":[{"instanceID":0},{"instanceID":0}],"_damageNumbers":{"instanceID":0},"_flashStrength":0.800000011920929,"_flashDelay":0.019999999552965165,"_hudFadeDelay":0.11999999731779099,"_hudFadeDuration":0.23000000417232514,"_letterboxDelay":0.15000000596046449,"_letterboxDuration":0.25,"_letterboxHeight":0.07999999821186066}}
+Any->ARPG_Samurai_Attack_Heavy1_Start duration=0.25
+Any->ARPG_Samurai_Death2 duration=0.2499999
+Any->Samurai_UnequipB duration=0.25
+Any->ARPG_Halberd_Death2 duration=0.25
+Any->LightFront duration=0.08
+Any->LightBack duration=0.08
+Any->LightLeft duration=0.08
+Any->LightRight duration=0.08
+Any->HeavyFront duration=0.08
+Any->HeavyBack duration=0.08
+Any->HeavyLeft duration=0.08
+Any->HeavyRight duration=0.08
+Sheath clip __preview__HumanM@SheatheBack01_Both length=1
+Sheath clip HumanM@SheatheBack01_Both length=0.7333333
+Sheath clip __preview__HumanM@SheatheBack01_L length=1
+Sheath clip HumanM@SheatheBack01_L length=0.7333333
+Sheath clip __preview__HumanM@SheatheBack01_R length=1
+Sheath clip HumanM@SheatheBack01_R length=0.7333333
+Sheath clip __preview__HumanM@SheatheHips01_Both length=1
+Sheath clip HumanM@SheatheHips01_Both length=0.7333333
+Sheath clip __preview__HumanM@SheatheHips01_L length=1
+Sheath clip HumanM@SheatheHips01_L length=0.7333333
+Sheath clip __preview__HumanM@SheatheHips01_R length=1
+Sheath clip HumanM@SheatheHips01_R length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheBack01_Both length=1
+Sheath clip HumanM@UnsheatheBack01_Both length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheBack01_L length=1
+Sheath clip HumanM@UnsheatheBack01_L length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheBack01_R length=1
+Sheath clip HumanM@UnsheatheBack01_R length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheHips01_Both length=1
+Sheath clip HumanM@UnsheatheHips01_Both length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheHips01_L length=1
+Sheath clip HumanM@UnsheatheHips01_L length=0.7333333
+Sheath clip __preview__HumanM@UnsheatheHips01_R length=1
+Sheath clip HumanM@UnsheatheHips01_R length=0.7333333
+EnemyDeadSound=EnemyDead
+Audio={"MonoBehaviour":{"m_Enabled":true,"m_EditorHideFlags":0,"m_Name":"","m_EditorClassIdentifier":"Assembly-CSharp::AudioManager","bgmSource":{"instanceID":0},"bgmSources":[],"sfxSourcePrefab":{"instanceID":0},"bgmList":[{"name":"TitleBGM","clip":{"fileID":8300000,"guid":"2dc35d9da56105f4c9c619a062569fc4","type":3}},{"name":"InGameBGM","clip":{"fileID":8300000,"guid":"a1c15d862d4d56b459a8a309dfb16c52","type":3}}],"seList":[{"name":"StartSE","clip":{"fileID":8300000,"guid":"1f807c5eb909a884f86c2f0f912cf6bc","type":3}},{"name":"Sheathing","clip":{"fileID":8300000,"guid":"9a6f886439a99b34baf051631463c47c","type":3}},{"name":"Drawing","clip":{"fileID":8300000,"guid":"33dcd419d6c88494781cddbc09e9b0b7","type":3}},{"name":"LockOn","clip":{"fileID":8300000,"guid":"165e1c8be425c2848a40ff627d338332","type":3}},{"name":"Slash","clip":{"fileID":8300000,"guid":"cf0e5fe19fc14c74f9e1759a780d1d78","type":3}},{"name":"Damage","clip":{"fileID":8300000,"guid":"6895fde4b737c86478834953b544b93c","type":3}},{"name":"Iai","clip":{"fileID":8300000,"guid":"2f89b99ce7fc729468feb891fd98f74c","type":3}},{"name":"Slash2","clip":{"fileID":8300000,"guid":"e8d6653c8d3f50c4bbb3d73ce5988e9a","type":3}},{"name":"Poke","clip":{"fileID":8300000,"guid":"b01b146af99981148b388d2c10e3e689","type":3}},{"name":"BigSlash","clip":{"fileID":8300000,"guid":"d38b7f1a68a1ef841b4bd6fbba47feaa","type":3}},{"name":"NormalSlash","clip":{"fileID":8300000,"guid":"34b0e6c3e31350b4abf77717082f83b5","type":3}},{"name":"SmallSlash","clip":{"fileID":8300000,"guid":"f74925b5042cf104bac84a38124c8a53","type":3}},{"name":"NormalSlash2","clip":{"fileID":8300000,"guid":"e8d6653c8d3f50c4bbb3d73ce5988e9a","type":3}},{"name":"NormalSlash2","clip":{"fileID":8300000,"guid":"e8d6653c8d3f50c4bbb3d73ce5988e9a","type":3}},{"name":"JustAvoid","clip":{"fileID":8300000,"guid":"e8d6653c8d3f50c4bbb3d73ce5988e9a","type":3}},{"name":"EnemyDead","clip":{"fileID":8300000,"guid":"bdcc5db5ce36ff3409d90d57452d3f6c","type":3}},{"name":"Death","clip":{"fileID":8300000,"guid":"7f51de64f3d2963439302f857b69f11f","type":3}}],"sfxPoolSize":14,"maxSfxPoolSize":32,"_audioConfig":{"fileID":11400000,"guid":"01b6a76e3828a8543a849f7445b4bb22","type":2},"_audioListener":{"instanceID":0},"_bgmChannelCount":3,"_justAvoidDuckVolume":0.25,"_justAvoidDuckEnter":0.029999999329447748,"_justAvoidDuckHold":0.10000000149011612,"_justAvoidDuckRestore":0.18000000715255738}}

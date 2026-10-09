@@ -6,32 +6,69 @@ public sealed class CombatFeedback : MonoBehaviour
 {
     [Header("Ghost shimmer")]
     /// <summary> ゴースト表示時の色。 </summary>
+    [Tooltip("幽体化中の体色と透明度。")]
     [SerializeField] private Color _ghostTint = new Color(.66f, .78f, .8f, .35f);
     /// <summary>
     /// ゴースト表示時の揺れの大きさ。値が大きいほど揺れが大きくなる。
     /// </summary>
+    [Tooltip("幽体化中の輪郭の揺れ幅。大きいほど揺れが目立つ。")]
     [SerializeField, Range(0f, .03f)] private float _ghostSway = .009f;
     /// <summary>
     /// ゴースト表示時の流れる速度。値が大きいほど流れが速くなる。
     /// </summary>
+    [Tooltip("幽体化の輪郭を流す速度倍率。")]
     [SerializeField, Range(.1f, 4f)] private float _ghostFlowSpeed = 1.2f;
+    /// <summary>Just Avoid成功時の固定残像を表示する時間（秒）。</summary>
+    [Tooltip("Just Avoid成功時の固定残像を表示する時間（秒）。")]
     [Header("ジャスト回避")]
     [SerializeField, Min(.01f)] private float _afterImageDuration = .3f;
+    /// <summary>Just Avoid成功時の残像Flashの継続時間（秒）。</summary>
+    [Tooltip("Just Avoid成功時の残像Flashの継続時間（秒）。")]
     [SerializeField, Min(.01f)] private float _flashDuration = .15f;
+    /// <summary>Just Avoid成功時の固定残像の色と初期透明度。</summary>
+    [Tooltip("Just Avoid成功時の固定残像の色と初期透明度。")]
     [SerializeField] private Color _afterImageTint = new Color(.75f, .9f, 1f, .3f);
+    /// <summary>Just Avoid成功時の残像Flashの色と初期透明度。</summary>
+    [Tooltip("Just Avoid成功時の残像Flashの色と初期透明度。")]
     [SerializeField] private Color _flashTint = new Color(.85f, .95f, 1f, .65f);
+    /// <summary>命中時に体へ加えるFlashの継続時間（秒）。</summary>
+    [Tooltip("命中時に体へ加えるFlashの継続時間（秒）。")]
     [Header("接触フィードバック")]
     [SerializeField, Min(.01f)] private float _hitFlashDuration = .09f;
+    /// <summary>Just Avoid成功時の小さなFlashの継続時間（秒）。</summary>
+    [Tooltip("Just Avoid成功時の小さなFlashの継続時間（秒）。")]
     [SerializeField, Min(.01f)] private float _justAvoidFlashDuration = .09f;
+    /// <summary>Just Avoid成功時の小さなFlashのサイズ（Unity単位）。</summary>
+    [Tooltip("Just Avoid成功時の小さなFlashのサイズ（Unity単位）。")]
     [SerializeField, Min(.01f)] private float _justAvoidFlashSize = .35f;
+    /// <summary>通常Light命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。</summary>
+    [Tooltip("通常Light命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。")]
     [SerializeField, Range(0f, 20f)] private float _lightReactionAngle = 5f;
+    /// <summary>通常Heavy命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。</summary>
+    [Tooltip("通常Heavy命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。")]
     [SerializeField, Range(0f, 25f)] private float _heavyReactionAngle = 10f;
+    /// <summary>通常命中の局所的な体の反応時間（秒）。</summary>
+    [Tooltip("通常命中の局所的な体の反応時間（秒）。")]
     [SerializeField, Min(.01f)] private float _reactionDuration = .18f;
+    /// <summary>Enemyが通常Heavyを受けた際の局所反応時間（秒）。</summary>
+    [Tooltip("Enemyが通常Heavyを受けた際の局所反応時間（秒）。")]
     [Header("Enemy normal hit presentation only")]
     [SerializeField, Range(.18f, .25f)] private float _enemyHeavyReactionDuration = .22f;
+    /// <summary>Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。</summary>
+    [Tooltip("Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。")]
     [SerializeField, Range(.3f, 1f)] private float _enemyAttackReactionScale = .55f;
+    /// <summary>EnemyへLightが命中した際の体Flashの強さ。</summary>
+    [Tooltip("EnemyへLightが命中した際の体Flashの強さ。")]
     [SerializeField, Range(0f, .5f)] private float _enemyLightFlashStrength = .18f;
+    /// <summary>EnemyへHeavyが命中した際の体Flashの強さ。</summary>
+    [Tooltip("EnemyへHeavyが命中した際の体Flashの強さ。")]
     [SerializeField, Range(0f, .5f)] private float _enemyHeavyFlashStrength = .28f;
+    /// <summary>Just Avoid成功時に体へ加えるFlashの強さ。</summary>
+    [Tooltip("Just Avoid成功時に体へ加えるFlashの強さ。")]
+    [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
+    /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
+    [SerializeField, Range(.12f, .16f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
+    private float _justAvoidCounterHitStop = .14f;
     private EnemyController _enemyOwner;
     private EnemyAnimationController _enemyAnimation;
     private Animator _reactionAnimator;
@@ -40,7 +77,6 @@ public sealed class CombatFeedback : MonoBehaviour
     private Material _normalFlashMaterial;
     private float _normalFlashUntil, _normalFlashLength;
     private bool _normalFlashHeavy;
-    [SerializeField, Range(0f, 1f)] private float _justAvoidBodyFlashStrength = .2f;
     private Vector3 _reactionEuler;
     private CameraManager _cameraFeedback;
     private JustAvoidScreenDistortion _screenDistortion;
@@ -76,6 +112,7 @@ public sealed class CombatFeedback : MonoBehaviour
     private bool _initialized;
     private JustAvoidContrast _justAvoidContrast;
 
+    /// <summary>キャラクター表示と命中演出を準備し、Playerには回避演出、Enemyには通常被弾用の骨補正を接続する。</summary>
     public void Init(AudioManager audio = null, VFXConfig vfxConfig = null, CameraManager camera = null, HitStopManager hitStop = null, bool enableJustAvoid = true)
     {
         if (_initialized) return;
@@ -112,6 +149,7 @@ public sealed class CombatFeedback : MonoBehaviour
         if (enableJustAvoid && (audio != null || vfxConfig != null)) PrepareJustAvoid(shader);
     }
 
+    /// <summary>元のMeshと骨を共有するEnemy用の光オーバーレイを準備し、元Materialを差し替えず命中を表現する。</summary>
     private void PrepareNormalHitFlash(Shader shader)
     {
         if (shader == null) return;
@@ -134,6 +172,7 @@ public sealed class CombatFeedback : MonoBehaviour
         }
     }
 
+    /// <summary>攻撃種別と実時間の終了時刻を記録して通常被弾Flashを開始する。</summary>
     private void BeginNormalHitFlash(bool heavy)
     {
         _normalFlashHeavy = heavy;
@@ -141,6 +180,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _normalFlashUntil = Time.unscaledTime + _normalFlashLength;
     }
 
+    /// <summary>元MeshのBlendShapeを追従し、攻撃種別に応じた光を減衰させて終了時に非表示にする。</summary>
     private void UpdateNormalHitFlash()
     {
         if (_normalFlashMaterial == null) return;
@@ -155,6 +195,7 @@ public sealed class CombatFeedback : MonoBehaviour
         }
     }
 
+    /// <summary>通常被弾の骨補正と光を解除し、大被弾・死亡へ持ち越さない。</summary>
     public void CancelNormalHitReaction()
     {
         _enemyBoneReaction?.Clear();
@@ -162,6 +203,7 @@ public sealed class CombatFeedback : MonoBehaviour
         UpdateNormalHitFlash();
     }
 
+    /// <summary>成功時の固定残像・Flash・任意Shockwaveに使用するMeshとMaterialを準備する。</summary>
     private void PrepareJustAvoid(Shader shader)
     {
         if (shader != null)
@@ -230,6 +272,8 @@ public sealed class CombatFeedback : MonoBehaviour
         }
     }
 
+    /// <summary>Meshのサブメッシュ数に合わせて同一Materialの参照配列を作る。</summary>
+    /// <returns>サブメッシュに割り当てるMaterial配列。</returns>
     private Material[] RepeatedMaterial(Material material, int count)
     {
         var materials = new Material[count];
@@ -239,6 +283,7 @@ public sealed class CombatFeedback : MonoBehaviour
 
     /// <summary>成立通知から一度だけ呼ぶ。判定、ゲージ、スローには触れない。</summary>
     public void PlayJustAvoidFeedback() => PlayJustAvoidFeedback(new DamageInfo(0, transform.position + Vector3.up, transform.forward, null, null));
+    /// <summary>既定の接触位置で共通の成功演出を要求する。成功判定や追撃受付は変更しない。</summary>
     public void PlayJustAvoidFeedback(DamageInfo info)
     {
         if (!_initialized || !isActiveAndEnabled) return;
@@ -288,6 +333,7 @@ public sealed class CombatFeedback : MonoBehaviour
         UpdateJustAvoid();
     }
 
+    /// <summary>成功からの実経過時間に応じて残像・Flash・Shockwaveを減衰し、終了後に表示を解除する。</summary>
     private void UpdateJustAvoid()
     {
         if (!_justAvoidPlaying) return;
@@ -321,6 +367,7 @@ public sealed class CombatFeedback : MonoBehaviour
         if (elapsed >= Mathf.Max(_afterImageDuration, Mathf.Max(_flashDuration, shockwaveDuration))) StopJustAvoid();
     }
 
+    /// <summary>Shockwaveの粒子を停止・消去して表示オブジェクトを非表示にする。</summary>
     private void StopShockwave()
     {
         if (_shockwaveRoot == null || !_shockwaveRoot.activeSelf) return;
@@ -329,6 +376,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _shockwaveRoot.SetActive(false);
     }
 
+    /// <summary>回避用の残像とFlash、Shockwaveを停止する。新しい成功の色・音の時計は別の所有者が管理する。</summary>
     private void StopJustAvoid()
     {
         _justAvoidPlaying = false;
@@ -359,10 +407,7 @@ public sealed class CombatFeedback : MonoBehaviour
         Refresh();
     }
 
-    /// <summary>受理された命中から同期して演出する。AI、移動、攻撃状態は変更しない。</summary>
-    [SerializeField, Range(.12f, .16f), Tooltip("Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。")]
-    private float _justAvoidCounterHitStop = .14f;
-
+    /// <summary>攻撃情報または既定の被弾で、音・HitStop・接触VFXと必要な骨反応を開始する。</summary>
     public void Hit(DamageInfo info, bool useBoneReaction = true)
     {
         if (!_initialized || !isActiveAndEnabled) return;
@@ -406,6 +451,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint);
     }
 
+    /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
     private void PrepareContactFeedback()
     {
         _contactPulse = new ContactPulse(gameObject.layer);
@@ -437,6 +483,7 @@ public sealed class CombatFeedback : MonoBehaviour
             }
         }
     }
+    /// <summary>再利用する命中Prefabを接触位置へ配置し、攻撃種別に応じた粒子量と速度で再生する。</summary>
     private void PlayHitVFX(DamageInfo info)
     {
         if (_hitRoots == null) return;
@@ -476,6 +523,8 @@ public sealed class CombatFeedback : MonoBehaviour
             particle.Play(false);
         }
     }
+    /// <summary>元のParticleカーブを保持しながら指定倍率を反映する。</summary>
+    /// <returns>倍率を反映した粒子用カーブ。</returns>
     private static ParticleSystem.MinMaxCurve ScaleHitCurve(ParticleSystem.MinMaxCurve value, float scale)
     {
         if (value.mode == ParticleSystemCurveMode.Constant) value.constant *= scale;
@@ -485,12 +534,14 @@ public sealed class CombatFeedback : MonoBehaviour
         return value;
     }
 
+    /// <summary>指定スロットの粒子を停止・消去し、命中表示を非表示にする。</summary>
     private void StopHitVFX(int i)
     {
         foreach (var particle in _hitParticles[i]) if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         _hitRoots[i].SetActive(false);
     }
 
+    /// <summary>前フレームの骨補正を除去し、被弾・回避・接触演出の終了時刻と表示状態を更新する。</summary>
     private void Update() 
     { 
         RemoveOffset(); 
@@ -503,6 +554,7 @@ public sealed class CombatFeedback : MonoBehaviour
                 if (_hitRoots[i].activeSelf && Time.unscaledTime - _hitStarted[i] >= _vfxConfig.HitVFXDuration) StopHitVFX(i);
     }
 
+    /// <summary>Animator更新後の姿勢へキャラクター別の被弾補正を重ねる。Enemyの通常反応は死亡・大被弾で解除する。</summary>
     private void LateUpdate()
     {
         if (_enemyOwner != null)
@@ -553,6 +605,7 @@ public sealed class CombatFeedback : MonoBehaviour
             if (_renderers[i] != null) _renderers[i].sharedMaterials = visible ? _glow[i] : _original[i];
     }
 
+    /// <summary>回避・命中・骨補正を停止してMaterialと表示状態を通常へ戻す。</summary>
     private void OnDisable()
     {
         _justAvoidContrast?.Cancel();
@@ -565,6 +618,7 @@ public sealed class CombatFeedback : MonoBehaviour
         Refresh();
     }
 
+    /// <summary>生成したFlash・残像・ParticleオブジェクトとMesh・Materialを解放する。</summary>
     private void OnDestroy() 
     { 
         _enemyBoneReaction?.Clear();
@@ -595,6 +649,7 @@ internal sealed class ContactPulse
     private readonly Material material;
     private readonly Mesh mesh;
     private int next;
+    /// <summary>接触Flash用Mesh・Materialと固定数の表示スロットを準備する。</summary>
     public ContactPulse(int layer)
     {
         var shader = Resources.Load<Shader>("ContactFlash");
@@ -616,6 +671,7 @@ internal sealed class ContactPulse
             renderers[i].receiveShadows = false; objects[i].SetActive(false);
         }
     }
+    /// <summary>次の再利用スロットを接触位置へ配置し、サイズ・色・実時間の寿命を設定する。</summary>
     public void Play(Vector3 position, Vector3 direction, float size, float duration, float strength, Color? tint = null)
     {
         if (objects == null) return;
@@ -627,6 +683,7 @@ internal sealed class ContactPulse
         tints[i] = tint ?? new Color(.86f, .95f, 1f);
         objects[i].SetActive(true); Update();
     }
+    /// <summary>有効な接触Flashの実時間に応じて透明度を下げ、寿命を過ぎたスロットを非表示にする。</summary>
     public void Update()
     {
         if (objects == null) return;
@@ -640,7 +697,9 @@ internal sealed class ContactPulse
             renderers[i].SetPropertyBlock(block);
         }
     }
+    /// <summary>接触Flashの全スロットを即座に非表示にする。</summary>
     public void Stop() { if (objects != null) foreach (var obj in objects) if (obj != null) obj.SetActive(false); }
+    /// <summary>接触Flashの表示オブジェクトと所有するMesh・Materialを解放する。</summary>
     public void Dispose()
     {
         if (objects != null) foreach (var obj in objects) if (obj != null) Object.Destroy(obj);

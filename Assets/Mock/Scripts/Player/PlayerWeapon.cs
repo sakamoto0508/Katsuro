@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerWeapon
 {
+    /// <summary>刀の判定Colliderと自己衝突を無視するCollider一覧を保持する。</summary>
     public PlayerWeapon(Collider[] weaponColliders, Collider[] ignoreColliders = null)
     {
         _weaponColliders = weaponColliders;
@@ -20,7 +21,9 @@ public sealed class PlayerWeapon
     private readonly Dictionary<Collider, SwordTrail> _trails = new();
     private readonly Dictionary<BoxCollider, Vector3> _authoredSizes = new();
     private bool _initialized;
+    /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
     public void Init() => Init(Vector3.zero);
+    /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
     public void Init(Vector3 padding)
     {
         if (_initialized) return;
@@ -55,6 +58,7 @@ public sealed class PlayerWeapon
     /// <summary>ヒットボックスを無効化する。</summary>
     public void DisableHitbox() => SetHitboxActive(false);
 
+    /// <summary>保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。</summary>
     public void SetTrailStyle(SwordTrail.AttackStyle style)
     {
         foreach (var trail in _trails.Values) trail.SetStyle(style);
@@ -88,9 +92,12 @@ public sealed class PlayerWeapon
         }
     }
 
+    /// <summary>初期化時に保存した刀判定Relayを列挙する。</summary>
+    /// <returns>登録済みの命中通知Relay。</returns>
     private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
 
     /// <summary>対象に最も近い刀の判定部分から、接触面の位置を求める。</summary>
+    /// <returns>刀の判定形状と対象の近接点から求めた接触位置。</returns>
     public Vector3 GetContactPoint(Collider target)
     {
         Vector3 point = target.bounds.center;
@@ -107,6 +114,7 @@ public sealed class PlayerWeapon
     }
 
     /// <summary>接触点と同じ最寄りの刀から、血飛沫用の移動方向を取得する。</summary>
+    /// <returns>直近の刀の振りから求めた斬撃方向。取得できなければ対象との方向。</returns>
     public Vector3 GetSlashDirection(Collider target)
     {
         float nearest = float.PositiveInfinity;
@@ -123,6 +131,7 @@ public sealed class PlayerWeapon
         return direction;
     }
 
+    /// <summary>刀Colliderと軌跡の受付をまとめて切り替え、判定区間と表示区間を対応させる。</summary>
     private void SetHitboxActive(bool isActive)
     {
         if (_weaponColliders == null)
@@ -142,6 +151,7 @@ public sealed class PlayerWeapon
         }
     }
 
+    /// <summary>指定された自己Colliderとの衝突を刀Colliderごとに無視する。</summary>
     private void SetupIgnoreCollisions()
     {
         if (_weaponColliders == null || _ignoreColliders == null) return;

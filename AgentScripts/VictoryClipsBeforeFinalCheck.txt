@@ -1,0 +1,7 @@
+ARPG_Samurai_Death2 speed=1 clip=Assets/InportAssets/ARPGPack/ARPGSamurai/Animations/Humanoid/ARPG_Samurai_Death2.anim length=1.25
+Event 0.55 AnimEvent_OnSoundEffect Death
+Samurai_UnequipB speed=1 clip=Assets/Mock/Animation/Player/Samurai_UnequipB.anim length=2.066667
+Event 1.266667 AnimEvent_OnSoundEffect Sheathing
+Event 1.316667 AnimEvent_OnSwordSheathing 
+ARPG_Halberd_Death2 speed=1 clip=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Death2.anim length=1.233333
+Event 0.6166667 AnimEvent_OnSoundEffect Death

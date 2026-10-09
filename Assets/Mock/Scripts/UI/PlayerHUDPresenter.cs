@@ -58,6 +58,7 @@ namespace Mock.UI
             _view.SetSkillNormalized(_skillNormalizedReactive.Value);
         }
 
+        /// <summary>現在HPを最大HPで正規化してViewへ渡す。最大HPが無効ならゼロ表示にする。</summary>
         private void UpdateHp(float hp)
         {
             var norm = _maxHp > 0f ? hp / _maxHp : 0f;

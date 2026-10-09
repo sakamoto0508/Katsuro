@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public sealed class AbilityManager
 {
+    /// <summary>移動状態とは独立して能力を継続するため、Context・各能力・HP・回避設定を保持する。</summary>
     public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
     {
         _context = context;
@@ -16,6 +17,7 @@ public sealed class AbilityManager
         _stateConfig = stateConfig;
     }
 
+    /// <summary>幽体化の開始・解除・開始失敗を呼び出し側へ伝える。</summary>
     public enum GhostToggleResult
     {
         Began,
@@ -70,6 +72,7 @@ public sealed class AbilityManager
     }
 
     /// <summary>ゴーストのトグル（開始 / 終了）を行う。結果を返す。</summary>
+    /// <returns>開始・解除・失敗を表す結果。</returns>
     public GhostToggleResult ToggleGhost()
     {
         if (_ghost == null) return GhostToggleResult.Failed;
@@ -100,6 +103,7 @@ public sealed class AbilityManager
     /// <summary>
     /// SelfSacrifice のトグル（開始 / 終了）。開始は現在HP比で許可されるかを確認してから行う。
     /// </summary>
+    /// <returns>要求に応じて自傷能力を切り替えられた場合はtrue。</returns>
     public bool ToggleSelfSacrifice()
     {
         var s = _selfSacrifice;
@@ -123,6 +127,7 @@ public sealed class AbilityManager
     /// <summary>
     /// Heal のトグル（開始 / 終了）。開始時はデフォルトの回復速度を使用します。
     /// </summary>
+    /// <returns>要求に応じて回復能力を切り替えられた場合はtrue。</returns>
     public bool ToggleHeal()
     {
         var h = _healer;

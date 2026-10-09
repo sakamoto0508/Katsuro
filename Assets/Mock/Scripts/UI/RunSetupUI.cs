@@ -6,20 +6,41 @@ using UnityEngine.UI;
 /// <summary>シーンに配置して使用する画面表示。配置・文字・見た目はプレハブで設定する。</summary>
 public sealed class RunSetupUI : MonoBehaviour
 {
+    /// <summary>名前・装備選択画面全体の表示と入力受付を切り替えるCanvasGroup。</summary>
+    [UnityEngine.Tooltip("名前・装備選択画面全体の表示と入力受付を切り替えるCanvasGroup。")]
     [SerializeField] private CanvasGroup _panel;
+    /// <summary>新しいRunの挑戦者名を入力するTMP Input Field。</summary>
+    [UnityEngine.Tooltip("新しいRunの挑戦者名を入力するTMP Input Field。")]
     [SerializeField] private TMP_InputField _nameInput;
+    /// <summary>攻撃装備を選ぶToggle一覧。配列順をRunSession.AttackNamesに合わせる。</summary>
+    [UnityEngine.Tooltip("攻撃装備を選ぶToggle一覧。配列順をRunSession.AttackNamesに合わせる。")]
     [SerializeField] private Toggle[] _attackOptions;
+    /// <summary>防御装備を選ぶToggle一覧。配列順をRunSession.DefenseNamesに合わせる。</summary>
+    [UnityEngine.Tooltip("防御装備を選ぶToggle一覧。配列順をRunSession.DefenseNamesに合わせる。")]
     [SerializeField] private Toggle[] _defenseOptions;
+    /// <summary>選択中の攻撃装備の効果説明を表示するTMPテキスト。</summary>
+    [UnityEngine.Tooltip("選択中の攻撃装備の効果説明を表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _attackDescription;
+    /// <summary>選択中の防御装備の効果説明を表示するTMPテキスト。</summary>
+    [UnityEngine.Tooltip("選択中の防御装備の効果説明を表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _defenseDescription;
+    /// <summary>前回勝者と継承装備の説明を表示するTMPテキスト。</summary>
+    [UnityEngine.Tooltip("前回勝者と継承装備の説明を表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _opponent;
+    /// <summary>残機・復活・勝者継承ルールを表示するTMPテキスト。</summary>
+    [UnityEngine.Tooltip("残機・復活・勝者継承ルールを表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _rules;
+    /// <summary>前回の勝敗結果と保存エラーを表示するTMPテキスト。</summary>
+    [UnityEngine.Tooltip("前回の勝敗結果と保存エラーを表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _result;
+    /// <summary>入力した名前と装備でRunを確定し、戦闘を開始するButton。</summary>
+    [UnityEngine.Tooltip("入力した名前と装備でRunを確定し、戦闘を開始するButton。")]
     [SerializeField] private Button _startButton;
     public bool IsOpen { get; private set; }
     private TitleManager _title;
     private int _attack, _defense, _openedFrame;
     private bool _initialized;
+    /// <summary>装備Toggleと開始Buttonの通知を一度だけ接続し、初期状態では設定画面を隠す。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -37,6 +58,7 @@ public sealed class RunSetupUI : MonoBehaviour
         }
         _startButton.onClick.AddListener(Confirm);
     }
+    /// <summary>保存中の名前・装備・前回勝者を表示し、操作可能な設定画面とUI選択を開始する。</summary>
     public void Open(TitleManager title)
     {
         _title = title;
@@ -59,11 +81,13 @@ public sealed class RunSetupUI : MonoBehaviour
         Cursor.visible = true;
         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_attackOptions[_attack].gameObject);
     }
+    /// <summary>現在選択中の攻撃・防御装備の効果説明を更新する。</summary>
     private void RefreshDescriptions()
     {
         _attackDescription.text = RunSession.AttackDescription(_attack);
         _defenseDescription.text = RunSession.DefenseDescription(_defense);
     }
+    /// <summary>画面を開いた同フレームの入力を除外し、選択内容でランを開始してTitleの遷移を要求する。</summary>
     public void Confirm()
     {
         // 画面を開いたときの入力で、そのまま決定されないようにする。
@@ -75,6 +99,7 @@ public sealed class RunSetupUI : MonoBehaviour
         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
         _title.BeginConfiguredGame();
     }
+    /// <summary>設定パネルの不透明度と入力・Raycast受付をまとめて切り替える。</summary>
     private void SetVisible(bool value)
     {
         _panel.alpha = value ? 1f : 0f;

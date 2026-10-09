@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public sealed class EnemyWeapon
 {
+    /// <summary>刀判定Colliderと攻撃設定未指定時の基礎威力を保持する。</summary>
     public EnemyWeapon(Collider[] weaponColliders, float fallbackPower)
     {
         _weaponColliders = weaponColliders;
@@ -21,6 +22,7 @@ public sealed class EnemyWeapon
 
     private readonly Dictionary<Collider, SwordTrail> _trails = new();
     private bool _initialized;
+    /// <summary>武器ColliderのTrigger Relayと刀の軌跡を一度だけ準備する。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -85,9 +87,12 @@ public sealed class EnemyWeapon
         }
     }
 
+    /// <summary>武器に保存した命中通知Relayを列挙する。</summary>
+    /// <returns>登録済みの武器Relay。</returns>
     private IEnumerable<WeaponHitboxRelay> EnumerateRelays() => _relayCache.Values;
 
     /// <summary>対象に最も近い刀の判定部分から、接触面の位置を求める。</summary>
+    /// <returns>刀の判定形状と対象の近接点から求めた接触位置。</returns>
     public Vector3 GetContactPoint(Collider target)
     {
         Vector3 point = target.bounds.center;
@@ -103,6 +108,7 @@ public sealed class EnemyWeapon
         return point;
     }
 
+    /// <summary>武器Colliderと軌跡の有効状態を切り替え、攻撃判定区間と表示を同期する。</summary>
     private void SetHitboxActive(bool isActive)
     {
         if (_weaponColliders == null)
@@ -129,6 +135,7 @@ public sealed class EnemyWeapon
     }
 
     /// <summary>この武器のダメージ量（ステータス参照）。</summary>
+    /// <returns>攻撃中の指定威力。指定が正でなければ基礎威力。</returns>
     public float Damage()
     {
         if (_currentAttackDamage > 0f) return _currentAttackDamage;

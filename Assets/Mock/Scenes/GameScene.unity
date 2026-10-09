@@ -122322,12 +122322,12 @@ MonoBehaviour:
   _whiteFlashDuration: 0.1
   _phase2Duration: 2.3
   _finalBlowText: {fileID: 1887536387}
-  _finalBlowTextFadeIn: 0.35
+  _finalBlowTextFadeIn: 0.22
   _presentation: {fileID: 1176989965}
   _cameraFeedback: {fileID: 1106239549}
   _cameraPushDelay: 0.18
   _sheathingDelay: 0.8
-  _textDelay: 1.05
+  _textDelay: 2.12
 --- !u!1001 &2064576541
 PrefabInstance:
   m_ObjectHideFlags: 0

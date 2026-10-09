@@ -1,0 +1,4 @@
+using System;using UnityEngine;using UnityEditor;
+public static class SaveVictoryOverlay {
+ public static string Run(){if(EditorApplication.isPlaying)throw new Exception("Edit Mode required");const string path="Assets/Mock/UI/FinalBlowOverlay.prefab";var root=PrefabUtility.LoadPrefabContents(path);try{var p=root.GetComponentInChildren<FinalBlowPresentation>(true);if(p==null)throw new Exception("Presentation missing");var so=new SerializedObject(p);so.FindProperty("_textStartScale").floatValue=.9f;so.FindProperty("_textOvershootScale").floatValue=1.025f;so.FindProperty("_textRiseFraction").floatValue=.55f;so.ApplyModifiedPropertiesWithoutUndo();EditorUtility.SetDirty(p);PrefabUtility.SaveAsPrefabAsset(root,path,out bool saved);if(!saved)throw new Exception("Save failed");}finally{PrefabUtility.UnloadPrefabContents(root);}AssetDatabase.SaveAssets();return "Saved FinalBlowOverlay.prefab: text scales=.9/1.025, rise fraction=.55; Edit Mode.";}
+}

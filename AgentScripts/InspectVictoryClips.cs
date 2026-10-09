@@ -1,0 +1,5 @@
+using System;using System.Text;using System.IO;using UnityEngine;using UnityEditor;using UnityEditor.Animations;
+public static class InspectVictoryClips {
+ static void Walk(AnimatorStateMachine sm,StringBuilder b){foreach(var item in sm.states){var s=item.state;if(s.name.Contains("Unequip")||s.name.Contains("Death")){var c=s.motion as AnimationClip;b.AppendLine(s.name+" speed="+s.speed+" clip="+AssetDatabase.GetAssetPath(c)+" length="+c?.length);if(c!=null)foreach(var e in AnimationUtility.GetAnimationEvents(c))b.AppendLine("Event "+e.time+" "+e.functionName+" "+e.stringParameter);foreach(var t in s.transitions)b.AppendLine("Exit "+t.destinationState?.name+" "+t.exitTime+" "+t.duration);}}foreach(var child in sm.stateMachines)Walk(child.stateMachine,b);}
+ public static string Run(){var b=new StringBuilder();foreach(var p in new[]{"Assets/Mock/AnimationController/Player.controller","Assets/Mock/AnimationController/Enemy.controller"})foreach(var l in AssetDatabase.LoadAssetAtPath<AnimatorController>(p).layers)Walk(l.stateMachine,b);File.WriteAllText("AgentScripts/VictoryClips.txt",b.ToString());return b.ToString();}
+}

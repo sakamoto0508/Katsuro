@@ -4,27 +4,58 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class SwordTrail : MonoBehaviour
 {
+    /// <summary>通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。</summary>
     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
+    /// <summary>通常攻撃の刀軌跡を残す時間（秒）。</summary>
+    [UnityEngine.Tooltip("通常攻撃の刀軌跡を残す時間（秒）。")]
     [Header("刀身の軌跡")]
     [SerializeField, Min(.01f)] private float _duration = .11f;
+    /// <summary>刀身の根元を示すTransform。刃先との間を軌跡の幅として使う。</summary>
+    [UnityEngine.Tooltip("刀身の根元を示すTransform。刃先との間を軌跡の幅として使う。")]
     [SerializeField] private Transform _bladeBase;
+    /// <summary>刀の刃先を示すTransform。刀身の軌跡の外側を生成する。</summary>
+    [UnityEngine.Tooltip("刀の刃先を示すTransform。刀身の軌跡の外側を生成する。")]
     [SerializeField] private Transform _tip;
+    /// <summary>実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。</summary>
     [Tooltip("実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。")]
     [SerializeField, Range(0f, 1f)] private float _bladeTrailStart = .48f;
+    /// <summary>同じ刀の複数Colliderは、代表となるSwordTrailを共有する。</summary>
     [Tooltip("同じ刀の複数Colliderは、代表となるSwordTrailを共有する。")]
     [SerializeField] private SwordTrail _sharedTrail;
+    /// <summary>刀軌跡を描画するMaterial参照。未設定なら対応ShaderからMaterialを生成する。</summary>
+    [UnityEngine.Tooltip("刀軌跡を描画するMaterial参照。未設定なら対応ShaderからMaterialを生成する。")]
     [SerializeField] private Material _trailMaterial;
+    /// <summary>通常攻撃の軌跡の明るさ倍率。</summary>
+    [UnityEngine.Tooltip("通常攻撃の軌跡の明るさ倍率。")]
     [SerializeField, Range(0f, 2f)] private float _brightness = .8f;
+    /// <summary>時間経過で軌跡を消すFade曲線の指数。</summary>
+    [UnityEngine.Tooltip("時間経過で軌跡を消すFade曲線の指数。")]
     [SerializeField, Min(.1f)] private float _fade = 1.5f;
+    /// <summary>刀軌跡の基準色と透明度。</summary>
+    [UnityEngine.Tooltip("刀軌跡の基準色と透明度。")]
     [SerializeField] private Color _color = new Color(.78f, .9f, 1f, .32f);
+    /// <summary>軌跡を出し始める刀の最低速度（Unity単位/秒）。低速の三角形を抑える。</summary>
+    [UnityEngine.Tooltip("軌跡を出し始める刀の最低速度（Unity単位/秒）。低速の三角形を抑える。")]
     [Header("振りの速度 / 攻撃差")]
     [SerializeField, Min(0f)] private float _minimumSpeed = 3.5f;
+    /// <summary>軌跡の表示強度が最大になる刀の速度（Unity単位/秒）。</summary>
+    [UnityEngine.Tooltip("軌跡の表示強度が最大になる刀の速度（Unity単位/秒）。")]
     [SerializeField, Min(.1f)] private float _fullSpeed = 16f;
+    /// <summary>Heavy攻撃の刀軌跡を残す時間（秒）。</summary>
+    [UnityEngine.Tooltip("Heavy攻撃の刀軌跡を残す時間（秒）。")]
     [SerializeField, Min(.01f)] private float _heavyDuration = .13f;
+    /// <summary>Just Avoid追撃の刀軌跡を残す時間（秒）。</summary>
+    [UnityEngine.Tooltip("Just Avoid追撃の刀軌跡を残す時間（秒）。")]
     [SerializeField, Min(.01f)] private float _counterDuration = .15f;
+    /// <summary>通常の明るさへ掛けるHeavy攻撃の追加倍率。</summary>
+    [UnityEngine.Tooltip("通常の明るさへ掛けるHeavy攻撃の追加倍率。")]
     [SerializeField, Range(1f, 2f)] private float _heavyBrightness = 1.18f;
+    /// <summary>通常の明るさへ掛けるJust Avoid追撃の追加倍率。</summary>
+    [UnityEngine.Tooltip("通常の明るさへ掛けるJust Avoid追撃の追加倍率。")]
     [SerializeField, Range(1f, 2f)] private float _counterBrightness = 1.35f;
     // 旧Prefabの幅設定を保持する。端点未設定の場合だけ使う。
+    /// <summary>刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。</summary>
+    [UnityEngine.Tooltip("刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。")]
     [SerializeField, HideInInspector] private float _width = .045f;
     private const int Capacity = 40;
     private readonly Vector3[] bases = new Vector3[Capacity], tips = new Vector3[Capacity];
@@ -47,11 +78,13 @@ public sealed class SwordTrail : MonoBehaviour
     private float previousTime, speedStrength;
     private bool hasPrevious;
 
+    /// <summary>共有先を含む刀の軌跡を攻撃種別の持続時間・明るさへ切り替える。</summary>
     public void SetStyle(AttackStyle value)
     {
         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value); return; }
         style = value;
     }
+    /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
     public void SetActive(bool active)
     {
         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetActive(active); return; }
@@ -59,6 +92,8 @@ public sealed class SwordTrail : MonoBehaviour
         emitting = active;
         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; Sample(); }
     }
+    /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
+    /// <returns>軌跡の描画リソースを使用可能になった場合はtrue。</returns>
     public bool Init()
     {
         if (initialized) return true;
@@ -81,6 +116,7 @@ public sealed class SwordTrail : MonoBehaviour
         initialized = true;
         return true;
     }
+    /// <summary>切先側の端点をワールド座標で記録し、所有者の移動を除いた刀の振り速度から表示強度を求める。</summary>
     private void Sample()
     {
         Vector3 realBase = _bladeBase != null ? _bladeBase.position : transform.position;
@@ -110,16 +146,19 @@ public sealed class SwordTrail : MonoBehaviour
         sampleWidths[count] = style == AttackStyle.Light ? 1f : style == AttackStyle.Heavy ? 1.04f : 1.08f;
         count++;
     }
+    /// <summary>履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。</summary>
     private void RemoveOldest()
     {
         for (int i = 1; i < count; i++) CopySample(i, i - 1);
         count--;
     }
+    /// <summary>軌跡サンプルの端点・寿命・表示量を指定スロットへ複製する。</summary>
     private void CopySample(int source, int destination)
     {
         bases[destination] = bases[source]; tips[destination] = tips[source]; times[destination] = times[source];
         lifetimes[destination] = lifetimes[source]; strengths[destination] = strengths[source]; sampleWidths[destination] = sampleWidths[source];
     }
+    /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
     private void LateUpdate()
     {
         if (!initialized || mesh == null) return;
@@ -152,6 +191,8 @@ public sealed class SwordTrail : MonoBehaviour
         mesh.SetTriangles(triangles, 0, (count - 1) * 6, 0);
         mesh.RecalculateBounds();
     }
+    /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
     private void OnDisable() { emitting = false; count = 0; if (mesh != null) mesh.Clear(); }
+    /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
     private void OnDestroy() { if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
 }

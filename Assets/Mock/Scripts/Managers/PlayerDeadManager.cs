@@ -16,28 +16,60 @@ public class PlayerDeadManager : MonoBehaviour
 {
     public static PlayerDeadManager Instance { get; private set; }
 
+    /// <summary>敗北時の死亡Triggerとスローの対象Player参照。</summary>
+    [UnityEngine.Tooltip("敗北時の死亡Triggerとスローの対象Player参照。")]
     [SerializeField] private PlayerController _playerController;
+    /// <summary>敗北時のスローを適用するEnemy参照。</summary>
+    [UnityEngine.Tooltip("敗北時のスローを適用するEnemy参照。")]
     [SerializeField] private EnemyController _enemyController;
     // ヴィネットのフェードイン時間（秒）
+    /// <summary>敗北時の画面周辺の赤みと暗さが立ち上がる時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("敗北時の画面周辺の赤みと暗さが立ち上がる時間（実時間の秒）。")]
     [SerializeField] private float _vignetteFadeIn = 0.25f;
     // ヴィネットの色（赤みを帯びた色を想定）
+    /// <summary>敗北用の画面周辺オーバーレイの色。</summary>
+    [UnityEngine.Tooltip("敗北用の画面周辺オーバーレイの色。")]
     [SerializeField] private Color _vignetteColor = new Color(0.4f, 0f, 0f, 0.0f);
     // ヴィネットの最大アルファ
+    /// <summary>敗北用オーバーレイの最大不透明度。0で透明、1で不透明。</summary>
+    [UnityEngine.Tooltip("敗北用オーバーレイの最大不透明度。0で透明、1で不透明。")]
     [SerializeField] private float _vignetteMaxAlpha = 0.6f;
     // 全体スローの継続時間（秒）
+    /// <summary>敗北時のAnimatorスローを維持する時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("敗北時のAnimatorスローを維持する時間（実時間の秒）。")]
     [SerializeField] private float _slowDuration = 1.2f;
     // 全体スロー時に適用する再生速度（0..1、1が通常速度）
+    /// <summary>敗北時のAnimator速度倍率。0で停止、1で通常速度。TimeScaleは変更しない。</summary>
+    [UnityEngine.Tooltip("敗北時のAnimator速度倍率。0で停止、1で通常速度。TimeScaleは変更しない。")]
     [SerializeField] private float _slowSpeed = 0.4f;
     // 崩れ後の無音継続時間（秒）
+    /// <summary>敗北のスロー後、全Audioを停止して待つ時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("敗北のスロー後、全Audioを停止して待つ時間（実時間の秒）。")]
     [SerializeField] private float _silenceDuration = 0.5f;
     // ローパスのカットオフ周波数（Hz）: 値を下げるほど音がこもる
+    /// <summary>敗北時のローパスのカットオフ周波数（Hz）。低いほど音がこもる。</summary>
+    [UnityEngine.Tooltip("敗北時のローパスのカットオフ周波数（Hz）。低いほど音がこもる。")]
     [SerializeField] private float _lowPassCutoff = 800f;
+    /// <summary>敗北時にVignetteを制御するHDRP Volume参照。</summary>
+    [UnityEngine.Tooltip("敗北時にVignetteを制御するHDRP Volume参照。")]
     [SerializeField] private Volume _volume;
+    /// <summary>旧補間時間設定（秒）。現行の敗北演出では直接参照しない。</summary>
+    [UnityEngine.Tooltip("旧補間時間設定（秒）。現行の敗北演出では直接参照しない。")]
     [SerializeField] private float _smoothTime = 0.1f;
+    /// <summary>敗北時のHDRP Vignetteの目標強度。</summary>
+    [UnityEngine.Tooltip("敗北時のHDRP Vignetteの目標強度。")]
     [SerializeField] private float _intensity = 0.45f;
+    /// <summary>敗北時のHDRP Vignetteの縁の滑らかさ。0〜1。</summary>
+    [UnityEngine.Tooltip("敗北時のHDRP Vignetteの縁の滑らかさ。0〜1。")]
     [SerializeField, Range(0f, 1f)] private float _smoothness = 0.5f;
+    /// <summary>敗北時に表示する死亡文字のTMP参照。</summary>
+    [UnityEngine.Tooltip("敗北時に表示する死亡文字のTMP参照。")]
     [SerializeField] private TextMeshProUGUI _deadText;
+    /// <summary>死亡文字が不透明になるまでの時間（実時間の秒）。</summary>
+    [UnityEngine.Tooltip("死亡文字が不透明になるまでの時間（実時間の秒）。")]
     [SerializeField] private float _deadTextFadeIn = 2f;
+    /// <summary>死亡文字のFadeに適用するDOTweenの補間曲線。</summary>
+    [UnityEngine.Tooltip("死亡文字のFadeに適用するDOTweenの補間曲線。")]
     [SerializeField] private Ease _ease = Ease.InQuint;
 
     private GameObject _overlay;
@@ -54,6 +86,7 @@ public class PlayerDeadManager : MonoBehaviour
     private LoadSceneManager _loader;
     private GlobalFader _fader;
     private bool _initialized;
+    /// <summary>敗北演出の依存先と共有インスタンスを接続し、既存Volume・暗転・死亡文字を初期化する。</summary>
     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
         if (_initialized) return;
@@ -71,6 +104,7 @@ public class PlayerDeadManager : MonoBehaviour
         }
     }
 
+    /// <summary>敗北用暗転オーバーレイとVignette参照を準備し、死亡文字を非表示で待機させる。</summary>
     private void InitPresentation()
     {
         CreateVignetteOverlay();
@@ -284,6 +318,7 @@ public class PlayerDeadManager : MonoBehaviour
         }
     }
 
+    /// <summary>現在のVignette強度と滑らかさから目標値へ実時間で補間する。</summary>
     private async UniTask FadeVignette(float intensity, float smoothness, float duration)
     {
         float start = _vignette.intensity.value;
@@ -303,6 +338,7 @@ public class PlayerDeadManager : MonoBehaviour
         _vignette.smoothness.value = smoothness;
     }
 
+    /// <summary>共有参照、文字Tween、生成MaterialとLowPassを解除し、敗北の音声補正を持ち越さない。</summary>
     private void OnDestroy()
     {
         if (Instance != this) return;

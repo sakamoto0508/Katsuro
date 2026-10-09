@@ -50,17 +50,20 @@ public class EnemyMover
     private readonly float _attackRootMotionScale;
     private Vector3 _pendingAttackRootMotion;
     public bool IsUsingAttackRootMotion => _usingRootMotionAttack;
+    /// <summary>攻撃の移動停止中だけ水平Root Motionを受け付ける。被弾と後退移動が優先中なら開始しない。</summary>
     public void BeginAttackRootMotion()
     {
         if (!_isMovementHeldForAttack || _reactionHeld || _usingRootMotionStepBack) return;
         _usingRootMotionAttack = true;
     }
+    /// <summary>攻撃移動の受付・保留量を解除し、動的Rigidbodyの残留速度を消去する。</summary>
     public void EndAttackRootMotion()
     {
         _usingRootMotionAttack = false;
         _pendingAttackRootMotion = Vector3.zero;
         if (_rb != null && !_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
     }
+    /// <summary>蓄積した水平移動を衝突とNavMeshで制限して物理フレームに反映する。HitStop中は移動を消去する。</summary>
     public void FixedUpdateAttackRootMotion()
     {
         if (!_usingRootMotionAttack) return;
@@ -91,6 +94,7 @@ public class EnemyMover
     private bool _reactionHeld, _reactionAgentStopped, _reactionAgentRotation, _reactionKinematic;
     private bool _releaseAttackAfterReaction, _endStepBackAfterReaction;
 
+    /// <summary>被弾用にAgentとRigidbodyの状態を保存して移動を停止し、攻撃Root Motionを解除する。</summary>
     public void HoldMovementForReaction()
     {
         EndAttackRootMotion();
@@ -116,6 +120,7 @@ public class EnemyMover
         ResetLocomotionAnimation();
     }
 
+    /// <summary>被弾前のAgentとRigidbody設定を復元し、現在位置にAgentを再同期する。</summary>
     public void ReleaseMovementAfterReaction()
     {
         if (!_reactionHeld) return;
@@ -130,6 +135,7 @@ public class EnemyMover
         if (_releaseAttackAfterReaction) { _releaseAttackAfterReaction = false; ReleaseMovementAfterAttack(); }
     }
 
+    /// <summary>後退と攻撃による移動停止を終了し、別の行動や死亡へ安全に切り替える。</summary>
     public void InterruptMovementAction()
     {
         if (_isStepBack) EndStepBack();
@@ -174,6 +180,7 @@ public class EnemyMover
     }
 
     // パトロール中のアニメ／回転／到達判定の更新
+    /// <summary>待機歩行中の旋回設定と移動先を更新し、実移動に合わせてAnimatorへ反映する。</summary>
     private void UpdatePatrolWalking()
     {
         if (_enemyStuts != null)
@@ -210,6 +217,7 @@ public class EnemyMover
     }
 
     // Animator に渡す速度・方向値の更新
+    /// <summary>Agentの実速度を取得し、Enemyの向きを基準に移動BlendTreeへ反映する。</summary>
     private void UpdateAnimatorValues()
     {
         Vector3 velocity = GetLocomotionVelocity();
@@ -217,12 +225,15 @@ public class EnemyMover
         _animationController?.MoveVector(GetLocalMovementDirection(velocity));
     }
 
+    /// <summary>移動速度と二軸方向をゼロにして、攻撃・被弾中の歩行Blendを止める。</summary>
     public void ResetLocomotionAnimation()
     {
         _animationController?.MoveVelocity(0f);
         _animationController?.MoveVector(Vector2.zero);
     }
 
+    /// <summary>移動停止・被弾・後退と微小速度を除外し、Agentの有効な水平実速度を取得する。</summary>
+    /// <returns>移動表示に使用する水平速度。停止条件ではゼロ。</returns>
     private Vector3 GetLocomotionVelocity()
     {
         if (_reactionHeld || _isMovementHeldForAttack || _isStepBack || _agent == null ||
@@ -232,6 +243,8 @@ public class EnemyMover
         return velocity.sqrMagnitude < MovementDeadZone * MovementDeadZone ? Vector3.zero : velocity;
     }
 
+    /// <summary>水平速度をEnemyの向きに対する正規化二軸方向へ変換する。</summary>
+    /// <returns>ローカルX/Z方向。微小速度ではゼロ。</returns>
     private Vector2 GetLocalMovementDirection(Vector3 velocity)
     {
         velocity.y = 0f;
@@ -241,6 +254,7 @@ public class EnemyMover
     }
 
     // 追跡の有効判定、目的地更新、回転の更新をまとめた処理
+    /// <summary>追跡距離と更新間隔を判定してPlayer側の移動先を更新し、範囲外ならAgentを停止する。</summary>
     private void UpdateTrackingAndDestination()
     {
         if (_agent == null || !_agent.isActiveAndEnabled || !_agent.isOnNavMesh || _enemyStuts == null) return;
@@ -427,6 +441,8 @@ public class EnemyMover
     }
 
     // プレイヤーのコライダー半径を考慮して目的地を少し手前にずらす
+    /// <summary>PlayerのCollider半径を考慮して接近先をずらし、中心へのめり込みを抑える。</summary>
+    /// <returns>Playerの占有半径を考慮した接近先。</returns>
     private Vector3 GetAdjustedDestination(Vector3 playerPos)
     {
         if (_playerPosition == null) return playerPos;
@@ -661,6 +677,7 @@ public class EnemyMover
 
     /// <summary>指定ターゲットの方向を見る。</summary>
 
+    /// <returns>対象方向への補間旋回が終了するまで待機するタスク。</returns>
     public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
     {
         if (_enemyTransform == null || _playerPosition == null) return;

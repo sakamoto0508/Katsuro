@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public readonly struct DamageInfo
 {
+    /// <summary>命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。</summary>
     public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false)
     {
         DamageAmount = damageAmount;

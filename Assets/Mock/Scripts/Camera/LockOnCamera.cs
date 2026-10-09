@@ -5,6 +5,7 @@ using UnityEngine;
 // - プレイヤーとターゲット（敵）の Transform を受け取り、ロックオン状態の管理を行う
 // - Cinemachine の VirtualCamera 優先度制御や、必要に応じて CinemachineBrain を無効化して
 //   手動でカメラの Transform を制御するためのラッパです
+/// <summary>通常・Lock-Onカメラの優先度とAnimatorフラグを切り替え、手動追従中のBrain停止と復帰を管理する。</summary>
 public class LockOnCamera
 {
     /// <summary>
@@ -68,11 +69,13 @@ public class LockOnCamera
     /// <summary>
     /// 現在有効なロック対象が設定されているかを返します。
     /// </summary>
+    /// <returns>対象が存在し、Hierarchy上で有効ならtrue。</returns>
     public bool HasValidTarget()
     {
         return _enemyPosition != null && _enemyPosition.gameObject.activeInHierarchy;
     }
 
+    /// <summary>有効な対象へLock-Onし、カメラ優先度とAnimatorフラグを変更する。手動追従中はBrainを停止する。</summary>
     public void LockOn()
     {
         if (!HasValidTarget() || _playerPosition == null) return;
@@ -96,6 +99,7 @@ public class LockOnCamera
         }
     }
 
+    /// <summary>Lock-Onを解除して仮想カメラ優先度とAnimatorフラグを戻し、自身が停止したBrainだけを再開する。</summary>
     public void UnLockOn()
     {
         if (!IsLockOn) return;

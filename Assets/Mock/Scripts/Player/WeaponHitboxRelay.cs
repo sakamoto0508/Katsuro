@@ -27,6 +27,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         }
     }
 
+    /// <summary>有効な刀Colliderの位置差を記録して接触時の斬撃方向に使用する。無効時は前回サンプルを破棄する。</summary>
     private void LateUpdate()
     {
         if (_ownerCollider == null || !_ownerCollider.enabled)
@@ -70,6 +71,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
     }
 
     private bool _initialized;
+    /// <summary>所有Colliderを取得し、命中通知用Triggerとして一度だけ初期化する。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -77,6 +79,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         AssignColliderAndForceTrigger();
     }
 
+    /// <summary>Editorでコンポーネントを追加した際に所有ColliderをTriggerへ設定する。</summary>
     private void Reset()
     {
         AssignColliderAndForceTrigger();
@@ -92,6 +95,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         }
     }
 
+    /// <summary>有効な判定区間だけ接触Colliderを登録済み購読者へ通知する。</summary>
     private void OnTriggerEnter(Collider other)
     {
         if (!enabled || !gameObject.activeInHierarchy)

@@ -1,0 +1,3086 @@
+[
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_moveVelocity",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_moveVectorX",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_moveVectorY",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_isDrawingSword",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_isLockOn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_lightAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_strongAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_justAvoidAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_comboStep",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_backStep",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_isSwordDrawn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_justAvoid",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_justAvoidWindow",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_enemyDead",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_playerDead",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "field": "_swordSheathing",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "MoveVelocity",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "MoveVectorX",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "MoveVectorY",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "IsDrawingSword",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "IsLockOn",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "LightAttack",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "StrongAttack",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "JustAvoidAttack",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "ComboStep",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "BackStep",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "IsSwordDrawn",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "JustAvoid",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "JustAvoidWindow",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "EnemyDead",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "PlayerDead",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+    "property": "SwordSheathing",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_lightHitSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_heavyHitSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_justAvoidSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_titleBGM",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_startSE",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_inGameBGM",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_attackSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_hitSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_plaeyrDeadSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "field": "_enemyDeadSound",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "StartSE",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "TitleBGM",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "InGameBGM",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "AttackSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "HitSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "PlayerDeadSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "EnemyDeadSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "LightHitSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "HeavyHitSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+    "property": "JustAvoidSound",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_lightHitCameraStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_heavyHitCameraStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_cameraDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_justAvoidFOVOffset",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_justAvoidFOVDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_cameraDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_cameraHeight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_positionSmooth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_rotationSmooth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_lookAtHeight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "field": "_cameraCollisionRadius",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "CameraDistance",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "CameraHeight",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "PositionSmooth",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "RotationSmooth",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "LookAtHeight",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "CameraCollisionRadius",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "LightHitCameraStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "HeavyHitCameraStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "CameraDuration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "JustAvoidFOVOffset",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+    "property": "JustAvoidFOVDuration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+    "field": "_damageMultiplierPerStack",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+    "field": "_maxStacks",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+    "property": "DamageMultiplierPerStack",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+    "property": "MaxStacks",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+    "field": "_tiers",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+    "field": "HpBelowRatio",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+    "field": "DamageMultiplier",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+    "field": "SkillGaugeRegenBonus",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+    "field": "Label",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "field": "_buffs",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "field": "_label",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "field": "_attackPowerMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "field": "_flatAttackBonus",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "field": "_onHitEffectPrefab",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+    "property": "Buffs",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_maxSkillGauge",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_skillGaugeRecoveryPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_justAvoidTime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_ghostColor",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_alpha",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_defaultLightComboWindowDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_defaultStrongComboWindowDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_lightAttackClips",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_lockOnLightAttackClips",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_strongAttackClips",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_justAvoidAttackClips",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_clips",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_comboWindowDelaySeconds",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "field": "_clipFlatDamage",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+    "property": "Clips",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_life",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_maxHealth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_attackPower",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_noWeaponMoveSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_noWeaponSprintSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_unLockWalkSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_unLockSprintSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_lockOnWalkSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_lockOnSprintSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_rotationSmoothness",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_acceleration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_breakForce",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_maxSkillGauge",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugeLockoutThresholdNormalized",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugePassiveRecoveryPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugeOnAttackGain",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugeOnAvoidGain",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugeOnJustAvoidBonus",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_skillGaugeCost",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_lowHpBuffTable",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_justAvoidBuffConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_dashPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_ghostActivationCost",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_ghostPerSecondCost",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_selfSacrificeGaugePerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_selfSacrificeMinHpRatio",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_selfSacrificeDamagePercentPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_healGaugePerPercent",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+    "field": "_buffGaugePerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+    "field": "_titleScene",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+    "field": "_gameScene",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+    "property": "TitleScene",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+    "property": "GameScene",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_screenDistortionEnable",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionMaxRadius",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionRadiusSpeed",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionRingWidth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionNoiseStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionNoiseScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionFadePower",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionEdgeTint",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_distortionEdgeTintStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_justAvoidShockwavePrefab",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_shockwaveDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_shockwaveEnable",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_shockwaveStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_shockwaveSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_hitVFX",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_hitVFXDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_heavyHitVFXAmount",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_heavyHitVFXSpread",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_heavyHitVFXSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_heavyHitVFXScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_heavyHitVFXSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_counterHitVFXSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_counterHitVFXSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_playEffectHeal",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_playEffectGhost",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "field": "_playEffectBuff",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "ScreenDistortionEnable",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionDuration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionMaxRadius",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionRadiusSpeed",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionRingWidth",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionNoiseStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionNoiseScale",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionFadePower",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionEdgeTint",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "DistortionEdgeTintStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HeavyHitVFXScale",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HeavyHitVFXSpeed",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HeavyHitVFXAmount",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HeavyHitVFXSpread",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HeavyHitVFXSize",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "CounterHitVFXSpeed",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "CounterHitVFXSize",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HitVFX",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "HitVFXDuration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "ShockwaveEnable",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "ShockwaveStrength",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "ShockwaveSize",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "JustAvoidShockwavePrefab",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "ShockwaveDuration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "PlayEffectHeal",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "PlayEffectGhost",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "property": "PlayEffectBuff",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+    "field": "_combatImpulse",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+    "field": "_finalBlowFOVOffset",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+    "field": "_finalBlowPushDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_camera",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_moveDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_sideAngle",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_lookHeight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_horizontalFraming",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+    "field": "_obstacles",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_animName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_reactionLayerName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_lightHitDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_heavyHitDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_lightHitWeight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_reactionBlendIn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "field": "_reactionBlendOut",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+    "property": "AnimName",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_actionType",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_animatorTrigger",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_damage",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_range",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_hitboxIndex",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_hitboxEnableDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "field": "_hitboxDisableDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "ActionType",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "AnimatorTrigger",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "Damage",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "Range",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "HitboxIndex",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "HitboxEnableDelay",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+    "property": "HitboxDisableDelay",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "FarDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "NearDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "ObserveSeconds",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "ReconsiderInterval",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightWarpAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightApproach",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightRush",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightObserve",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightSlash",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "WeightBackstep",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "RepeatPenalty",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "FarCandidates",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "MidCandidates",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "NearCandidates",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "Action",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+    "field": "Weight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_enemyPower",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_enemyMaxHealth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_chaseStartDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_stopDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_destinationUpdateInterval",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "FarDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "NearDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "ObserveSeconds",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightWarpBehind",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightApproach",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightRush",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightObserve",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightMelee",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "WeightBackstep",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "_rotateSmoothTime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "RotationMode",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+    "field": "TurnSpeed",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_enemyStuts",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_animName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_enemyWeaponColliders",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_playerWeaponColliders",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_animator",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_attackData",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_decisionConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_stepBackDistance",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_characterEffect",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_enemyDeadDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+    "field": "_attackRootMotionScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs",
+    "field": "attacks",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_ghostTint",
+    "summary": false,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_ghostSway",
+    "summary": false,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_ghostFlowSpeed",
+    "summary": false,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_afterImageDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_flashDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_afterImageTint",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_flashTint",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_hitFlashDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_justAvoidFlashDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_justAvoidFlashSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_lightReactionAngle",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_heavyReactionAngle",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_reactionDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_enemyHeavyReactionDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_enemyAttackReactionScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_enemyLightFlashStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_enemyHeavyFlashStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "field": "_justAvoidBodyFlashStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_container",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_normalTemplate",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_criticalTemplate",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_camera",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_lifetime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_worldOffset",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_screenOffset",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_randomOffsetRange",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_riseSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+    "field": "_poolSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+    "field": "_volume",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+    "field": "_enter",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+    "field": "_hold",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+    "field": "_restore",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs",
+    "field": "_material",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_speedParameter",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_windupSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_slashSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_recoverySpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_slashStart",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_slashEnd",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+    "field": "_recoveryStart",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_duration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_bladeBase",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_tip",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_bladeTrailStart",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_sharedTrail",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_trailMaterial",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_brightness",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_fade",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_color",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_minimumSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_fullSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_heavyDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_counterDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_heavyBrightness",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_counterBrightness",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "field": "_width",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+    "field": "_volume",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+    "field": "_enter",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+    "field": "_hold",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+    "field": "_restore",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "bgmSource",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "bgmSources",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "sfxSourcePrefab",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "bgmList",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "seList",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "sfxPoolSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "maxSfxPoolSize",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_audioConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_audioListener",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_bgmChannelCount",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_justAvoidDuckVolume",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_justAvoidDuckEnter",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_justAvoidDuckHold",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "_justAvoidDuckRestore",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "name",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "field": "clip",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+    "property": "AudioConfig",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_audioConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_player",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_enemyController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_phase1HitStop",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_whiteFlashDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_phase2Duration",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_finalBlowText",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_finalBlowTextFadeIn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_presentation",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_cameraFeedback",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_cameraPushDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_sheathingDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+    "field": "_textDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_inputBuffer",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_playerPosition",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_playerController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_playerAnimationController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_animationName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_cameraConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_audioConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_enemyPosition",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_enemyController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_cameraManager",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_camera",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_cinemachineCamera",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_cinemachineLockOncamera",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_loadSceneManager",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_damageNumbers",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_soundVolume",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "field": "_state",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+    "property": "Player",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GlobalFader.cs",
+    "field": "fadeImage",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/GlobalFader.cs",
+    "field": "duration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "field": "_hitStopTime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "field": "_lastHitStopTime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "field": "_heavyHitStop",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "property": "LightHitStop",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "property": "HeavyHitStop",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "property": "HitStopTime",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+    "property": "LastHitStopTime",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/LoadSceneManager.cs",
+    "field": "_sceneNameConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/LoadSceneManager.cs",
+    "property": "SceneNameConfig",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_playerController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_enemyController",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_vignetteFadeIn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_vignetteColor",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_vignetteMaxAlpha",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_slowDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_slowSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_silenceDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_lowPassCutoff",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_volume",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_smoothTime",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_intensity",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_smoothness",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_deadText",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_deadTextFadeIn",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+    "field": "_ease",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+    "field": "_audioConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+    "field": "_sceneNameConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+    "field": "_transitionDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+    "field": "_setup",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs",
+    "field": "_counterWindupSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs",
+    "field": "_counterSlashSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerAnimationController.cs",
+    "field": "_animName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerAnimationController.cs",
+    "property": "AnimName",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_attackRootMotionScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_playerWeapon",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_playerStartWeapon",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_weaponColliders",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_weaponHitboxPadding",
+    "summary": true,
+    "tooltip": false
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_enemyWeaponColliders",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_playerStatus",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_animationName",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_playerStateConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_passiveBuffSet",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_vfxConfig",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_justAvoidSlowDef",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_canAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+    "field": "_playerHudView",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "StartingLives",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "ReviveInvulnerability",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "ShortGhostDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "GhostCooldown",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "JustBuffDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "FullHpRegenMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "LowHpRegenMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "FullHpSelfCostMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "LowHpSelfCostMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "FullHpAvoidMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "LowHpAvoidMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "PowerAttack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "SoulHitGain",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "DesperationBonus",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "GuardDamage",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "SpiritCost",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "BreathRegen",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "SoulBossDamage",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "SpiritBossSpeed",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+    "field": "BreathBossHealth",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+    "field": "Version",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+    "field": "Name",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+    "field": "Attack",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+    "field": "Defense",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+    "field": "ClearSeconds",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_id",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_duration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_speedMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_animationSpeedMultiplier",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_maxStacks",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_stacking",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+    "field": "_vfxPrefab",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/BossBarSilhouette.cs",
+    "field": "_outline",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+    "field": "_currentFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+    "field": "_trailFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+    "field": "_delay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+    "field": "_catchupPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_whiteFlash",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_letterboxTop",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_letterboxBottom",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_hudGroups",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_hudVisibilityOwners",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_damageNumbers",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_flashStrength",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_flashDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_hudFadeDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_hudFadeDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_letterboxDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_letterboxDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_letterboxHeight",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_textStartScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_textOvershootScale",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+    "field": "_textRiseFraction",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+    "field": "_hpFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+    "field": "_damageFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+    "field": "_skillFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+    "field": "_damageDelay",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+    "field": "_damageCatchupPerSecond",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_player",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_enemy",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_enemyHpFill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_enemyGauge",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_lifeOrbs",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_lifeActiveColor",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_lifeEmptyColor",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_visibility",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_challenger",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_opponent",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_health",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_lives",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_equipment",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_skill",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+    "field": "_ghostStatus",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_panel",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_nameInput",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_attackOptions",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_defenseOptions",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_attackDescription",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_defenseDescription",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_opponent",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_rules",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_result",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+    "field": "_startButton",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+    "field": "_text",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+    "field": "_fadeInDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+    "field": "_fadeOutDuration",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+    "field": "_ease",
+    "summary": true,
+    "tooltip": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+    "field": "_gameSceneName",
+    "summary": true,
+    "tooltip": true
+  }
+]

@@ -60,6 +60,7 @@ public class SkillGauge : IDisposable
     /// 指定量だけゲージを消費し、成功すれば true を返します。失敗時はゲージを変更しません。
     /// </summary>
     /// <param name="amount">消費量（負値は 0 扱い）。</param>
+    /// <returns>必要量を消費できた場合はtrue。</returns>
     public bool TryConsume(float amount)
     {
         amount = Mathf.Max(0f, amount);

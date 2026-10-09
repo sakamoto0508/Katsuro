@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerLightAttackState : PlayerAttackState
 {
+    /// <summary>弱攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。</summary>
     public PlayerLightAttackState(PlayerStateContext context, PlayerStateMachine stateMachine)
         : base(context, stateMachine, context?.StateConfig?.GetLightAttackDuration() ?? 0.8f)
     {
@@ -14,6 +15,7 @@ public sealed class PlayerLightAttackState : PlayerAttackState
 
     public override PlayerStateId Id => PlayerStateId.LightAttack;
 
+    /// <summary>攻撃開始時のLock-On種別を固定して、共通の弱攻撃・コンボ進行を開始する。</summary>
     public override void Enter()
     {
         _isLockOnCombo = Context?.IsLockOn ?? false;

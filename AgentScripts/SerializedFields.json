@@ -1,0 +1,3000 @@
+{
+  "fields": [
+    {
+      "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+      "owner": "CameraManager",
+      "name": "_combatImpulse",
+      "type": "CinemachineImpulseSource",
+      "tooltip": "命中時の揺れを発生させるCinemachine Impulse Source。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+      "owner": "CameraManager",
+      "name": "_finalBlowFOVOffset",
+      "type": "Single",
+      "tooltip": "Final Blow中に加える画角の差（度）。負数で画角を狭めて寄りを強調する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/CameraManager.cs",
+      "owner": "CameraManager",
+      "name": "_finalBlowPushDuration",
+      "type": "Single",
+      "tooltip": "Final Blowの画角が寄るまでの時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_camera",
+      "type": "CinemachineCamera",
+      "tooltip": "勝利中だけOverrideで使用する専用CinemachineCamera。通常時は無効にして待機する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_moveDuration",
+      "type": "Single",
+      "tooltip": "勝利カメラが開始位置から納刀構図へ移る時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_sideAngle",
+      "type": "Single",
+      "tooltip": "Player背面から側面へ回り込む角度（度）。腕と刀が見える構図を調整する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_lookHeight",
+      "type": "Single",
+      "tooltip": "Player位置から勝利カメラの注視点までの高さ（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_horizontalFraming",
+      "type": "Single",
+      "tooltip": "Playerの右方向への注視点のずらし量（Unity単位）。画面内の配置を調整する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Camera/VictoryCameraRig.cs",
+      "owner": "VictoryCameraRig",
+      "name": "_obstacles",
+      "type": "LayerMask",
+      "tooltip": "勝利カメラのSphereCastで障害物として扱うLayer。Player・Enemy自身は除外する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_moveVelocity",
+      "type": "String",
+      "tooltip": "移動速度をAnimatorへ渡すFloatパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_moveVectorX",
+      "type": "String",
+      "tooltip": "移動方向の左右成分をAnimatorへ渡すFloatパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_moveVectorY",
+      "type": "String",
+      "tooltip": "移動方向の前後成分をAnimatorへ渡すFloatパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_isDrawingSword",
+      "type": "String",
+      "tooltip": "抜刀中の状態をAnimatorへ伝えるパラメータ名。Controller側と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_isLockOn",
+      "type": "String",
+      "tooltip": "Lock-On状態をAnimatorへ伝えるBoolパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_lightAttack",
+      "type": "String",
+      "tooltip": "通常Light攻撃を開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_strongAttack",
+      "type": "String",
+      "tooltip": "通常Heavy攻撃を開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_justAvoidAttack",
+      "type": "String",
+      "tooltip": "Just Avoid成功後の追撃を開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_comboStep",
+      "type": "String",
+      "tooltip": "攻撃のコンボ段階を指定するAnimator Intパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_backStep",
+      "type": "String",
+      "tooltip": "バックステップを開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_isSwordDrawn",
+      "type": "String",
+      "tooltip": "刀を抜いている状態をAnimatorへ伝えるBoolパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_justAvoid",
+      "type": "String",
+      "tooltip": "Just Avoid成功演出を開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_justAvoidWindow",
+      "type": "String",
+      "tooltip": "Just Avoid受付状態をAnimatorへ伝えるパラメータ名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_enemyDead",
+      "type": "String",
+      "tooltip": "Enemy死亡アニメーションを開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_playerDead",
+      "type": "String",
+      "tooltip": "Player死亡アニメーションを開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AnimationName.cs",
+      "owner": "AnimationName",
+      "name": "_swordSheathing",
+      "type": "String",
+      "tooltip": "勝利時の納刀アニメーションを開始するAnimator Trigger名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_lightHitSound",
+      "type": "String",
+      "tooltip": "通常Light命中時にAudioManagerのSE一覧から検索する登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_heavyHitSound",
+      "type": "String",
+      "tooltip": "通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_justAvoidSound",
+      "type": "String",
+      "tooltip": "AudioManagerのSEリストに登録した名前。空欄なら再生しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_titleBGM",
+      "type": "String",
+      "tooltip": "タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_startSE",
+      "type": "String",
+      "tooltip": "ゲーム開始操作で再生するSEの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_inGameBGM",
+      "type": "String",
+      "tooltip": "戦闘中に再生するBGMの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_attackSound",
+      "type": "String",
+      "tooltip": "攻撃時に再生するSEの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_hitSound",
+      "type": "String",
+      "tooltip": "被弾時に再生する共通SEの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_plaeyrDeadSound",
+      "type": "String",
+      "tooltip": "Player死亡時に再生するSEの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/AudioConfig.cs",
+      "owner": "AudioConfig",
+      "name": "_enemyDeadSound",
+      "type": "String",
+      "tooltip": "Final Blow開始時に再生するEnemy死亡SEの登録名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_lightHitCameraStrength",
+      "type": "Single",
+      "tooltip": "Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_heavyHitCameraStrength",
+      "type": "Single",
+      "tooltip": "Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_cameraDuration",
+      "type": "Single",
+      "tooltip": "命中時カメラ衝撃の継続時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_justAvoidFOVOffset",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時に加える画角の差（度）。正数で広く、負数で狭くなる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_justAvoidFOVDuration",
+      "type": "Single",
+      "tooltip": "Just Avoidの画角演出を往復させる時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_cameraDistance",
+      "type": "Single",
+      "tooltip": "追従カメラとPlayerの基準水平距離（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_cameraHeight",
+      "type": "Single",
+      "tooltip": "Player位置からの追従カメラの基準高さ（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_positionSmooth",
+      "type": "Single",
+      "tooltip": "カメラ位置の追従補間係数。大きいほど目標位置へ速く追従する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_rotationSmooth",
+      "type": "Single",
+      "tooltip": "カメラ回転の追従補間係数。大きいほど目標方向へ速く追従する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_lookAtHeight",
+      "type": "Single",
+      "tooltip": "Player位置から注視点までの高さ（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/CameraConfig.cs",
+      "owner": "CameraConfig",
+      "name": "_cameraCollisionRadius",
+      "type": "Single",
+      "tooltip": "カメラ障害物判定のSphereCast半径（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+      "owner": "JustAvoidBuffConfig",
+      "name": "_damageMultiplierPerStack",
+      "type": "Single",
+      "tooltip": "1スタックあたりの攻撃倍率加算（例: 0.05 = +5% / stack）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/JustAvoidBuffConfig.cs",
+      "owner": "JustAvoidBuffConfig",
+      "name": "_maxStacks",
+      "type": "Int32",
+      "tooltip": "スタックの最大数（これを超える分は無視）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+      "owner": "LowHpBuffTable",
+      "name": "_tiers",
+      "type": "List`1",
+      "tooltip": "HP比率に応じて選ぶ低HPボーナスの段階一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+      "owner": "Tier",
+      "name": "HpBelowRatio",
+      "type": "Single",
+      "tooltip": "この割合以下のときに該当する (0..1)。例: 0.25 = 25%"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+      "owner": "Tier",
+      "name": "DamageMultiplier",
+      "type": "Single",
+      "tooltip": "ダメージに掛ける乗算倍率（例: 1.10 = +10%）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+      "owner": "Tier",
+      "name": "SkillGaugeRegenBonus",
+      "type": "Single",
+      "tooltip": "スキルゲージ回復ボーナス（割合加算、例: 0.05 = +5%）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/LowHpBuffTable.cs",
+      "owner": "Tier",
+      "name": "Label",
+      "type": "String",
+      "tooltip": "表示用ラベル（任意）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+      "owner": "PlayerPassiveBuffSet",
+      "name": "_buffs",
+      "type": "List`1",
+      "tooltip": "装備による攻撃倍率・固定加算威力・任意の命中Effectの一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_maxSkillGauge",
+      "type": "Single",
+      "tooltip": "PlayerStatus未設定時に使うスキルゲージの代替最大値。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_skillGaugeRecoveryPerSecond",
+      "type": "Single",
+      "tooltip": "PlayerStatus未設定時に使うスキルゲージの代替自然回復量（ゲージ単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_justAvoidTime",
+      "type": "Single",
+      "tooltip": "回避開始後のJust Avoid判定を受け付ける時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_ghostColor",
+      "type": "Color",
+      "tooltip": "幽体化の旧表示色設定。現在の体色演出はCombatFeedbackのGhost Tintを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_alpha",
+      "type": "Single",
+      "tooltip": "幽体化の旧透明度設定（0〜1）。現在の体色演出はCombatFeedbackのGhost TintのAlphaを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_defaultLightComboWindowDelay",
+      "type": "Single",
+      "tooltip": "Lightの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_defaultStrongComboWindowDelay",
+      "type": "Single",
+      "tooltip": "Heavyの段階別受付遅延が未設定の場合に使うコンボ受付開始時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_lightAttackClips",
+      "type": "AttackClipList",
+      "tooltip": "非Lock-On時のLightコンボClip・受付遅延・固定ダメージ設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_lockOnLightAttackClips",
+      "type": "AttackClipList",
+      "tooltip": "Lock-On時のLightコンボ設定。未設定時は通常Light設定を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_strongAttackClips",
+      "type": "AttackClipList",
+      "tooltip": "HeavyコンボのClip・受付遅延・固定ダメージ設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "PlayerStateConfig",
+      "name": "_justAvoidAttackClips",
+      "type": "AttackClipList",
+      "tooltip": "Just Avoid追撃のClip・受付遅延・固定ダメージ設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_life",
+      "type": "Int32",
+      "tooltip": "Playerの初期残機設定。Runの進行ではRunSessionの残機を使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_maxHealth",
+      "type": "Int32",
+      "tooltip": "Playerの最大HP。体力初期化とHP比率計算の基準。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_attackPower",
+      "type": "Single",
+      "tooltip": "Playerの基準攻撃力。攻撃Clipや装備・バフのダメージ計算で参照する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_noWeaponMoveSpeed",
+      "type": "Single",
+      "tooltip": "納刀中の通常移動速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_noWeaponSprintSpeed",
+      "type": "Single",
+      "tooltip": "納刀中の疾走速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_unLockWalkSpeed",
+      "type": "Single",
+      "tooltip": "抜刀・非Lock-On時の歩行速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_unLockSprintSpeed",
+      "type": "Single",
+      "tooltip": "抜刀・非Lock-On時の疾走速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_lockOnWalkSpeed",
+      "type": "Single",
+      "tooltip": "Lock-On中の歩行速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_lockOnSprintSpeed",
+      "type": "Single",
+      "tooltip": "Lock-On中の疾走速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_rotationSmoothness",
+      "type": "Single",
+      "tooltip": "Playerが移動方向へ向く回転補間係数。大きいほど素早く向きを合わせる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_acceleration",
+      "type": "Single",
+      "tooltip": "通常移動で目標速度へ近づける加速係数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_breakForce",
+      "type": "Single",
+      "tooltip": "移動入力がなくなったときに速度を落とす減速係数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_maxSkillGauge",
+      "type": "Single",
+      "tooltip": "Playerスキルゲージの最大値。初期化時に使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugeLockoutThresholdNormalized",
+      "type": "Single",
+      "tooltip": "ゲージ消費行動の受付制限に使う正規化閾値。0〜1で最大ゲージに対する比率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugePassiveRecoveryPerSecond",
+      "type": "Single",
+      "tooltip": "スキルゲージの基準自然回復量（ゲージ単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugeOnAttackGain",
+      "type": "Single",
+      "tooltip": "攻撃命中時の基本ゲージ回復量（ゲージ単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugeOnAvoidGain",
+      "type": "Single",
+      "tooltip": "回避時の基本ゲージ回復量（ゲージ単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugeOnJustAvoidBonus",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時に追加するゲージ回復量（ゲージ単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_skillGaugeCost",
+      "type": "SkillGaugeCostConfig",
+      "tooltip": "疾走・幽体化・自傷・回復などのゲージ消費設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_lowHpBuffTable",
+      "type": "LowHpBuffTable",
+      "tooltip": "現在HP比率に応じた攻撃倍率・ゲージ回復補正の参照表。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "PlayerStatus",
+      "name": "_justAvoidBuffConfig",
+      "type": "JustAvoidBuffConfig",
+      "tooltip": "Just Avoid成功の累積攻撃ボーナスと最大スタックの設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+      "owner": "SceneNameConfig",
+      "name": "_titleScene",
+      "type": "String",
+      "tooltip": "タイトルへ戻る際にロードするScene名。Build設定のScene名と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/SceneNameConfig.cs",
+      "owner": "SceneNameConfig",
+      "name": "_gameScene",
+      "type": "String",
+      "tooltip": "戦闘開始時にロードするScene名。Build設定のScene名と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_screenDistortionEnable",
+      "type": "Boolean",
+      "tooltip": "Just Avoid成功時の画面歪みを有効にする。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid画面歪みが消えるまでの時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionMaxRadius",
+      "type": "Single",
+      "tooltip": "画面高さを1とした最終半径。画面の隅まで届く半径は自動で保証する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionRadiusSpeed",
+      "type": "Single",
+      "tooltip": "拡大速度の曲線。大きいほど最初に速く広がる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionRingWidth",
+      "type": "Single",
+      "tooltip": "画面歪みのリング幅。画面UVを基準にした値。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionStrength",
+      "type": "Single",
+      "tooltip": "リング付近の画面UVをずらす強さ。大きいほど歪みが強くなる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionNoiseStrength",
+      "type": "Single",
+      "tooltip": "画面歪みに重ねるノイズの強さ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionNoiseScale",
+      "type": "Single",
+      "tooltip": "画面歪みのノイズの細かさを調整する倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionFadePower",
+      "type": "Single",
+      "tooltip": "画面歪みの減衰曲線の指数。消え方の速さを調整する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionEdgeTint",
+      "type": "Color",
+      "tooltip": "画面歪みの縁に加える色。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_distortionEdgeTintStrength",
+      "type": "Single",
+      "tooltip": "画面歪みの縁色を加える強さ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_justAvoidShockwavePrefab",
+      "type": "GameObject",
+      "tooltip": "薄い円形衝撃波のParticleSystem Prefab。未設定なら衝撃波のみ省略。自動破棄スクリプトは付けない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_shockwaveDuration",
+      "type": "Single",
+      "tooltip": "従来Particle Shockwaveの寿命（秒）。旧演出互換の設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_shockwaveEnable",
+      "type": "Boolean",
+      "tooltip": "従来Particle Shockwaveの有効設定。画面歪みとは別の旧演出設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_shockwaveStrength",
+      "type": "Single",
+      "tooltip": "従来Particle Shockwaveの強度設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_shockwaveSize",
+      "type": "Single",
+      "tooltip": "従来Particle Shockwaveのサイズ倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_hitVFX",
+      "type": "GameObject",
+      "tooltip": "追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_hitVFXDuration",
+      "type": "Single",
+      "tooltip": "命中VFXの再生後に片付けるまでの時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_heavyHitVFXAmount",
+      "type": "Single",
+      "tooltip": "強攻撃の粒子数倍率。PrefabのBurst数を基準に毎回適用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_heavyHitVFXSpread",
+      "type": "Single",
+      "tooltip": "Heavy命中VFXの粒子の広がり補正。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_heavyHitVFXSize",
+      "type": "Single",
+      "tooltip": "Heavy命中VFXの粒子サイズ補正。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_heavyHitVFXScale",
+      "type": "Single",
+      "tooltip": "Heavy命中VFXオブジェクト全体のScale倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_heavyHitVFXSpeed",
+      "type": "Single",
+      "tooltip": "Heavy命中VFXの粒子速度補正。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_counterHitVFXSpeed",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃命中VFXの粒子速度補正。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_counterHitVFXSize",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃命中VFXの粒子サイズ補正。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_playEffectHeal",
+      "type": "String",
+      "tooltip": "CharacterEffectに登録した回復Effectの再生名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_playEffectGhost",
+      "type": "String",
+      "tooltip": "CharacterEffectに登録した幽体化Effectの再生名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+      "owner": "VFXConfig",
+      "name": "_playEffectBuff",
+      "type": "String",
+      "tooltip": "CharacterEffectに登録したバフEffectの再生名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_animName",
+      "type": "AnimationName",
+      "tooltip": "Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_reactionLayerName",
+      "type": "String",
+      "tooltip": "Just Avoid追撃の大きなHitReactionを再生するAnimator Layer名。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_lightHitDuration",
+      "type": "Single",
+      "tooltip": "Light用の大Reaction時間設定（秒）。通常Lightでは大Reactionを要求しない仕様。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_heavyHitDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃の大Reactionを維持する時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_lightHitWeight",
+      "type": "Single",
+      "tooltip": "Light用Reaction Layer Weight。通常Lightでは大Reactionを要求しない仕様。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_reactionBlendIn",
+      "type": "Single",
+      "tooltip": "大Reactionへ入る短いBlend時間（秒）。Poseの急変を抑える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs",
+      "owner": "EnemyAnimationController",
+      "name": "_reactionBlendOut",
+      "type": "Single",
+      "tooltip": "大Reactionから通常状態へ戻すBlend時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_actionType",
+      "type": "EnemyActionType",
+      "tooltip": "この攻撃設定を使うEnemy行動の種類。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_animatorTrigger",
+      "type": "String",
+      "tooltip": "この行動を開始するAnimator Trigger名。Controllerのパラメータと一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_damage",
+      "type": "Single",
+      "tooltip": "この行動の基準ダメージ。攻撃開始時に武器へ渡す。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_range",
+      "type": "Single",
+      "tooltip": "行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_hitboxIndex",
+      "type": "Int32",
+      "tooltip": "有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_hitboxEnableDelay",
+      "type": "Single",
+      "tooltip": "Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/Config/EnemyAttackData.cs",
+      "owner": "EnemyAttackData",
+      "name": "_hitboxDisableDelay",
+      "type": "Single",
+      "tooltip": "Hitbox無効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "FarDistance",
+      "type": "Single",
+      "tooltip": "遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "NearDistance",
+      "type": "Single",
+      "tooltip": "近距離行動候補へ切り替えるPlayerとの距離（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "ObserveSeconds",
+      "type": "Single",
+      "tooltip": "Wait行動で様子を見る時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "ReconsiderInterval",
+      "type": "Single",
+      "tooltip": "行動中に距離条件などを再検討する間隔（秒）。短いほど頻繁に判断する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightWarpAttack",
+      "type": "Single",
+      "tooltip": "旧形式のWarp攻撃の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightApproach",
+      "type": "Single",
+      "tooltip": "旧形式の接近行動の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightRush",
+      "type": "Single",
+      "tooltip": "旧形式の突進行動の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightObserve",
+      "type": "Single",
+      "tooltip": "旧形式の待機行動の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightSlash",
+      "type": "Single",
+      "tooltip": "旧形式の斬撃行動の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "WeightBackstep",
+      "type": "Single",
+      "tooltip": "旧形式の後退行動の抽選重み。現行は距離帯別Candidates一覧を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "RepeatPenalty",
+      "type": "Single",
+      "tooltip": "直前に実行した行動の重みを何倍にするか（0 = 完全に除外、1 = 変化なし）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "FarCandidates",
+      "type": "ActionWeight[]",
+      "tooltip": "候補: 遠距離用の行動リストと重み"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "MidCandidates",
+      "type": "ActionWeight[]",
+      "tooltip": "候補: 中距離用の行動リストと重み"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "EnemyDecisionConfig",
+      "name": "NearCandidates",
+      "type": "ActionWeight[]",
+      "tooltip": "候補: 近距離用の行動リストと重み"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "ActionWeight",
+      "name": "Action",
+      "type": "EnemyActionType",
+      "tooltip": "この抽選候補が実行するEnemy行動の種類。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyDecisionConfig.cs",
+      "owner": "ActionWeight",
+      "name": "Weight",
+      "type": "Single",
+      "tooltip": "この候補の抽選重み。大きいほど選ばれやすく、直前行動にはRepeatPenaltyを掛ける。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_enemyPower",
+      "type": "Single",
+      "tooltip": "Enemy武器を初期化する基準攻撃力。行動別Damageを使う場合はその値が優先される。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_enemyMaxHealth",
+      "type": "Single",
+      "tooltip": "Enemyの最大HP。体力初期化とHP比率の基準。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_chaseStartDistance",
+      "type": "Single",
+      "tooltip": "追跡開始距離の基礎設定（Unity単位）。距離帯別の行動判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_stopDistance",
+      "type": "Single",
+      "tooltip": "Playerへ近づく際のNavMeshAgent停止距離（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_destinationUpdateInterval",
+      "type": "Single",
+      "tooltip": "追跡中にNavMeshAgentの目的地を更新する間隔（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "FarDistance",
+      "type": "Single",
+      "tooltip": "旧形式の遠距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "NearDistance",
+      "type": "Single",
+      "tooltip": "旧形式の近距離閾値（Unity単位）。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "ObserveSeconds",
+      "type": "Single",
+      "tooltip": "旧形式の様子見時間（秒）。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightWarpBehind",
+      "type": "Single",
+      "tooltip": "旧形式の背後Warp行動の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightApproach",
+      "type": "Single",
+      "tooltip": "旧形式の接近行動の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightRush",
+      "type": "Single",
+      "tooltip": "旧形式の突進行動の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightObserve",
+      "type": "Single",
+      "tooltip": "旧形式の様子見行動の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightMelee",
+      "type": "Single",
+      "tooltip": "旧形式の近接攻撃の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "WeightBackstep",
+      "type": "Single",
+      "tooltip": "旧形式の後退行動の重み。現行の判断はEnemyDecisionConfigを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "_rotateSmoothTime",
+      "type": "Single",
+      "tooltip": "旧回転補間の時間設定（秒）。Smooth旋回はTurnSpeedによる角速度制御を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "RotationMode",
+      "type": "RotationControlMode",
+      "tooltip": "Enemyの向きの制御方式。Agent任せ・即時旋回・角速度で滑らかに旋回から選ぶ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyConfig/EnemyStuts.cs",
+      "owner": "EnemyStuts",
+      "name": "TurnSpeed",
+      "type": "Single",
+      "tooltip": "回転の速度（Smooth モード時の最大角速度、度/秒）"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_enemyStuts",
+      "type": "EnemyStuts",
+      "tooltip": "EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_animName",
+      "type": "AnimationName",
+      "tooltip": "Enemy Animatorのパラメータ名を共有する設定参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_enemyWeaponColliders",
+      "type": "Collider[]",
+      "tooltip": "Enemyの武器攻撃判定Collider。Animation Eventと死亡処理でON/OFFする。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_playerWeaponColliders",
+      "type": "Collider[]",
+      "tooltip": "Player武器との接触を調整するために参照するCollider一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_animator",
+      "type": "Animator",
+      "tooltip": "Enemy本体のAnimator。攻撃・移動・死亡・Root Motionの状態を取得する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_attackData",
+      "type": "EnemyAttackData[]",
+      "tooltip": "行動種類に対応する攻撃Trigger・Damageの設定一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_decisionConfig",
+      "type": "EnemyDecisionConfig",
+      "tooltip": "距離帯別の行動候補・抽選重みを定義したAI設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_stepBackDistance",
+      "type": "Single",
+      "tooltip": "後退行動でPlayerから離れる目標距離（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_characterEffect",
+      "type": "CharacterEffect",
+      "tooltip": "Enemyの登録済み見た目Effectを再生するコンポーネント参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_enemyDeadDelay",
+      "type": "Int32",
+      "tooltip": "旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/EnemyController.cs",
+      "owner": "EnemyController",
+      "name": "_attackRootMotionScale",
+      "type": "Single",
+      "tooltip": "Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Enemy/SampleEnemyAttacks.cs",
+      "owner": "SampleEnemyAttacks",
+      "name": "attacks",
+      "type": "EnemyAttackData[]",
+      "tooltip": "Enemy攻撃設定のサンプル参照一覧。各要素にEnemyAttackDataを割り当てる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_ghostTint",
+      "type": "Color",
+      "tooltip": "幽体化中の体色と透明度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_ghostSway",
+      "type": "Single",
+      "tooltip": "幽体化中の輪郭の揺れ幅。大きいほど揺れが目立つ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_ghostFlowSpeed",
+      "type": "Single",
+      "tooltip": "幽体化の輪郭を流す速度倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_afterImageDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時の固定残像を表示する時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_flashDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時の残像Flashの継続時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_afterImageTint",
+      "type": "Color",
+      "tooltip": "Just Avoid成功時の固定残像の色と初期透明度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_flashTint",
+      "type": "Color",
+      "tooltip": "Just Avoid成功時の残像Flashの色と初期透明度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_hitFlashDuration",
+      "type": "Single",
+      "tooltip": "命中時に体へ加えるFlashの継続時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_justAvoidFlashDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時の小さなFlashの継続時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_justAvoidFlashSize",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時の小さなFlashのサイズ（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_lightReactionAngle",
+      "type": "Single",
+      "tooltip": "通常Light命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_heavyReactionAngle",
+      "type": "Single",
+      "tooltip": "通常Heavy命中で体を局所的に揺らす角度（度）。大きなAnimator Reactionとは別。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_reactionDuration",
+      "type": "Single",
+      "tooltip": "通常命中の局所的な体の反応時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_enemyHeavyReactionDuration",
+      "type": "Single",
+      "tooltip": "Enemyが通常Heavyを受けた際の局所反応時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_enemyAttackReactionScale",
+      "type": "Single",
+      "tooltip": "Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_enemyLightFlashStrength",
+      "type": "Single",
+      "tooltip": "EnemyへLightが命中した際の体Flashの強さ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_enemyHeavyFlashStrength",
+      "type": "Single",
+      "tooltip": "EnemyへHeavyが命中した際の体Flashの強さ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_justAvoidBodyFlashStrength",
+      "type": "Single",
+      "tooltip": "Just Avoid成功時に体へ加えるFlashの強さ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+      "owner": "CombatFeedback",
+      "name": "_justAvoidCounterHitStop",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃専用のHitStop。通常Light / Heavyの値は維持する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_container",
+      "type": "RectTransform",
+      "tooltip": "ダメージ数字のUIを生成・配置する親RectTransform。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_normalTemplate",
+      "type": "TMP_Text",
+      "tooltip": "通常命中のダメージ数字に使うTMPテンプレート。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_criticalTemplate",
+      "type": "TMP_Text",
+      "tooltip": "強い命中のダメージ数字に使う必須TMPテンプレート。通常用と両方割り当てる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_camera",
+      "type": "Camera",
+      "tooltip": "命中のワールド位置を画面座標へ変換するCamera。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_lifetime",
+      "type": "Single",
+      "tooltip": "ダメージ数字を表示して消すまでの時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_worldOffset",
+      "type": "Vector3",
+      "tooltip": "命中位置へ加えるワールド座標の表示ずらし（Unity単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_screenOffset",
+      "type": "Vector2",
+      "tooltip": "画面へ投影した後に加えるUI座標の表示ずらし。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_randomOffsetRange",
+      "type": "Vector2",
+      "tooltip": "数字の表示位置に加えるランダムなずらし幅（UIローカル単位）。両成分を0にすると無効。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_riseSpeed",
+      "type": "Single",
+      "tooltip": "数字の投影元ワールド位置が上昇する速度（Unity単位/秒）。その位置を毎フレーム画面へ投影する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/DamageNumbers.cs",
+      "owner": "DamageNumbers",
+      "name": "_poolSize",
+      "type": "Int32",
+      "tooltip": "初期化時に用意するダメージ数字のプール数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+      "owner": "JustAvoidContrast",
+      "name": "_volume",
+      "type": "Volume",
+      "tooltip": "Just Avoid成功専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+      "owner": "JustAvoidContrast",
+      "name": "_enter",
+      "type": "Single",
+      "tooltip": "Just Avoid成功から完全モノクロへ移行する時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+      "owner": "JustAvoidContrast",
+      "name": "_hold",
+      "type": "Single",
+      "tooltip": "完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs",
+      "owner": "JustAvoidContrast",
+      "name": "_restore",
+      "type": "Single",
+      "tooltip": "完全モノクロから元の色へ戻す時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/JustAvoidScreenDistortion.cs",
+      "owner": "JustAvoidScreenDistortion",
+      "name": "_material",
+      "type": "Material",
+      "tooltip": "Just Avoid画面歪みのCustom Pass描画に使うMaterial参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_speedParameter",
+      "type": "String",
+      "tooltip": "この攻撃State専用のAnimator速度Floatパラメータ名。他のコンボ段階と共有しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_windupSpeed",
+      "type": "Single",
+      "tooltip": "振りかぶり区間のアニメーション速度倍率。1でClip本来の速度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_slashSpeed",
+      "type": "Single",
+      "tooltip": "斬撃区間のアニメーション速度倍率。1でClip本来の速度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_recoverySpeed",
+      "type": "Single",
+      "tooltip": "攻撃後の回復区間のアニメーション速度倍率。1でClip本来の速度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_slashStart",
+      "type": "Single",
+      "tooltip": "斬撃速度へ切り替えるClipの正規化時刻（0〜1）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_slashEnd",
+      "type": "Single",
+      "tooltip": "斬撃区間が終わるClipの正規化時刻（0〜1）。ここから回復速度へ補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/NormalAttackSpeedState.cs",
+      "owner": "NormalAttackSpeedState",
+      "name": "_recoveryStart",
+      "type": "Single",
+      "tooltip": "回復速度への補間が完了するClipの正規化時刻（0〜1）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_duration",
+      "type": "Single",
+      "tooltip": "通常攻撃の刀軌跡を残す時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_bladeBase",
+      "type": "Transform",
+      "tooltip": "刀身の根元を示すTransform。刃先との間を軌跡の幅として使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_tip",
+      "type": "Transform",
+      "tooltip": "刀の刃先を示すTransform。刀身の軌跡の外側を生成する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_bladeTrailStart",
+      "type": "Single",
+      "tooltip": "実Blade BaseからTipへ寄せる割合。0.48なら刀身の外側52%だけを使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_sharedTrail",
+      "type": "SwordTrail",
+      "tooltip": "同じ刀の複数Colliderは、代表となるSwordTrailを共有する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_trailMaterial",
+      "type": "Material",
+      "tooltip": "刀軌跡を描画するMaterial参照。未設定なら対応ShaderからMaterialを生成する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_brightness",
+      "type": "Single",
+      "tooltip": "通常攻撃の軌跡の明るさ倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_fade",
+      "type": "Single",
+      "tooltip": "時間経過で軌跡を消すFade曲線の指数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_color",
+      "type": "Color",
+      "tooltip": "刀軌跡の基準色と透明度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_minimumSpeed",
+      "type": "Single",
+      "tooltip": "軌跡を出し始める刀の最低速度（Unity単位/秒）。低速の三角形を抑える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_fullSpeed",
+      "type": "Single",
+      "tooltip": "軌跡の表示強度が最大になる刀の速度（Unity単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_heavyDuration",
+      "type": "Single",
+      "tooltip": "Heavy攻撃の刀軌跡を残す時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_counterDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃の刀軌跡を残す時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_heavyBrightness",
+      "type": "Single",
+      "tooltip": "通常の明るさへ掛けるHeavy攻撃の追加倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_counterBrightness",
+      "type": "Single",
+      "tooltip": "通常の明るさへ掛けるJust Avoid追撃の追加倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+      "owner": "SwordTrail",
+      "name": "_width",
+      "type": "Single",
+      "tooltip": "刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+      "owner": "VictoryContrast",
+      "name": "_volume",
+      "type": "Volume",
+      "tooltip": "勝利専用のHDRP Volume。通常Profileを書き換えずWeightでモノクロを制御する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+      "owner": "VictoryContrast",
+      "name": "_enter",
+      "type": "Single",
+      "tooltip": "勝利から完全モノクロへ移行する時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+      "owner": "VictoryContrast",
+      "name": "_hold",
+      "type": "Single",
+      "tooltip": "完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Feedback/VictoryContrast.cs",
+      "owner": "VictoryContrast",
+      "name": "_restore",
+      "type": "Single",
+      "tooltip": "完全モノクロから元の色へ戻す時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "bgmSource",
+      "type": "AudioSource",
+      "tooltip": "単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "bgmSources",
+      "type": "List`1",
+      "tooltip": "BGMを再生するAudioSource一覧。各チャンネルの基準音量へ一時Ducking倍率を掛ける。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "sfxSourcePrefab",
+      "type": "AudioSource",
+      "tooltip": "SEプールを生成するAudioSource Prefab。SE再生用のSource設定を引き継ぐ。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "bgmList",
+      "type": "List`1",
+      "tooltip": "BGMの登録名とAudioClipの対応一覧。登録名からClipを検索する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "seList",
+      "type": "List`1",
+      "tooltip": "SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "sfxPoolSize",
+      "type": "Int32",
+      "tooltip": "初期化時に用意するSE用AudioSource数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "maxSfxPoolSize",
+      "type": "Int32",
+      "tooltip": "SE用AudioSourceプールの最大数。同時再生で増やせる上限。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_audioConfig",
+      "type": "AudioConfig",
+      "tooltip": "タイトル・戦闘・命中などの再生登録名を共有する設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_audioListener",
+      "type": "AudioListener",
+      "tooltip": "敗北演出のローパスを適用するAudioListener参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_bgmChannelCount",
+      "type": "Int32",
+      "tooltip": "初期化で確保するBGMチャンネル数。複数BGMの切り替えに使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_justAvoidDuckVolume",
+      "type": "Single",
+      "tooltip": "Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_justAvoidDuckEnter",
+      "type": "Single",
+      "tooltip": "BGMが一時音量へ下がる時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_justAvoidDuckHold",
+      "type": "Single",
+      "tooltip": "Just Avoidの一時BGM音量を保持する時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "AudioManager",
+      "name": "_justAvoidDuckRestore",
+      "type": "Single",
+      "tooltip": "BGMが基準音量へ戻る時間（実時間の秒）。停止済みBGMを再開しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_audioConfig",
+      "type": "AudioConfig",
+      "tooltip": "Final Blow開始時に再生するEnemy死亡SEの登録名設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_player",
+      "type": "PlayerController",
+      "tooltip": "勝利時に納刀・一時速度解除を要求するPlayer参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_enemyController",
+      "type": "EnemyController",
+      "tooltip": "最後のHitStopと一時速度解除の対象Enemy参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_phase1HitStop",
+      "type": "Single",
+      "tooltip": "最終Hitの停止・スローを維持する時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_whiteFlashDuration",
+      "type": "Single",
+      "tooltip": "最終Hitの白Flashの継続時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_phase2Duration",
+      "type": "Single",
+      "tooltip": "納刀開始からScene Fade開始まで。納刀Clip 2.07秒を見せる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_finalBlowText",
+      "type": "TextMeshProUGUI",
+      "tooltip": "納刀後に表示する討伐文字のTMP参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_finalBlowTextFadeIn",
+      "type": "Single",
+      "tooltip": "討伐文字のFadeとScale演出の時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_presentation",
+      "type": "FinalBlowPresentation",
+      "tooltip": "白Flash・HUD・黒帯・討伐文字を進行させるUI演出コンポーネント。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_cameraFeedback",
+      "type": "CameraManager",
+      "tooltip": "勝利専用構図・FOV・モノクロの開始と解除を要求するCameraManager参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_cameraPushDelay",
+      "type": "Single",
+      "tooltip": "最終Hitから勝利カメラとFOVの寄りを始めるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_sheathingDelay",
+      "type": "Single",
+      "tooltip": "最終Hitから納刀Triggerを要求するまでの時間（実時間の秒）。カメラDelay以上で開始する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/FinalBlowManager.cs",
+      "owner": "FinalBlowManager",
+      "name": "_textDelay",
+      "type": "Single",
+      "tooltip": "最終Hitから討伐文字を表示するまでの時間（実時間の秒）。納刀の見せ場に合わせる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_inputBuffer",
+      "type": "InputBuffer",
+      "tooltip": "Player入力通知と戦闘中の入力受付を管理する参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_playerPosition",
+      "type": "Transform",
+      "tooltip": "初期化時にカメラとEnemyへ渡すPlayerの位置参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_playerController",
+      "type": "PlayerController",
+      "tooltip": "Playerの初期化・入力・戦闘状態を管理する参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_playerAnimationController",
+      "type": "PlayerAnimationController",
+      "tooltip": "PlayerのAnimation Event・パラメータ制御の参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_animationName",
+      "type": "AnimationName",
+      "tooltip": "Playerと関連処理で使うAnimatorパラメータ名の設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_cameraConfig",
+      "type": "CameraConfig",
+      "tooltip": "通常追従・Lock-On・命中カメラの調整値。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_audioConfig",
+      "type": "AudioConfig",
+      "tooltip": "タイトル・戦闘・効果音の登録名設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_enemyPosition",
+      "type": "Transform",
+      "tooltip": "Lock-Onカメラが注視するEnemyの位置参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_enemyController",
+      "type": "EnemyController",
+      "tooltip": "Enemyの初期化と戦闘終了処理を管理する参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_cameraManager",
+      "type": "CameraManager",
+      "tooltip": "通常・Lock-On・勝利カメラの制御を接続する参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_camera",
+      "type": "Camera",
+      "tooltip": "画面に描画する出力Camera。入力の向きやUI投影にも使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_cinemachineCamera",
+      "type": "CinemachineCamera",
+      "tooltip": "通常戦闘のCinemachineCamera参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_cinemachineLockOncamera",
+      "type": "CinemachineCamera",
+      "tooltip": "Lock-On用CinemachineCameraの設定参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_loadSceneManager",
+      "type": "LoadSceneManager",
+      "tooltip": "戦闘終了時などのSceneロードを接続する参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_damageNumbers",
+      "type": "DamageNumbers",
+      "tooltip": "命中時ダメージ数字を表示するコンポーネント参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_soundVolume",
+      "type": "Single",
+      "tooltip": "GameManagerがBGM再生を要求する際の基準音量。0で無音、1で最大。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GameManager.cs",
+      "owner": "GameManager",
+      "name": "_state",
+      "type": "GameState",
+      "tooltip": "現在のゲーム進行状態。タイトル・戦闘・勝利・敗北の入力受付と演出を分ける。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GlobalFader.cs",
+      "owner": "GlobalFader",
+      "name": "fadeImage",
+      "type": "Image",
+      "tooltip": "Scene切り替え時に画面を覆うFade用Image。Alphaで暗転を制御する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/GlobalFader.cs",
+      "owner": "GlobalFader",
+      "name": "duration",
+      "type": "Single",
+      "tooltip": "Scene切り替えの暗転・明転それぞれの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+      "owner": "HitStopManager",
+      "name": "_hitStopTime",
+      "type": "Single",
+      "tooltip": "通常Light命中のHitStop時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+      "owner": "HitStopManager",
+      "name": "_lastHitStopTime",
+      "type": "Single",
+      "tooltip": "最終Hit用に公開するHitStop時間設定（実時間の秒）。FinalBlowManagerには専用時間設定もある。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/HitStopManager.cs",
+      "owner": "HitStopManager",
+      "name": "_heavyHitStop",
+      "type": "Single",
+      "tooltip": "通常Heavy命中のHitStop時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/LoadSceneManager.cs",
+      "owner": "LoadSceneManager",
+      "name": "_sceneNameConfig",
+      "type": "SceneNameConfig",
+      "tooltip": "タイトルと戦闘Sceneのロード名を共有する設定参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_playerController",
+      "type": "PlayerController",
+      "tooltip": "敗北時の死亡Triggerとスローの対象Player参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_enemyController",
+      "type": "EnemyController",
+      "tooltip": "敗北時のスローを適用するEnemy参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_vignetteFadeIn",
+      "type": "Single",
+      "tooltip": "敗北時の画面周辺の赤みと暗さが立ち上がる時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_vignetteColor",
+      "type": "Color",
+      "tooltip": "敗北用の画面周辺オーバーレイの色。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_vignetteMaxAlpha",
+      "type": "Single",
+      "tooltip": "敗北用オーバーレイの最大不透明度。0で透明、1で不透明。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_slowDuration",
+      "type": "Single",
+      "tooltip": "敗北時のAnimatorスローを維持する時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_slowSpeed",
+      "type": "Single",
+      "tooltip": "敗北時のAnimator速度倍率。0で停止、1で通常速度。TimeScaleは変更しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_silenceDuration",
+      "type": "Single",
+      "tooltip": "敗北のスロー後、全Audioを停止して待つ時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_lowPassCutoff",
+      "type": "Single",
+      "tooltip": "敗北時のローパスのカットオフ周波数（Hz）。低いほど音がこもる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_volume",
+      "type": "Volume",
+      "tooltip": "敗北時にVignetteを制御するHDRP Volume参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_smoothTime",
+      "type": "Single",
+      "tooltip": "旧補間時間設定（秒）。現行の敗北演出では直接参照しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_intensity",
+      "type": "Single",
+      "tooltip": "敗北時のHDRP Vignetteの目標強度。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_smoothness",
+      "type": "Single",
+      "tooltip": "敗北時のHDRP Vignetteの縁の滑らかさ。0〜1。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_deadText",
+      "type": "TextMeshProUGUI",
+      "tooltip": "敗北時に表示する死亡文字のTMP参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_deadTextFadeIn",
+      "type": "Single",
+      "tooltip": "死亡文字が不透明になるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/PlayerDeadManager.cs",
+      "owner": "PlayerDeadManager",
+      "name": "_ease",
+      "type": "Ease",
+      "tooltip": "死亡文字のFadeに適用するDOTweenの補間曲線。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+      "owner": "TitleManager",
+      "name": "_audioConfig",
+      "type": "AudioConfig",
+      "tooltip": "タイトルBGMと開始SEの登録名設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+      "owner": "TitleManager",
+      "name": "_sceneNameConfig",
+      "type": "SceneNameConfig",
+      "tooltip": "開始後にロードする戦闘Scene名の設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+      "owner": "TitleManager",
+      "name": "_transitionDelay",
+      "type": "Single",
+      "tooltip": "開始操作からScene切り替えまでの待機時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/TitleManager.cs",
+      "owner": "TitleManager",
+      "name": "_setup",
+      "type": "RunSetupUI",
+      "tooltip": "名前・装備選択を開くRun設定画面の参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs",
+      "owner": "JustAvoidCounterAnimation",
+      "name": "_counterWindupSpeed",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃の振りかぶり区間のAnimator速度倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs",
+      "owner": "JustAvoidCounterAnimation",
+      "name": "_counterSlashSpeed",
+      "type": "Single",
+      "tooltip": "Just Avoid追撃の斬撃区間のAnimator速度倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerAnimationController.cs",
+      "owner": "PlayerAnimationController",
+      "name": "_animName",
+      "type": "AnimationName",
+      "tooltip": "Player Animatorの移動・攻撃・回避・抜刀/納刀パラメータ名の設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_attackRootMotionScale",
+      "type": "Single",
+      "tooltip": "Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_playerWeapon",
+      "type": "MeshRenderer",
+      "tooltip": "抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_playerStartWeapon",
+      "type": "GameObject",
+      "tooltip": "納刀中の刀の見た目を切り替えるGameObject参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_weaponColliders",
+      "type": "Collider[]",
+      "tooltip": "Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_weaponHitboxPadding",
+      "type": "Vector3",
+      "tooltip": "プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_enemyWeaponColliders",
+      "type": "Collider[]",
+      "tooltip": "接触調整で参照するEnemy武器のCollider一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_playerStatus",
+      "type": "PlayerStatus",
+      "tooltip": "PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_animationName",
+      "type": "AnimationName",
+      "tooltip": "Player Animatorのパラメータ名を共有する設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_playerStateConfig",
+      "type": "PlayerStateConfig",
+      "tooltip": "Playerの回避受付時間・幽体化・コンボClipの設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_passiveBuffSet",
+      "type": "PlayerPassiveBuffSet",
+      "tooltip": "装備による攻撃倍率・加算威力・命中Effectの設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_vfxConfig",
+      "type": "VFXConfig",
+      "tooltip": "命中・Just Avoid・回復・バフなどの見た目演出設定。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_justAvoidSlowDef",
+      "type": "StatusEffectDef",
+      "tooltip": "Just Avoid成功時に適用するスロー状態効果の定義。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_canAttack",
+      "type": "Boolean",
+      "tooltip": "攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Player/PlayerController.cs",
+      "owner": "PlayerController",
+      "name": "_playerHudView",
+      "type": "PlayerHUDView",
+      "tooltip": "PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "StartingLives",
+      "type": "Int32",
+      "tooltip": "新しいRunを開始したときの残機数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "ReviveInvulnerability",
+      "type": "Single",
+      "tooltip": "復活後にダメージを無効化する時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "ShortGhostDuration",
+      "type": "Single",
+      "tooltip": "短い幽体化回避を維持する時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "GhostCooldown",
+      "type": "Single",
+      "tooltip": "幽体化回避を再使用できるまでの時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "JustBuffDuration",
+      "type": "Single",
+      "tooltip": "Just Avoid成功で得る攻撃ボーナスの有効時間（秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "FullHpRegenMultiplier",
+      "type": "Single",
+      "tooltip": "満HP時の自然ゲージ回復倍率。低HP時の倍率からHP比率で補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "LowHpRegenMultiplier",
+      "type": "Single",
+      "tooltip": "HP比率が0のときの自然ゲージ回復倍率。満HP時の倍率まで補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "FullHpSelfCostMultiplier",
+      "type": "Single",
+      "tooltip": "満HP時の自傷ゲージ消費倍率。低HP時の倍率から補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "LowHpSelfCostMultiplier",
+      "type": "Single",
+      "tooltip": "HP比率が0のときの自傷ゲージ消費倍率。満HP時の倍率まで補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "FullHpAvoidMultiplier",
+      "type": "Single",
+      "tooltip": "満HP時のJust Avoid受付時間倍率。低HP時の倍率から補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "LowHpAvoidMultiplier",
+      "type": "Single",
+      "tooltip": "HP比率が0のときのJust Avoid受付時間倍率。満HP時の倍率まで補間する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "PowerAttack",
+      "type": "Single",
+      "tooltip": "攻撃装備「剛力」の与ダメージ倍率。1で補正なし。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "SoulHitGain",
+      "type": "Single",
+      "tooltip": "攻撃装備「吸魂」の命中時ゲージ回復倍率。1で補正なし。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "DesperationBonus",
+      "type": "Single",
+      "tooltip": "攻撃装備「窮地」の最大追加ダメージ倍率。HPが低いほど増え、0.35で最大35%増。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "GuardDamage",
+      "type": "Single",
+      "tooltip": "防御装備「堅守」の被ダメージ倍率。0.8で通常の80%。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "SpiritCost",
+      "type": "Single",
+      "tooltip": "防御装備「霊衣」の幽体化開始・継続ゲージ消費倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "BreathRegen",
+      "type": "Single",
+      "tooltip": "防御装備「息吹」の自然ゲージ回復倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "SoulBossDamage",
+      "type": "Single",
+      "tooltip": "前回勝者が「吸魂」の場合に継承Enemyへ適用する攻撃倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "SpiritBossSpeed",
+      "type": "Single",
+      "tooltip": "前回勝者が「霊衣」の場合に継承Enemyへ適用する移動速度倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/GameplayRules.cs",
+      "owner": "GameplayRules",
+      "name": "BreathBossHealth",
+      "type": "Single",
+      "tooltip": "前回勝者が「息吹」の場合に継承Enemyへ適用する最大HP倍率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_id",
+      "type": "String",
+      "tooltip": "状態効果を識別するID。同じIDの追加時にStackPolicyで扱いを決める。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_duration",
+      "type": "Single",
+      "tooltip": "状態効果の有効時間（秒）。経過後に解除する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_speedMultiplier",
+      "type": "Single",
+      "tooltip": "状態効果中の移動速度倍率。1で補正なし。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_animationSpeedMultiplier",
+      "type": "Single",
+      "tooltip": "状態効果中のAnimator速度倍率。HitStopの一時倍率とは別に合成する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_maxStacks",
+      "type": "Int32",
+      "tooltip": "同じ状態効果を重ねられる最大スタック数。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_stacking",
+      "type": "StackPolicy",
+      "tooltip": "同じIDの状態効果を追加した際の更新・加算・置換の方針。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/StatusEffect/StatusEffectDef.cs",
+      "owner": "StatusEffectDef",
+      "name": "_vfxPrefab",
+      "type": "GameObject",
+      "tooltip": "状態効果中に表示する任意のVFX Prefab。未設定ならVFXを生成しない。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/BossBarSilhouette.cs",
+      "owner": "BossBarSilhouette",
+      "name": "_outline",
+      "type": "Vector2[]",
+      "tooltip": "ボスHPバーの輪郭を作る正規化座標の頂点一覧。RectTransformの大きさへ変換して描画する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+      "owner": "DamageTrailGauge",
+      "name": "_currentFill",
+      "type": "Image",
+      "tooltip": "現在値を即時反映する手前のゲージImage。Filled方式で使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+      "owner": "DamageTrailGauge",
+      "name": "_trailFill",
+      "type": "Image",
+      "tooltip": "ダメージ前の値から遅れて追従する奥のゲージImage。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+      "owner": "DamageTrailGauge",
+      "name": "_delay",
+      "type": "Single",
+      "tooltip": "ダメージ追従ゲージが減り始めるまでの待機時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/DamageTrailGauge.cs",
+      "owner": "DamageTrailGauge",
+      "name": "_catchupPerSecond",
+      "type": "Single",
+      "tooltip": "追従ゲージが現在値へ近づく速度（正規化ゲージ量/秒）。大きいほど速く追従する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_whiteFlash",
+      "type": "CanvasGroup",
+      "tooltip": "最終Hitで白Flashを表示するCanvasGroup。Alphaで強さを制御する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_letterboxTop",
+      "type": "RectTransform",
+      "tooltip": "勝利中に画面上へ出す黒帯のRectTransform。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_letterboxBottom",
+      "type": "RectTransform",
+      "tooltip": "勝利中に画面下へ出す黒帯のRectTransform。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_hudGroups",
+      "type": "CanvasGroup[]",
+      "tooltip": "勝利中にFade OutするHUDのCanvasGroup一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_hudVisibilityOwners",
+      "type": "RunHUD[]",
+      "tooltip": "通常HUD更新と勝利演出の表示制御を調停するRunHUD一覧。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_damageNumbers",
+      "type": "DamageNumbers",
+      "tooltip": "勝利中に新しいダメージ数字を抑制する表示コンポーネント。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_flashStrength",
+      "type": "Single",
+      "tooltip": "最終Hit白Flashの最大Alpha。0で透明、1で不透明。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_flashDelay",
+      "type": "Single",
+      "tooltip": "勝利開始から白Flashを出すまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_hudFadeDelay",
+      "type": "Single",
+      "tooltip": "勝利開始からHUDを消し始めるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_hudFadeDuration",
+      "type": "Single",
+      "tooltip": "HUDのFade Outにかける時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_letterboxDelay",
+      "type": "Single",
+      "tooltip": "勝利開始から上下黒帯を出し始めるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_letterboxDuration",
+      "type": "Single",
+      "tooltip": "上下黒帯が目標高さになるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_letterboxHeight",
+      "type": "Single",
+      "tooltip": "各黒帯の目標高さ。親画面の高さに対する比率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_textStartScale",
+      "type": "Single",
+      "tooltip": "討伐文字が現れる瞬間のScale倍率。元のScaleを基準にする。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_textOvershootScale",
+      "type": "Single",
+      "tooltip": "討伐文字が素早く拡大したときの最大Scale倍率。その後元のScaleへ戻す。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/FinalBlowPresentation.cs",
+      "owner": "FinalBlowPresentation",
+      "name": "_textRiseFraction",
+      "type": "Single",
+      "tooltip": "討伐表示時間のうち最初の拡大・Fadeに使う割合。残りの時間でScaleを落ち着かせる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+      "owner": "PlayerHUDView",
+      "name": "_hpFill",
+      "type": "Image",
+      "tooltip": "Playerの現在HPを即時反映するゲージImage。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+      "owner": "PlayerHUDView",
+      "name": "_damageFill",
+      "type": "Image",
+      "tooltip": "ダメージ前のHPから遅れて減る追従ゲージImage。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+      "owner": "PlayerHUDView",
+      "name": "_skillFill",
+      "type": "Image",
+      "tooltip": "Playerのスキルゲージ比率を反映するImage。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+      "owner": "PlayerHUDView",
+      "name": "_damageDelay",
+      "type": "Single",
+      "tooltip": "HPダメージ後に追従ゲージが減り始めるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/PlayerHUDView.cs",
+      "owner": "PlayerHUDView",
+      "name": "_damageCatchupPerSecond",
+      "type": "Single",
+      "tooltip": "HP追従ゲージの減少速度（正規化ゲージ量/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_player",
+      "type": "PlayerController",
+      "tooltip": "HP・スキルゲージ・無敵・Just Avoidボーナスを表示するPlayer参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_enemy",
+      "type": "EnemyController",
+      "tooltip": "ボスHP比率を取得するEnemy参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_enemyHpFill",
+      "type": "Image",
+      "tooltip": "ボスHPを直接反映するImage。EnemyGauge未設定時に使用する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_enemyGauge",
+      "type": "DamageTrailGauge",
+      "tooltip": "ボスHPと遅延ダメージを表示するゲージ。設定時は直接Fillより優先する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_lifeOrbs",
+      "type": "Image[]",
+      "tooltip": "残機を表すImage一覧。先頭から残機数だけ点灯色にする。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_lifeActiveColor",
+      "type": "Color",
+      "tooltip": "残っている命の表示色。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_lifeEmptyColor",
+      "type": "Color",
+      "tooltip": "消費済みの命の表示色。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_visibility",
+      "type": "CanvasGroup",
+      "tooltip": "Run HUD全体の表示Alphaを制御するCanvasGroup。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_challenger",
+      "type": "TMP_Text",
+      "tooltip": "現在の挑戦者名を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_opponent",
+      "type": "TMP_Text",
+      "tooltip": "前回勝者または初期相手の名前を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_health",
+      "type": "TMP_Text",
+      "tooltip": "Playerの現在HPを数値で表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_lives",
+      "type": "TMP_Text",
+      "tooltip": "現在の残機数を文字で表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_equipment",
+      "type": "TMP_Text",
+      "tooltip": "選択した攻撃装備・防御装備の名前を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_skill",
+      "type": "TMP_Text",
+      "tooltip": "Playerの現在スキルゲージを数値で表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunHUD.cs",
+      "owner": "RunHUD",
+      "name": "_ghostStatus",
+      "type": "TMP_Text",
+      "tooltip": "Just Avoidボーナスの倍率・残り時間と無敵状態を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_panel",
+      "type": "CanvasGroup",
+      "tooltip": "名前・装備選択画面全体の表示と入力受付を切り替えるCanvasGroup。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_nameInput",
+      "type": "TMP_InputField",
+      "tooltip": "新しいRunの挑戦者名を入力するTMP Input Field。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_attackOptions",
+      "type": "Toggle[]",
+      "tooltip": "攻撃装備を選ぶToggle一覧。配列順をRunSession.AttackNamesに合わせる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_defenseOptions",
+      "type": "Toggle[]",
+      "tooltip": "防御装備を選ぶToggle一覧。配列順をRunSession.DefenseNamesに合わせる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_attackDescription",
+      "type": "TMP_Text",
+      "tooltip": "選択中の攻撃装備の効果説明を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_defenseDescription",
+      "type": "TMP_Text",
+      "tooltip": "選択中の防御装備の効果説明を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_opponent",
+      "type": "TMP_Text",
+      "tooltip": "前回勝者と継承装備の説明を表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_rules",
+      "type": "TMP_Text",
+      "tooltip": "残機・復活・勝者継承ルールを表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_result",
+      "type": "TMP_Text",
+      "tooltip": "前回の勝敗結果と保存エラーを表示するTMPテキスト。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/RunSetupUI.cs",
+      "owner": "RunSetupUI",
+      "name": "_startButton",
+      "type": "Button",
+      "tooltip": "入力した名前と装備でRunを確定し、戦闘を開始するButton。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+      "owner": "TitleText",
+      "name": "_text",
+      "type": "TextMeshProUGUI",
+      "tooltip": "タイトル画面で点滅FadeするTMP文字参照。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+      "owner": "TitleText",
+      "name": "_fadeInDuration",
+      "type": "Single",
+      "tooltip": "タイトル文字が現れるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+      "owner": "TitleText",
+      "name": "_fadeOutDuration",
+      "type": "Single",
+      "tooltip": "タイトル文字が消えるまでの時間（実時間の秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+      "owner": "TitleText",
+      "name": "_ease",
+      "type": "Ease",
+      "tooltip": "タイトル文字のFadeに使用するDOTween補間曲線。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/UI/TitleText.cs",
+      "owner": "TitleText",
+      "name": "_gameSceneName",
+      "type": "String",
+      "tooltip": "TitleManager未設定時の代替開始処理でロードするScene名。通常はTitleManagerへ委譲する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+      "owner": "PassiveBuffEntry",
+      "name": "_label",
+      "type": "String",
+      "tooltip": "Inspector上で装備ボーナスを識別する表示用ラベル。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+      "owner": "PassiveBuffEntry",
+      "name": "_attackPowerMultiplier",
+      "type": "Single",
+      "tooltip": "この装備の与ダメージ倍率。1で補正なし。他の装備倍率と乗算する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+      "owner": "PassiveBuffEntry",
+      "name": "_flatAttackBonus",
+      "type": "Single",
+      "tooltip": "この装備が加える固定攻撃力。他の装備の加算値と合算する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerPassiveBuffSet.cs",
+      "owner": "PassiveBuffEntry",
+      "name": "_onHitEffectPrefab",
+      "type": "GameObject",
+      "tooltip": "この装備の命中時に使うEffect Prefab参照。未設定も許容する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "AttackClipList",
+      "name": "_clips",
+      "type": "List`1",
+      "tooltip": "コンボ段階順のAnimation Clip一覧。段階番号に対応する要素を再生する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "AttackClipList",
+      "name": "_comboWindowDelaySeconds",
+      "type": "List`1",
+      "tooltip": "段階ごとの追加コンボ受付開始までの遅延（秒）。未設定・負数は代替値を使う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStateConfig.cs",
+      "owner": "AttackClipList",
+      "name": "_clipFlatDamage",
+      "type": "List`1",
+      "tooltip": "段階ごとの固定ダメージ。未設定なら代替値を使い、設定済みのゼロ・負数はそのまま返す。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_dashPerSecond",
+      "type": "Single",
+      "tooltip": "疾走中の毎秒ゲージ消費量（ゲージ単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_ghostActivationCost",
+      "type": "Single",
+      "tooltip": "幽体化を開始した瞬間に消費するゲージ量（ゲージ単位）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_ghostPerSecondCost",
+      "type": "Single",
+      "tooltip": "幽体化を継続する毎秒ゲージ消費量（ゲージ単位/秒）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_selfSacrificeGaugePerSecond",
+      "type": "Single",
+      "tooltip": "自傷中の毎秒ゲージ消費量（ゲージ単位/秒）。HP消費とは別に支払う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_selfSacrificeMinHpRatio",
+      "type": "Single",
+      "tooltip": "自傷を継続できるHP比率の下限。0〜1で最大HPに対する比率。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_selfSacrificeDamagePercentPerSecond",
+      "type": "Single",
+      "tooltip": "自傷で毎秒失う最大HPの割合（%/秒）。1で最大HPの1%を毎秒失う。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_healGaugePerPercent",
+      "type": "Single",
+      "tooltip": "最大HPを1%回復するために消費するゲージ量（ゲージ単位/1%）。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Config/PlayerStatus.cs",
+      "owner": "SkillGaugeCostConfig",
+      "name": "_buffGaugePerSecond",
+      "type": "Single",
+      "tooltip": "バフ用の毎秒ゲージ消費設定。使用する行動側から参照するための値。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "SoundData",
+      "name": "name",
+      "type": "String",
+      "tooltip": "AudioManagerからClipを検索する登録名。AudioConfigやAnimation Eventの指定名と一致させる。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Managers/AudioManager.cs",
+      "owner": "SoundData",
+      "name": "clip",
+      "type": "AudioClip",
+      "tooltip": "この登録名で再生するAudioClip。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+      "owner": "ChampionTrace",
+      "name": "Version",
+      "type": "Int32",
+      "tooltip": "保存した勝者データの形式バージョン。ロード時に互換性を判定する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+      "owner": "ChampionTrace",
+      "name": "Name",
+      "type": "String",
+      "tooltip": "次のRunの相手として引き継ぐ前回勝者の名前。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+      "owner": "ChampionTrace",
+      "name": "Attack",
+      "type": "Int32",
+      "tooltip": "前回勝者の攻撃装備番号。AttackNamesの要素番号に対応する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+      "owner": "ChampionTrace",
+      "name": "Defense",
+      "type": "Int32",
+      "tooltip": "前回勝者の防御装備番号。DefenseNamesの要素番号に対応する。"
+    },
+    {
+      "path": "Assets/Mock/Scripts/Progression/RunSession.cs",
+      "owner": "ChampionTrace",
+      "name": "ClearSeconds",
+      "type": "Single",
+      "tooltip": "前回勝者がクリアまでに要した時間（秒）。"
+    }
+  ]
+}

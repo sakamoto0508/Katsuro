@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerResource : IDisposable
 {
+    /// <summary>最大HPと現在HPの通知を初期化し、能力コストや死亡処理で使う依存先を保持する。</summary>
     public PlayerResource(PlayerStatus status,PlayerAnimationController animController)
     {
         _maxHp = status != null ? status.MaxHealth : 100f;
@@ -38,6 +39,7 @@ public class PlayerResource : IDisposable
     private PlayerDeadManager _playerDead;
     private LoadSceneManager _loader;
     private bool _initialized;
+    /// <summary>ゲーム進行・Audio・死亡演出・遷移先を一度だけ接続する。</summary>
     public void Init(GameManager game, AudioManager audio, PlayerDeadManager playerDead, LoadSceneManager loader)
     {
         if (_initialized) return;
@@ -81,6 +83,7 @@ public class PlayerResource : IDisposable
         }
     }
 
+    /// <summary>残機があればHPと無敵時間を復元する。残機がなければ死亡を確定し、敗北演出または遷移を要求する。</summary>
     public void PlayerDeath()
     {
         if (_dead) return;
@@ -107,6 +110,7 @@ public class PlayerResource : IDisposable
         }
     }
 
+    /// <summary>HP変更通知に使用したReactivePropertyを解放する。</summary>
     public void Dispose()
     {
         _hpRx?.Dispose();

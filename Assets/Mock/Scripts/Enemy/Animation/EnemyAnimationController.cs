@@ -1,20 +1,36 @@
 using UnityEngine;
 
+/// <summary>Enemyの移動・攻撃パラメータと追撃専用被弾Layerを制御する。AI判断と位置移動は担当しない。</summary>
 [RequireComponent(typeof(Animator))]
 public class EnemyAnimationController : MonoBehaviour
 {
+    /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
     public AnimationName AnimName => _animName;
+    /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
+    [UnityEngine.Tooltip("Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。")]
     [SerializeField] private AnimationName _animName;
     private Animator _animator;
     private int _moveVelocityHash;
     private int _moveVectorXHash;
     private int _moveVectorYHash;
+    /// <summary>Just Avoid追撃の大きなHitReactionを再生するAnimator Layer名。</summary>
+    [UnityEngine.Tooltip("Just Avoid追撃の大きなHitReactionを再生するAnimator Layer名。")]
     [Header("Hit Reaction")]
     [SerializeField] private string _reactionLayerName = "HitReaction";
+    /// <summary>Light用の大Reaction時間設定（秒）。通常Lightでは大Reactionを要求しない仕様。</summary>
+    [UnityEngine.Tooltip("Light用の大Reaction時間設定（秒）。通常Lightでは大Reactionを要求しない仕様。")]
     [SerializeField, Range(.15f, .3f)] private float _lightHitDuration = .24f;
+    /// <summary>Just Avoid追撃の大Reactionを維持する時間（秒）。</summary>
+    [UnityEngine.Tooltip("Just Avoid追撃の大Reactionを維持する時間（秒）。")]
     [SerializeField, Range(.3f, .5f)] private float _heavyHitDuration = .4f;
+    /// <summary>Light用Reaction Layer Weight。通常Lightでは大Reactionを要求しない仕様。</summary>
+    [UnityEngine.Tooltip("Light用Reaction Layer Weight。通常Lightでは大Reactionを要求しない仕様。")]
     [SerializeField, Range(0f, 1f)] private float _lightHitWeight = .6f;
+    /// <summary>大Reactionへ入る短いBlend時間（秒）。Poseの急変を抑える。</summary>
+    [UnityEngine.Tooltip("大Reactionへ入る短いBlend時間（秒）。Poseの急変を抑える。")]
     [SerializeField, Range(.05f, .12f)] private float _reactionBlendIn = .08f;
+    /// <summary>大Reactionから通常状態へ戻すBlend時間（秒）。</summary>
+    [UnityEngine.Tooltip("大Reactionから通常状態へ戻すBlend時間（秒）。")]
     [SerializeField, Range(.05f, .12f)] private float _reactionBlendOut = .08f;
     private static readonly string[] HitDirections = { "Front", "Back", "Left", "Right" };
     private int _reactionLayer = -1;
@@ -24,6 +40,8 @@ public class EnemyAnimationController : MonoBehaviour
     public bool IsHeavyReacting { get; private set; }
 
     // Direction identifies the side the attacker occupies in the enemy's local space.
+    /// <summary>攻撃者位置または命中情報をEnemyのローカル方向へ変換し、四方向の被弾Clipを選ぶ。</summary>
+    /// <returns>前・後・左・右を表す方向インデックス。</returns>
     public static int GetHitDirection(Transform enemy, DamageInfo info)
     {
         Vector3 source = info.Instigator != null ? info.Instigator.transform.position - enemy.position : Vector3.zero;
@@ -37,6 +55,8 @@ public class EnemyAnimationController : MonoBehaviour
         return local.z >= 0f ? 0 : 1;
     }
 
+    /// <summary>有効な専用Layerと追撃フラグがある場合だけ大きい被弾反応を開始する。</summary>
+    /// <returns>追撃専用の被弾Stateを開始した場合はtrue。</returns>
     public bool TryPlayHitReaction(DamageInfo info)
     {
         if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
@@ -60,6 +80,7 @@ public class EnemyAnimationController : MonoBehaviour
         return true;
     }
 
+    /// <summary>攻撃用トリガーと攻撃再生を解除して被弾への短いBlendを要求する。死亡トリガーは保持する。</summary>
     public void InterruptAttackForHitReaction()
     {
         if (_animator == null) return;
@@ -71,6 +92,8 @@ public class EnemyAnimationController : MonoBehaviour
         if (_animator.HasState(0, idle)) _animator.CrossFadeInFixedTime(idle, _reactionBlendIn, 0, 0f);
     }
 
+    /// <summary>Animator速度に合わせて被弾Layerと減速移動の進行を更新し、復帰完了を通知する。</summary>
+    /// <returns>被弾反応がこの更新で完了した場合はtrue。</returns>
     public bool TickHitReaction(float deltaTime)
     {
         if (!IsReacting) return false;
@@ -84,6 +107,7 @@ public class EnemyAnimationController : MonoBehaviour
         return true;
     }
 
+    /// <summary>被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。</summary>
     public void CancelHitReaction()
     {
         IsReacting = IsHeavyReacting = false;
@@ -140,10 +164,8 @@ public class EnemyAnimationController : MonoBehaviour
         _animator?.SetInteger(parameterName, value);
     }
 
-    /// <summary>
-    /// Animator 参照を取得する。
-    /// </summary>
     private bool _initialized;
+    /// <summary>Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。</summary>
     public void Init()
     {
         if (_initialized) return;

@@ -200,6 +200,9 @@ MonoBehaviour:
   _letterboxDelay: 0.15
   _letterboxDuration: 0.25
   _letterboxHeight: 0.08
+  _textStartScale: 0.9
+  _textOvershootScale: 1.025
+  _textRiseFraction: 0.55
 --- !u!1 &6890895786211621009
 GameObject:
   m_ObjectHideFlags: 0

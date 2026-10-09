@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
 /// <summary>
 /// ステータス効果の管理コンポーネント。
 /// 敵オブジェクトにアタッチされ、適用された効果の残り時間やスタック管理、
 /// アニメータ／NavMeshAgent への速度乗算反映、VFX の生成・破棄を行います。
 /// </summary>
+[RequireComponent(typeof(Animator))]
 public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
 {
     // 現在適用中の効果インスタンス一覧
@@ -19,6 +19,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     private AnimationSpeedController _speed;
 
     private bool _initialized;
+    /// <summary>AnimatorとAgentを取得し、基準移動速度と合成用の速度制御を一度だけ接続する。</summary>
     public void Init()
     {
         if (_initialized) return;
@@ -30,6 +31,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         if (_animator != null) { _speed = _animator.GetComponent<AnimationSpeedController>(); _speed?.Init(); }
     }
 
+    /// <summary>効果の残り時間を進め、期限切れのVFXを除去して倍率の変更を再計算する。</summary>
     private void Update()
     {
         // 各効果の残り時間を減算し、期限切れは解除する。
@@ -52,6 +54,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         if (changed) RecalculateModifiers();
     }
 
+    /// <summary>同じIDの効果を定義の更新・置換・加算方式で合成し、新規の場合はVFXを生成して倍率を反映する。</summary>
     public void ApplyStatusEffect(StatusEffectInstance instance)
     {
         // 受け取った効果インスタンスをリストに追加、または既存と合成する
@@ -91,7 +94,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     /// <summary>
     ///     指定した ID のステータス効果を解除する。存在しない場合は何もしない。
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">状態効果定義の識別子。</param>
     public void RemoveStatusEffect(string id)
     {
         for (int i = _effects.Count - 1; i >= 0; --i)
@@ -108,13 +111,14 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     /// <summary>
     ///   指定した ID のステータス効果が現在適用中かどうかを返す。
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">状態効果定義の識別子。</param>
+    /// <returns>指定IDの効果が適用中ならtrue。</returns>
     public bool HasStatusEffect(string id)
     {
         return _effects.Exists(e => e.Def.Id == id);
     }
 
+    /// <summary>全効果とVFXを解除し、Animator倍率とAgent移動速度を基準へ戻す。</summary>
     private void OnDisable()
     {
         foreach (var effect in _effects) if (effect.Vfx != null) Destroy(effect.Vfx);

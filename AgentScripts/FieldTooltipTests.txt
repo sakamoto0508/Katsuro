@@ -1,0 +1,9 @@
+CameraManager._moveDuration = 勝利カメラが開始位置から納刀構図へ移る時間（実時間の秒）。
+CameraManager._sideAngle = Player背面から側面へ回り込む角度（度）。腕と刀が見える構図を調整する。
+CameraManager._hold = 完全モノクロを保持する時間（実時間の秒）。移行時間とは別に加算する。
+FinalBlowOverlay._textStartScale = 討伐文字が現れる瞬間のScale倍率。元のScaleを基準にする。
+PlayerStatus._maxHealth = Playerの最大HP。体力初期化とHP比率計算の基準。
+PlayerStatus._skillGaugeCost._healGaugePerPercent = 最大HPを1%回復するために消費するゲージ量（ゲージ単位/1%）。
+PlayerStateConfig._lightAttackClips._comboWindowDelaySeconds = 段階ごとの追加コンボ受付開始までの遅延（秒）。未設定・負数は代替値を使う。
+AudioManager.seList = SEの登録名とAudioClipの対応一覧。AudioConfigやAnimation Eventの名前と一致させる。
+PASS: native SerializedProperty.tooltip on saved Prefab/ScriptableObject, including nested serialized settings. Compile errors=0; Edit Mode; saved.

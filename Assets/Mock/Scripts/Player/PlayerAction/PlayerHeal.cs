@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerHeal : AbilityBase
 {
+    /// <summary>回復能力のゲージ・移動処理・消費設定を接続する。</summary>
     public PlayerHeal(SkillGauge gauge, PlayerMover playerMover, SkillGaugeCostConfig costConfig = null)
         : base(gauge, costConfig)
     {
@@ -22,6 +23,8 @@ public sealed class PlayerHeal : AbilityBase
     /// チャネリング回復を開始する。percentPerSecond は「秒あたりの回復率(%)」。
     /// 0 以下だと開始に失敗します。
     /// </summary>
+    /// <param name="percentPerSecond">最大HPを毎秒何パーセント回復するか。1は1%/秒。</param>
+    /// <returns>正の回復率と使用可能なゲージで回復を開始できた場合はtrue。</returns>
     public bool TryBegin(float percentPerSecond)
     {
         if (percentPerSecond <= 0f) return false;

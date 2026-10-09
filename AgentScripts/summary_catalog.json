@@ -1,0 +1,658 @@
+{
+  "_types": {
+    "CameraManager": "入力・Lock-On・Cinemachineと戦闘時の一時的な画面補正を接続し、勝利中は専用カメラへ制御を渡す。",
+    "DamageInfo": "一回の命中について、ダメージ量・接触位置・攻撃者・攻撃種別と追撃フラグを伝える値型。",
+    "AnimationName": "PlayerとEnemyが使用するAnimatorパラメータ名をInspectorで共有する設定。",
+    "AudioConfig": "BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。",
+    "CameraConfig": "通常追従・Lock-On・命中・ジャスト回避のカメラ距離と補正量をまとめる設定。",
+    "JustAvoidBuffConfig": "ジャスト回避成功で蓄積する攻撃倍率の加算量と最大スタック数を定義する。",
+    "Tier": "HP割合のしきい値と、その段階で付与する低HP効果を対応付ける。",
+    "PlayerPassiveBuffSet": "攻撃・回避などの契機に応じて付与するPlayerのパッシブ効果を定義する。",
+    "PassiveBuffEntry": "状態効果の定義と付与時の持続時間を組として保持する。",
+    "AttackClipList": "コンボ段階ごとのClip、受付遅延、固定ダメージを保持し、未設定時の代替値を提供する。",
+    "PlayerStateConfig": "Playerのスキルゲージ、幽体化、攻撃Clipとコンボ受付時間を共有する設定。",
+    "PlayerStatus": "PlayerのHP・移動・攻撃などの基礎値と能力コストをInspectorで設定する。",
+    "SceneNameConfig": "TitleとGameの遷移先名を共有し、呼び出し側の文字列重複を避ける設定。",
+    "VFXConfig": "命中、追撃、ジャスト回避のPrefabと表示量を定義する。命中判定やダメージ計算は担当しない。",
+    "EnemyActionLock": "Enemy行動ロック用に残されている拡張枠。現在のStartとUpdateには処理がない。",
+    "EnemyActionTimer": "Enemy行動時間の管理用に残されている拡張枠。現在のStartとUpdateには処理がない。",
+    "EnemyAnimationController": "Enemyの移動・攻撃パラメータと追撃専用被弾Layerを制御する。AI判断と位置移動は担当しない。",
+    "EnemyAnimationRelay": "Enemyの攻撃終了イベントをAI側へ中継し、Animatorと行動管理を接続する。",
+    "EnemyAttackData": "Enemy行動ごとのAnimator名、攻撃力・武器などをInspectorで定義する。",
+    "EnemyAction": "Enemy行動用に残されている空の拡張枠。現在は実行処理を持たない。",
+    "EnemyActionType": "Enemyが選択可能な接近・待機・攻撃・後退などの行動を識別する。",
+    "EnemyActionProvider": "Enemyの行動提供用に残されている空の拡張枠。現在のAI行動はこのクラスで実行しない。",
+    "EnemyDecisionConfig": "距離帯ごとの行動候補と重み・連続選択の補正を定義するAI判断用設定。",
+    "ActionWeight": "Enemyの行動候補と抽選時の基準重みを対応付ける。",
+    "EnemyStuts": "EnemyのHP・攻撃・追跡・移動・旋回方式をInspectorで定義する基礎設定。",
+    "RotationControlMode": "Enemyの旋回をAgent任せ、対象へ即時旋回、手動補間のいずれで行うか識別する。",
+    "EnemyController": "Enemyの依存先を接続し、AI更新・命中・死亡・Animation Eventを統括する。死亡後の戦闘更新を遮断する。",
+    "EnemyHealth": "Enemyの最大HPと現在HPを保持して変更を通知する。死亡演出とAI停止はControllerに任せる。",
+    "EnemyState": "Enemyの待機・追跡・攻撃などの行動状態を識別する。",
+    "EnemyStateMachine": "Enemy状態管理用に残されている空の拡張枠。現在の戦闘状態管理は別のAI実装が担当する。",
+    "SampleEnemyAttacks": "InspectorでEnemyAttackDataのサンプル参照一覧を保持する補助コンポーネント。攻撃の実行処理は持たない。",
+    "AttackRootMotionPhysics": "攻撃Root Motionの水平移動をRigidbodyの衝突形状で制限する共通処理。",
+    "AttackRootMotionState": "攻撃Stateへの入退場をControllerへ通知し、Root Motionを適用するStateの所有権を管理する。",
+    "CombatLog": "戦闘の診断ログを条件付きで出力する。リリース時の不要なログ呼び出しを抑える。",
+    "JustAvoidContrast": "ジャスト回避成功時だけ専用Volumeで世界をモノクロ化し、BGM Duckを同時に開始する。",
+    "JustAvoidEnvelope": "現在値から開始できる移行・保持・復帰の包絡線。時間の取得と適用先は呼び出し側が担当する。",
+    "AttackStyle": "通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。",
+    "DistortionPass": "出力カメラのPost Process後の画面を別RTへ複製し、成功地点から広がる歪みを描画する。",
+    "SoundData": "AudioManagerで参照する登録名とAudioClipを対応付ける。",
+    "AudioManager": "複数BGMチャンネルとSEプールを管理する。BGM基準音量と一時的なDucking倍率を分離して保持する。",
+    "AnimationSpeedController": "基準速度・状態効果・実時間で期限切れになる一時倍率を合成し、Animator速度を更新する。",
+    "GhostToggleResult": "幽体化の開始・解除・開始失敗を呼び出し側へ伝える。",
+    "DistanceManager": "距離管理用に残されている拡張枠。現在は距離計測・通知の処理を持たない。",
+    "HitStopManager": "登録済み対象のAnimationSpeedControllerへ実時間期限の停止・減速を要求する。TimeScaleは変更しない。",
+    "LoadSceneManager": "共有FaderへScene遷移を委譲し、必要なら指定時間の待機後に遷移する。",
+    "GameState": "Title・戦闘・勝利・敗北・Pauseの進行段階を識別し、入力と音声の切り替えに使用する。",
+    "InputBuffer": "PlayerInputから行動別InputActionを取得し、コンポーネントの有効状態に合わせて入力受付を切り替える。",
+    "PlayerMover": "移動入力・旋回・Rigidbody移動と攻撃Root Motionの物理反映を担当する。攻撃や能力の選択は行わない。",
+    "PlayerResource": "PlayerのHP・能力による消費回復・命中時ゲージ回復を管理し、残機と死亡演出を接続する。",
+    "PlayerStateId": "Playerの移動・攻撃・Dash・能力状態をステートマシン内で識別する。",
+    "PlayerDashState": "Dash中の移動とゲージ消費を進め、解除や攻撃入力に応じて次のPlayer状態へ移る。",
+    "PlayerGhostState": "幽体化中の移動・見た目・回避受付を管理し、解除や攻撃に応じて状態を切り替える。",
+    "PlayerLocomotionState": "通常移動の更新をMoverへ委譲し、能力や攻撃の入力で対応するPlayer状態へ移る。",
+    "ChampionTrace": "勝利した挑戦者の名前・装備選択・所要時間を保存し、次回の対戦相手へ引き継ぐデータ。",
+    "GameplayRules": "装備倍率、残機、HP依存の能力倍率などラン全体の調整値を提供する設定。",
+    "IStatusEffectReceiver": "状態効果の付与・解除・存在確認を受け付ける契約。効果の進行方法は実装側が定義する。",
+    "StatusEffectDef": "状態効果のID、持続・重複方式とステータス倍率を定義する共有データ。",
+    "StackPolicy": "同じ状態効果の再付与時に、更新・加算などどの重複処理を行うか識別する。",
+    "StatusEffectInstance": "付与された効果の定義・残り時間・スタック数を個別に保持するランタイムデータ。",
+    "LockOnCamera": "通常・Lock-Onカメラの優先度とAnimatorフラグを切り替え、手動追従中のBrain停止と復帰を管理する。"
+  },
+  "CameraManager": {
+    "Init": "入力イベントとLock-On移動、出力カメラ、勝利カメラの依存先を一度だけ接続する。",
+    "OnDestroy": "描画イベントと入力購読を解除し、勝利カメラの一時状態を解放する。",
+    "PlayHitFeedback": "攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。",
+    "PlayJustAvoidFeedback": "Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。",
+    "PlayFinalBlowFeedback": "回避FOVを解除して勝利FOVと専用構図を開始する。寄り始めは指定秒数だけ遅らせる。",
+    "StopFinalBlowFeedback": "勝利補正を解除し、出力カメラとCinemachineの通常制御を復元する。",
+    "OnEnable": "初期化済みなら描画前後の補正イベントを再登録する。",
+    "OnDisable": "描画購読を解除し、回避・勝利の一時カメラ補正を消去する。",
+    "SubscribeRendering": "出力カメラの描画前後で一時補正を適用・解除するイベントを重複なく登録する。",
+    "UnsubscribeRendering": "描画イベントを解除し、適用中の一時補正が残らないよう復元する。",
+    "BeginRendering": "Cinemachine更新後の出力構図を保存し、その描画だけImpulseとFOV補正を重ねる。",
+    "EndRendering": "出力カメラの描画終了後に元の位置とFOVを戻し、次のカメラ更新に補正を持ち越さない。",
+    "RestoreCamera": "描画用に保存した位置とFOVを一度だけ復元する。",
+    "LateUpdate": "勝利中は専用仮想カメラを進行し、それ以外はLock-Onの手動追従を更新する。",
+    "InputEventRegistry": "Lock-On開始入力をこのカメラ管理へ接続する。",
+    "InputEventUnRegistry": "Lock-On入力の購読を解除して破棄後の呼び出しを防ぐ。",
+    "OnLookOnAction": "現在のLock-On状態に応じて対象の固定と解除を切り替える。"
+  },
+  "LockOnCamera": {
+    "LockOnCamera": "対象・通常カメラ・Lock-OnカメラとAnimator設定を保持し、優先度切り替えの依存先を接続する。",
+    "LockOn": "有効な対象へLock-Onし、カメラ優先度とAnimatorフラグを変更する。手動追従中はBrainを停止する。",
+    "UnLockOn": "Lock-Onを解除して仮想カメラ優先度とAnimatorフラグを戻し、自身が停止したBrainだけを再開する。"
+  },
+  "LockOnCameraMover": {
+    "LockOnCameraMover": "追従対象とカメラ設定を保持し、Brainの有効状態に応じた追従先を準備する。",
+    "LateUpdate": "有効なLock-On対象を向く位置と角度へ補間する。対象を失った場合はLock-Onを解除する。"
+  },
+  "VictoryCameraRig": {
+    "OnDisable": "勝利Overrideを解放してBrainの有効状態を復元する。",
+    "OnDestroy": "所有する勝利Overrideを残さず通常カメラへ制御を返す。"
+  },
+  "DamageInfo": {
+    "DamageInfo": "命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。"
+  },
+  "PlayerStateConfig": {
+    "GetClip": "段階番号を有効範囲へ制限してClipを取得する。未設定ならnullを返す。|指定段階に対応するClip。リストが空ならnull。",
+    "GetDuration": "Clip長を返し、Clip未設定時は指定の代替秒数を使用する。|最低0.1秒を保証したClip長または代替秒数。",
+    "GetComboWindowDelay": "段階別のコンボ受付遅延を取得し、未設定・負値の場合は代替値を使用する。|0以上の受付遅延秒数。",
+    "GetClipDamage": "段階別の固定ダメージを取得する。設定済みの負数やゼロはそのまま返す。|設定されたダメージ値。未設定の場合は非負の代替値。",
+    "GetLightAttackDuration": "Lock-Onに応じた弱攻撃Clipの長さを取得し、未設定時は弱攻撃用の代替時間を返す。|指定段階のClip長または代替秒数。",
+    "GetLightAttackClipDamage": "Lock-Onの有無とコンボ段階に対応する弱攻撃の固定ダメージを取得する。|指定段階のダメージ設定値。",
+    "GetLightAttackComboWindowDelay": "Lock-Onの有無に応じて弱攻撃のコンボ受付遅延を取得する。|受付遅延秒数。",
+    "GetLightAttackComboCount": "使用する弱攻撃Clipリストからコンボ段数を求める。|使用可能な弱攻撃段数。",
+    "GetLightAttackClips": "Lock-On用Clipが設定されていればそのリストを選び、なければ通常弱攻撃を使用する。|選択された弱攻撃Clipリスト。",
+    "GetStrongAttackDuration": "強攻撃の段階別Clip長を取得し、未設定時は代替時間を使用する。|指定段階の強攻撃時間。",
+    "GetStrongAttackClipDamage": "強攻撃のコンボ段階に対応する固定ダメージを取得する。|指定段階のダメージ設定値。",
+    "GetStrongAttackComboWindowDelay": "強攻撃の段階別コンボ受付遅延を取得する。|受付遅延秒数。",
+    "GetJustAvoidAttackDuration": "追撃の段階別Clip長を取得し、未設定時は追撃用の代替時間を使用する。|指定段階の追撃時間。",
+    "SelectLightAttackList": "Lock-On用Clipの存在を確認し、実際に使用する弱攻撃リストを選ぶ。|使用対象の弱攻撃設定。"
+  },
+  "AnimationEventStream": {
+    "Publish": "Animation Eventの種類を購読中のPlayer状態管理へ通知する。",
+    "Dispose": "通知を完了し、Subjectの購読リソースを解放する。"
+  },
+  "InputBuffer": {
+    "OnEnable": "行動別InputActionを有効にして入力受付を再開する。",
+    "OnDisable": "行動別InputActionを無効にし、停止中のゲームへ入力を渡さない。",
+    "SetActionsEnabled": "保持している移動・攻撃・能力・カメラの入力Actionをまとめて切り替える。",
+    "SetActionEnabled": "未取得Actionを無視し、有効化または無効化を適用する。",
+    "Init": "PlayerInputから必要な名前付きActionを一度だけ取得する。"
+  },
+  "JustAvoidCounterAnimation": {
+    "Awake": "速度パラメータを操作するAnimatorを同じオブジェクトから取得する。",
+    "BeginCounter": "追撃Stateの所有権を記録し、命中・終了フラグと振りかぶり速度を初期化する。",
+    "ExitCounter": "終了したStateが現在の追撃所有者の場合だけ速度を戻す。連続追撃へのBlendを保護する。",
+    "AnimEvent_JustAvoidCounterSlash": "現在の追撃Clipからの有効Eventであれば、振りかぶりから斬撃速度へ切り替える。",
+    "AnimEvent_JustAvoidCounterResetSpeed": "現在の追撃ClipからのEventだけを受け付けて速度倍率を通常へ戻す。",
+    "AnimEvent_OnAttackFinished": "追撃の終了Eventで速度倍率を解除し、Clip側の追加Eventがなくても復帰させる。",
+    "AcceptEvent": "Event発生元のStateと現在の追撃所有者が一致するか検証する。|現在の追撃Stateから届いた有効Eventならtrue。",
+    "IsCurrentCounter": "現在または遷移先のAnimator Stateが所有中の追撃か確認する。|有効なAnimatorで追撃タグとStateハッシュが一致すればtrue。",
+    "ResetSpeed": "追撃の所有権を消去し、Animatorの専用速度パラメータを1へ戻す。",
+    "LateUpdate": "追撃Stateから離れた場合の取り残された速度倍率を解除する。",
+    "OnDisable": "停止時に追撃速度を通常倍率へ戻す。"
+  },
+  "JustAvoidCounterSpeedState": {
+    "OnStateEnter": "ベースLayerの追撃State開始を通知し、そのStateに速度制御の所有権を渡す。",
+    "OnStateExit": "ベースLayerの終了Stateを通知し、所有者に一致する追撃速度だけを解除する。"
+  },
+  "AbilityBase": {
+    "AbilityBase": "ゲージと能力コスト設定を保持し、ゲージ未指定の能力生成を拒否する。",
+    "SetActive": "能力の有効状態をReactivePropertyへ反映して購読者に通知する。",
+    "PublishConsumed": "能力が消費または進行した量を通知し、HP処理などを外部の購読者へ委譲する。",
+    "End": "能力の有効フラグを解除する。派生能力は終了時の追加処理を拡張できる。",
+    "Tick": "派生能力が時間経過による消費・終了判定を実装するための更新フック。基底では状態を変更しない。",
+    "Dispose": "能力通知を完了し、購読・消費通知・有効状態のReactiveリソースを解放する。"
+  },
+  "PlayerAttacker": {
+    "PlayerAttacker": "Animator、武器、攻撃設定と所有者を保持し、命中処理に必要な依存先を接続する。",
+    "Init": "ゲーム進行とHitStopの参照を一度だけ接続する。",
+    "PlayLightAttack": "弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。",
+    "PlayStrongAttack": "強攻撃の段階を記録し、その段階の固定ダメージとAnimatorトリガーを設定する。",
+    "PlayStrongAttackInternal": "強攻撃の種別と段階を記録して共通のトリガー処理へ渡す。",
+    "Dispose": "追撃速度と武器の命中購読を解除し、保持している命中対象を消去する。",
+    "PlayAttackTrigger": "攻撃トリガー名を検証してコンボ段階をAnimatorへ渡し、命中管理を次の攻撃へ切り替える。"
+  },
+  "PlayerGhost": {
+    "PlayerGhost": "幽体化に使用するゲージと開始・継続コスト設定を基底能力へ渡す。",
+    "TryBegin": "再使用待ちを確認し、開始コストが足りなければ短時間の幽体化として開始する。|幽体化を新しく開始できた場合はtrue。",
+    "End": "幽体化を終了し、有効だった場合は再使用待ちを設定して短時間モードを解除する。",
+    "Tick": "再使用待ちと短時間モードを進め、通常モードでは継続コスト不足で幽体化を終了する。"
+  },
+  "PlayerHeal": {
+    "PlayerHeal": "回復能力のゲージ・移動処理・消費設定を接続する。"
+  },
+  "PlayerSelfSacrifice": {
+    "PlayerSelfSacrifice": "自傷能力が使用するゲージとコスト設定を基底能力へ渡す。",
+    "Tick": "継続ゲージを消費し、成功時は経過秒を購読者へ渡してHP消費を委譲する。ゲージ不足なら終了する。"
+  },
+  "PlayerSprint": {
+    "PlayerSprint": "Dashの開始・継続消費で使用するゲージとコスト設定を保持する。"
+  },
+  "PlayerMover": {
+    "PlayerMover": "移動設定・Rigidbody・PlayerとEnemyのTransform・Animatorを保持する。",
+    "BeginAttackRootMotion": "攻撃Root Motionの受付を開始し、前の攻撃の移動量を消去する。",
+    "EndAttackRootMotion": "攻撃Root Motionの受付と蓄積量を解除し、適用していた攻撃速度を停止する。",
+    "QueueAttackRootMotion": "再生中の攻撃から水平移動量を蓄積する。HitStop中の移動は蓄積しない。",
+    "FixedUpdateAttackRootMotion": "蓄積した攻撃移動量を衝突で制限し、物理フレームのRigidbody速度へ変換する。",
+    "StopAttackVelocity": "自身が適用した攻撃速度を停止し、垂直方向の速度を保持する。",
+    "Update": "入力に応じた移動速度・方向と表示用Animator値を更新する。",
+    "FixedUpdate": "攻撃Root Motionが優先されていなければ、通常移動と旋回を物理フレームで反映する。",
+    "OnMove": "次の移動更新に使用する平面入力を保持する。",
+    "SetSprint": "通常移動速度とDash速度の選択に使用するフラグを切り替える。",
+    "LockOnDirection": "Lock-On状態と対象方向を保持し、移動・旋回の基準へ反映する。",
+    "MoveStop": "移動入力と水平移動速度を止め、静止状態のAnimator値へ戻す。",
+    "SetDrawingSword": "抜刀状態を記録し、移動時に使用する姿勢と速度の選択へ反映する。",
+    "ReturnVelocity": "移動速度をAnimatorへ渡すための値に換算する。|現在の移動速度に対応するAnimator値。",
+    "UpdateDirection": "カメラとLock-On方向を基準に、入力からワールドの移動方向を求める。",
+    "Movement": "水平移動方向と速度をRigidbodyへ反映し、垂直速度を維持する。",
+    "ResolveTargetSpeed": "静止・歩行・Dashなど現在の入力と状態から目標速度を選ぶ。|移動状態に対応する目標速度。",
+    "UpdateRotation": "移動またはLock-Onの向きへPlayerを補間旋回させる。",
+    "SpeedControll": "目標速度に向けて加減速し、急激な速度切り替えを抑える。",
+    "ReturnVector": "現在の入力を移動Animatorへ渡す二軸値として取得する。|移動方向を表す二軸値。"
+  },
+  "PlayerAnimationController": {
+    "Init": "Animatorを取得し、移動パラメータのハッシュを一度だけ初期化する。"
+  },
+  "PlayerController": {
+    "BeginAnimationAttackRootMotion": "戦闘可能なときだけ攻撃Stateのハッシュを記録し、MoverのRoot Motion受付を開始する。",
+    "EndAnimationAttackRootMotion": "終了Stateが現在の所有者に一致する場合だけ攻撃Root Motionを停止する。",
+    "StopAttackRootMotion": "攻撃Stateの所有権とMoverの保留移動・攻撃速度を解除する。",
+    "OnAnimatorMove": "所有中の攻撃Stateの水平移動をMoverへ渡す。戦闘終了や別Stateへの遷移では受付を解除する。",
+    "OnDisable": "無効化時に保留中の攻撃Root Motionを消去する。",
+    "OnRevived": "能力・攻撃・演出を終了させ、復活後の通常移動状態へ戻す。",
+    "SetGhostVisual": "幽体化の表示状態をCombatFeedbackへ渡す。",
+    "PlayBuffAudio": "バフ用BGMを専用の第2チャンネルへ要求する。",
+    "StopBuffAudio": "バフ用の第2BGMチャンネルを停止する。",
+    "Init": "入力・状態・移動・能力・武器・表示の依存先を組み立て、必要な通知を購読する。",
+    "OnDestroy": "Root Motionと入力購読を停止し、Playerが所有する状態・能力・武器のリソースを解放する。",
+    "Update": "Inspector変更の刀判定を反映し、戦闘可能な間だけ状態と能力のフレーム更新を進める。",
+    "FixedUpdate": "戦闘可能な間だけ攻撃Root Motionと現在状態の物理更新を進める。",
+    "HandleSelfSacrificeTick": "自傷能力から受けた経過秒を最大HPの割合へ換算し、音を重ねずHP消費へ反映する。",
+    "HandleHealTick": "回復能力から通知された割合をPlayerResourceのHP回復へ反映する。",
+    "OnMove": "移動入力の開始・変更・解除を読み取り、解除時はゼロ入力を状態管理へ渡す。",
+    "OnLightAttackAction": "有効な弱攻撃開始入力で抜刀状態を確認し、現在状態の攻撃・コンボ受付へ渡す。",
+    "OnStrongAttackAction": "有効な強攻撃開始入力で抜刀状態を確認し、現在状態の強攻撃・コンボ受付へ渡す。",
+    "OnGhostAction": "幽体化能力の開始・解除を入力に応じて処理し、状態と表示を接続する。",
+    "OnSelfSacrificeAction": "自傷能力の開始・解除結果を状態管理とバフ表示へ反映する。",
+    "OnHeal": "回復能力の開始・解除を入力に応じて要求し、対応するPlayer状態へ通知する。",
+    "OnSprint": "Dash入力の開始と解除を現在状態へ転送する。",
+    "AnimaEvent_OnSordDrawWeapon": "抜刀ClipのEventに合わせ、使用中の刀モデルを表示して納刀側モデルを隠す。",
+    "AnimEvent_OnSwordSheathing": "納刀ClipのEventに合わせ、使用中の刀モデルを隠して鞘側モデルへ切り替える。",
+    "AnimEvent_OnJustAvoidStarted": "ジャスト回避Clip開始Eventで専用Animator Boolを有効にする。",
+    "AnimEvent_OnJustAvoidFinished": "ジャスト回避Clip終了Eventで専用Animator Boolを解除する。",
+    "AnimEvent_OnSoundEffect": "Clipが指定した登録名のSEをAudioManagerへ要求する。"
+  },
+  "PlayerResource": {
+    "PlayerResource": "最大HPと現在HPの通知を初期化し、能力コストや死亡処理で使う依存先を保持する。",
+    "Init": "ゲーム進行・Audio・死亡演出・遷移先を一度だけ接続する。",
+    "PlayerDeath": "残機があればHPと無敵時間を復元する。残機がなければ死亡を確定し、敗北演出または遷移を要求する。",
+    "Dispose": "HP変更通知に使用したReactivePropertyを解放する。"
+  },
+  "PlayerWeapon": {
+    "PlayerWeapon": "刀の判定Colliderと自己衝突を無視するCollider一覧を保持する。",
+    "Init": "刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。",
+    "SetTrailStyle": "保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。",
+    "EnumerateRelays": "初期化時に保存した刀判定Relayを列挙する。|登録済みの命中通知Relay。",
+    "SetHitboxActive": "刀Colliderと軌跡の受付をまとめて切り替え、判定区間と表示区間を対応させる。",
+    "SetupIgnoreCollisions": "指定された自己Colliderとの衝突を刀Colliderごとに無視する。"
+  },
+  "PlayerState": {
+    "PlayerState": "状態が共有するContextと遷移先のステートマシンを保持する。"
+  },
+  "PlayerStateContext": {
+    "PlayerStateContext": "状態処理が使用するController・Mover・能力・設定などの依存先を保持する。"
+  },
+  "PlayerStateMachine": {
+    "PlayerStateMachine": "共有Contextを保持し、各Player状態とAnimation Event購読を準備する。",
+    "SubscribeAnimationEvents": "Combo受付と攻撃終了の通知を現在状態へ転送する購読を登録する。",
+    "Dispose": "Animation Eventなどの購読を解除し、破棄後の状態呼び出しを防ぐ。"
+  },
+  "PlayerAttackState": {
+    "PlayerAttackState": "共通の攻撃状態にContext・遷移管理とClip未設定時の攻撃時間を渡す。",
+    "IsNormalAttackStillPlaying": "現在または遷移先の通常攻撃Clipが終端前か確認し、時間による早期終了を抑える。|通常攻撃タグを持つStateが再生途中ならtrue。"
+  },
+  "PlayerDashState": {
+    "PlayerDashState": "Dash状態から移動・ゲージ・状態遷移を操作するための共有Contextを保持する。",
+    "Enter": "Dash能力を開始してMoverを高速移動へ切り替える。",
+    "Exit": "Dash能力と高速移動フラグを解除する。",
+    "Update": "Dash中の移動を更新し、Dash能力が終了したら通常移動へ戻る。",
+    "FixedUpdate": "Dash中のRigidbody移動をMoverの物理更新へ委譲する。",
+    "OnSprintCanceled": "Dash解除入力で通常移動状態へ戻る。",
+    "OnLightAttack": "攻撃依存先がある場合にDashから弱攻撃状態へ移る。",
+    "OnStrongAttack": "攻撃依存先がある場合にDashから強攻撃状態へ移る。"
+  },
+  "PlayerGhostState": {
+    "PlayerGhostState": "幽体化状態が使用する能力・表示・遷移管理のContextを保持する。",
+    "Enter": "幽体化能力の有効性を確認し、見た目と短時間のジャスト回避受付を開始する。",
+    "Exit": "幽体化能力・回避受付・表示を解除して通常姿勢へ戻す。",
+    "Update": "移動と回避受付時間を進め、幽体化能力が終了したら通常移動へ戻る。",
+    "FixedUpdate": "幽体化中の移動をMoverの物理更新へ委譲する。",
+    "OnGhostCanceled": "解除入力で幽体化状態を終了し、通常移動へ戻る。",
+    "OnLightAttack": "幽体化から弱攻撃へ状態を切り替える。",
+    "OnStrongAttack": "幽体化から強攻撃へ状態を切り替える。"
+  },
+  "PlayerHealState": {
+    "PlayerHealState": "回復能力と移動・表示を扱うための共有Contextを保持する。",
+    "Enter": "回復能力を確認して回復中の表示・移動状態を開始する。",
+    "Exit": "回復能力と能力用の表示を終了する。",
+    "Update": "回復中の移動を更新し、能力が終了したら通常移動へ戻る。",
+    "OnHealCanceled": "入力解除で回復能力を終了させる。"
+  },
+  "PlayerLightAttackState": {
+    "PlayerLightAttackState": "弱攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。",
+    "Enter": "攻撃開始時のLock-On種別を固定して、共通の弱攻撃・コンボ進行を開始する。"
+  },
+  "PlayerLocomotionState": {
+    "PlayerLocomotionState": "通常移動と各行動の開始に使用する共有Contextを保持する。",
+    "Enter": "前の状態から持ち越したDash速度フラグを解除する。",
+    "Update": "通常移動の入力・方向・速度更新をMoverへ委譲する。",
+    "FixedUpdate": "通常移動のRigidbody反映をMoverへ委譲する。",
+    "OnSprintStarted": "Dash能力が開始可能な場合だけDash状態へ移る。",
+    "OnGhostStarted": "幽体化の開始要求を対応する状態へ渡す。",
+    "OnSelfSacrificeStarted": "自傷能力を扱う状態へ移る。",
+    "OnHealStarted": "回復能力を扱う状態へ移る。",
+    "OnLightAttack": "攻撃依存先が存在する場合に弱攻撃状態へ移る。",
+    "OnStrongAttack": "攻撃依存先が存在する場合に強攻撃状態へ移る。"
+  },
+  "PlayerSelfSacrificeState": {
+    "PlayerSelfSacrificeState": "自傷能力の継続・表示と状態遷移で使用するContextを保持する。",
+    "Enter": "自傷能力を確認し、能力中の移動・表示を準備する。",
+    "Exit": "自傷能力の寿命はAbilityManagerに任せ、攻撃への遷移でも効果を継続させる。",
+    "Update": "移動を更新し、自傷能力が終了したら通常移動へ戻る。",
+    "OnSelfSacrificeCanceled": "自傷能力・バフ表示・専用音声を入力解除で終了する。",
+    "OnLightAttack": "自傷能力を継続したまま弱攻撃状態へ移る。",
+    "OnStrongAttack": "自傷能力を継続したまま強攻撃状態へ移る。",
+    "FixedUpdate": "自傷中もMoverへ物理更新を委譲して移動を維持する。"
+  },
+  "PlayerStrongAttackState": {
+    "PlayerStrongAttackState": "強攻撃用の設定時間と共有Contextを共通攻撃状態へ渡す。"
+  },
+  "WeaponHitboxRelay": {
+    "LateUpdate": "有効な刀Colliderの位置差を記録して接触時の斬撃方向に使用する。無効時は前回サンプルを破棄する。",
+    "Init": "所有Colliderを取得し、命中通知用Triggerとして一度だけ初期化する。",
+    "Reset": "Editorでコンポーネントを追加した際に所有ColliderをTriggerへ設定する。",
+    "OnTriggerEnter": "有効な判定区間だけ接触Colliderを登録済み購読者へ通知する。"
+  },
+  "EnemyAnimationController": {
+    "GetHitDirection": "攻撃者位置または命中情報をEnemyのローカル方向へ変換し、四方向の被弾Clipを選ぶ。|前・後・左・右を表す方向インデックス。",
+    "TryPlayHitReaction": "有効な専用Layerと追撃フラグがある場合だけ大きい被弾反応を開始する。|追撃専用の被弾Stateを開始した場合はtrue。",
+    "InterruptAttackForHitReaction": "攻撃用トリガーと攻撃再生を解除して被弾への短いBlendを要求する。死亡トリガーは保持する。",
+    "TickHitReaction": "Animator速度に合わせて被弾Layerと減速移動の進行を更新し、復帰完了を通知する。|被弾反応がこの更新で完了した場合はtrue。",
+    "CancelHitReaction": "被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。",
+    "Init": "Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。"
+  },
+  "EnemyAttacker": {
+    "EnemyAttacker": "Enemyの攻撃設定、武器、Animator、基礎威力と攻撃者を保持する。",
+    "Init": "命中時に使用するHitStopManagerを一度だけ接続する。",
+    "FindData": "指定行動に対応する攻撃設定を候補から選ぶ。|対応する攻撃設定。候補がなければnull。",
+    "Dispose": "全武器の命中判定を停止し、自身が登録した命中通知ハンドラを解除する。"
+  },
+  "EnemyMover": {
+    "BeginAttackRootMotion": "攻撃の移動停止中だけ水平Root Motionを受け付ける。被弾と後退移動が優先中なら開始しない。",
+    "EndAttackRootMotion": "攻撃移動の受付・保留量を解除し、動的Rigidbodyの残留速度を消去する。",
+    "FixedUpdateAttackRootMotion": "蓄積した水平移動を衝突とNavMeshで制限して物理フレームに反映する。HitStop中は移動を消去する。",
+    "HoldMovementForReaction": "被弾用にAgentとRigidbodyの状態を保存して移動を停止し、攻撃Root Motionを解除する。",
+    "ReleaseMovementAfterReaction": "被弾前のAgentとRigidbody設定を復元し、現在位置にAgentを再同期する。",
+    "InterruptMovementAction": "後退と攻撃による移動停止を終了し、別の行動や死亡へ安全に切り替える。",
+    "UpdatePatrolWalking": "待機歩行中の旋回設定と移動先を更新し、実移動に合わせてAnimatorへ反映する。",
+    "UpdateAnimatorValues": "Agentの実速度を取得し、Enemyの向きを基準に移動BlendTreeへ反映する。",
+    "ResetLocomotionAnimation": "移動速度と二軸方向をゼロにして、攻撃・被弾中の歩行Blendを止める。",
+    "GetLocomotionVelocity": "移動停止・被弾・後退と微小速度を除外し、Agentの有効な水平実速度を取得する。|移動表示に使用する水平速度。停止条件ではゼロ。",
+    "GetLocalMovementDirection": "水平速度をEnemyの向きに対する正規化二軸方向へ変換する。|ローカルX/Z方向。微小速度ではゼロ。",
+    "UpdateTrackingAndDestination": "追跡距離と更新間隔を判定してPlayer側の移動先を更新し、範囲外ならAgentを停止する。",
+    "GetAdjustedDestination": "PlayerのCollider半径を考慮して接近先をずらし、中心へのめり込みを抑える。|Playerの占有半径を考慮した接近先。"
+  },
+  "EnemyDecisionMaker": {
+    "Decide": "距離帯の候補から無効な重みを除外し、連続選択の補正を含めて行動を抽選する。|選ばれた行動。有効候補がない場合はWait。",
+    "Weight": "候補の重みを検証し、直前と同じ行動には繰り返し補正を適用する。|抽選に使用する有効重み。無効値ならゼロ。"
+  },
+  "EnemyController": {
+    "BeginAnimationAttackRootMotion": "戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。",
+    "EndAnimationAttackRootMotion": "終了Stateが攻撃移動の所有者に一致する場合だけ移動停止を解除する。",
+    "FixedUpdate": "戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。",
+    "OnDisable": "攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。",
+    "Init": "EnemyのHP・AI・移動・武器・演出を作成し、ゲーム進行と命中通知を一度だけ接続する。",
+    "PlayEffectNextFrame": "生成直後の初期化を一フレーム待ってCharacterEffectを再生する。破棄時は待機をキャンセルする。",
+    "ApplyDamage": "通常の命中情報をクリティカルなしの共通ダメージ処理へ渡す。",
+    "OnDestroy": "Root Motionを終了し、武器購読とHP通知の所有リソースを解放する。",
+    "Update": "戦闘中だけ被弾の復帰・AI判断・予約行動・移動を順に進める。死亡時は歩行表示を停止する。",
+    "EnemyDead": "死亡を確定して攻撃・AI更新・移動を停止し、既存死亡ClipとFinal Blowまたは遷移を要求する。",
+    "OnAnimatorMove": "所有中の攻撃Stateの移動をMoverへ渡す。死亡・別Stateへの切り替えではRoot Motionを解除する。",
+    "AnimEvent_OnStepBackFinished": "有効な後退終了Eventで移動を再開し、AIへ行動完了を通知する。死亡・大被弾中は無視する。",
+    "AnimEvent_OnSoundEffect": "Clipから指定されたSEを再生し、診断用の戦闘ログへ記録する。"
+  },
+  "EnemyHealth": {
+    "EnemyHealth": "基礎HPにラン継承倍率を適用し、現在HPのReactive通知を初期化する。",
+    "Dispose": "EnemyのHP通知に使用するReactivePropertyを解放する。"
+  },
+  "EnemyWeapon": {
+    "EnemyWeapon": "刀判定Colliderと攻撃設定未指定時の基礎威力を保持する。",
+    "Init": "武器ColliderのTrigger Relayと刀の軌跡を一度だけ準備する。",
+    "EnumerateRelays": "武器に保存した命中通知Relayを列挙する。|登録済みの武器Relay。",
+    "SetHitboxActive": "武器Colliderと軌跡の有効状態を切り替え、攻撃判定区間と表示を同期する。"
+  },
+  "AttackRootMotionPhysics": {
+    "LimitDisplacement": "RigidbodyのSweepで水平移動先の衝突を確認し、接触面より手前まで移動量を制限する。|衝突を考慮した水平移動量。"
+  },
+  "AttackRootMotionState": {
+    "OnStateEnter": "ベースLayerの攻撃開始StateをPlayerまたはEnemy Controllerへ通知してRoot Motionを受け付ける。",
+    "OnStateExit": "終了StateのハッシュをControllerへ渡し、所有者に一致する攻撃Root Motionだけを解除する。"
+  },
+  "CombatLog": {
+    "Trace": "戦闘診断用の文字列をUnity Consoleへ出力する。条件付きコンパイルで不要な呼び出しを省く。"
+  },
+  "CombatFeedback": {
+    "Init": "キャラクター表示と命中演出を準備し、Playerには回避演出、Enemyには通常被弾用の骨補正を接続する。",
+    "PrepareNormalHitFlash": "元のMeshと骨を共有するEnemy用の光オーバーレイを準備し、元Materialを差し替えず命中を表現する。",
+    "BeginNormalHitFlash": "攻撃種別と実時間の終了時刻を記録して通常被弾Flashを開始する。",
+    "UpdateNormalHitFlash": "元MeshのBlendShapeを追従し、攻撃種別に応じた光を減衰させて終了時に非表示にする。",
+    "CancelNormalHitReaction": "通常被弾の骨補正と光を解除し、大被弾・死亡へ持ち越さない。",
+    "PrepareJustAvoid": "成功時の固定残像・Flash・任意Shockwaveに使用するMeshとMaterialを準備する。",
+    "RepeatedMaterial": "Meshのサブメッシュ数に合わせて同一Materialの参照配列を作る。|サブメッシュに割り当てるMaterial配列。",
+    "PlayJustAvoidFeedback": "既定の接触位置で共通の成功演出を要求する。成功判定や追撃受付は変更しない。",
+    "UpdateJustAvoid": "成功からの実経過時間に応じて残像・Flash・Shockwaveを減衰し、終了後に表示を解除する。",
+    "StopShockwave": "Shockwaveの粒子を停止・消去して表示オブジェクトを非表示にする。",
+    "StopJustAvoid": "回避用の残像とFlash、Shockwaveを停止する。新しい成功の色・音の時計は別の所有者が管理する。",
+    "Hit": "攻撃情報または既定の被弾で、音・HitStop・接触VFXと必要な骨反応を開始する。",
+    "PrepareContactFeedback": "VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。",
+    "PlayHitVFX": "再利用する命中Prefabを接触位置へ配置し、攻撃種別に応じた粒子量と速度で再生する。",
+    "ScaleHitCurve": "元のParticleカーブを保持しながら指定倍率を反映する。|倍率を反映した粒子用カーブ。",
+    "StopHitVFX": "指定スロットの粒子を停止・消去し、命中表示を非表示にする。",
+    "CombatFeedback.Update": "前フレームの骨補正を除去し、被弾・回避・接触演出の終了時刻と表示状態を更新する。",
+    "LateUpdate": "Animator更新後の姿勢へキャラクター別の被弾補正を重ねる。Enemyの通常反応は死亡・大被弾で解除する。",
+    "OnDisable": "回避・命中・骨補正を停止してMaterialと表示状態を通常へ戻す。",
+    "OnDestroy": "生成したFlash・残像・ParticleオブジェクトとMesh・Materialを解放する。",
+    "ContactPulse": "接触Flash用Mesh・Materialと固定数の表示スロットを準備する。",
+    "ContactPulse.Play": "次の再利用スロットを接触位置へ配置し、サイズ・色・実時間の寿命を設定する。",
+    "ContactPulse.Update": "有効な接触Flashの実時間に応じて透明度を下げ、寿命を過ぎたスロットを非表示にする。",
+    "ContactPulse.Stop": "接触Flashの全スロットを即座に非表示にする。",
+    "ContactPulse.Dispose": "接触Flashの表示オブジェクトと所有するMesh・Materialを解放する。"
+  },
+  "DamageNumbers": {
+    "SetPresentationSuppressed": "勝利などの演出中に新しいダメージ数値の表示を抑制する。",
+    "Init": "使用カメラを接続し、配置済みuGUIテンプレートから表示プールを一度だけ準備する。",
+    "Initialize": "参照を検証し、通常・Criticalの数値ラベルを固定数生成して非表示で待機させる。|表示プールを使用可能になった場合はtrue。",
+    "Show": "命中位置とダメージ量を通常表示の共通処理へ渡す。",
+    "Display": "Critical種別に応じた再利用ラベルへ数値を設定し、位置と表示寿命を初期化する。",
+    "CreateRandomOffset": "Inspectorの範囲内で数値の画面上の位置ずれを生成する。|各軸の指定範囲内のランダムOffset。",
+    "LateUpdate": "実時間でラベルの浮上・透明度・寿命を更新し、期限を過ぎた表示をプールへ戻す。",
+    "PositionLabel": "ワールド命中位置をCanvasへ投影し、上昇とOffsetを加えてラベルを配置する。",
+    "OnDisable": "使用中の数値ラベルを非表示にして、停止後に表示が取り残されないようにする。"
+  },
+  "EnemyBoneHitReaction": {
+    "EnemyBoneHitReaction": "Humanoidの上半身の骨を取得し、通常被弾を分散する重みと遅延を準備する。",
+    "GetLocalImpulse": "攻撃者から離れる水平衝撃方向を求め、Enemyのローカル座標へ変換する。|通常被弾の傾きに使用するローカル衝撃方向。",
+    "Begin": "命中方向と攻撃角度から骨補正の目標を設定する。再被弾は現在値から接続して補正を累積しない。",
+    "Envelope": "衝撃初期の立ち上がりと後半の減衰を持つ骨反応の重みを計算する。|被弾経過時間に対応する0から1の重み。",
+    "Tick": "Animator速度を掛けた時間で骨反応を進め、HitStop中は進行を止める。",
+    "Apply": "Animatorが更新した基準姿勢へ重み付き骨回転を重ね、次の更新で除去する姿勢を記録する。",
+    "RemoveOffsets": "前回の補正姿勢が残っている骨だけ基準姿勢へ戻し、新しく評価されたAnimator姿勢を保護する。",
+    "Clear": "全骨の補正を除去し、通常被弾の目標・時計・所有状態を消去する。"
+  },
+  "JustAvoidContrast": {
+    "Play": "勝利・敗北が優先中でなければ、現在値から回避用モノクロとBGM Duckを同時に開始する。",
+    "Update": "実時間の包絡線を専用Volume重みへ反映し、指定時間後に通常表示へ戻す。",
+    "Cancel": "専用Volumeと回避用BGM Duckを即解除する。BGMの再生状態は変更しない。",
+    "SceneChanged": "アクティブScene変更時に回避用の色と音を通常へ戻す。",
+    "SceneUnloaded": "SceneのUnload時に取り残された回避演出を解除する。",
+    "GameStateChanged": "戦闘・Pause以外の進行状態では演出を解除し、新しい回避演出の開始を拒否する。",
+    "OnEnable": "Scene変更とゲーム進行の通知を購読して中断時の復帰を保証する。",
+    "OnDisable": "Scene・進行通知を解除し、回避演出の色と音を戻す。",
+    "OnDestroy": "破棄時に回避用Volumeと音量倍率を通常へ戻す。"
+  },
+  "JustAvoidEnvelope": {
+    "Begin": "現在の包絡線値を起点として移行・保持・復帰の時計を再開始する。",
+    "Evaluate": "指定実時刻の重みを計算し、全区間の終了時には自動的に状態をリセットする。|移行・保持・復帰に対応する0から1の値。",
+    "Reset": "包絡線の再生状態を解除し、適用量をゼロへ戻す。"
+  },
+  "JustAvoidScreenDistortion": {
+    "Play": "成功地点と設定を保持して実時間の歪みを開始し、AfterPostProcessのCustom Passを登録する。",
+    "Update": "設定が無効化された場合や実時間の寿命終了時に歪みPassを解除する。",
+    "Stop": "自身が登録したGlobal Custom Passを解除し、歪みの再生状態を終了する。",
+    "OnDisable": "Global Custom Passを解除して画面複製用のRTリソースを解放する。",
+    "OnDestroy": "歪みPassと所有する描画リソースを破棄時に解放する。",
+    "TryProjectCenter": "命中点を画面へ投影し、使用できなければ身体中心を代替として使用する。|画面内の有効な中心を求められた場合はtrue。",
+    "TryProject": "有限なワールド座標をViewportへ投影し、手前や画面外の値を除外する。|有効な画面内位置を求められた場合はtrue。",
+    "DistortionPass": "歪みの所有者と描画バッファ設定を保持し、HDRPへの独立したPassを準備する。",
+    "Execute": "対象カメラの画面を別RTへコピーし、成功点から広がる輪状の歪みを実経過時間に応じて描く。",
+    "ReleaseResources": "Passが所有する画面複製用RTHandleを解放する。",
+    "Cleanup": "HDRPがPassを片付ける際に所有するRTHandleを解放する。"
+  },
+  "NormalAttackSpeedState": {
+    "AcceptGameplayEvent": "通常攻撃のBlend中に古いClipから届くEventを除外する。通常攻撃以外の既存Event受付は維持する。|現在または遷移先が所有する通常攻撃Event、または通常攻撃以外ならtrue。",
+    "EvaluateSpeed": "Clipの正規化時刻から振りかぶり・斬撃・回復の速度倍率を選び、斬撃後は滑らかに補間する。|該当する攻撃段階の速度倍率。",
+    "OnStateEnter": "ベースLayerの攻撃Stateに割り当てた速度パラメータを通常倍率で初期化する。",
+    "OnStateUpdate": "Blend中は通常倍率を保ち、単独再生中だけClip時刻に応じた専用速度を設定する。",
+    "OnStateExit": "終了したState自身の速度パラメータを戻し、次のコンボ段階のパラメータを保護する。",
+    "SetSpeed": "割り当て済みの専用Animatorパラメータだけに速度倍率を反映する。"
+  },
+  "SwordTrail": {
+    "SetStyle": "共有先を含む刀の軌跡を攻撃種別の持続時間・明るさへ切り替える。",
+    "SetActive": "刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。",
+    "Init": "共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。|軌跡の描画リソースを使用可能になった場合はtrue。",
+    "Sample": "切先側の端点をワールド座標で記録し、所有者の移動を除いた刀の振り速度から表示強度を求める。",
+    "RemoveOldest": "履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。",
+    "CopySample": "軌跡サンプルの端点・寿命・表示量を指定スロットへ複製する。",
+    "LateUpdate": "寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。",
+    "OnDisable": "サンプリングを停止して履歴とMesh表示を消去する。",
+    "OnDestroy": "所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。"
+  },
+  "VictoryContrast": {
+    "Update": "実時間で勝利専用モノクロの移行・保持・復帰を進める。",
+    "SceneChanged": "Scene変更時に勝利用Volumeの重みをゼロへ戻す。",
+    "OnEnable": "Scene変更通知を購読してモノクロの持ち越しを防ぐ。",
+    "OnDisable": "Scene購読を解除し、専用Volumeの重みを通常へ戻す。",
+    "OnDestroy": "破棄時に専用Volumeのモノクロを解除する。"
+  },
+  "AbilityManager": {
+    "AbilityManager": "移動状態とは独立して能力を継続するため、Context・各能力・HP・回避設定を保持する。"
+  },
+  "AnimationSpeedController": {
+    "Init": "Animatorとその基準速度を一度だけ取得する。",
+    "SetStatus": "状態効果の持続倍率を更新し、基準速度と一時倍率を掛けてAnimatorへ反映する。",
+    "SetTemporary": "HitStopなどの一時速度と実時間の期限を設定し、現在の状態効果と合成する。",
+    "Update": "実時間の期限を判定し、一時倍率の自動解除と合成速度の反映を行う。",
+    "OnDisable": "持続・一時倍率と期限を解除し、Animatorを保存した基準速度へ戻す。"
+  },
+  "AudioManager": {
+    "BaseVolume": "チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。|一時倍率を掛ける前のチャンネル音量。",
+    "SetBaseVolume": "チャンネルの基準音量を更新し、現在のDucking倍率を掛けた実音量を反映する。",
+    "PlayJustAvoidDuck": "現在の音量包絡線から回避用Duckingを再開始し、連続成功でも倍率を累積しない。",
+    "Update": "回避用Duckingを実時間で進め、各BGMの基準音量に倍率を掛けて反映する。",
+    "UpdateDuck": "指定実時刻からDucking倍率を求め、SEに触れず全BGMチャンネルへ適用する。",
+    "CancelJustAvoidDuck": "一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。",
+    "SceneChanged": "Scene切り替え時に回避用Duckingを解除する。",
+    "SceneUnloaded": "SceneのUnload時に一時Duckingを通常音量へ戻す。",
+    "GameStateChanged": "勝利・敗北・Titleなど戦闘外へ移った場合にDuckingを解除する。",
+    "OnEnable": "Sceneとゲーム進行の中断通知を購読する。",
+    "OnDisable": "中断通知の購読を解除し、一時Duckingを通常倍率へ戻す。",
+    "Init": "共有AudioManagerを確立し、ListenerのLowPass参照とBGM・SEプールを一度だけ準備する。",
+    "InitializeAudioManager": "BGMチャンネル、登録名のClip辞書とSEプールを初期化する。",
+    "EnsureBGMSources": "既存の単一参照を複数チャンネルへ引き継ぎ、BGM Sourceがなければ先頭チャンネルを生成する。",
+    "CreateBgmChannels": "設定数のBGMチャンネルを確保し、SEから独立したAudioSourceを生成する。",
+    "GetBgmSource": "負のチャンネルを先頭へ補正して対応するBGM Sourceを取得する。|指定チャンネルのSource。範囲外ならnull。",
+    "CreateSFXPool": "以前のSEプールを片付け、指定Prefabから上限内の再利用Sourceを生成する。",
+    "PlayBGM": "指定チャンネルへClipと基準音量を設定してループ再生する。同一Clip・基準音量で再生中なら継続する。",
+    "OnDestroy": "一時音量を解除し、自身が共有インスタンスの場合は参照を消去する。"
+  },
+  "FinalBlowManager": {
+    "Init": "勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。",
+    "StartFinalBlow": "重複開始を防いで回避の色と音を解除し、勝利用モノクロ・UI・決着シーケンスを開始する。",
+    "DoFinalBlow": "HitStopとBGM停止から専用カメラ、納刀、討伐、既存Scene Fadeへ実時間で進め、中断時も一時状態を片付ける。",
+    "WaitUntil": "開始基準の実時刻までUpdateで待機し、TimeScaleに左右されずキャンセルを受け付ける。",
+    "CancelPresentation": "進行中の非同期演出をキャンセルし、勝利UI・Volume・カメラを復元する。",
+    "Cleanup": "演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。",
+    "OnDisable": "勝利シーケンスを中断して表示とカメラ・Volumeを片付ける。",
+    "OnDestroy": "勝利演出を中断し、自身が共有インスタンスなら参照を消去する。"
+  },
+  "GameManager": {
+    "Awake": "ゲーム進行管理の共有インスタンスを確立し、重複を破棄してカーソルを戦闘向けに固定する。",
+    "Start": "Sceneの依存先を接続し、既存の戦闘開始状態へ切り替える。",
+    "OnDestroy": "自身が共有インスタンスの場合に参照を解除する。",
+    "Init": "Sceneの共有ManagerとPlayer・Enemy・カメラの依存先を一度だけ組み立てる。",
+    "StartGame": "既存のゲーム状態切り替えを通して入力とBGMを戦闘用へ切り替える。",
+    "WinGame": "進行中のランだけを勝利として完了し、Victory状態とその通知を確定する。",
+    "LoseGame": "進行中のランだけを敗北として完了し、Defeat状態とその通知を確定する。"
+  },
+  "GlobalFader": {
+    "Init": "永続する共有Faderとオーバーレイを準備し、重複オブジェクトを除去する。",
+    "OnDestroy": "自身が共有Faderの場合に共有参照を解除する。",
+    "FadeToScene": "遷移先を検証し、実時間の暗転後にSceneを読み込んで再表示する。多重遷移は開始しない。",
+    "FadeAlpha": "指定不透明度へ実時間で補間し、破棄によるキャンセルを受け付ける。",
+    "SetAlpha": "暗転用Imageを黒のまま指定不透明度へ設定する。"
+  },
+  "HitStopManager": {
+    "RegisterTarget": "対象階層の速度制御を初期化し、子オブジェクトからも同じ対象へ停止を要求できるよう登録する。",
+    "Init": "永続する共有HitStopManagerを確立し、重複を除去する。",
+    "PlayHitStop": "登録済みの対象へ指定実時間の完全停止を要求する。TimeScaleは変更しない。",
+    "PlayHitStopSlow": "登録済み対象のAnimatorへ一時速度を設定し、終了時の解除対象として保持する。",
+    "OnDisable": "自身が影響を与えた速度制御の一時倍率を全解除する。",
+    "OnDestroy": "自身が共有インスタンスの場合に参照を解除する。"
+  },
+  "LoadSceneManager": {
+    "LoadSceneAsync": "指定した実時間の待機後に共有Faderへ遷移を要求する。所有者の破棄で待機を中断する。",
+    "Init": "共有インスタンスとFaderを一度だけ接続する。",
+    "OnDestroy": "自身が共有インスタンスの場合に参照を解除する。"
+  },
+  "PlayerDeadManager": {
+    "Init": "敗北演出の依存先と共有インスタンスを接続し、既存Volume・暗転・死亡文字を初期化する。",
+    "InitPresentation": "敗北用暗転オーバーレイとVignette参照を準備し、死亡文字を非表示で待機させる。",
+    "FadeVignette": "現在のVignette強度と滑らかさから目標値へ実時間で補間する。",
+    "OnDestroy": "共有参照、文字Tween、生成MaterialとLowPassを解除し、敗北の音声補正を持ち越さない。"
+  },
+  "SceneInitialization": {
+    "Init": "配置済みの共有Managerを依存順に初期化し、SceneのControllerへ渡す参照を保持する。",
+    "InitTitleTexts": "Title用の文字演出へTitleManagerと共有Faderを接続する。",
+    "InitAll": "初期化時だけ有効な同型コンポーネントを収集し、指定の接続処理を各対象へ適用する。"
+  },
+  "TitleManager": {
+    "Start": "配置済みのTitle用依存先とBGMを初期化する。",
+    "Init": "共有Managerとラン設定画面を接続し、Titleの表示・音声を一度だけ準備する。",
+    "Update": "遷移中・設定画面表示中を除き、キーボードなどの開始入力を受け付ける。"
+  },
+  "BossBarSilhouette": {
+    "ModifyMesh": "通常の四角形Imageを指定輪郭の三角形群へ置き換え、バーの装飾外側を描画しない。",
+    "Add": "輪郭の正規化座標から元Imageの位置とUVを補間し、描画頂点を追加する。"
+  },
+  "DamageTrailGauge": {
+    "SetNormalized": "現在ゲージを即時更新する。減少時だけ遅延追従を予約し、回復・初期化時は遅延ゲージも一致させる。",
+    "Update": "TimeScaleに依存せず遅延ゲージの追従を進める。",
+    "Tick": "待機時間が終わった遅延ゲージを現在値へ指定速度で近づける。",
+    "OnDisable": "遅延表示を現在値へ揃えて待機時刻を解除する。"
+  },
+  "EquipmentOptionSelection": {
+    "OnSelect": "方向入力で選択された有効なToggleをオンにして装備選択へ反映する。"
+  },
+  "FinalBlowPresentation": {
+    "Begin": "元の文字・HUD状態を保存し、Flash・黒帯・討伐表示の実時間タイムラインを開始する。",
+    "Update": "勝利UIが進行中の間だけ、開始からの実経過時間で表示を更新する。",
+    "RenderAt": "指定経過秒でFlash、HUD非表示、黒帯と討伐文字の素早い出現・Scaleの落ち着きを反映する。",
+    "SetLetterbox": "画面高の比率を使って上下黒帯のAnchorを移動し、解像度に依存せず出現させる。",
+    "ResetPresentation": "Flashと黒帯を解除し、保存したHUD・文字の色・Scale・有効状態を復元する。",
+    "OnDisable": "勝利UIを解除して停止前のHUDと文字状態を復元する。",
+    "OnDestroy": "勝利UIが保持した一時表示を解除して元の状態へ戻す。"
+  },
+  "PlayerHUDPresenter": {
+    "UpdateHp": "現在HPを最大HPで正規化してViewへ渡す。最大HPが無効ならゼロ表示にする。"
+  },
+  "PlayerHUDView": {
+    "SetHpNormalized": "現在HPを即反映し、減少時は赤いダメージ履歴を遅延追従させる。回復時は両表示を揃える。",
+    "Update": "HPの遅延表示を実時間で進め、HitStop中もUIの追従を維持する。",
+    "TickDamageTrail": "減少後の待機時間を過ぎた赤いゲージを現在HPへ指定速度で近づける。",
+    "SetSkillNormalized": "スキルゲージ値を0から1へ制限してImageの充填量へ反映する。",
+    "OnDisable": "HPの遅延表示を現在値へ揃え、待機時刻をリセットする。"
+  },
+  "RunHUD": {
+    "SetPresentationVisibility": "勝利演出などの表示所有者から、通常のラン情報を表示してよいか切り替える。",
+    "Init": "共有Faderを接続し、配置済みのラン情報表示を一度だけ初期化する。",
+    "LateUpdate": "ランの残機・相手・結果などを表示し、演出による非表示指定を優先する。",
+    "SetLabel": "参照があり文字列が変わった場合だけTMPテキストを更新する。"
+  },
+  "RunSetupUI": {
+    "Init": "装備Toggleと開始Buttonの通知を一度だけ接続し、初期状態では設定画面を隠す。",
+    "Open": "保存中の名前・装備・前回勝者を表示し、操作可能な設定画面とUI選択を開始する。",
+    "RefreshDescriptions": "現在選択中の攻撃・防御装備の効果説明を更新する。",
+    "Confirm": "画面を開いた同フレームの入力を除外し、選択内容でランを開始してTitleの遷移を要求する。",
+    "SetVisible": "設定パネルの不透明度と入力・Raycast受付をまとめて切り替える。"
+  },
+  "TitleText": {
+    "Init": "TitleとFaderを接続し、有効な文字表示なら実時間の点滅を開始する。",
+    "OnEnable": "初期化済みのTitle文字に点滅Tweenを再開する。",
+    "StartPulse": "文字のFadeと待機を繰り返すTweenを実時間更新で組み立てる。",
+    "OnDisable": "所有する点滅Tweenを停止して参照を解除する。",
+    "OnStartButton": "多重遷移を防ぎ、TitleManagerの設定画面または既存のゲーム開始処理を要求する。",
+    "StartGame": "共有FaderでGameSceneへ遷移し、成功・中断にかかわらず遷移中フラグを解除する。"
+  },
+  "GameplayRules": {
+    "Regen": "HP割合に応じて低HP時と満HP時のゲージ回復倍率を補間する。|0以上のゲージ自然回復倍率。",
+    "SelfCost": "HP割合に応じて低HP時と満HP時の自傷消費倍率を補間する。|0以上の自傷コスト倍率。",
+    "AvoidWindow": "HP割合に応じてジャスト回避受付時間の倍率を補間する。|0以上の回避受付倍率。"
+  },
+  "RunSession": {
+    "AttackDescription": "選択した攻撃装備の倍率や低HP効果を現在の調整値から説明文へ変換する。|攻撃装備の日本語説明。",
+    "DefenseDescription": "選択した防御装備の被ダメージ・幽体化コスト・回復効果を説明文へ変換する。|防御装備の日本語説明。",
+    "Reset": "新しい実行セッション開始時にランの状態・前回相手・結果・保存エラーを消去する。",
+    "CleanName": "名前から制御文字とタグ記号を除き、長さを制限して空の場合は既定名を使用する。|表示と保存に使用する整形済みの名前。",
+    "ReadChampion": "PlayerPrefsの勝者データを読み込み、欠損や不正な保存値の場合は相手なしとして扱う。|検証済みの勝者データ。保存がない・不正な場合はnull。",
+    "Begin": "名前と装備選択を検証して残機・相手・開始時刻を初期化し、新しいランを有効にする。",
+    "EnsureRun": "ラン未開始の場合だけ、保持している名前と装備で開始する。",
+    "ConsumeLife": "有効なランの残機を一つ減らし、復活可能かを返す。|消費後に残機があり復活可能ならtrue。",
+    "Complete": "有効なランを一度だけ完了し、勝利時は名前・装備・実所要時間を次回相手として保存する。",
+    "DamageMultiplier": "攻撃装備と現在HP割合からPlayerの与ダメージ倍率を求める。|現在の装備・HPに対応する与ダメージ倍率。",
+    "EnemyDamage": "前回勝者の攻撃装備とEnemyのHP割合から継承された攻撃倍率を求める。|Enemyの与ダメージ倍率。継承相手がなければ1。"
+  },
+  "StatusEffectInstance": {
+    "StatusEffectInstance": "効果定義と付与元を保持し、残り時間・一段階のスタックと未生成VFXを初期化する。"
+  },
+  "StatusEffectManager": {
+    "Init": "AnimatorとAgentを取得し、基準移動速度と合成用の速度制御を一度だけ接続する。",
+    "Update": "効果の残り時間を進め、期限切れのVFXを除去して倍率の変更を再計算する。",
+    "ApplyStatusEffect": "同じIDの効果を定義の更新・置換・加算方式で合成し、新規の場合はVFXを生成して倍率を反映する。",
+    "OnDisable": "全効果とVFXを解除し、Animator倍率とAgent移動速度を基準へ戻す。"
+  }
+}

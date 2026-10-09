@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerHealState : PlayerState
 {
+    /// <summary>回復能力と移動・表示を扱うための共有Contextを保持する。</summary>
     public PlayerHealState(PlayerStateContext context, PlayerStateMachine stateMachine)
         : base(context, stateMachine)
     {
@@ -14,6 +15,7 @@ public class PlayerHealState : PlayerState
 
     public override PlayerStateId Id => PlayerStateId.Heal;
 
+    /// <summary>回復能力を確認して回復中の表示・移動状態を開始する。</summary>
     public override void Enter()
     {
         if (Context?.Healer == null)
@@ -31,12 +33,14 @@ public class PlayerHealState : PlayerState
         Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectHeal);
     }
 
+    /// <summary>回復能力と能力用の表示を終了する。</summary>
     public override void Exit()
     {
         Context.Healer?.End();
         Context?.CharacterEffect?.StopEffect_CharacterEffect();
     }
 
+    /// <summary>回復中の移動を更新し、能力が終了したら通常移動へ戻る。</summary>
     public override void Update(float deltaTime)
     {
         Context.Mover.Update();
@@ -48,6 +52,7 @@ public class PlayerHealState : PlayerState
         }
     }
 
+    /// <summary>入力解除で回復能力を終了させる。</summary>
     public override void OnHealCanceled()
     {
         Context.Healer?.End();

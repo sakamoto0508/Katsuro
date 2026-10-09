@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public abstract class PlayerAttackState : PlayerState
 {
+    /// <summary>共通の攻撃状態にContext・遷移管理とClip未設定時の攻撃時間を渡す。</summary>
     protected PlayerAttackState(PlayerStateContext context, PlayerStateMachine stateMachine, float attackDuration)
         : base(context, stateMachine)
     {
@@ -195,6 +196,8 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>次段に進める余地があるか判定する。</summary>
     private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
 
+    /// <summary>現在または遷移先の通常攻撃Clipが終端前か確認し、時間による早期終了を抑える。</summary>
+    /// <returns>通常攻撃タグを持つStateが再生途中ならtrue。</returns>
     private bool IsNormalAttackStillPlaying()
     {
         if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;

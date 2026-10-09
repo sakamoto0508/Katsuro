@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public abstract class PlayerState
 {
+    /// <summary>状態が共有するContextと遷移先のステートマシンを保持する。</summary>
     protected PlayerState(PlayerStateContext context, PlayerStateMachine stateMachine)
     {
         Context = context;
