@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Mock.UI
 {
-    /// <summary>空ゲージの上に赤い遅延ダメージ、その上に緑の現在体力を重ねて表示する。</summary>
+    /// <summary>空ゲージの上に遅延ダメージと現在体力を重ねて表示する。配色と配置はPrefabで設定する。</summary>
     public class PlayerHUDView : MonoBehaviour, IKatsuroPlayerHUDView
     {
         /// <summary>Playerの現在HPを即時反映するゲージImage。</summary>
@@ -26,14 +26,14 @@ namespace Mock.UI
         private float _targetHp;
         private float _catchupAt;
 
-        /// <summary>現在HPを即反映し、減少時は赤いダメージ履歴を遅延追従させる。回復時は両表示を揃える。</summary>
+        /// <summary>現在HPを即反映し、減少時はダメージ履歴を遅延追従させる。回復時は両表示を揃える。</summary>
         public void SetHpNormalized(float normalized)
         {
             normalized = Mathf.Clamp01(normalized);
             if (_hpFill != null) _hpFill.fillAmount = normalized;
             if (!_initialized || normalized > _targetHp)
             {
-                // 初期表示・回復・復活時には、緑の現在体力と赤い遅延表示を一致させる。
+                // 初期表示・回復・復活時には、現在体力と遅延表示を一致させる。
                 if (_damageFill != null) _damageFill.fillAmount = normalized;
                 _catchupAt = 0;
             }
@@ -48,7 +48,7 @@ namespace Mock.UI
         /// <summary>HPの遅延表示を実時間で進め、HitStop中もUIの追従を維持する。</summary>
         private void Update() => TickDamageTrail(Time.unscaledTime, Time.unscaledDeltaTime);
 
-        /// <summary>減少後の待機時間を過ぎた赤いゲージを現在HPへ指定速度で近づける。</summary>
+        /// <summary>減少後の待機時間を過ぎた遅延ゲージを現在HPへ指定速度で近づける。</summary>
         private void TickDamageTrail(float now, float deltaTime)
         {
             if (!_initialized || _damageFill == null || now < _catchupAt) return;

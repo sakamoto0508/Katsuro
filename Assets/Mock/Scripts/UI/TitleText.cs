@@ -61,7 +61,7 @@ public class TitleText : MonoBehaviour
     public void OnStartButton()
     {
         if (_isTransitioning) return;
-        var titleManager = _title;
+        var titleManager = _title != null ? _title : FindFirstObjectByType<TitleManager>();
         if (titleManager != null)
         {
             titleManager.OnPressStart();

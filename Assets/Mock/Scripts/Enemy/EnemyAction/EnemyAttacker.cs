@@ -59,7 +59,13 @@ public class EnemyAttacker : IDisposable
             return;
         }
 
+        PerformAttack(data, attackType == EnemyActionType.HeavySlash);
+    }
 
+    /// <summary>既存の攻撃Dataを使って通常と同じAnimator・武器を動かす。修練では同じ予備動作を反復できる。</summary>
+    public void PerformAttack(EnemyAttackData data, bool heavy)
+    {
+        if (data == null) return;
         if (_animController != null)
         {
             // Animator トリガー名をそのまま使ってトリガーを発火する
@@ -69,11 +75,11 @@ public class EnemyAttacker : IDisposable
             }
             else
             {
-                Debug.LogWarning($"EnemyAttacker: attack data for {attackType} has no AnimatorTrigger assigned.");
+                Debug.LogWarning($"EnemyAttacker: attack data for {data.ActionType} has no AnimatorTrigger assigned.");
             }
         }
 
-        _currentIsHeavy = attackType == EnemyActionType.HeavySlash;
+        _currentIsHeavy = heavy;
 
         // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
         if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
@@ -82,7 +88,7 @@ public class EnemyAttacker : IDisposable
         }
         else
         {
-            CombatLog.Trace($"EnemyAttacker: perform {attackType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
+            CombatLog.Trace($"EnemyAttacker: perform {data.ActionType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
         }
     }
 
@@ -146,7 +152,7 @@ public class EnemyAttacker : IDisposable
         float damage = sourceWeapon != null ? sourceWeapon.Damage() : (_status != null ? _status.EnemyPower : 0f);
 
         var owner = _ownerTransform != null ? _ownerTransform.GetComponent<EnemyController>() : null;
-        damage *= RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
+        damage *= owner != null && owner.IsTraining ? 1f : RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
         CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");

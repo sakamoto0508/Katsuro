@@ -81,6 +81,49 @@ public class AudioManager : MonoBehaviour
     private readonly Dictionary<AudioSource, float> _bgmBaseVolumes = new();
     private JustAvoidEnvelope _duckEnvelope;
     private float _duckMultiplier = 1;
+    /// <summary>ユーザー設定の音量倍率。個々の再生基準音量とは独立する。</summary>
+    public float MasterVolume { get; private set; } = 1f;
+    /// <summary>全BGMチャンネルに適用するユーザー音量倍率。</summary>
+    public float BGMVolume { get; private set; } = 1f;
+    /// <summary>再利用・新規SE Sourceにも適用するユーザー音量倍率。</summary>
+    public float SEVolume { get; private set; } = 1f;
+    private readonly Dictionary<AudioSource, float> _sfxBaseVolumes = new();
+    private const string VolumeKey = "Katsuro.Audio.";
+    /// <summary>保存値の異常を除外し、音量を0～1に収める。</summary>
+    private static float ValidVolume(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 1f : Mathf.Clamp01(value);
+    /// <summary>三つのユーザー倍率を即時反映し、再生状態に触れず保存値を更新する。</summary>
+    public void SetUserVolumes(float master, float bgm, float se)
+    {
+        MasterVolume = ValidVolume(master); BGMVolume = ValidVolume(bgm); SEVolume = ValidVolume(se);
+        PlayerPrefs.SetFloat(VolumeKey + "Master", MasterVolume);
+        PlayerPrefs.SetFloat(VolumeKey + "BGM", BGMVolume);
+        PlayerPrefs.SetFloat(VolumeKey + "SE", SEVolume);
+        ApplyUserVolumes();
+    }
+    /// <summary>ユーザー倍率のみを100%へ戻し、個別音量とDuckingを保持して保存する。</summary>
+    public void ResetUserVolumes() { SetUserVolumes(1f, 1f, 1f); SaveUserVolumes(); }
+    /// <summary>設定終了・アプリ終了時に音量設定をディスクへ保存する。</summary>
+    public void SaveUserVolumes() => PlayerPrefs.Save();
+    /// <summary>保存済みの倍率を復元し、初回起動では各100%にする。</summary>
+    private void LoadUserVolumes()
+    {
+        MasterVolume = ValidVolume(PlayerPrefs.GetFloat(VolumeKey + "Master", 1f));
+        BGMVolume = ValidVolume(PlayerPrefs.GetFloat(VolumeKey + "BGM", 1f));
+        SEVolume = ValidVolume(PlayerPrefs.GetFloat(VolumeKey + "SE", 1f));
+        ApplyUserVolumes();
+    }
+    /// <summary>基準音量から全Sourceの実音量を再計算する。停止した音を再開しない。</summary>
+    private void ApplyUserVolumes()
+    {
+        if (bgmSources != null) foreach (var source in bgmSources)
+            if (source != null) source.volume = BaseVolume(source) * BGMVolume * _duckMultiplier * MasterVolume;
+        foreach (var source in _sfxPool) if (source != null)
+            source.volume = (_sfxBaseVolumes.TryGetValue(source, out var baseline) ? baseline : 1f) * SEVolume * MasterVolume;
+    }
+    /// <summary>アプリ終了時に変更済み音量を保存する。</summary>
+    private void OnApplicationQuit() { if (_initialized) SaveUserVolumes(); }
+    /// <summary>アプリの中断時に変更済み音量を保存する。</summary>
+    private void OnApplicationPause(bool paused) { if (paused && _initialized) SaveUserVolumes(); }
     /// <summary>チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。</summary>
     /// <returns>一時倍率を掛ける前のチャンネル音量。</returns>
     private float BaseVolume(AudioSource source)
@@ -93,7 +136,7 @@ public class AudioManager : MonoBehaviour
     private void SetBaseVolume(AudioSource source, float volume)
     {
         _bgmBaseVolumes[source] = volume;
-        source.volume = volume * _duckMultiplier;
+        source.volume = volume * _duckMultiplier * BGMVolume * MasterVolume;
     }
     /// <summary>現在の音量包絡線から回避用Duckingを再開始し、連続成功でも倍率を累積しない。</summary>
     public void PlayJustAvoidDuck()
@@ -110,7 +153,7 @@ public class AudioManager : MonoBehaviour
         _duckMultiplier = Mathf.Lerp(1, _justAvoidDuckVolume,
             _duckEnvelope.Evaluate(now, _justAvoidDuckEnter, _justAvoidDuckHold, _justAvoidDuckRestore));
         if (bgmSources != null) foreach (var source in bgmSources)
-            if (source != null) source.volume = BaseVolume(source) * _duckMultiplier;
+            if (source != null) source.volume = BaseVolume(source) * _duckMultiplier * BGMVolume * MasterVolume;
     }
     /// <summary>一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。</summary>
     public void CancelJustAvoidDuck() { _duckEnvelope.Reset(); UpdateDuck(Time.unscaledTime); }
@@ -177,6 +220,9 @@ public class AudioManager : MonoBehaviour
         // BGM 用 AudioSource を準備する（複数チャンネル対応）。
         EnsureBGMSources();
         CreateBgmChannels();
+        foreach (var source in bgmSources) RetainSceneSource(source);
+        RetainSceneSource(sfxSourcePrefab);
+        LoadUserVolumes();
 
         // BGM リストを辞書に登録。
         _bgmDict.Clear();
@@ -200,6 +246,13 @@ public class AudioManager : MonoBehaviour
 
         // SFX 用のプールを生成。
         CreateSFXPool();
+    }
+
+    /// <summary>Sceneに配置されたBGM音源とSE生成元を共有Managerの子にし、Scene遷移による参照消失を防ぐ。</summary>
+    private void RetainSceneSource(AudioSource source)
+    {
+        if (source != null && source.gameObject.scene.IsValid() && !source.transform.IsChildOf(transform))
+            source.transform.SetParent(transform, true);
     }
 
     /// <summary>既存の単一参照を複数チャンネルへ引き継ぎ、BGM Sourceがなければ先頭チャンネルを生成する。</summary>
@@ -261,6 +314,7 @@ public class AudioManager : MonoBehaviour
             }
         }
         _sfxPool.Clear();
+        _sfxBaseVolumes.Clear();
 
         // 指定数だけ SFX 用 AudioSource を生成してプールに追加する。
         for (int i = 0; i < Mathf.Clamp(sfxPoolSize, 0, Mathf.Max(1, maxSfxPoolSize)); i++)
@@ -272,6 +326,8 @@ public class AudioManager : MonoBehaviour
                 sfxSource.loop = false; // SFX はループしない。
                 sfxSource.clip = null;  // クリップは後で設定する。
                 _sfxPool.Add(sfxSource);
+                _sfxBaseVolumes[sfxSource] = 1f;
+                sfxSource.volume = SEVolume * MasterVolume;
             }
         }
     }
@@ -389,7 +445,7 @@ public class AudioManager : MonoBehaviour
     }
 
     /// <summary>
-    /// BGM の音量を設定する。
+    /// BGMの再生基準音量を設定する。ユーザー倍率の変更にはSetUserVolumesを使用する。
     /// </summary>
     public void SetBGMVolume(float volume)
     {
@@ -431,7 +487,8 @@ public class AudioManager : MonoBehaviour
             if (src != null)
             {
                 src.clip = clip;
-                src.volume = Mathf.Clamp01(volume);
+                _sfxBaseVolumes[src] = Mathf.Clamp01(volume);
+                src.volume = _sfxBaseVolumes[src] * SEVolume * MasterVolume;
                 src.Play();
             }
         }
@@ -458,6 +515,8 @@ public class AudioManager : MonoBehaviour
             extra.playOnAwake = false;
             extra.loop = false;
             _sfxPool.Add(extra);
+            _sfxBaseVolumes[extra] = 1f;
+            extra.volume = SEVolume * MasterVolume;
             return extra;
         }
 
@@ -465,17 +524,11 @@ public class AudioManager : MonoBehaviour
     }
 
     /// <summary>
-    /// SE の音量を設定する。
+    /// ユーザーSE倍率を更新し、次回再生・再利用Sourceにも適用する。
     /// </summary>
     public void SetSEVolume(float volume)
     {
-        foreach (var s in _sfxPool)
-        {
-            if (s != null)
-            {
-                s.volume = Mathf.Clamp01(volume);
-            }
-        }
+        SetUserVolumes(MasterVolume, BGMVolume, volume);
     }
 
     /// <summary>

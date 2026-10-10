@@ -37,6 +37,8 @@ public class LockOnCamera
 
     /// <summary>現在ロックオン中かどうか</summary>
     public bool IsLockOn { get; private set; }
+    /// <summary>現在の実際のLock-On対象を読み取り専用で公開する。</summary>
+    public Transform Target => _enemyPosition;
 
     // --- 参照項目 ---
     /// <summary>プレイヤーの Transform（参照保持）</summary>

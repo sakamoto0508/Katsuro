@@ -11,8 +11,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3aa03368a6844008bf6ac32708d15f17, type: 3}
   m_Name: KatsuroRules
-  m_EditorClassIdentifier:
-  StartingLives: 2
+  m_EditorClassIdentifier: 
+  StartingLives: 1
   ReviveInvulnerability: 2
   ShortGhostDuration: 0.08
   GhostCooldown: 0.35

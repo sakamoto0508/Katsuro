@@ -12,6 +12,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// 敵の現在のHP比率を取得します。0.0f（死亡）から1.0f（満タン）の範囲で返されます。
     /// </summary>
     public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
+    /// <summary>訓練用に通常AIと正式撃破を無効化しているか。</summary>
+    public bool IsTraining => _game != null && _game.IsTutorial;
 
     /// <summary>EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。</summary>
     [UnityEngine.Tooltip("EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。")]
@@ -93,6 +95,27 @@ public class EnemyController : MonoBehaviour, IDamageable
         _mover?.ReleaseMovementAfterAttack();
     }
     private EnemyAI _ai;
+    /// <summary>HPへ適用された命中を通知する。修練はこの結果を観察し、武器の判定を変更しない。</summary>
+    public event System.Action<DamageInfo> HitReceived;
+    /// <summary>既存Animation Eventによる修練攻撃の終了通知。</summary>
+    public event System.Action TrainingAttackFinished;
+    /// <summary>修練の一回の攻撃が進行中か。</summary>
+    public bool TrainingAttackInProgress { get; private set; }
+    /// <summary>相手の既存Clipを一回再生する。通常AIと被弾中の割り込みは変更しない。</summary>
+    public bool BeginTrainingAttack(EnemyAttackData data)
+    {
+        if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
+        TrainingAttackInProgress = true; _mover?.FacePlayerInstant(); _mover?.HoldMovementForAttack();
+        _attacker?.PerformAttack(data, data.ActionType == EnemyActionType.HeavySlash);
+        return true;
+    }
+    /// <summary>課題変更時に武器と攻撃移動を止める。被弾Reactionの復帰は既存処理へ任せる。</summary>
+    public void CancelTrainingAttack()
+    {
+        if (!IsTraining) return;
+        TrainingAttackInProgress = false; _pendingAction = null; _attacker?.DisableWeaponHitbox();
+        _enemyAnimController?.InterruptAttackForHitReaction(); _mover?.ReleaseMovementAfterAttack();
+    }
     private EnemyActionType? _pendingAction;
     private CancellationToken _token;
     private bool _dead = false;
@@ -116,8 +139,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_combatFeedback != null) _combatFeedback.Init(audio, vfxConfig, cameraManager, hitStop, false);
         else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
         var navMeshAgent = GetComponent<NavMeshAgent>();
-        if (navMeshAgent != null) navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
-        gameObject.name = RunSession.Opponent?.Name ?? gameObject.name;
+        if (navMeshAgent != null && !IsTraining) navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
+        gameObject.name = IsTraining ? "修練の相手" : RunSession.Opponent?.Name ?? gameObject.name;
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
         _enemyAnimController.Init();
@@ -126,13 +149,14 @@ public class EnemyController : MonoBehaviour, IDamageable
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
             , navMeshAgent, _animator, _animName, _attackRootMotionScale);
-        _health = new EnemyHealth(_enemyStuts);
+        _health = new EnemyHealth(_enemyStuts, IsTraining);
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
         wrapper.Init();
         _attacker = new EnemyAttacker(_enemyAnimController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
         _attacker.Init(hitStop);
-        _ai = new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
+        _ai = IsTraining ? null : new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
+        if (IsTraining && navMeshAgent != null && navMeshAgent.isOnNavMesh) _mover.StopMove();
 
 
         GetComponent<StatusEffectManager>()?.Init();
@@ -179,7 +203,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_health == null || _dead || (_game != null && !_game.IsCombatActive)) return;
 
         float before = _health.CurrentHp;
-        _health.ApplyDamage(info.DamageAmount * RunSession.EnemyDefense);
+        if (IsTraining) { _health.RestoreForTraining(); before = _health.CurrentHp; }
+        _health.ApplyDamage(info.DamageAmount * (IsTraining ? 1f : RunSession.EnemyDefense));
         float dealt = before - _health.CurrentHp;
         if (dealt > 0f)
         {
@@ -205,6 +230,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             _combatFeedback?.Hit(info, boneReaction);
             if (_combatFeedback == null) _audio?.PlaySE("Damage");
             _damageNumbers?.Show(transform.position, dealt, isCritical);
+            HitReceived?.Invoke(info);
         }
 
         if (_health.CurrentHp <= 0f && !_dead)
@@ -237,7 +263,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             else return;
         }
         // AI の Tick を先に呼び、意思決定を行わせる
-        _ai?.Tick(Time.deltaTime);
+        if (!IsTraining) _ai?.Tick(Time.deltaTime);
 
         // AI が設定したペンディングの行動を先に実行してから移動更新を行う。
         // これにより WaitWalk 等が選択されたフレームで即座に振る舞いを反映できます。
@@ -279,12 +305,14 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
 
         // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
-        _mover?.Update();
+        if (IsTraining) _mover?.ResetLocomotionAnimation();
+        else _mover?.Update();
     }
 
     /// <summary>死亡を確定して攻撃・AI更新・移動を停止し、既存死亡ClipとFinal Blowまたは遷移を要求する。</summary>
     private void EnemyDead()
     {
+        if (IsTraining) { _health.RestoreForTraining(); return; }
         _combatFeedback?.CancelNormalHitReaction();
         _attackAnimationHash = 0;
         _mover?.InterruptMovementAction();
@@ -319,6 +347,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox()
     {
+        if (IsTraining && !TrainingAttackInProgress) return;
         if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
         _attacker?.EnableWeaponHitbox();
@@ -361,6 +390,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _ai?.OnAttackFinished();
         // 攻撃終了時に一時停止していた移動制御を復帰させる
         _mover?.ReleaseMovementAfterAttack();
+        if (IsTraining) { TrainingAttackInProgress = false; TrainingAttackFinished?.Invoke(); }
     }
 
     /// <summary>有効な後退終了Eventで移動を再開し、AIへ行動完了を通知する。死亡・大被弾中は無視する。</summary>

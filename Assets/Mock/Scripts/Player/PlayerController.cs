@@ -11,6 +11,33 @@ using INab.VFXAssets;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour, IDamageable
 {
+    /// <summary>現在の攻撃が既存コンボの何段目かを修練へ公開する。</summary>
+    public int AttackComboStepForTutorial => _stateContext?.Attacker?.CurrentComboStep ?? 0;
+    /// <summary>実際のLock-On状態と有効な対象が修練の相手に一致するか調べる。</summary>
+    public bool IsLockedOnForTutorial(Transform target) => _lookOnCamera != null && _lookOnCamera.IsLockOn && _lookOnCamera.HasValidTarget() && _lookOnCamera.Target == target;
+    /// <summary>既存の攻撃受信処理で成立した通常回避を通知する。</summary>
+    public event Action<DamageInfo> AvoidSucceeded;
+    /// <summary>既存のジャスト回避判定で成立した成功を通知する。</summary>
+    public event Action<DamageInfo> JustAvoidSucceeded;
+    /// <summary>実際にHPを消費したバフを通知する。</summary>
+    public event Action BuffSucceeded;
+    /// <summary>実際のHP回復量を通知する。満タンでの空振りは通知しない。</summary>
+    public event Action<float> HealSucceeded;
+    /// <summary>修練で致死ダメージから復帰したことを通知する。</summary>
+    public event Action TrainingRecovered;
+    /// <summary>修練でのみ能力を終了し、回復課題用HPと気力を準備する。</summary>
+    public void PrepareTrainingVitals(float hpRatio)
+    {
+        if (_game == null || !_game.IsTutorial || _stateContext == null) return;
+        _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        _stateContext.Healer.End(); _stateContext.SelfSacrifice.End(); StopBuffAudio();
+        _playerResource.SetTrainingHpRatio(hpRatio); RefillTrainingGauge();
+    }
+    /// <summary>気力不足で修練が止まらないよう、修練でのみ気力を補充する。</summary>
+    public void RefillTrainingGauge()
+    {
+        if (_game != null && _game.IsTutorial) _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
+    }
     public PlayerAnimationController AnimController => _animationController;
     /// <summary>Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
     [UnityEngine.Tooltip("Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
@@ -116,6 +143,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float Gauge => _stateContext != null ? _stateContext.SkillGauge.Value : 0f;
     public float JustBonus => JustStacks * (_playerStatus != null && _playerStatus.JustAvoidBuffConfig != null ? _playerStatus.JustAvoidBuffConfig.DamageMultiplierPerStack : 0f);
     public bool IsInvulnerable => (_stateContext?.IsGhostMode ?? false) || (_playerResource != null && Time.time < _playerResource.InvulnerableUntil);
+    /// <summary>HUD向けに、復活後の無敵が終了するまでの実際の残りゲーム秒を返す。</summary>
+    public float ReviveProtectionSeconds => _playerResource != null ? Mathf.Max(0f, _playerResource.InvulnerableUntil - Time.time) : 0f;
+    /// <summary>HUD向けに、回復チャネリングの有効状態だけを読み取る。</summary>
+    public bool IsHealingForHUD => _stateContext?.Healer?.IsHealing ?? false;
+    /// <summary>HUD向けに、バフ操作による自傷能力の有効状態だけを読み取る。</summary>
+    public bool IsBuffActiveForHUD => _stateContext?.SelfSacrifice?.IsSacrificing ?? false;
     private bool CanFight => _playerResource != null && !_playerResource.IsDead
         && (_game == null || _game.IsCombatActive);
     /// <summary>能力・攻撃・演出を終了させ、復活後の通常移動状態へ戻す。</summary>
@@ -133,6 +166,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
         _justBuffRemaining = 0f;
         _audio?.StopBGM(2);
+        if (_game != null && _game.IsTutorial) TrainingRecovered?.Invoke();
     }
 
     /// <summary>
@@ -258,12 +292,14 @@ public class PlayerController : MonoBehaviour, IDamageable
                 }
             }
             _combatFeedback?.PlayJustAvoidFeedback(info);
+            JustAvoidSucceeded?.Invoke(info);
             return;
         }
         // ゴーストモード中はダメージを無効化する。
         if (_stateContext?.IsGhostMode ?? false)
         {
             _stateContext.SkillGauge.Add(_playerStatus != null ? _playerStatus.SkillGaugeOnAvoidGain : 5f);
+            AvoidSucceeded?.Invoke(info);
             return;
         }
         _combatFeedback?.Hit(info);
@@ -358,6 +394,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         float applied = Mathf.Min(damage, maxAllowedDamage);
         // SelfSacrifice による毎フレームのダメージは効果音を鳴らさない
         _playerResource?.ApplyDamage(applied, false);
+        if (applied > 0f) BuffSucceeded?.Invoke();
 
         // もし要求ダメージが大きく、残量が不足している場合は自動停止
         if (applied < damage)
@@ -370,7 +407,10 @@ public class PlayerController : MonoBehaviour, IDamageable
     private void HandleHealTick(float healedPercent)
     {
         // healedPercent は "このフレームで回復した割合 (%)"（Ability が通知）
+        float before = _playerResource.CurrentHp;
         _playerResource.HealByPercent(healedPercent);
+        float actual = _playerResource.CurrentHp - before;
+        if (actual > 0f) HealSucceeded?.Invoke(actual);
     }
 
     /// <summary>必要な 入力Action を購読する。</summary>

@@ -51,6 +51,8 @@ public sealed class PlayerAttacker : IDisposable
     private HitStopManager _hitStop;
     private bool _initialized;
     private int _currentComboStep;
+    /// <summary>実行中の既存コンボ段階。入力回数ではなく、成立した攻撃段階を修練の命中確認へ渡す。</summary>
+    public int CurrentComboStep => _currentComboStep;
     private bool _currentIsLockOnVariant;
     private bool _currentIsStrongAttack;
     private bool _hasDrawnSword;

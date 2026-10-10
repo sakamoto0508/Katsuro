@@ -23,6 +23,10 @@ public class TitleManager : MonoBehaviour
     /// <summary>名前・装備選択を開くRun設定画面の参照。</summary>
     [UnityEngine.Tooltip("名前・装備選択を開くRun設定画面の参照。")]
     [SerializeField] private RunSetupUI _setup;
+    /// <summary>タイトル専用の音量設定画面。</summary>
+    [SerializeField, Tooltip("タイトル専用の音量設定画面。")] private TitleAudioSettingsUI _audioSettings;
+    /// <summary>準備画面やScene遷移と競合せずに音量設定を開けるか。</summary>
+    public bool CanOpenAudioSettings => !_isTransitioning && !(_setup != null && _setup.IsOpen) && !(_fader != null && _fader.IsTransitioning);
 
     /// <summary>配置済みのTitle用依存先とBGMを初期化する。</summary>
     private void Start() => Init();
@@ -40,6 +44,7 @@ public class TitleManager : MonoBehaviour
         _audio = _scene.Audio;
         _fader = _scene.Fader;
         _scene.InitTitleTexts(this);
+        if (_audioSettings != null) _audioSettings.Init(this, _audio);
         // タイトルBGM再生（null ガード）
         if (_audioConfig != null && _audio != null)
         {
@@ -51,6 +56,7 @@ public class TitleManager : MonoBehaviour
     private void Update()
     {
         if (_isTransitioning || (_setup != null && _setup.IsOpen)) return;
+        if (_audioSettings != null && (_audioSettings.ConsumeTitleNavigation() || _audioSettings.BlocksStart)) return;
         if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
         {
             OnPressStart();
@@ -69,9 +75,11 @@ public class TitleManager : MonoBehaviour
     /// </summary>
     public void OnPressStart()
     {
+        if (_audioSettings != null && _audioSettings.BlocksStart) return;
         if (_isTransitioning || (_fader != null && _fader.IsTransitioning)) return;
         if (_setup != null && _setup.IsOpen) return;
         if (_setup == null) { Debug.LogError("Assign the scene RunSetupUI to TitleManager.", this); return; }
+        if (_audioSettings != null) _audioSettings.SetTitleAvailable(false);
         _setup.Open(this);
     }
 
@@ -80,7 +88,13 @@ public class TitleManager : MonoBehaviour
     /// </summary>
     public void BeginConfiguredGame()
     {
-        if (_isTransitioning) return;
+        BeginConfiguredGame(false);
+    }
+
+    /// <summary>準備画面の行き先を確定し、正式Runを開始せずにFade遷移を要求する。</summary>
+    public void BeginConfiguredGame(bool tutorial)
+    {
+        if (_isTransitioning || (_audioSettings != null && _audioSettings.BlocksStart)) return;
         _isTransitioning = true;
 
         // SE再生
@@ -89,20 +103,21 @@ public class TitleManager : MonoBehaviour
             _audio.PlaySE(_audioConfig.StartSE);
         }
 
-        LoadGameScene().Forget();
+        LoadGameScene(tutorial).Forget();
     }
 
     /// <summary>
     /// ゲームシーンへの遷移を行う。
     /// </summary>
     /// <returns></returns>
-    private async UniTask LoadGameScene()
+    private async UniTask LoadGameScene(bool tutorial)
     {
         try
         {
             await UniTask.Delay((int)(Mathf.Max(0f, _transitionDelay) * 1000), ignoreTimeScale: true,
                 cancellationToken: this.GetCancellationTokenOnDestroy());
-            var sceneName = _sceneNameConfig != null ? _sceneNameConfig.GameScene : "GameScene";
+            if (_sceneNameConfig == null) throw new System.InvalidOperationException("SceneNameConfig is required.");
+            var sceneName = tutorial ? _sceneNameConfig.TutorialScene : _sceneNameConfig.GameScene;
             await _fader.FadeToScene(sceneName);
         }
         catch (System.OperationCanceledException) { }

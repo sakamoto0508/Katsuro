@@ -50,6 +50,12 @@ public class PlayerResource : IDisposable
     public event Action Revived;
     public bool IsDead => _dead;
     public float InvulnerableUntil { get; private set; }
+    /// <summary>修練の回復課題用にHPを準備する。本編では呼ばれても値を変更しない。</summary>
+    public void SetTrainingHpRatio(float ratio)
+    {
+        if (_game == null || !_game.IsTutorial || _dead) return;
+        _hpRx.Value = _maxHp * Mathf.Clamp(ratio, .1f, 1f);
+    }
 
     /// <summary>
     /// 指定した割合（percent）だけ HP を回復する（percent は 0..100）。
@@ -87,6 +93,13 @@ public class PlayerResource : IDisposable
     public void PlayerDeath()
     {
         if (_dead) return;
+        if (_game != null && _game.IsTutorial)
+        {
+            _hpRx.Value = _maxHp;
+            InvulnerableUntil = Time.time + .5f;
+            Revived?.Invoke();
+            return;
+        }
         if (RunSession.ConsumeLife())
         {
             _hpRx.Value = _maxHp;

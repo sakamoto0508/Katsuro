@@ -53,6 +53,9 @@ public sealed class RunHUD : MonoBehaviour
     /// <summary>Just Avoidボーナスの倍率・残り時間と無敵状態を表示するTMPテキスト。</summary>
     [UnityEngine.Tooltip("Just Avoidボーナスの倍率・残り時間と無敵状態を表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _ghostStatus;
+    /// <summary>左下HUDの右隣に置く最大3件の状態表示。空の行は背景とともに非表示にする。</summary>
+    [Tooltip("発動中の状態を優先順に表示する3行のTMP。各行の親を状態パネルにしてください。")]
+    [SerializeField] private TMP_Text[] _statusLabels = new TMP_Text[0];
     private float _nextRefresh;
     private bool _presentationControlsVisibility;
     /// <summary>勝利演出などの表示所有者から、通常のラン情報を表示してよいか切り替える。</summary>
@@ -74,10 +77,11 @@ public sealed class RunHUD : MonoBehaviour
         }
     }
 
-    /// <summary>ランの残機・相手・結果などを表示し、演出による非表示指定を優先する。</summary>
+    /// <summary>相手名・HP・有効な状態表示を更新し、既存ラン情報の互換性と演出側の表示所有権を維持する。</summary>
     private void LateUpdate()
     {
-        bool visible = RunSession.Active && _player != null
+        bool training = GameManager.Instance != null && GameManager.Instance.IsTutorial;
+        bool visible = (RunSession.Active || training) && _player != null
             && !(_fader != null && _fader.IsTransitioning);
         if (_visibility != null && !_presentationControlsVisibility) _visibility.alpha = visible ? 1f : 0f;
         float enemyHp = _enemy != null ? Mathf.Clamp01(_enemy.HpRatio) : 0f;
@@ -89,7 +93,7 @@ public sealed class RunHUD : MonoBehaviour
         _nextRefresh = Time.unscaledTime + .1f;
 
         SetLabel(_challenger, RunSession.PlayerName);
-        SetLabel(_opponent, RunSession.Opponent?.Name ?? "名もなき守人");
+        SetLabel(_opponent, training ? "修練の相手" : RunSession.Opponent?.Name ?? "名もなき守人");
         SetLabel(_lives, $"命 {RunSession.Lives}");
         SetLabel(_equipment, $"{RunSession.AttackNames[RunSession.Attack]} / {RunSession.DefenseNames[RunSession.Defense]}");
         var player = _player;
@@ -98,6 +102,35 @@ public sealed class RunHUD : MonoBehaviour
         SetLabel(_ghostStatus, player == null ? "" :
             (player.JustStacks > 0 ? $"半霊半生 +{player.JustBonus * 100:0}% / {player.JustSeconds:0.0}秒" : "")
             + (player.IsInvulnerable ? "  無敵" : ""));
+        RefreshStatuses();
+    }
+
+    /// <summary>有効な無敵・Just Avoid・回復・バフを優先順に最大3件表示し、使用しない行を隠す。</summary>
+    private void RefreshStatuses()
+    {
+        int index = 0;
+        if (_player.IsInvulnerable)
+            SetStatus(ref index, _player.ReviveProtectionSeconds > 0f
+                ? $"無敵　{_player.ReviveProtectionSeconds:0.0}秒" : "無敵　継続中", new Color(.66f, .83f, .87f));
+        if (_player.JustStacks > 0 && _player.JustSeconds > 0f)
+            SetStatus(ref index, $"半霊半生　{_player.JustSeconds:0.0}秒", new Color(.87f, .73f, .43f));
+        if (_player.IsHealingForHUD)
+            SetStatus(ref index, "回復　継続中", new Color(.67f, .83f, .65f));
+        if (_player.IsBuffActiveForHUD)
+            SetStatus(ref index, "バフ　継続中", new Color(.88f, .63f, .49f));
+        for (; index < _statusLabels.Length; index++)
+            if (_statusLabels[index] != null) _statusLabels[index].transform.parent.gameObject.SetActive(false);
+    }
+
+    /// <summary>空き行に状態名・時間と識別色を反映する。上限を超えた低優先状態は表示しない。</summary>
+    private void SetStatus(ref int index, string value, Color color)
+    {
+        if (index >= Mathf.Min(3, _statusLabels.Length)) return;
+        var label = _statusLabels[index++];
+        if (label == null) return;
+        label.transform.parent.gameObject.SetActive(true);
+        label.color = color;
+        SetLabel(label, value);
     }
 
     /// <summary>参照があり文字列が変わった場合だけTMPテキストを更新する。</summary>

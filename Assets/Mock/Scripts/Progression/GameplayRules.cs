@@ -6,7 +6,7 @@ public sealed class GameplayRules : ScriptableObject
 {
     /// <summary>新しいRunを開始したときの残機数。</summary>
     [UnityEngine.Tooltip("新しいRunを開始したときの残機数。")]
-    [Min(1)] public int StartingLives = 2;
+    [Min(1)] public int StartingLives = 1;
     /// <summary>復活後にダメージを無効化する時間（秒）。</summary>
     [UnityEngine.Tooltip("復活後にダメージを無効化する時間（秒）。")]
     [Min(0)] public float ReviveInvulnerability = 2f;

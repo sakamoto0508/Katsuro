@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8180975b1807bd4eaa7b629a8edc311, type: 3}
   m_Name: SceneNameConfig
   m_EditorClassIdentifier: Assembly-CSharp::SceneNameConfig
+  _tutorialScene: TutorialScene
   _titleScene: TitleScene
   _gameScene: GameScene

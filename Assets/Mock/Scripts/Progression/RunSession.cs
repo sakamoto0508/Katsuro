@@ -27,6 +27,14 @@ public static class RunSession
 {
     private const string SaveKey = "Katsuro.Champion.v1";
     public static bool Active { get; private set; }
+    /// <summary>名前・装備は確定したが、正式な戦闘開始を待っている状態。</summary>
+    public static bool PendingStart { get; private set; }
+    /// <summary>選択内容だけを保持する。修練の入場では残機・時計・結果・勝者データを開始しない。</summary>
+    public static void Prepare(string name, int attack, int defense)
+    {
+        PlayerName = CleanName(name); Attack = Mathf.Clamp(attack, 0, 2); Defense = Mathf.Clamp(defense, 0, 2);
+        Active = false; PendingStart = true;
+    }
     public static string PlayerName { get; private set; } = "挑戦者";
     public static int Attack { get; private set; }
     public static int Defense { get; private set; }
@@ -52,7 +60,7 @@ public static class RunSession
 
     /// <summary>新しい実行セッション開始時にランの状態・前回相手・結果・保存エラーを消去する。</summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void Reset() { Active = false; Opponent = null; Result = null; SaveError = null; }
+    private static void Reset() { Active = false; PendingStart = false; Opponent = null; Result = null; SaveError = null; }
     /// <summary>名前から制御文字とタグ記号を除き、長さを制限して空の場合は既定名を使用する。</summary>
     /// <returns>表示と保存に使用する整形済みの名前。</returns>
     public static string CleanName(string name)
@@ -80,6 +88,7 @@ public static class RunSession
     /// <summary>名前と装備選択を検証して残機・相手・開始時刻を初期化し、新しいランを有効にする。</summary>
     public static void Begin(string name, int attack, int defense)
     {
+        PendingStart = false;
         PlayerName = CleanName(name);
         Attack = Mathf.Clamp(attack, 0, 2);
         Defense = Mathf.Clamp(defense, 0, 2);

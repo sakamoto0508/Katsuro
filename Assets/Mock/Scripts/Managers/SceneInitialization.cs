@@ -38,6 +38,7 @@ public sealed class SceneInitialization
         InitAll<EnemyAnimationController>(x => x.Init());
         InitAll<RunSetupUI>(x => x.Init());
         InitAll<RunHUD>(x => x.Init(Fader));
+        InitAll<ControlGuidePresenter>(x => x.Init(game, Fader));
     }
 
     /// <summary>Title用の文字演出へTitleManagerと共有Faderを接続する。</summary>

@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Mock/Scenes/GameScene.unity
     guid: 42ad93d41c03e5e419eccdbbc395a9f6
+  - enabled: 1
+    path: Assets/Mock/Scenes/TutorialScene.unity
+    guid: d01eb5f85b841a04790865c47c2aff27
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
   m_UseUCBPForAssetBundles: 0

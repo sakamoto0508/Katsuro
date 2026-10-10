@@ -6,9 +6,10 @@ using UnityEngine;
 public class EnemyHealth : IDisposable
 {
     /// <summary>基礎HPにラン継承倍率を適用し、現在HPのReactive通知を初期化する。</summary>
-    public EnemyHealth(EnemyStuts status)
+    public EnemyHealth(EnemyStuts status, bool training = false)
     {
-        _maxHp = status != null ? status.EnemyMaxHealth * RunSession.EnemyHealth : 100f * RunSession.EnemyHealth;
+        _training = training;
+        _maxHp = (status != null ? status.EnemyMaxHealth : 100f) * (training ? 1f : RunSession.EnemyHealth);
         _hpRx = new ReactiveProperty<float>(_maxHp);
     }
 
@@ -30,6 +31,9 @@ public class EnemyHealth : IDisposable
     public float CurrentHpRatio => _maxHp > 0f ? _hpRx.Value / _maxHp : 0f;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
+    private readonly bool _training;
+    /// <summary>修練用に作成された個体だけ、次の命中練習へHPを戻す。</summary>
+    public void RestoreForTraining() { if (_training) _hpRx.Value = _maxHp; }
 
     /// <summary>
     /// 指定した量のダメージを適用する（0 以下は無視）。
@@ -38,7 +42,7 @@ public class EnemyHealth : IDisposable
     public void ApplyDamage(float amount)
     {
         if (amount <= 0f) return;
-        _hpRx.Value = Mathf.Max(0f, _hpRx.Value - amount);
+        _hpRx.Value = Mathf.Max(_training ? 1f : 0f, _hpRx.Value - amount);
     }
 
     /// <summary>EnemyのHP通知に使用するReactivePropertyを解放する。</summary>

@@ -538,7 +538,7 @@ public sealed class CombatFeedback : MonoBehaviour
     private void StopHitVFX(int i)
     {
         foreach (var particle in _hitParticles[i]) if (particle != null) particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
-        _hitRoots[i].SetActive(false);
+        if (_hitRoots[i] != null) _hitRoots[i].SetActive(false);
     }
 
     /// <summary>前フレームの骨補正を除去し、被弾・回避・接触演出の終了時刻と表示状態を更新する。</summary>

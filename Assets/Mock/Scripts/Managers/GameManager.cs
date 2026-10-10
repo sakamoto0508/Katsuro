@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -106,9 +106,11 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    /// <summary>Sceneの依存先を接続し、既存の戦闘開始状態へ切り替える。</summary>
+    /// <summary>前Sceneの時間停止を解除して依存先を接続し、戦闘開始状態へ切り替える。</summary>
     private void Start()
     {
+        // Scene開始時だけ時間を初期化し、以後のPauseやHitStopの制御は各処理へ委ねる。
+        Time.timeScale = 1f;
         Init();
         SetGameState(GameState.InGame);
     }
@@ -121,8 +123,13 @@ public class GameManager : MonoBehaviour
 
     /// <summary>Playerの初期化・入力・戦闘状態を管理する参照。</summary>
     public PlayerController Player => _playerController;
+    /// <summary>正式なRunを開始せず、失敗・撃破を本編記録へ送らない修練Scene。</summary>
+    [SerializeField, Tooltip("修練Sceneだけで有効にします。正式Run・残機・勝者保存を使用しません。")]
+    private bool _isTutorial;
+    /// <summary>現在のSceneが修練モードか。</summary>
+    public bool IsTutorial => _isTutorial;
     /// <summary>戦闘状態と有効なランが両方成立している場合だけtrue。死亡後の入力・AI更新を遮断する。</summary>
-    public bool IsCombatActive => _state == GameState.InGame && RunSession.Active;
+    public bool IsCombatActive => _state == GameState.InGame && (IsTutorial || RunSession.Active);
 
     private readonly SceneInitialization _scene = new SceneInitialization();
     private AudioManager _audio;
@@ -136,7 +143,11 @@ public class GameManager : MonoBehaviour
         _scene.Init(this);
         _audio = _scene.Audio;
         _fader = _scene.Fader;
-        RunSession.EnsureRun();
+        if (!IsTutorial)
+        {
+            if (RunSession.PendingStart) RunSession.Begin(RunSession.PlayerName, RunSession.Attack, RunSession.Defense);
+            else RunSession.EnsureRun();
+        }
         if (_damageNumbers != null) _damageNumbers.Init(_camera);
         else Debug.LogError("GameManagerにDamageNumbersを割り当ててください。", this);
         _lockOnCamera = new LockOnCamera(_playerPosition, _enemyPosition
@@ -189,6 +200,7 @@ public class GameManager : MonoBehaviour
     /// <summary>進行中のランだけを勝利として完了し、Victory状態とその通知を確定する。</summary>
     public void WinGame()
     {
+        if (IsTutorial) return;
         if (!RunSession.Active) return;
         RunSession.Complete(true);
         SetGameState(GameState.Victory);
@@ -197,6 +209,7 @@ public class GameManager : MonoBehaviour
     /// <summary>進行中のランだけを敗北として完了し、Defeat状態とその通知を確定する。</summary>
     public void LoseGame()
     {
+        if (IsTutorial) return;
         if (!RunSession.Active) return;
         RunSession.Complete(false);
         SetGameState(GameState.Defeat);
