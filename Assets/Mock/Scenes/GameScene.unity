@@ -75019,6 +75019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1232949745}
   - component: {fileID: 1232949744}
+  - component: {fileID: 1232949746}
   m_Layer: 0
   m_Name: Planar Reflection
   m_TagString: Untagged
@@ -75102,13 +75103,13 @@ MonoBehaviour:
       m_UseOverride: 0
       m_Level: 0
     cameraSettings:
-      customRenderingSettings: 0
+      customRenderingSettings: 1
       renderingPathCustomFrameSettings:
         bitDatas:
           data1: 72198260625768269
           data2: 13763000477350330392
-        lodBias: 1
-        lodBiasMode: 0
+        lodBias: 0.1
+        lodBiasMode: 1
         lodBiasQualityLevel: 0
         maximumLODLevel: 0
         maximumLODLevelMode: 0
@@ -75121,7 +75122,7 @@ MonoBehaviour:
         materialQuality: 0
       renderingPathCustomFrameSettingsOverrideMask:
         mask:
-          data1: 0
+          data1: 3458764513820540928
           data2: 0
       bufferClearing:
         clearColorMode: 0
@@ -75447,6 +75448,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1232949746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232949743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e13a744d0dfde74283d193ab5f47a9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlanarReflectionRefresh
+  _probe: {fileID: 1232949744}
+  _viewerCamera: {fileID: 1207750011}
+  _maximumUpdatesPerSecond: 20
+  _positionThreshold: 0.35
+  _rotationThreshold: 3
 --- !u!1001 &1234010610
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -109245,6 +109263,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1030972590, guid: abc00000000017422811510689664856, type: 3}
   m_PrefabInstance: {fileID: 1846423657}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1851470944
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1851470946}
+  - component: {fileID: 1851470945}
+  m_Layer: 0
+  m_Name: GameScene Shadow Distance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1851470945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851470944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 20
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 77483e0d198f201439bb28b1e8a70f5b, type: 2}
+--- !u!4 &1851470946
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851470944}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1853191417
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -128617,3 +128684,4 @@ SceneRoots:
   - {fileID: 9200000201}
   - {fileID: 1176989964}
   - {fileID: 1126326643}
+  - {fileID: 1851470946}
