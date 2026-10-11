@@ -25,118 +25,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public event Action<float> HealSucceeded;
     /// <summary>修練で致死ダメージから復帰したことを通知する。</summary>
     public event Action TrainingRecovered;
-    /// <summary>修練でのみ能力を終了し、回復課題用HPと気力を準備する。</summary>
-    public void PrepareTrainingVitals(float hpRatio)
-    {
-        if (_game == null || !_game.IsTutorial || _stateContext == null) return;
-        _stateMachine.ChangeState(PlayerStateId.Locomotion);
-        _stateContext.Healer.End(); _stateContext.SelfSacrifice.End(); StopBuffAudio();
-        _playerResource.SetTrainingHpRatio(hpRatio); RefillTrainingGauge();
-    }
-    /// <summary>気力不足で修練が止まらないよう、修練でのみ気力を補充する。</summary>
-    public void RefillTrainingGauge()
-    {
-        if (_game != null && _game.IsTutorial) _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
-    }
-    public PlayerAnimationController AnimController => _animationController;
-    /// <summary>Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
-    [UnityEngine.Tooltip("Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
-    [Header("Attack Root Motion")]
-    [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
-    private Animator _rootMotionAnimator;
-    private int _attackAnimationHash;
-    /// <summary>戦闘可能なときだけ攻撃Stateのハッシュを記録し、MoverのRoot Motion受付を開始する。</summary>
-    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
-    public void BeginAnimationAttackRootMotion(int stateHash)
-    {
-        if (!CanFight) { StopAttackRootMotion(); return; }
-        _attackAnimationHash = stateHash;
-        _stateContext?.Mover?.BeginAttackRootMotion();
-    }
-    /// <summary>終了Stateが現在の所有者に一致する場合だけ攻撃Root Motionを停止する。</summary>
-    /// <param name="stateHash">終了したStateのfullPathHash。別Stateの終了では所有権を解除しない。</param>
-    public void EndAnimationAttackRootMotion(int stateHash)
-    {
-        if (_attackAnimationHash == stateHash) StopAttackRootMotion();
-    }
-    /// <summary>攻撃Stateの所有権とMoverの保留移動・攻撃速度を解除する。</summary>
-    public void StopAttackRootMotion()
-    {
-        _attackAnimationHash = 0;
-        _stateContext?.Mover?.EndAttackRootMotion();
-    }
-    /// <summary>所有中の攻撃Stateの水平移動をMoverへ渡す。戦闘終了や別Stateへの遷移では受付を解除する。</summary>
-    private void OnAnimatorMove()
-    {
-        if (!CanFight) { StopAttackRootMotion(); return; }
-        if (_rootMotionAnimator == null) _rootMotionAnimator = GetComponent<Animator>();
-        var state = _rootMotionAnimator.IsInTransition(0) ? _rootMotionAnimator.GetNextAnimatorStateInfo(0) : _rootMotionAnimator.GetCurrentAnimatorStateInfo(0);
-        if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
-        _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
-    }
-    /// <summary>無効化時に保留中の攻撃Root Motionを消去する。</summary>
-    private void OnDisable() => StopAttackRootMotion();
 
-    /// <summary>抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。</summary>
-    [UnityEngine.Tooltip("抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。")]
-    [Header("PlayerStatus")]
-    [SerializeField] private GameObject _playerWeapon;
-    /// <summary>納刀中の刀の見た目を切り替えるGameObject参照。</summary>
-    [UnityEngine.Tooltip("納刀中の刀の見た目を切り替えるGameObject参照。")]
-    [SerializeField] private GameObject _playerStartWeapon;
-    /// <summary>Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。</summary>
-    [UnityEngine.Tooltip("Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。")]
-    [SerializeField] private Collider[] _weaponColliders;
-    /// <summary>プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。</summary>
-    [Tooltip("プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。")]
-    [SerializeField] private Vector3 _weaponHitboxPadding = new Vector3(.08f, .02f, .08f);
-    private PlayerWeapon _weaponHitboxes;
-    private Vector3 _appliedHitboxPadding;
-    /// <summary>接触調整で参照するEnemy武器のCollider一覧。</summary>
-    [UnityEngine.Tooltip("接触調整で参照するEnemy武器のCollider一覧。")]
-    [SerializeField] private Collider[] _enemyWeaponColliders;
-
-    /// <summary>PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。</summary>
-    [UnityEngine.Tooltip("PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。")]
-    [Header("ScriptableObject")]
-    [SerializeField] private PlayerStatus _playerStatus;
-    /// <summary>Player Animatorのパラメータ名を共有する設定。</summary>
-    [UnityEngine.Tooltip("Player Animatorのパラメータ名を共有する設定。")]
-    [SerializeField] private AnimationName _animationName;
-    /// <summary>Playerの回避受付時間・幽体化・コンボClipの設定。</summary>
-    [UnityEngine.Tooltip("Playerの回避受付時間・幽体化・コンボClipの設定。")]
-    [SerializeField] private PlayerStateConfig _playerStateConfig;
-    /// <summary>装備による攻撃倍率・加算威力・命中Effectの設定。</summary>
-    [UnityEngine.Tooltip("装備による攻撃倍率・加算威力・命中Effectの設定。")]
-    [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
-    /// <summary>命中・Just Avoid・回復・バフなどの見た目演出設定。</summary>
-    [UnityEngine.Tooltip("命中・Just Avoid・回復・バフなどの見た目演出設定。")]
-    [SerializeField] private VFXConfig _vfxConfig;
-
-    /// <summary>Just Avoid成功時に適用するスロー状態効果の定義。</summary>
-    [UnityEngine.Tooltip("Just Avoid成功時に適用するスロー状態効果の定義。")]
-    [Header("Status Effects")]
-    [SerializeField] private StatusEffectDef _justAvoidSlowDef;
-
-    // デバッグ用：入力を通して攻撃が可能かを制御。
-    /// <summary>攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。</summary>
-    [UnityEngine.Tooltip("攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。")]
-    [SerializeField] private bool _canAttack;
-    // 表示・状態・仲介を分離したゲーム内表示。
-    /// <summary>PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。</summary>
-    [UnityEngine.Tooltip("PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。")]
-    [Header("UI")]
-    [SerializeField] private PlayerHUDView _playerHudView;
-    private PlayerHUDPresenter _playerHudPresenter;
-
-    private InputBuffer _inputBuffer;
-    private PlayerAnimationController _animationController;
-    private LockOnCamera _lookOnCamera;
-    private PlayerStateContext _stateContext;
-    private PlayerStateMachine _stateMachine;
-    private AnimationEventStream _animationEventStream;
-    private PlayerResource _playerResource;
-    private float _justBuffRemaining;
     public int JustStacks => _stateContext != null ? _stateContext.JustAvoidStacks : 0;
     public float JustSeconds => Mathf.Max(0f, _justBuffRemaining);
     public float Hp => _playerResource != null ? _playerResource.CurrentHp : 0f;
@@ -151,38 +40,83 @@ public class PlayerController : MonoBehaviour, IDamageable
     public bool IsBuffActiveForHUD => _stateContext?.SelfSacrifice?.IsSacrificing ?? false;
     private bool CanFight => _playerResource != null && !_playerResource.IsDead
         && (_game == null || _game.IsCombatActive);
-    /// <summary>能力・攻撃・演出を終了させ、復活後の通常移動状態へ戻す。</summary>
-    private void OnRevived()
-    {
-        _stateMachine.ChangeState(PlayerStateId.Locomotion);
-        _stateContext.Sprint.End();
-        _stateContext.Ghost.End();
-        _stateContext.Healer.End();
-        _stateContext.SelfSacrifice.End();
-        _stateContext.ClearJustAvoidStacks();
-        _stateContext.SetJustAvoidWindow(false);
-        _stateContext.IsGhostMode = false;
-        _stateContext.Attacker.EndAttack();
-        _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
-        _justBuffRemaining = 0f;
-        _audio?.StopBGM(2);
-        if (_game != null && _game.IsTutorial) TrainingRecovered?.Invoke();
-    }
 
     /// <summary>
     /// ゲームマネージャーから呼び出される初期化メソッド。必要な各種モジュールを生成し依存を結線する。
     /// </summary>
     public VFXConfig FeedbackConfig => _vfxConfig;
-    /// <summary>幽体化の表示状態をCombatFeedbackへ渡す。</summary>
-    public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
+
+    public PlayerAnimationController AnimController => _animationController;
+    /// <summary>Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。</summary>
+    [Tooltip("Player攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
+    [Header("Attack Root Motion")]
+    [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
+    /// <summary>抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。</summary>
+    [Tooltip("抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。")]
+    [Header("PlayerStatus")]
+    [SerializeField] private GameObject _playerWeapon;
+    /// <summary>納刀中の刀の見た目を切り替えるGameObject参照。</summary>
+    [Tooltip("納刀中の刀の見た目を切り替えるGameObject参照。")]
+    [SerializeField] private GameObject _playerStartWeapon;
+    /// <summary>Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。</summary>
+    [Tooltip("Player武器の攻撃判定Collider一覧。Animation Eventで有効・無効を切り替える。")]
+    [SerializeField] private Collider[] _weaponColliders;
+    /// <summary>プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。</summary>
+    [Tooltip("プレイヤーの刀判定に加算する全体サイズ。刀のローカル軸。Yは長さ、X/Zは厚み。")]
+    [SerializeField] private Vector3 _weaponHitboxPadding = new Vector3(.08f, .02f, .08f);
+    private PlayerWeapon _weaponHitboxes;
+    private Vector3 _appliedHitboxPadding;
+    /// <summary>接触調整で参照するEnemy武器のCollider一覧。</summary>
+    [Tooltip("接触調整で参照するEnemy武器のCollider一覧。")]
+    [SerializeField] private Collider[] _enemyWeaponColliders;
+
+    /// <summary>PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。</summary>
+    [Tooltip("PlayerのHP・移動速度・ゲージ・能力コストの基礎設定。")]
+    [Header("ScriptableObject")]
+    [SerializeField] private PlayerStatus _playerStatus;
+    /// <summary>Player Animatorのパラメータ名を共有する設定。</summary>
+    [Tooltip("Player Animatorのパラメータ名を共有する設定。")]
+    [SerializeField] private AnimationName _animationName;
+    /// <summary>Playerの回避受付時間・幽体化・コンボClipの設定。</summary>
+    [Tooltip("Playerの回避受付時間・幽体化・コンボClipの設定。")]
+    [SerializeField] private PlayerStateConfig _playerStateConfig;
+    /// <summary>装備による攻撃倍率・加算威力・命中Effectの設定。</summary>
+    [Tooltip("装備による攻撃倍率・加算威力・命中Effectの設定。")]
+    [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
+    /// <summary>命中・Just Avoid・回復・バフなどの見た目演出設定。</summary>
+    [Tooltip("命中・Just Avoid・回復・バフなどの見た目演出設定。")]
+    [SerializeField] private VFXConfig _vfxConfig;
+
+    /// <summary>Just Avoid成功時に適用するスロー状態効果の定義。</summary>
+    [Tooltip("Just Avoid成功時に適用するスロー状態効果の定義。")]
+    [Header("Status Effects")]
+    [SerializeField] private StatusEffectDef _justAvoidSlowDef;
+
+    // デバッグ用：入力を通して攻撃が可能かを制御。
+    /// <summary>攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。</summary>
+    [Tooltip("攻撃入力を受け付けるための許可フラグ。falseならLight/Heavy入力を無視する。")]
+    [SerializeField] private bool _canAttack;
+    // 表示・状態・仲介を分離したゲーム内表示。
+    /// <summary>PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。</summary>
+    [Tooltip("PlayerのHP・ダメージ追従・ゲージを表示するHUD参照。")]
+    [Header("UI")]
+    [SerializeField] private PlayerHUDView _playerHudView;
+    private PlayerHUDPresenter _playerHudPresenter;
+    private InputBuffer _inputBuffer;
+    private PlayerAnimationController _animationController;
+    private LockOnCamera _lookOnCamera;
+    private PlayerStateContext _stateContext;
+    private PlayerStateMachine _stateMachine;
+    private AnimationEventStream _animationEventStream;
+    private PlayerResource _playerResource;
+    private float _justBuffRemaining;
+    private Animator _rootMotionAnimator;
+    private int _attackAnimationHash;
     private GameManager _game;
     private AudioManager _audio;
     private CombatFeedback _combatFeedback;
-    /// <summary>バフ用BGMを専用の第2チャンネルへ要求する。</summary>
-    public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
-    /// <summary>バフ用の第2BGMチャンネルを停止する。</summary>
-    public void StopBuffAudio() => _audio?.StopBGM(2);
     private bool _initialized;
+
     /// <summary>入力・状態・移動・能力・武器・表示の依存先を組み立て、必要な通知を購読する。</summary>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
         , CameraManager cameraManager, LockOnCamera lockOnCamera, GameManager game, AudioManager audio, HitStopManager hitStop, PlayerDeadManager playerDead, LoadSceneManager loader)
@@ -262,6 +196,79 @@ public class PlayerController : MonoBehaviour, IDamageable
         _playerStartWeapon.SetActive(true);
     }
 
+    /// <summary>修練でのみ能力を終了し、回復課題用HPと気力を準備する。</summary>
+    public void PrepareTrainingVitals(float hpRatio)
+    {
+        if (_game == null || !_game.IsTutorial || _stateContext == null) return;
+        _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        _stateContext.Healer.End(); _stateContext.SelfSacrifice.End(); StopBuffAudio();
+        _playerResource.SetTrainingHpRatio(hpRatio); RefillTrainingGauge();
+    }
+    /// <summary>気力不足で修練が止まらないよう、修練でのみ気力を補充する。</summary>
+    public void RefillTrainingGauge()
+    {
+        if (_game != null && _game.IsTutorial) _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
+    }
+    
+    /// <summary>戦闘可能なときだけ攻撃Stateのハッシュを記録し、MoverのRoot Motion受付を開始する。</summary>
+    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
+    public void BeginAnimationAttackRootMotion(int stateHash)
+    {
+        if (!CanFight) { StopAttackRootMotion(); return; }
+        _attackAnimationHash = stateHash;
+        _stateContext?.Mover?.BeginAttackRootMotion();
+    }
+    /// <summary>終了Stateが現在の所有者に一致する場合だけ攻撃Root Motionを停止する。</summary>
+    /// <param name="stateHash">終了したStateのfullPathHash。別Stateの終了では所有権を解除しない。</param>
+    public void EndAnimationAttackRootMotion(int stateHash)
+    {
+        if (_attackAnimationHash == stateHash) StopAttackRootMotion();
+    }
+    /// <summary>攻撃Stateの所有権とMoverの保留移動・攻撃速度を解除する。</summary>
+    public void StopAttackRootMotion()
+    {
+        _attackAnimationHash = 0;
+        _stateContext?.Mover?.EndAttackRootMotion();
+    }
+    /// <summary>所有中の攻撃Stateの水平移動をMoverへ渡す。戦闘終了や別Stateへの遷移では受付を解除する。</summary>
+    private void OnAnimatorMove()
+    {
+        if (!CanFight) { StopAttackRootMotion(); return; }
+        if (_rootMotionAnimator == null) _rootMotionAnimator = GetComponent<Animator>();
+        var state = _rootMotionAnimator.IsInTransition(0) ? _rootMotionAnimator.GetNextAnimatorStateInfo(0) : _rootMotionAnimator.GetCurrentAnimatorStateInfo(0);
+        if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
+        _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
+    }
+    /// <summary>無効化時に保留中の攻撃Root Motionを消去する。</summary>
+    private void OnDisable() => StopAttackRootMotion();
+
+    /// <summary>幽体化の表示状態をCombatFeedbackへ渡す。</summary>
+    public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
+
+    /// <summary>能力・攻撃・演出を終了させ、復活後の通常移動状態へ戻す。</summary>
+    private void OnRevived()
+    {
+        _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        _stateContext.Sprint.End();
+        _stateContext.Ghost.End();
+        _stateContext.Healer.End();
+        _stateContext.SelfSacrifice.End();
+        _stateContext.ClearJustAvoidStacks();
+        _stateContext.SetJustAvoidWindow(false);
+        _stateContext.IsGhostMode = false;
+        _stateContext.Attacker.EndAttack();
+        _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
+        _justBuffRemaining = 0f;
+        _audio?.StopBGM(2);
+        if (_game != null && _game.IsTutorial) TrainingRecovered?.Invoke();
+    }
+
+   
+    /// <summary>バフ用BGMを専用の第2チャンネルへ要求する。</summary>
+    public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
+    /// <summary>バフ用の第2BGMチャンネルを停止する。</summary>
+    public void StopBuffAudio() => _audio?.StopBGM(2);
+    
     /// <summary>ダメージを適用する。</summary>
     public void ApplyDamage(DamageInfo info)
     {
