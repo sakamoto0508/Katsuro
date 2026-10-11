@@ -25,10 +25,10 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _EdgeStrength: 0.35
+    - _EdgeStrength: 0.48
     - _Mist: 0
     m_Colors:
-    - _EdgeTint: {r: 0.54999995, g: 0.044999972, b: 0.025, a: 1}
+    - _EdgeTint: {r: 0.64, g: 0.025, b: 0.035, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

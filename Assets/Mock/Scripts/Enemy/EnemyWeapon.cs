@@ -108,6 +108,29 @@ public sealed class EnemyWeapon
         return point;
     }
 
+    /// <summary>接触点と同じ最寄りの刀の移動方向を取得し、被弾表示の向きに使用する。</summary>
+    public Vector3 GetSlashDirection(Collider target)
+    {
+        Vector3 direction = Vector3.zero;
+        float nearest = float.PositiveInfinity;
+        if (_weaponColliders == null) return direction;
+        foreach (var blade in _weaponColliders)
+        {
+            if (blade == null || !blade.enabled) continue;
+            float distance = (target.ClosestPoint(blade.bounds.center) - blade.bounds.center).sqrMagnitude;
+            if (distance >= nearest) continue;
+            nearest = distance;
+            direction = _relayCache.TryGetValue(blade, out var relay) ? relay.SweepDirection : Vector3.zero;
+        }
+        return direction;
+    }
+
+    /// <summary>攻撃判定を変えず、刀の軌跡だけを攻撃種別に応じた表示へ切り替える。</summary>
+    public void SetTrailStyle(SwordTrail.AttackStyle style)
+    {
+        foreach (var trail in _trails.Values) trail.SetStyle(style);
+    }
+
     /// <summary>武器Colliderと軌跡の有効状態を切り替え、攻撃判定区間と表示を同期する。</summary>
     private void SetHitboxActive(bool isActive)
     {

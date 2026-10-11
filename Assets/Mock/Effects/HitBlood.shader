@@ -47,8 +47,7 @@ Shader "Katsuro/HitBlood"
                 float edge=smoothstep(.3,.8,body)*smoothstep(.35,.7,i.uv.y);
                 color.rgb=lerp(color.rgb,_EdgeTint.rgb,edge*_EdgeStrength*(1-_Mist));
                 color.a*=coverage;
-                // HDRPの透明パスへ非発光の色として渡す。
-                color.rgb*=GetCurrentExposureMultiplier();
+                // 露出に依存しない暗赤色を透明合成し、黒つぶれを防ぐ。
                 return color;
             }
             ENDHLSL

@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &896412902379726821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5499229943775681088}
+  m_Layer: 0
+  m_Name: TrailBladeTip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5499229943775681088
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896412902379726821}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.00073748676, y: 0.07768931, z: 0.71055704}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5878546654812417642}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8505109037372690859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3345332562367348435}
+  m_Layer: 0
+  m_Name: TrailBladeBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3345332562367348435
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8505109037372690859}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.001545487, y: 0.01780176, z: 0.04944277}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5878546654812417642}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2008460640856286266
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8,6 +70,62 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5273032211155335175}
     m_Modifications:
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _tip
+      value: 
+      objectReference: {fileID: 5499229943775681088}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _fade
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _color.a
+      value: 0.62
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _color.g
+      value: 0.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _color.r
+      value: 0.93
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _duration
+      value: 0.075
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _bladeBase
+      value: 
+      objectReference: {fileID: 3345332562367348435}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _brightness
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _heavyDuration
+      value: 0.105
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _trailMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _bladeTrailStart
+      value: 0.58
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _counterDuration
+      value: 0.105
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _heavyBrightness
+      value: 1.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      propertyPath: _counterBrightness
+      value: 1.32
+      objectReference: {fileID: 0}
     - target: {fileID: 45149086753798285, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: m_Name
       value: Katana_Rust
@@ -74,7 +192,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5353574096023063120, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3345332562367348435}
+    - targetCorrespondingSourceObject: {fileID: 5353574096023063120, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5499229943775681088}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
 --- !u!65 &2747136150273885671 stripped

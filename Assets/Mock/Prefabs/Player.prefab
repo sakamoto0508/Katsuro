@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8135760075842674910
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3307967605631511118}
+  m_Layer: 0
+  m_Name: TrailBladeBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3307967605631511118
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8135760075842674910}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0005435012, y: 0.017574007, z: 0.04950621}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4055209128234147603}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &9099470657887412700
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4640826797573995834}
+  m_Layer: 0
+  m_Name: TrailBladeTip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4640826797573995834
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9099470657887412700}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.00016733275, y: 0.07764189, z: 0.7106205}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4055209128234147603}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &988845199140301145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -351,7 +413,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1217173154282891202, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3307967605631511118}
+    - targetCorrespondingSourceObject: {fileID: 1217173154282891202, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4640826797573995834}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6572628888076005939, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
       insertIndex: -1
@@ -541,21 +609,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.11
-  _bladeBase: {fileID: 2928109130905257396}
-  _tip: {fileID: 2928109130905257398}
-  _bladeTrailStart: 0.48
-  _sharedTrail: {fileID: 0}
+  _duration: 0.075
+  _bladeBase: {fileID: 3307967605631511118}
+  _tip: {fileID: 4640826797573995834}
+  _bladeTrailStart: 0.58
+  _sharedTrail: {fileID: 6681281439378193827}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
-  _brightness: 1.05
-  _fade: 1.15
-  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _brightness: 0.95
+  _fade: 1.8
+  _color: {r: 0.93, g: 0.96, b: 1, a: 0.62}
   _minimumSpeed: 3.5
   _fullSpeed: 16
-  _heavyDuration: 0.13
-  _counterDuration: 0.15
-  _heavyBrightness: 1.18
-  _counterBrightness: 1.35
+  _heavyDuration: 0.105
+  _counterDuration: 0.105
+  _heavyBrightness: 1.12
+  _counterBrightness: 1.32
   _width: 0.045
 --- !u!114 &2685883468460359435
 MonoBehaviour:
@@ -569,16 +637,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a24ce3c3ac413d744b59a2bdf3871c2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponHitboxRelay
---- !u!4 &2928109130905257396 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9300000101, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-  m_PrefabInstance: {fileID: 2928109139064076497}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2928109130905257398 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9300000103, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-  m_PrefabInstance: {fileID: 2928109139064076497}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3364876375464077024 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 437071831499726385, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
@@ -706,21 +764,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.11
-  _bladeBase: {fileID: 0}
-  _tip: {fileID: 0}
-  _bladeTrailStart: 0.48
-  _sharedTrail: {fileID: 6188147716110040468}
+  _duration: 0.075
+  _bladeBase: {fileID: 3307967605631511118}
+  _tip: {fileID: 4640826797573995834}
+  _bladeTrailStart: 0.58
+  _sharedTrail: {fileID: 6681281439378193827}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
-  _brightness: 1.05
-  _fade: 1.15
-  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _brightness: 0.95
+  _fade: 1.8
+  _color: {r: 0.93, g: 0.96, b: 1, a: 0.62}
   _minimumSpeed: 3.5
   _fullSpeed: 16
-  _heavyDuration: 0.13
-  _counterDuration: 0.15
-  _heavyBrightness: 1.18
-  _counterBrightness: 1.35
+  _heavyDuration: 0.105
+  _counterDuration: 0.105
+  _heavyBrightness: 1.12
+  _counterBrightness: 1.32
   _width: 0.045
 --- !u!114 &2827786783917834820
 MonoBehaviour:
@@ -861,21 +919,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.11
-  _bladeBase: {fileID: 0}
-  _tip: {fileID: 0}
-  _bladeTrailStart: 0.48
-  _sharedTrail: {fileID: 6188147716110040468}
+  _duration: 0.075
+  _bladeBase: {fileID: 3307967605631511118}
+  _tip: {fileID: 4640826797573995834}
+  _bladeTrailStart: 0.58
+  _sharedTrail: {fileID: 6681281439378193827}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
-  _brightness: 1.05
-  _fade: 1.15
-  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _brightness: 0.95
+  _fade: 1.8
+  _color: {r: 0.93, g: 0.96, b: 1, a: 0.62}
   _minimumSpeed: 3.5
   _fullSpeed: 16
-  _heavyDuration: 0.13
-  _counterDuration: 0.15
-  _heavyBrightness: 1.18
-  _counterBrightness: 1.35
+  _heavyDuration: 0.105
+  _counterDuration: 0.105
+  _heavyBrightness: 1.12
+  _counterBrightness: 1.32
   _width: 0.045
 --- !u!114 &219595742750856084
 MonoBehaviour:
@@ -1036,21 +1094,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.11
-  _bladeBase: {fileID: 0}
-  _tip: {fileID: 0}
-  _bladeTrailStart: 0.48
-  _sharedTrail: {fileID: 6188147716110040468}
+  _duration: 0.075
+  _bladeBase: {fileID: 3307967605631511118}
+  _tip: {fileID: 4640826797573995834}
+  _bladeTrailStart: 0.58
+  _sharedTrail: {fileID: 6681281439378193827}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
-  _brightness: 1.05
-  _fade: 1.15
-  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _brightness: 0.95
+  _fade: 1.8
+  _color: {r: 0.93, g: 0.96, b: 1, a: 0.62}
   _minimumSpeed: 3.5
   _fullSpeed: 16
-  _heavyDuration: 0.13
-  _counterDuration: 0.15
-  _heavyBrightness: 1.18
-  _counterBrightness: 1.35
+  _heavyDuration: 0.105
+  _counterDuration: 0.105
+  _heavyBrightness: 1.12
+  _counterBrightness: 1.32
   _width: 0.045
 --- !u!114 &4341062004680815879
 MonoBehaviour:
@@ -1081,21 +1139,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
-  _duration: 0.11
-  _bladeBase: {fileID: 0}
-  _tip: {fileID: 0}
-  _bladeTrailStart: 0.48
-  _sharedTrail: {fileID: 6188147716110040468}
+  _duration: 0.075
+  _bladeBase: {fileID: 3307967605631511118}
+  _tip: {fileID: 4640826797573995834}
+  _bladeTrailStart: 0.58
+  _sharedTrail: {fileID: 0}
   _trailMaterial: {fileID: 2100000, guid: 51038ea1a8481a74cb67a6bdbb8fd7ce, type: 2}
-  _brightness: 1.05
-  _fade: 1.15
-  _color: {r: 0.92, g: 0.96, b: 1, a: 0.72}
+  _brightness: 0.95
+  _fade: 1.8
+  _color: {r: 0.93, g: 0.96, b: 1, a: 0.62}
   _minimumSpeed: 3.5
   _fullSpeed: 16
-  _heavyDuration: 0.13
-  _counterDuration: 0.15
-  _heavyBrightness: 1.18
-  _counterBrightness: 1.35
+  _heavyDuration: 0.105
+  _counterDuration: 0.105
+  _heavyBrightness: 1.12
+  _counterBrightness: 1.32
   _width: 0.035
 --- !u!114 &3014878826444549024
 MonoBehaviour:

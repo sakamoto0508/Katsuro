@@ -119,6 +119,21 @@ public class VFXConfig : ScriptableObject
     public float CounterHitVFXSpeed => _counterHitVFXSpeed;
     /// <summary>Just Avoid追撃命中VFXの粒子サイズ補正。</summary>
     public float CounterHitVFXSize => _counterHitVFXSize;
+    /// <summary>斬撃線のワールド長。XはLight、YはHeavy、Zは追撃。</summary>
+    [SerializeField, Tooltip("命中斬撃線の長さ（m）。X=Light、Y=Heavy、Z=Just Avoid追撃。")]
+    private Vector3 _slashLineLengths = new Vector3(.72f, .95f, 1.1f);
+    /// <summary>斬撃線の幅。XはLight、YはHeavy、Zは追撃。</summary>
+    [SerializeField, Tooltip("命中斬撃線の幅（m）。X=Light、Y=Heavy、Z=追撃。強い発光リボンにはしません。")]
+    private Vector3 _slashLineWidths = new Vector3(.022f, .03f, .026f);
+    /// <summary>斬撃線の総寿命。約前半が強い線、後半が淡い残像になる。</summary>
+    [SerializeField, Tooltip("斬撃線の総寿命（実時間秒）。X=Light、Y=Heavy、Z=追撃。Pause中は停止します。")]
+    private Vector3 _slashLineDurations = new Vector3(.09f, .12f, .105f);
+    /// <summary>攻撃種別に対応する斬撃線の長さ・幅・総寿命を返す。判定や攻撃速度には使用しない。</summary>
+    public Vector3 GetSlashLineStyle(bool heavy, bool counter)
+    {
+        int index = counter ? 2 : heavy ? 1 : 0;
+        return new Vector3(Mathf.Max(.01f, _slashLineLengths[index]), Mathf.Max(.001f, _slashLineWidths[index]), Mathf.Max(.01f, _slashLineDurations[index]));
+    }
     /// <summary>追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。</summary>
     public GameObject HitVFX => _hitVFX;
     /// <summary>命中VFXの再生後に片付けるまでの時間（秒）。</summary>

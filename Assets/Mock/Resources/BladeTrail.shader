@@ -50,9 +50,9 @@ Shader "Katsuro/BladeTrail"
                 float bodyShape = exp(-pow((blade-.75)/width,2));
                 float bodyA = i.color.a * _BodyAlpha * bodyShape * edge * tail;
                 float coreShape = exp(-pow((blade-.9)/max(.005,_CoreWidth),2));
-                // Only the freshest quarter retains the bright core; older samples
+                // Only the fresh half retains the bright core; older samples
                 // use the faint body/glow and the compounded vertex + shader fade.
-                float coreA = i.color.a * .82 * coreShape * edge * (1-smoothstep(.1,.25,age));
+                float coreA = i.color.a * .82 * coreShape * edge * (1-smoothstep(.12,.55,age));
                 float glowShape = exp(-pow((blade-.75)/(width*1.1),2));
                 float glowA = i.color.a * _AfterGlowAlpha * glowShape * edge * tail * smoothstep(.08,.3,age);
                 float3 steel = i.color.rgb * _Brightness;

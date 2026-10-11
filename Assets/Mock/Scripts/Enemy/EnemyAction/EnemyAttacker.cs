@@ -116,6 +116,7 @@ public class EnemyAttacker : IDisposable
         if (_weapons == null) return;
         foreach (var w in _weapons)
         {
+            w?.SetTrailStyle(_currentIsHeavy ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
             w?.EnableHitbox();
         }
     }
@@ -153,7 +154,8 @@ public class EnemyAttacker : IDisposable
 
         var owner = _ownerTransform != null ? _ownerTransform.GetComponent<EnemyController>() : null;
         damage *= owner != null && owner.IsTraining ? 1f : RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
-        DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy);
+        DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy,
+            sourceWeapon != null ? sourceWeapon.GetSlashDirection(other) : Vector3.zero);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
         CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
         damageable.ApplyDamage(damageInfo);

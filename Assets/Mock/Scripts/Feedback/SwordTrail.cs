@@ -61,11 +61,12 @@ public sealed class SwordTrail : MonoBehaviour
     private readonly Vector3[] bases = new Vector3[Capacity], tips = new Vector3[Capacity];
     private readonly float[] times = new float[Capacity];
     private readonly float[] lifetimes = new float[Capacity], strengths = new float[Capacity], sampleWidths = new float[Capacity];
-    private readonly Vector3[] vertices = new Vector3[Capacity * 2];
-    private readonly Vector2[] uvs = new Vector2[Capacity * 2];
-    private readonly Vector2[] dynamics = new Vector2[Capacity * 2];
-    private readonly Color[] colors = new Color[Capacity * 2];
-    private readonly int[] triangles = new int[(Capacity - 1) * 6];
+    private const int CurveSteps = 3;
+    private readonly Vector3[] vertices = new Vector3[Capacity * CurveSteps * 2];
+    private readonly Vector2[] uvs = new Vector2[Capacity * CurveSteps * 2];
+    private readonly Vector2[] dynamics = new Vector2[Capacity * CurveSteps * 2];
+    private readonly Color[] colors = new Color[Capacity * CurveSteps * 2];
+    private readonly int[] triangles = new int[(Capacity * CurveSteps - 1) * 6];
     private int count;
     private bool initialized, emitting;
     private Mesh mesh;
@@ -122,7 +123,7 @@ public sealed class SwordTrail : MonoBehaviour
         Vector3 realBase = _bladeBase != null ? _bladeBase.position : transform.position;
         Vector3 b = _tip != null ? _tip.position : transform.position + transform.up * _width;
         Vector3 a = Vector3.Lerp(realBase, b, _bladeTrailStart);
-        float now = Time.unscaledTime;
+        float now = FeedbackVisualTime.Now;
         Vector3 ownerPosition = owner != null ? owner.position : Vector3.zero;
         float delta = now - previousTime;
         float speed = hasPrevious && delta > .0001f ? ((b - previousTip) - (ownerPosition - previousOwnerPosition)).magnitude / delta : 0f;
@@ -161,35 +162,48 @@ public sealed class SwordTrail : MonoBehaviour
     /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
     private void LateUpdate()
     {
-        if (!initialized || mesh == null) return;
+        if (!initialized || mesh == null || FeedbackVisualTime.IsPaused) return;
+        float now = FeedbackVisualTime.Now;
         int live = 0;
         for (int i = 0; i < count; i++)
-            if (Time.unscaledTime - times[i] < lifetimes[i]) { CopySample(i, live); live++; }
+            if (now - times[i] < lifetimes[i]) { CopySample(i, live); live++; }
         count = live;
         if (emitting) Sample();
         mesh.Clear();
         if (count < 2) return;
-        for (int i = 0; i < count; i++)
+        int points = (count - 1) * CurveSteps + 1;
+        for (int p = 0; p < points; p++)
         {
-            int v = i * 2;
-            vertices[v] = bases[i]; vertices[v + 1] = tips[i];
-            float age = Mathf.Clamp01((Time.unscaledTime - times[i]) / Mathf.Max(.01f, lifetimes[i]));
+            int i = Mathf.Min(p / CurveSteps, count - 2), j = i + 1;
+            float t = (p - i * CurveSteps) / (float)CurveSteps;
+            int v = p * 2;
+            vertices[v] = InterpolateBlade(bases, i, t); vertices[v + 1] = InterpolateBlade(tips, i, t);
+            float strength = Mathf.Lerp(strengths[i], strengths[j], t);
+            float age = Mathf.Clamp01((now - Mathf.Lerp(times[i], times[j], t)) / Mathf.Max(.01f, Mathf.Lerp(lifetimes[i], lifetimes[j], t)));
             uvs[v] = new Vector2(age, 0); uvs[v + 1] = new Vector2(age, 1);
-            dynamics[v] = dynamics[v + 1] = new Vector2(Mathf.Clamp01(strengths[i]), sampleWidths[i]);
-            Color color = _color; color.r *= _brightness * strengths[i]; color.g *= _brightness * strengths[i]; color.b *= _brightness * strengths[i];
-            color.a *= Mathf.Clamp01(strengths[i]) * Mathf.Pow(1f - age, _fade);
+            dynamics[v] = dynamics[v + 1] = new Vector2(Mathf.Clamp01(strength), Mathf.Lerp(sampleWidths[i], sampleWidths[j], t));
+            Color color = _color; color.r *= _brightness * strength; color.g *= _brightness * strength; color.b *= _brightness * strength;
+            color.a *= Mathf.Clamp01(strength) * Mathf.Pow(1f - age, _fade);
             colors[v] = colors[v + 1] = color;
-            if (i == count - 1) continue;
-            int t = i * 6;
-            triangles[t] = v; triangles[t + 1] = v + 1; triangles[t + 2] = v + 2;
-            triangles[t + 3] = v + 1; triangles[t + 4] = v + 3; triangles[t + 5] = v + 2;
+            if (p == points - 1) continue;
+            int index = p * 6;
+            triangles[index] = v; triangles[index + 1] = v + 1; triangles[index + 2] = v + 2;
+            triangles[index + 3] = v + 1; triangles[index + 4] = v + 3; triangles[index + 5] = v + 2;
         }
-        mesh.SetVertices(vertices, 0, count * 2);
-        mesh.SetUVs(0, uvs, 0, count * 2);
-        mesh.SetUVs(1, dynamics, 0, count * 2);
-        mesh.SetColors(colors, 0, count * 2);
-        mesh.SetTriangles(triangles, 0, (count - 1) * 6, 0);
+        mesh.SetVertices(vertices, 0, points * 2);
+        mesh.SetUVs(0, uvs, 0, points * 2);
+        mesh.SetUVs(1, dynamics, 0, points * 2);
+        mesh.SetColors(colors, 0, points * 2);
+        mesh.SetTriangles(triangles, 0, (points - 1) * 6, 0);
         mesh.RecalculateBounds();
+    }
+    /// <summary>記録済みの刀身端点を補間し、低FPSでも軌跡の折れ角を抑える。長い移動は直線補間に限定する。</summary>
+    private Vector3 InterpolateBlade(Vector3[] samples, int i, float t)
+    {
+        Vector3 b = samples[i], c = samples[i + 1];
+        if ((c - b).sqrMagnitude > 1f) return Vector3.Lerp(b, c, t);
+        Vector3 a = samples[Mathf.Max(0, i - 1)], d = samples[Mathf.Min(count - 1, i + 2)];
+        return .5f * ((2f * b) + (-a + c) * t + (2f * a - 5f * b + 4f * c - d) * t * t + (-a + 3f * b - 3f * c + d) * t * t * t);
     }
     /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
     private void OnDisable() { emitting = false; count = 0; if (mesh != null) mesh.Clear(); }

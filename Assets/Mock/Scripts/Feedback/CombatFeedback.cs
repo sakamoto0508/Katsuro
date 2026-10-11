@@ -87,6 +87,8 @@ public sealed class CombatFeedback : MonoBehaviour
     private float[][] _hitAngles;
     private ParticleSystem.MinMaxCurve[][] _hitSizes;
     private ParticleSystem.MinMaxCurve[][] _hitSpeeds;
+    private ParticleSystem.MinMaxCurve[][] _hitLifetimes;
+    private ParticleSystemRenderer[][] _hitSlashRenderers;
     private GameObject[] _hitRoots;
     private float[] _hitStarted;
     private int _nextHit;
@@ -439,7 +441,7 @@ public sealed class CombatFeedback : MonoBehaviour
             _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
         }
         Refresh();
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsJustAvoidCounter ? .17f : strongFeedback ? .16f : .12f, Mathf.Min(_hitFlashDuration, .05f), info.IsJustAvoidCounter ? .7f : strongFeedback ? .65f : .45f, new Color(1f, .96f, .9f));
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsJustAvoidCounter ? .12f : strongFeedback ? .10f : .075f, Mathf.Min(_hitFlashDuration, info.IsJustAvoidCounter ? .04f : .03f), info.IsJustAvoidCounter ? .5f : strongFeedback ? .4f : .3f, new Color(.93f, .96f, 1f));
         PlayHitVFX(info);
         var config = _audio != null ? _audio.AudioConfig : null;
         _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
@@ -460,6 +462,8 @@ public sealed class CombatFeedback : MonoBehaviour
         _hitBursts = new ParticleSystem.Burst[4][][];
         _hitAngles = new float[4][]; _hitSizes = new ParticleSystem.MinMaxCurve[4][];
         _hitSpeeds = new ParticleSystem.MinMaxCurve[4][];
+        _hitLifetimes = new ParticleSystem.MinMaxCurve[4][];
+        _hitSlashRenderers = new ParticleSystemRenderer[4][];
         for (int i = 0; i < 4; i++)
         {
             _hitRoots[i] = new GameObject("Contact VFX"); _hitRoots[i].SetActive(false);
@@ -469,6 +473,8 @@ public sealed class CombatFeedback : MonoBehaviour
             _hitAngles[i] = new float[_hitParticles[i].Length];
             _hitSizes[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
             _hitSpeeds[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            _hitLifetimes[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            _hitSlashRenderers[i] = new ParticleSystemRenderer[_hitParticles[i].Length];
             for (int j = 0; j < _hitParticles[i].Length; j++)
             {
                 var particle = _hitParticles[i][j];
@@ -478,6 +484,8 @@ public sealed class CombatFeedback : MonoBehaviour
                 _hitAngles[i][j] = particle.shape.angle;
                 _hitSizes[i][j] = particle.main.startSize;
                 _hitSpeeds[i][j] = particle.main.startSpeed;
+                _hitLifetimes[i][j] = particle.main.startLifetime;
+                if (particle.name == "SlashLine") _hitSlashRenderers[i][j] = particle.GetComponent<ParticleSystemRenderer>();
                 var main = particle.main;
                 main.loop = false; main.playOnAwake = false; main.useUnscaledTime = true; main.stopAction = ParticleSystemStopAction.None;
             }
@@ -495,14 +503,15 @@ public sealed class CombatFeedback : MonoBehaviour
         Vector3 up = Mathf.Abs(Vector3.Dot(direction.normalized, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
         _hitRoots[i].transform.SetPositionAndRotation(info.HitPoint, Quaternion.LookRotation(direction, up));
         _hitRoots[i].transform.localScale = Vector3.one * (strongFeedback ? _vfxConfig.HeavyHitVFXScale : 1f);
-        _hitRoots[i].SetActive(true); _hitStarted[i] = Time.unscaledTime;
+        _hitRoots[i].SetActive(true); _hitStarted[i] = FeedbackVisualTime.Now;
         for (int j = 0; j < _hitParticles[i].Length; j++)
         {
             var particle = _hitParticles[i][j];
             if (particle == null) continue;
             particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
-            float amount = strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            bool slash = _hitSlashRenderers[i][j] != null;
+            float amount = slash ? 1f : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
             var emission = particle.emission;
             for (int b = 0; b < _hitBursts[i][j].Length; b++)
             {
@@ -520,6 +529,16 @@ public sealed class CombatFeedback : MonoBehaviour
             var main = particle.main;
             main.startSize = ScaleHitCurve(_hitSizes[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSize : strongFeedback ? _vfxConfig.HeavyHitVFXSize : 1f);
             main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSpeed : strongFeedback ? _vfxConfig.HeavyHitVFXSpeed : 1f);
+            main.startLifetime = ScaleHitCurve(_hitLifetimes[i][j], info.IsJustAvoidCounter ? .9f : info.IsHeavy ? 1.05f : 1f);
+            if (slash)
+            {
+                Vector3 style = _vfxConfig.GetSlashLineStyle(info.IsHeavy, info.IsJustAvoidCounter);
+                float rootScale = _hitRoots[i].transform.localScale.x;
+                main.startSize = style.y / Mathf.Max(.01f, rootScale);
+                main.startLifetime = style.z;
+                _hitSlashRenderers[i][j].lengthScale = style.x / style.y;
+                main.startColor = new Color(.88f, .94f, 1f, info.IsJustAvoidCounter ? .95f : info.IsHeavy ? .9f : .8f);
+            }
             particle.Play(false);
         }
     }
@@ -549,9 +568,25 @@ public sealed class CombatFeedback : MonoBehaviour
         Refresh(); 
         UpdateJustAvoid();
         _contactPulse?.Update();
-        if (_hitRoots != null)
-            for (int i = 0; i < _hitRoots.Length; i++)
-                if (_hitRoots[i].activeSelf && Time.unscaledTime - _hitStarted[i] >= _vfxConfig.HitVFXDuration) StopHitVFX(i);
+        UpdateHitVFX();
+    }
+
+    /// <summary>AnimatorだけのHitStopでは粒子を進め、ゲーム全体のPauseでは遅延を含め粒子と寿命時計を止める。</summary>
+    private void UpdateHitVFX()
+    {
+        if (_hitRoots == null) return;
+        float now = FeedbackVisualTime.Now;
+        bool paused = FeedbackVisualTime.IsPaused;
+        for (int i = 0; i < _hitRoots.Length; i++)
+        {
+            if (!_hitRoots[i].activeSelf) continue;
+            foreach (var particle in _hitParticles[i])
+            {
+                if (paused && particle.isPlaying) particle.Pause(false);
+                else if (!paused && particle.isPaused) particle.Play(false);
+            }
+            if (now - _hitStarted[i] >= _vfxConfig.HitVFXDuration) StopHitVFX(i);
+        }
     }
 
     /// <summary>Animator更新後の姿勢へキャラクター別の被弾補正を重ねる。Enemyの通常反応は死亡・大被弾で解除する。</summary>
@@ -679,7 +714,7 @@ internal sealed class ContactPulse
         objects[i].transform.SetPositionAndRotation(position,
             direction.sqrMagnitude > .0001f ? Quaternion.LookRotation(direction) : Quaternion.identity);
         objects[i].transform.localScale = Vector3.one * Mathf.Max(.01f, size);
-        started[i] = Time.unscaledTime; durations[i] = Mathf.Max(.01f, duration); strengths[i] = strength;
+        started[i] = FeedbackVisualTime.Now; durations[i] = Mathf.Max(.01f, duration); strengths[i] = strength;
         tints[i] = tint ?? new Color(.86f, .95f, 1f);
         objects[i].SetActive(true); Update();
     }
@@ -690,7 +725,7 @@ internal sealed class ContactPulse
         for (int i = 0; i < objects.Length; i++)
         {
             if (objects[i] == null || !objects[i].activeSelf) continue;
-            float age = (Time.unscaledTime - started[i]) / durations[i];
+            float age = (FeedbackVisualTime.Now - started[i]) / durations[i];
             if (age >= 1) { objects[i].SetActive(false); continue; }
             var tint = tints[i]; tint.a *= strengths[i] * (1 - age);
             block.SetColor("_Tint", tint);
