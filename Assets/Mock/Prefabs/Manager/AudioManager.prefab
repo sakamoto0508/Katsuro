@@ -62,9 +62,9 @@ MonoBehaviour:
   - name: LockOn
     clip: {fileID: 8300000, guid: 165e1c8be425c2848a40ff627d338332, type: 3}
   - name: Slash
-    clip: {fileID: 8300000, guid: cf0e5fe19fc14c74f9e1759a780d1d78, type: 3}
+    clip: {fileID: 8300000, guid: 684204dfdadbb05449b60e1a2212a495, type: 3}
   - name: Damage
-    clip: {fileID: 8300000, guid: 6895fde4b737c86478834953b544b93c, type: 3}
+    clip: {fileID: 8300000, guid: 7bd5b9971a877de4d8bca4df57d77e92, type: 3}
   - name: Iai
     clip: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
   - name: Slash2
@@ -78,11 +78,11 @@ MonoBehaviour:
   - name: SmallSlash
     clip: {fileID: 8300000, guid: f74925b5042cf104bac84a38124c8a53, type: 3}
   - name: NormalSlash2
-    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+    clip: {fileID: 8300000, guid: bdb6cb44255ff894e86129ca72f8c3ef, type: 3}
   - name: NormalSlash2
-    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+    clip: {fileID: 8300000, guid: bdb6cb44255ff894e86129ca72f8c3ef, type: 3}
   - name: JustAvoid
-    clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+    clip: {fileID: 8300000, guid: 1f807c5eb909a884f86c2f0f912cf6bc, type: 3}
   - name: EnemyDead
     clip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
   - name: Death

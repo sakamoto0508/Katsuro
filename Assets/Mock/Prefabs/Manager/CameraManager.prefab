@@ -259,7 +259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidContrast
   _volume: {fileID: 5488475635193876066}
   _enter: 0.02
-  _hold: 0.08
+  _hold: 0.5
   _restore: 0.2
 --- !u!114 &9006711124090707925
 MonoBehaviour:
