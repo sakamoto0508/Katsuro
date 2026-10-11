@@ -55874,6 +55874,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2290892604967497847, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: _playerWeapon
+      value: 
+      objectReference: {fileID: 1703433829}
     - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
       propertyPath: _playerHudView
       value: 
@@ -100804,6 +100812,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1030972488, guid: abc00000000009532871996385052532, type: 3}
   m_PrefabInstance: {fileID: 1697837541}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1703433829 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 848964287751795975, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+  m_PrefabInstance: {fileID: 896154413}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1703660752
 PrefabInstance:

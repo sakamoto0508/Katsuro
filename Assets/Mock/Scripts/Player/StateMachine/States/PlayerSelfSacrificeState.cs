@@ -1,14 +1,12 @@
 using UnityEngine;
-using UniRx;
-using System;
 
 /// <summary>
 /// 自傷（Self Sacrifice）ステート。
-/// チャネリングを開始し、停止はステート外からのキャンセルやゲージ枯渇により行われます。
+/// 能力中の移動と攻撃への遷移を扱います。能力の寿命と表示はStateから独立して管理します。
 /// </summary>
 public class PlayerSelfSacrificeState : PlayerState
 {
-    /// <summary>自傷能力の継続・表示と状態遷移で使用するContextを保持する。</summary>
+    /// <summary>自傷中の移動と状態遷移で使用するContextを保持する。</summary>
     public PlayerSelfSacrificeState(PlayerStateContext context, PlayerStateMachine stateMachine)
         : base(context, stateMachine)
     {
@@ -16,9 +14,7 @@ public class PlayerSelfSacrificeState : PlayerState
 
     public override PlayerStateId Id => PlayerStateId.SelfSacrifice;
 
-    private IDisposable _selfSacrificeActiveDisp;
-
-    /// <summary>自傷能力を確認し、能力中の移動・表示を準備する。</summary>
+    /// <summary>能力が開始済みであることを確認し、未開始なら通常移動へ戻す。</summary>
     public override void Enter()
     {
         if (Context?.SelfSacrifice == null)
@@ -27,34 +23,11 @@ public class PlayerSelfSacrificeState : PlayerState
             return;
         }
 
-        // 現在HP比率を元に開始可否を判定
-        float currentHpRatio = Context.PlayerResource != null ? Context.PlayerResource.CurrentHpRatio : 1f;
-        if (Context.SelfSacrifice.CanBegin(currentHpRatio))
-        {
-            Context.SelfSacrifice.Begin();
-        }
-        else
+        // 開始可否と寿命はAbilityManager、表示とBGMはPlayerBuffPresentationが所有する。
+        if (!Context.SelfSacrifice.IsSacrificing)
         {
             StateMachine.ChangeState(PlayerStateId.Locomotion);
-        }
-        Context?.CharacterEffect?.PlayEffectByKey(Context.VFXConfig.PlayEffectBuff);
-        Context.Controller.PlayBuffAudio();
-
-        //アビリティの終了を監視するための購読を設定
-        _selfSacrificeActiveDisp?.Dispose();
-        if (Context.SelfSacrifice != null)
-        {
-            _selfSacrificeActiveDisp = Context.SelfSacrifice.IsActiveRx.Subscribe(active =>
-            {
-                if (!active)
-                {
-                    //アビリティが終了したらエフェクトとBGMを停止する
-                    Context?.CharacterEffect?.StopEffect_CharacterEffect();
-                    Context.Controller.StopBuffAudio();
-                    _selfSacrificeActiveDisp?.Dispose();
-                    _selfSacrificeActiveDisp = null;
-                }
-            });
+            return;
         }
     }
 
@@ -77,18 +50,16 @@ public class PlayerSelfSacrificeState : PlayerState
         }
     }
 
-    /// <summary>自傷能力・バフ表示・専用音声を入力解除で終了する。</summary>
+    /// <summary>入力解除を能力へ伝え、表示と専用音声の終了は能力通知へ任せる。</summary>
     public override void OnSelfSacrificeCanceled()
     {
         Context.SelfSacrifice?.End();
-        Context?.CharacterEffect?.StopEffect_CharacterEffect();
-        Context.Controller.StopBuffAudio();
     }
 
     /// <summary>自傷能力を継続したまま弱攻撃状態へ移る。</summary>
     public override void OnLightAttack()
     {
-        // 攻撃は SelfSacrifice 中でも可能にする（SelfSacrifice は Exit で自動的に End される）
+        // 攻撃へ移ってもSelfSacrificeの能力と表示を継続する。
         StateMachine.ChangeState(PlayerStateId.LightAttack);
     }
 

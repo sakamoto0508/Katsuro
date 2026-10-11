@@ -1,5 +1,74 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &845032270647949320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1499510430609684776}
+  - component: {fileID: 7194929799102977219}
+  m_Layer: 0
+  m_Name: BuffAuraEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1499510430609684776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845032270647949320}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7917865514115926464}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7194929799102977219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845032270647949320}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bed290d90ff4e5140a672625f874dcc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::INab.VFXAssets.CharacterEffect
+  meshRenderer: {fileID: 1943730102906970049}
+  meshBaker:
+    _sampleCount: 2048
+    SampleCountMultiplier: 1
+    UsePerSubmeshBaking: 0
+    SubmeshIndex: 0
+  sampleCountMultiplier: 1
+  usePerSubmeshBaking: 0
+  submeshIndex: 0
+  effectPrefab: {fileID: 6453331083074880768, guid: aa7db2cb75e02464bbd0f813e105ef78, type: 3}
+  instantiatedEffectPrefab: {fileID: 0}
+  debugMode: 0
+  effectName: Buff Aura
+  vfxComponent: {fileID: 0}
+  vfxBinder: {fileID: 0}
+  currentEffectState: 1
+  _Foldout_1: 1
+  _Foldout_2: 1
+  _Foldout_3: 1
+  _Foldout_4: 1
+  _Foldout_5: 1
+  Effects:
+  - Key: Buff
+    Prefab: {fileID: 6453331083074880768, guid: aa7db2cb75e02464bbd0f813e105ef78, type: 3}
+  effectState: 1
 --- !u!1 &8135760075842674910
 GameObject:
   m_ObjectHideFlags: 0
@@ -1577,6 +1646,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3102972085625564538}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1499510430609684776}
     - targetCorrespondingSourceObject: {fileID: 3742407835892290726, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3940250254222221947}
@@ -1620,6 +1692,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3929211125781539537}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1909171105686982173}
   m_SourcePrefab: {fileID: 100100000, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}
 --- !u!4 &397743367516346889 stripped
 Transform:
@@ -1994,6 +2069,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterAnimation
   _counterWindupSpeed: 0.78
   _counterSlashSpeed: 1.1
+--- !u!114 &1909171105686982173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7397786981939434362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3457b08c501de847a6c7dba48bf1f3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBuffPresentation
+  _buffEffect: {fileID: 7194929799102977219}
 --- !u!4 &7883702564304463566 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 505485589189708005, guid: 5ec8a79ca71ebbc479e0db6e50f94354, type: 3}

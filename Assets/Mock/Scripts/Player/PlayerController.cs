@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。</summary>
     [UnityEngine.Tooltip("抜刀・納刀に合わせて表示を切り替える刀のMeshRenderer。")]
     [Header("PlayerStatus")]
-    [SerializeField] private MeshRenderer _playerWeapon;
+    [SerializeField] private GameObject _playerWeapon;
     /// <summary>納刀中の刀の見た目を切り替えるGameObject参照。</summary>
     [UnityEngine.Tooltip("納刀中の刀の見た目を切り替えるGameObject参照。")]
     [SerializeField] private GameObject _playerStartWeapon;
@@ -236,6 +236,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             , _animationEventStream, _vfxConfig, characterEffect);
         _stateMachine = new PlayerStateMachine(_stateContext);
         playerAttacker.SetContext(_stateContext);
+        GetComponent<PlayerBuffPresentation>()?.Init(playerBuff, audio, _vfxConfig);
         _playerResource.Revived += OnRevived;
 
         // HUD プレゼンターを生成（Inspector に View を割り当てている場合）
@@ -257,7 +258,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             .AddTo(this);
 
         //武器の見た目を最初は非表示にする。
-        _playerWeapon.enabled = false;
+        _playerWeapon.GetComponent<MeshRenderer>().enabled = false;
         _playerStartWeapon.SetActive(true);
     }
 
@@ -646,7 +647,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void AnimaEvent_OnSordDrawWeapon()
     {
         //武器の見た目を表示する。
-        _playerWeapon.enabled = true;
+        _playerWeapon.GetComponent<MeshRenderer>().enabled = true;
         _playerStartWeapon.SetActive(false);
     }
 
@@ -654,7 +655,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void AnimEvent_OnSwordSheathing()
     {
         //武器の見た目を非表示にする。
-        _playerWeapon.enabled = false;
+        _playerWeapon.SetActive(false);
         _playerStartWeapon.SetActive(true);
     }
 
