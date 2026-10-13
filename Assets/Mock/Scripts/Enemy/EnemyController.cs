@@ -14,6 +14,14 @@ public class EnemyController : MonoBehaviour, IDamageable
     public float HpRatio => _health != null ? _health.CurrentHpRatio : 1f;
     /// <summary>訓練用に通常AIと正式撃破を無効化しているか。</summary>
     public bool IsTraining => _game != null && _game.IsTutorial;
+    /// <summary>Root Motionを所有する攻撃Stateが記録されているか。通常被弾の表示量の調整に使用する。</summary>
+    public bool IsAttackAnimationActive => _attackAnimationHash != 0;
+    /// <summary>HPへ適用された命中を通知する。修練はこの結果を観察し、武器の判定を変更しない。</summary>
+    public event System.Action<DamageInfo> HitReceived;
+    /// <summary>既存Animation Eventによる修練攻撃の終了通知。</summary>
+    public event System.Action TrainingAttackFinished;
+    /// <summary>修練の一回の攻撃が進行中か。</summary>
+    public bool TrainingAttackInProgress { get; private set; }
 
     /// <summary>EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。</summary>
     [UnityEngine.Tooltip("EnemyのHP・基準攻撃力・NavMesh移動・旋回の設定参照。")]
@@ -62,60 +70,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     [UnityEngine.Tooltip("Enemy攻撃Clipから取得する水平Root Motionの移動倍率。0で攻撃時の移動を抑える。")]
     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
     private int _attackAnimationHash;
-    /// <summary>Root Motionを所有する攻撃Stateが記録されているか。通常被弾の表示量の調整に使用する。</summary>
-    public bool IsAttackAnimationActive => _attackAnimationHash != 0;
-    /// <summary>戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。</summary>
-    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
-    public void BeginAnimationAttackRootMotion(int stateHash)
-    {
-        if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
-        _attackAnimationHash = stateHash;
-        _mover?.BeginAttackRootMotion();
-    }
-    /// <summary>終了Stateが攻撃移動の所有者に一致する場合だけ移動停止を解除する。</summary>
-    /// <param name="stateHash">終了したStateのfullPathHash。現在の所有者と一致する場合だけ解除する。</param>
-    public void EndAnimationAttackRootMotion(int stateHash)
-    {
-        if (_attackAnimationHash != stateHash) return;
-        _attackAnimationHash = 0;
-        _mover?.ReleaseMovementAfterAttack();
-    }
-    /// <summary>戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。</summary>
-    private void FixedUpdate()
-    {
-        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
-        _mover?.FixedUpdateAttackRootMotion();
-    }
-    /// <summary>攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。</summary>
-    private void OnDisable()
-    {
-        _attackAnimationHash = 0;
-        _mover?.EndAttackRootMotion();
-        _mover?.ReleaseMovementAfterReaction();
-        _mover?.ReleaseMovementAfterAttack();
-    }
     private EnemyAI _ai;
-    /// <summary>HPへ適用された命中を通知する。修練はこの結果を観察し、武器の判定を変更しない。</summary>
-    public event System.Action<DamageInfo> HitReceived;
-    /// <summary>既存Animation Eventによる修練攻撃の終了通知。</summary>
-    public event System.Action TrainingAttackFinished;
-    /// <summary>修練の一回の攻撃が進行中か。</summary>
-    public bool TrainingAttackInProgress { get; private set; }
-    /// <summary>相手の既存Clipを一回再生する。通常AIと被弾中の割り込みは変更しない。</summary>
-    public bool BeginTrainingAttack(EnemyAttackData data)
-    {
-        if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
-        TrainingAttackInProgress = true; _mover?.FacePlayerInstant(); _mover?.HoldMovementForAttack();
-        _attacker?.PerformAttack(data, data.ActionType == EnemyActionType.HeavySlash);
-        return true;
-    }
-    /// <summary>課題変更時に武器と攻撃移動を止める。被弾Reactionの復帰は既存処理へ任せる。</summary>
-    public void CancelTrainingAttack()
-    {
-        if (!IsTraining) return;
-        TrainingAttackInProgress = false; _pendingAction = null; _attacker?.DisableWeaponHitbox();
-        _enemyAnimController?.InterruptAttackForHitReaction(); _mover?.ReleaseMovementAfterAttack();
-    }
     private EnemyActionType? _pendingAction;
     private CancellationToken _token;
     private bool _dead = false;
@@ -162,6 +117,53 @@ public class EnemyController : MonoBehaviour, IDamageable
         GetComponent<StatusEffectManager>()?.Init();
         PlayEffectNextFrame("Dark").Forget();
         if (_characterEffect != null) _characterEffect.PlayEffect_CharacterEffect();
+    }
+
+    /// <summary>戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。</summary>
+    /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
+    public void BeginAnimationAttackRootMotion(int stateHash)
+    {
+        if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
+        _attackAnimationHash = stateHash;
+        _mover?.BeginAttackRootMotion();
+    }
+    /// <summary>終了Stateが攻撃移動の所有者に一致する場合だけ移動停止を解除する。</summary>
+    /// <param name="stateHash">終了したStateのfullPathHash。現在の所有者と一致する場合だけ解除する。</param>
+    public void EndAnimationAttackRootMotion(int stateHash)
+    {
+        if (_attackAnimationHash != stateHash) return;
+        _attackAnimationHash = 0;
+        _mover?.ReleaseMovementAfterAttack();
+    }
+    /// <summary>戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。</summary>
+    private void FixedUpdate()
+    {
+        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+        _mover?.FixedUpdateAttackRootMotion();
+    }
+    /// <summary>攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。</summary>
+    private void OnDisable()
+    {
+        _attackAnimationHash = 0;
+        _mover?.EndAttackRootMotion();
+        _mover?.ReleaseMovementAfterReaction();
+        _mover?.ReleaseMovementAfterAttack();
+    }
+    
+    /// <summary>相手の既存Clipを一回再生する。通常AIと被弾中の割り込みは変更しない。</summary>
+    public bool BeginTrainingAttack(EnemyAttackData data)
+    {
+        if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
+        TrainingAttackInProgress = true; _mover?.FacePlayerInstant(); _mover?.HoldMovementForAttack();
+        _attacker?.PerformAttack(data, data.ActionType == EnemyActionType.HeavySlash);
+        return true;
+    }
+    /// <summary>課題変更時に武器と攻撃移動を止める。被弾Reactionの復帰は既存処理へ任せる。</summary>
+    public void CancelTrainingAttack()
+    {
+        if (!IsTraining) return;
+        TrainingAttackInProgress = false; _pendingAction = null; _attacker?.DisableWeaponHitbox();
+        _enemyAnimController?.InterruptAttackForHitReaction(); _mover?.ReleaseMovementAfterAttack();
     }
 
     /// <summary>生成直後の初期化を一フレーム待ってCharacterEffectを再生する。破棄時は待機をキャンセルする。</summary>

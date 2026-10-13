@@ -8,10 +8,8 @@ public sealed class AnimationSpeedController : MonoBehaviour
     private Animator animator;
     private float baseSpeed;
     private float status = 1f, temporary = 1f, expires;
-
-
-
     private bool _initialized;
+
     /// <summary>Animatorとその基準速度を一度だけ取得する。</summary>
     public void Init()
     {

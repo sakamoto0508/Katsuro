@@ -23,6 +23,19 @@ public class HitStopManager : MonoBehaviour
     /// <summary>最終Hit用に公開するHitStop時間設定（実時間の秒）。FinalBlowManagerには専用時間設定もある。</summary>
     public float LastHitStopTime => _lastHitStopTime;
     private readonly Dictionary<GameObject, AnimationSpeedController[]> _targets = new();
+    private readonly List<AnimationSpeedController> affected = new();
+    private bool _initialized;
+
+    /// <summary>永続する共有HitStopManagerを確立し、重複を除去する。</summary>
+    public void Init()
+    {
+        if (_initialized) return;
+        _initialized = true;
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     /// <summary>対象階層の速度制御を初期化し、子オブジェクトからも同じ対象へ停止を要求できるよう登録する。</summary>
     public void RegisterTarget(GameObject owner)
     {
@@ -35,17 +48,7 @@ public class HitStopManager : MonoBehaviour
         foreach (var entry in _targets) if (entry.Key == null) stale.Add(entry.Key);
         foreach (var key in stale) _targets.Remove(key);
     }
-    private readonly List<AnimationSpeedController> affected = new();
-    private bool _initialized;
-    /// <summary>永続する共有HitStopManagerを確立し、重複を除去する。</summary>
-    public void Init()
-    {
-        if (_initialized) return;
-        _initialized = true;
-        if (Instance != null) { Destroy(gameObject); return; }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
+    
     /// <summary>登録済みの対象へ指定実時間の完全停止を要求する。TimeScaleは変更しない。</summary>
     /// <param name="durationRealtime">完全停止する実時間秒数。</param>
     /// <param name="targets">あらかじめRegisterTargetで登録した対象またはその子。</param>

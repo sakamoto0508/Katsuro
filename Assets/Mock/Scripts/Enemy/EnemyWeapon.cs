@@ -22,6 +22,7 @@ public sealed class EnemyWeapon
 
     private readonly Dictionary<Collider, SwordTrail> _trails = new();
     private bool _initialized;
+
     /// <summary>武器ColliderのTrigger Relayと刀の軌跡を一度だけ準備する。</summary>
     public void Init()
     {

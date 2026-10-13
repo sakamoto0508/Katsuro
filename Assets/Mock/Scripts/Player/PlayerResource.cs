@@ -31,6 +31,9 @@ public class PlayerResource : IDisposable
     /// 現在 HP の割合（0..1）。モデル側で正規化値を持っておくと便利なため提供します。
     /// </summary>
     public float CurrentHpRatio => _maxHp > 0f ? _hpRx.Value / _maxHp : 0f;
+    public event Action Revived;
+    public bool IsDead => _dead;
+    public float InvulnerableUntil { get; private set; }
     private readonly PlayerAnimationController _animController;
     private readonly ReactiveProperty<float> _hpRx;
     private readonly float _maxHp;
@@ -39,6 +42,7 @@ public class PlayerResource : IDisposable
     private PlayerDeadManager _playerDead;
     private LoadSceneManager _loader;
     private bool _initialized;
+    private bool _dead;
     /// <summary>ゲーム進行・Audio・死亡演出・遷移先を一度だけ接続する。</summary>
     public void Init(GameManager game, AudioManager audio, PlayerDeadManager playerDead, LoadSceneManager loader)
     {
@@ -46,10 +50,6 @@ public class PlayerResource : IDisposable
         _initialized = true;
         _game = game; _audio = audio; _playerDead = playerDead; _loader = loader;
     }
-    private bool _dead;
-    public event Action Revived;
-    public bool IsDead => _dead;
-    public float InvulnerableUntil { get; private set; }
     /// <summary>修練の回復課題用にHPを準備する。本編では呼ばれても値を変更しない。</summary>
     public void SetTrainingHpRatio(float ratio)
     {

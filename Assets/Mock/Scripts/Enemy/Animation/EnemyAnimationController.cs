@@ -6,6 +6,8 @@ public class EnemyAnimationController : MonoBehaviour
 {
     /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
     public AnimationName AnimName => _animName;
+    public bool IsReacting { get; private set; }
+    public bool IsHeavyReacting { get; private set; }
     /// <summary>Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。</summary>
     [UnityEngine.Tooltip("Enemy Animatorで使う移動・攻撃・死亡パラメータ名の設定。")]
     [SerializeField] private AnimationName _animName;
@@ -36,8 +38,35 @@ public class EnemyAnimationController : MonoBehaviour
     private int _reactionLayer = -1;
     private bool _reactionConfigured;
     private float _reactionElapsed, _reactionDuration, _reactionWeight, _reactionStartWeight;
-    public bool IsReacting { get; private set; }
-    public bool IsHeavyReacting { get; private set; }
+    private bool _initialized;
+
+    /// <summary>Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。</summary>
+    public void Init()
+    {
+        if (_initialized) return;
+        _initialized = true;
+        _animator = GetComponent<Animator>();
+        _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
+        bool trigger = false, direction = false, type = false, speed = false, counter = false;
+        foreach (var p in _animator.parameters)
+        {
+            trigger |= p.name == "HitReaction" && p.type == AnimatorControllerParameterType.Trigger;
+            direction |= p.name == "HitDirection" && p.type == AnimatorControllerParameterType.Int;
+            type |= p.name == "HitType" && p.type == AnimatorControllerParameterType.Int;
+            speed |= p.name == "HitPlaybackSpeed" && p.type == AnimatorControllerParameterType.Float;
+            counter |= p.name == "IsJustAvoidCounter" && p.type == AnimatorControllerParameterType.Bool;
+        }
+        _reactionConfigured = _reactionLayer >= 0 && trigger && direction && type && speed && counter;
+        if (_reactionConfigured)
+        {
+            _animator.SetLayerWeight(_reactionLayer, 0f);
+            _animator.SetBool("IsJustAvoidCounter", false);
+        }
+        // エディターで検証処理が呼ばれていなくても、実行時にパラメーターのハッシュ値を初期化する。
+        _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);
+        _moveVectorXHash = Animator.StringToHash(_animName.MoveVectorX);
+        _moveVectorYHash = Animator.StringToHash(_animName.MoveVectorY);
+    }
 
     // Direction identifies the side the attacker occupies in the enemy's local space.
     /// <summary>攻撃者位置または命中情報をEnemyのローカル方向へ変換し、四方向の被弾Clipを選ぶ。</summary>
@@ -162,35 +191,6 @@ public class EnemyAnimationController : MonoBehaviour
         }
 
         _animator?.SetInteger(parameterName, value);
-    }
-
-    private bool _initialized;
-    /// <summary>Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。</summary>
-    public void Init()
-    {
-        if (_initialized) return;
-        _initialized = true;
-        _animator = GetComponent<Animator>();
-        _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
-        bool trigger = false, direction = false, type = false, speed = false, counter = false;
-        foreach (var p in _animator.parameters)
-        {
-            trigger |= p.name == "HitReaction" && p.type == AnimatorControllerParameterType.Trigger;
-            direction |= p.name == "HitDirection" && p.type == AnimatorControllerParameterType.Int;
-            type |= p.name == "HitType" && p.type == AnimatorControllerParameterType.Int;
-            speed |= p.name == "HitPlaybackSpeed" && p.type == AnimatorControllerParameterType.Float;
-            counter |= p.name == "IsJustAvoidCounter" && p.type == AnimatorControllerParameterType.Bool;
-        }
-        _reactionConfigured = _reactionLayer >= 0 && trigger && direction && type && speed && counter;
-        if (_reactionConfigured)
-        {
-            _animator.SetLayerWeight(_reactionLayer, 0f);
-            _animator.SetBool("IsJustAvoidCounter", false);
-        }
-        // エディターで検証処理が呼ばれていなくても、実行時にパラメーターのハッシュ値を初期化する。
-        _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);
-        _moveVectorXHash = Animator.StringToHash(_animName.MoveVectorX);
-        _moveVectorYHash = Animator.StringToHash(_animName.MoveVectorY);
     }
 
     /// <summary>

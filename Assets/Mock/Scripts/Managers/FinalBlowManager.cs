@@ -62,6 +62,7 @@ public class FinalBlowManager : MonoBehaviour
     private LoadSceneManager _loader;
     private GlobalFader _fader;
     private bool _initialized;
+
     /// <summary>勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。</summary>
     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {

@@ -12,25 +12,9 @@ public class LoadSceneManager : MonoBehaviour
     /// <summary>タイトルと戦闘Sceneのロード名を共有する設定参照。</summary>
     [UnityEngine.Tooltip("タイトルと戦闘Sceneのロード名を共有する設定参照。")]
     [SerializeField] private SceneNameConfig _sceneNameConfig;
-
-    /// <summary>
-    /// フェードを伴うシーン遷移を開始します。
-    /// </summary>
-    public void LoadScene(string sceneName)
-    {
-        _fader.FadeToScene(sceneName).Forget();
-    }
-
-    /// <summary>指定した実時間の待機後に共有Faderへ遷移を要求する。所有者の破棄で待機を中断する。</summary>
-    public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
-    {
-        await UniTask.Delay(Mathf.Max(0, waitTime), ignoreTimeScale: true,
-            cancellationToken: this.GetCancellationTokenOnDestroy());
-        await _fader.FadeToScene(sceneName);
-    }
-
     private GlobalFader _fader;
     private bool _initialized;
+
     /// <summary>共有インスタンスとFaderを一度だけ接続する。</summary>
     public void Init(GlobalFader fader)
     {
@@ -47,6 +31,22 @@ public class LoadSceneManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
+
+    /// <summary>
+    /// フェードを伴うシーン遷移を開始します。
+    /// </summary>
+    public void LoadScene(string sceneName)
+    {
+        _fader.FadeToScene(sceneName).Forget();
+    }
+
+    /// <summary>指定した実時間の待機後に共有Faderへ遷移を要求する。所有者の破棄で待機を中断する。</summary>
+    public async UniTaskVoid LoadSceneAsync(string sceneName, int waitTime)
+    {
+        await UniTask.Delay(Mathf.Max(0, waitTime), ignoreTimeScale: true,
+            cancellationToken: this.GetCancellationTokenOnDestroy());
+        await _fader.FadeToScene(sceneName);
     }
 
     /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>

@@ -33,13 +33,16 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>抜刀アニメ再生中かどうか。</summary>
     public bool IsDrawingSword => _isDrawingSword;
 
+    /// <summary>実行中の既存コンボ段階。入力回数ではなく、成立した攻撃段階を修練の命中確認へ渡す。</summary>
+    public int CurrentComboStep => _currentComboStep;
+    public const string JustAvoidCounterTag = "JustAvoidCounter";
+
     private readonly PlayerAnimationController _animController;
     private readonly AnimationName _animName;
     private readonly PlayerWeapon _weapon;
     private readonly PlayerStatus _status;
     private readonly Transform _ownerTransform;
     private readonly Animator _ownerAnimator;
-    public const string JustAvoidCounterTag = "JustAvoidCounter";
 
     /// <summary>Just Avoid Counter Attack のアニメーション中かどうかを判定する。</summary>
     private bool IsJustAvoidCounterAttack => _ownerAnimator != null && _ownerAnimator.isActiveAndEnabled &&
@@ -51,8 +54,7 @@ public sealed class PlayerAttacker : IDisposable
     private HitStopManager _hitStop;
     private bool _initialized;
     private int _currentComboStep;
-    /// <summary>実行中の既存コンボ段階。入力回数ではなく、成立した攻撃段階を修練の命中確認へ渡す。</summary>
-    public int CurrentComboStep => _currentComboStep;
+    
     private bool _currentIsLockOnVariant;
     private bool _currentIsStrongAttack;
     private bool _hasDrawnSword;

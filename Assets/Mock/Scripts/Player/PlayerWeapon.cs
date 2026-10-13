@@ -21,8 +21,7 @@ public sealed class PlayerWeapon
     private readonly Dictionary<Collider, SwordTrail> _trails = new();
     private readonly Dictionary<BoxCollider, Vector3> _authoredSizes = new();
     private bool _initialized;
-    /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
-    public void Init() => Init(Vector3.zero);
+    
     /// <summary>刀判定を初期化し、Trigger Relay・軌跡・判定サイズ補正と自己衝突除外を準備する。</summary>
     public void Init(Vector3 padding)
     {

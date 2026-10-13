@@ -38,6 +38,10 @@ public class EnemyAttacker : IDisposable
     private bool _currentIsHeavy;
     private HitStopManager _hitStop;
     private bool _initialized;
+    private readonly Transform _ownerTransform;
+    private readonly EnemyStuts _status;
+    private readonly Dictionary<EnemyWeapon, Action<Collider>> _handlerMap = new();
+
     /// <summary>命中時に使用するHitStopManagerを一度だけ接続する。</summary>
     public void Init(HitStopManager hitStop)
     {
@@ -45,9 +49,6 @@ public class EnemyAttacker : IDisposable
         _initialized = true;
         _hitStop = hitStop;
     }
-    private readonly Transform _ownerTransform;
-    private readonly EnemyStuts _status;
-    private readonly Dictionary<EnemyWeapon, Action<Collider>> _handlerMap = new();
 
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
     public void PerformAttack(EnemyActionType attackType)
