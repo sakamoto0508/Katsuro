@@ -39,6 +39,32 @@ public class EnemyAnimationController : MonoBehaviour
     private bool _reactionConfigured;
     private float _reactionElapsed, _reactionDuration, _reactionWeight, _reactionStartWeight;
     private bool _initialized;
+    /// <summary>A/C比較用。通常Heavyだけ上半身ポーズを重ねる。弱攻撃と追撃には使用しない。</summary>
+    [Header("通常Heavy HitReaction / A-C比較")]
+    [SerializeField, Tooltip("C案の上半身被弾ポーズを使用。オフで従来のProceduralのみ。")]
+    private bool _enableNormalHeavyPose;
+    /// <summary>通常Heavyの上半身Override Layerの最大重み。</summary>
+    [SerializeField, Range(0f, 1f), Tooltip("通常Heavyの上半身ポーズの最大重み。")]
+    private float _normalHitWeight = .65f;
+    /// <summary>命中時に半分の重みを与えた後、ピークへ移行する時間。</summary>
+    [SerializeField, Range(.02f, .08f), Tooltip("被弾ポーズがピークに達する時間（秒）。")]
+    private float _normalHitBlendIn = .035f;
+    /// <summary>上半身の衝撃姿勢を保持する時間。HitStop時間は含まない。</summary>
+    [SerializeField, Range(0f, .15f), Tooltip("被弾ポーズの短い保持時間（秒）。")]
+    private float _normalHitHold = .065f;
+    /// <summary>Base Layerへ戻す時間。</summary>
+    [SerializeField, Range(.08f, .25f), Tooltip("通常アニメーションへ戻す時間（秒）。")]
+    private float _normalHitBlendOut = .14f;
+    /// <summary>C案のポーズに加算する既存Procedural補正の倍率。</summary>
+    [SerializeField, Range(0f, 1f), Tooltip("C案使用時の方向補正倍率。ポーズとの過剰な重なりを抑えます。")]
+    private float _normalHitProceduralScale = .35f;
+    private int _normalHitLayer = -1;
+    private float _normalHitElapsed, _normalHitTarget, _normalHitStart;
+    private bool _normalHitActive;
+    /// <summary>通常Heavy用の視覚ポーズLayer重み。AIの行動不能状態とは別。</summary>
+    public float NormalHitPoseWeight => _animator != null && _normalHitLayer >= 0 ? _animator.GetLayerWeight(_normalHitLayer) : 0f;
+    /// <summary>C案で加算するProcedural反応の倍率。</summary>
+    public float NormalHitProceduralScale => Mathf.Clamp01(_normalHitProceduralScale);
 
     /// <summary>Animatorと被弾Layer・必須パラメータを取得して、専用反応が使用可能か一度だけ確認する。</summary>
     public void Init()
@@ -46,6 +72,8 @@ public class EnemyAnimationController : MonoBehaviour
         if (_initialized) return;
         _initialized = true;
         _animator = GetComponent<Animator>();
+        _normalHitLayer = _animator.GetLayerIndex("NormalHeavyHit");
+        CancelNormalHitPose();
         _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
         bool trigger = false, direction = false, type = false, speed = false, counter = false;
         foreach (var p in _animator.parameters)
@@ -89,6 +117,7 @@ public class EnemyAnimationController : MonoBehaviour
     public bool TryPlayHitReaction(DamageInfo info)
     {
         if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
+        CancelNormalHitPose();
         int direction = GetHitDirection(transform, info);
         string state = _reactionLayerName + ".Heavy" + HitDirections[direction];
         if (!_animator.HasState(_reactionLayer, Animator.StringToHash(state))) return false;
@@ -139,6 +168,7 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。</summary>
     public void CancelHitReaction()
     {
+        CancelNormalHitPose();
         IsReacting = IsHeavyReacting = false;
         if (!_reactionConfigured) return;
         _animator.ResetTrigger("HitReaction");
@@ -146,6 +176,46 @@ public class EnemyAnimationController : MonoBehaviour
         _animator.SetLayerWeight(_reactionLayer, 0f);
         _animator.Play(Animator.StringToHash(_reactionLayerName + ".Empty"), _reactionLayer, 0f);
     }
+
+    /// <summary>通常Heavyの上半身ポーズだけを開始する。Base Layer・攻撃・移動・AIは操作しない。</summary>
+    public bool TryPlayNormalHeavyPose(float duringAttackScale)
+    {
+        int state = Animator.StringToHash("NormalHeavyHit.Pose");
+        if (!_enableNormalHeavyPose || IsReacting || _animator == null || !_animator.isActiveAndEnabled ||
+            _normalHitLayer < 0 || !_animator.HasState(_normalHitLayer, state)) return false;
+        _normalHitTarget = Mathf.Clamp01(_normalHitWeight) * Mathf.Clamp01(duringAttackScale);
+        _normalHitStart = _normalHitActive ? NormalHitPoseWeight : _normalHitTarget * .5f;
+        _normalHitElapsed = 0f;
+        _normalHitActive = true;
+        _animator.Play(state, _normalHitLayer, 0f);
+        _animator.SetLayerWeight(_normalHitLayer, _normalHitStart);
+        return true;
+    }
+
+    /// <summary>Animator評価前に通常被弾Layerの重みを更新する。HitStop中は同じ時計・重みを保持する。</summary>
+    private void Update()
+    {
+        if (!_normalHitActive) return;
+        if (!_enableNormalHeavyPose || IsReacting) { CancelNormalHitPose(); return; }
+        _normalHitElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
+        float fadeStart = _normalHitBlendIn + _normalHitHold;
+        float weight = Mathf.Lerp(_normalHitStart, _normalHitTarget,
+            Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_normalHitElapsed / Mathf.Max(.001f, _normalHitBlendIn))));
+        weight *= 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_normalHitElapsed - fadeStart) / Mathf.Max(.001f, _normalHitBlendOut)));
+        _animator.SetLayerWeight(_normalHitLayer, weight);
+        if (_normalHitElapsed >= fadeStart + _normalHitBlendOut) CancelNormalHitPose();
+    }
+
+    /// <summary>通常の視覚ポーズだけを解除する。死亡・追撃・終了時にLayer重みを残さない。</summary>
+    public void CancelNormalHitPose()
+    {
+        _normalHitActive = false;
+        _normalHitElapsed = 0f;
+        if (_animator != null && _normalHitLayer >= 0) _animator.SetLayerWeight(_normalHitLayer, 0f);
+    }
+
+    /// <summary>非表示・破棄へ通常被弾ポーズを持ち越さない。</summary>
+    private void OnDisable() => CancelNormalHitPose();
 
     /// <summary>
     /// 速度をスムージング付きで Animator に反映する。

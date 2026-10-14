@@ -167,6 +167,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1924162121158368255, guid: 84914fcd97ae4fc4b9e48219a853b5ee, type: 3}
+      propertyPath: _combatImpulse
+      value: 
+      objectReference: {fileID: 1106239551}
     - target: {fileID: 7657077357728260025, guid: 84914fcd97ae4fc4b9e48219a853b5ee, type: 3}
       propertyPath: m_Name
       value: 'LockOnCinemachineCamera '
@@ -174,7 +178,7 @@ PrefabInstance:
     - target: {fileID: 9178318774420476302, guid: 84914fcd97ae4fc4b9e48219a853b5ee, type: 3}
       propertyPath: Target.TrackingTarget
       value: 
-      objectReference: {fileID: 896154416}
+      objectReference: {fileID: 483043310}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6829,6 +6833,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6036845720986749799, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
+      propertyPath: effectPrefab
+      value: 
+      objectReference: {fileID: 2032136157}
     - target: {fileID: 6264507311838253422, guid: 23a89b67d3c540749bc7a5efebf255c1, type: 3}
       propertyPath: _playerHudView
       value: 
@@ -8291,6 +8299,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9121294748367822041, guid: 14e9240c7410c4f419d3b92901346649, type: 3}
   m_PrefabInstance: {fileID: 1106239548}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1106239551 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9300000300, guid: 14e9240c7410c4f419d3b92901346649, type: 3}
+  m_PrefabInstance: {fileID: 1106239548}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1107933464
 GameObject:
   m_ObjectHideFlags: 0

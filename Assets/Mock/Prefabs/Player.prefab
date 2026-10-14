@@ -541,14 +541,14 @@ BoxCollider:
   m_CorrespondingSourceObject: {fileID: 3098167903086615411, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
   m_PrefabInstance: {fileID: 2928109139064076497}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &848964287751795975 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2552022812387511766, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
+  m_PrefabInstance: {fileID: 2928109139064076497}
+  m_PrefabAsset: {fileID: 0}
 --- !u!65 &1852234771052466540 stripped
 BoxCollider:
   m_CorrespondingSourceObject: {fileID: 3537241101709126077, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
-  m_PrefabInstance: {fileID: 2928109139064076497}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &2382559430674468122 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 698680893977851339, guid: 9d8add75cfc335c44b8c2100cdeb9af9, type: 3}
   m_PrefabInstance: {fileID: 2928109139064076497}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2657799758123976354 stripped
@@ -1935,7 +1935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   _attackRootMotionScale: 0.25
-  _playerWeapon: {fileID: 2382559430674468122}
+  _playerWeapon: {fileID: 848964287751795975}
   _playerStartWeapon: {fileID: 2290892604967497847}
   _weaponColliders:
   - {fileID: 5537707048680417984}
@@ -2039,6 +2039,8 @@ MonoBehaviour:
   _reactionDuration: 0.18
   _enemyHeavyReactionDuration: 0.22
   _enemyAttackReactionScale: 0.55
+  _enemyReactionImpactFraction: 0.16
+  _enemyReactionFollowThroughFraction: 0.14
   _enemyLightFlashStrength: 0.18
   _enemyHeavyFlashStrength: 0.28
   _justAvoidBodyFlashStrength: 0.2

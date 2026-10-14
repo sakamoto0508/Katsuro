@@ -17,6 +17,27 @@ public class CameraConfig : ScriptableObject
     /// <summary>カメラ障害物判定のSphereCast半径（Unity単位）。</summary>
     public float CameraCollisionRadius => _cameraCollisionRadius;
 
+    /// <summary>ロックオン構図を横へずらす距離。ゼロで従来の中央構図。</summary>
+    public float LockOnSideOffset => _lockOnSideOffset;
+    /// <summary>敵を優先する注視割合。1で敵の上半身を直接注視する。</summary>
+    public float LockOnTargetWeight => Mathf.Clamp(_lockOnTargetWeight, .75f, 1f);
+    /// <summary>環境とのカメラ衝突判定に使用するレイヤー。</summary>
+    public LayerMask LockOnObstacleMask => _lockOnObstacleMask;
+    /// <summary>ロックオン時の横方向の距離。画角の急変を避けるため位置補間を通して適用する。</summary>
+    [SerializeField, Range(-2f, 2f), Tooltip("ロックオン構図の横オフセット（m）。ゼロで中央。")]
+    private float _lockOnSideOffset;
+    /// <summary>敵の予備動作を優先する注視割合。カメラ位置はPlayer基準のまま維持する。</summary>
+    [SerializeField, Range(.75f, 1f), Tooltip("敵への注視割合。1で敵を直接注視。0.75でも敵寄りを維持します。")]
+    private float _lockOnTargetWeight = 1f;
+    /// <summary>ロックオン解除時に現在の構図から通常カメラへ戻す描画上の補間時間。</summary>
+    [SerializeField, Range(.1f, .4f), Tooltip("ロックオン解除時の構図復帰時間（実時間秒）。")]
+    private float _lockOnReleaseBlendDuration = .22f;
+    /// <summary>通常カメラへ復帰する構図の補間時間。</summary>
+    public float LockOnReleaseBlendDuration => Mathf.Max(.01f, _lockOnReleaseBlendDuration);
+    /// <summary>カメラを遮る環境レイヤー。キャラクター自身とTriggerは判定から除外する。</summary>
+    [SerializeField, Tooltip("ロックオンカメラの障害物レイヤー。Player・Enemy階層は自動除外。")]
+    private LayerMask _lockOnObstacleMask = Physics.DefaultRaycastLayers;
+
     /// <summary>Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
     [UnityEngine.Tooltip("Light命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。")]
     [Header("戦闘フィードバック")]

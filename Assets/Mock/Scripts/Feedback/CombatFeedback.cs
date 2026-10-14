@@ -57,6 +57,12 @@ public sealed class CombatFeedback : MonoBehaviour
     /// <summary>Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。</summary>
     [Tooltip("Enemy攻撃中の局所反応の強さに掛ける倍率。攻撃Poseの崩れを抑える。")]
     [SerializeField, Range(.3f, 1f)] private float _enemyAttackReactionScale = .55f;
+    /// <summary>通常被弾の全反応時間のうち、衝撃が最大になるまでの割合。LightとHeavyの既存継続時間に連動する。</summary>
+    [SerializeField, Range(.08f, .3f), Tooltip("通常被弾のImpact割合。Light/Heavyそれぞれの反応時間に掛けます。")]
+    private float _enemyReactionImpactFraction = .16f;
+    /// <summary>衝撃のピーク後に短い余韻を残す時間の割合。残り時間で元の姿勢へ滑らかに戻る。</summary>
+    [SerializeField, Range(0f, .25f), Tooltip("通常被弾の余韻の割合。残り時間が自然な姿勢復帰に使われます。")]
+    private float _enemyReactionFollowThroughFraction = .14f;
     /// <summary>EnemyへLightが命中した際の体Flashの強さ。</summary>
     [Tooltip("EnemyへLightが命中した際の体Flashの強さ。")]
     [SerializeField, Range(0f, .5f)] private float _enemyLightFlashStrength = .18f;
@@ -200,6 +206,7 @@ public sealed class CombatFeedback : MonoBehaviour
     /// <summary>通常被弾の骨補正と光を解除し、大被弾・死亡へ持ち越さない。</summary>
     public void CancelNormalHitReaction()
     {
+        _enemyAnimation?.CancelNormalHitPose();
         _enemyBoneReaction?.Clear();
         _normalFlashUntil = 0f;
         UpdateNormalHitFlash();
@@ -402,7 +409,8 @@ public sealed class CombatFeedback : MonoBehaviour
         if (_enemyOwner != null)
         {
             _enemyBoneReaction?.Begin(new DamageInfo(0f, transform.position, -transform.forward, null, null),
-                _lightReactionAngle, _reactionDuration, _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f);
+                _lightReactionAngle, _reactionDuration, _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f,
+                _enemyReactionImpactFraction, _enemyReactionFollowThroughFraction);
             _hitUntil = 0f; BeginNormalHitFlash(false);
         }
         else { _reactionEuler = new Vector3(-_lightReactionAngle, 0, 0); _hitUntil = Time.unscaledTime + _reactionDuration; }
@@ -423,8 +431,16 @@ public sealed class CombatFeedback : MonoBehaviour
         {
             bool normal = !info.IsJustAvoidCounter;
             if (normal && useBoneReaction)
+            {
+                float attackScale = _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f;
+                if (info.IsHeavy && _enemyAnimation != null && _enemyAnimation.TryPlayNormalHeavyPose(attackScale))
+                    angle *= _enemyAnimation.NormalHitProceduralScale;
                 _enemyBoneReaction?.Begin(info, angle, info.IsHeavy ? _enemyHeavyReactionDuration : _reactionDuration,
-                    _enemyOwner.IsAttackAnimationActive ? _enemyAttackReactionScale : 1f);
+                    attackScale,
+                    _enemyReactionImpactFraction, _enemyReactionFollowThroughFraction);
+                // 命中したフレームから接触姿勢を見せ、その後のHitStop中は同じ補正を保持する。
+                _enemyBoneReaction?.Apply();
+            }
             else CancelNormalHitReaction();
             if (normal)
             {
@@ -450,7 +466,7 @@ public sealed class CombatFeedback : MonoBehaviour
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
         }
-        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint);
+        _cameraFeedback?.PlayHitFeedback(strongFeedback, info.HitPoint);
     }
 
     /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
@@ -640,9 +656,21 @@ public sealed class CombatFeedback : MonoBehaviour
             if (_renderers[i] != null) _renderers[i].sharedMaterials = visible ? _glow[i] : _original[i];
     }
 
+    /// <summary>敗北・勝利・タイトル遷移時の通常被弾補正を解除する通知を購読する。</summary>
+    private void OnEnable() => GameManager.OnGameStateChanged += OnGameStateChanged;
+
+    /// <summary>戦闘終了時だけ通常の骨反応を消去する。Pauseでは解除せず、専用Reactionの状態制御には触れない。</summary>
+    private void OnGameStateChanged(GameManager.GameState state)
+    {
+        if (_enemyOwner != null && (state == GameManager.GameState.Defeat ||
+            state == GameManager.GameState.Victory || state == GameManager.GameState.Title))
+            CancelNormalHitReaction();
+    }
+
     /// <summary>回避・命中・骨補正を停止してMaterialと表示状態を通常へ戻す。</summary>
     private void OnDisable()
     {
+        GameManager.OnGameStateChanged -= OnGameStateChanged;
         _justAvoidContrast?.Cancel();
         StopJustAvoid();
         _contactPulse?.Stop();

@@ -9824,6 +9824,10 @@ PrefabInstance:
       value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 4735781494124217749, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
+      propertyPath: _cameraConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: f0289c7243b3acf44a8c6b3e876860b1, type: 2}
+    - target: {fileID: 4735781494124217749, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
       propertyPath: _cameraManager
       value: 
       objectReference: {fileID: 1106239549}
@@ -99704,7 +99708,7 @@ TerrainCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: 586565b29ef24bc3a7ac54385ebc317c, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 23f048b70725f29459d6cab7e5fb4ebc, type: 2}
   m_EnableTreeColliders: 1
 --- !u!218 &1680678467
 Terrain:
@@ -99715,7 +99719,7 @@ Terrain:
   m_GameObject: {fileID: 1680678465}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 586565b29ef24bc3a7ac54385ebc317c, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 23f048b70725f29459d6cab7e5fb4ebc, type: 2}
   m_TreeDistance: 400
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5

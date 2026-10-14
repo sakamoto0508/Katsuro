@@ -27,6 +27,11 @@ public class CameraManager : MonoBehaviour
     private bool _finalBlowPlaying;
     private float _finalBlowStarted;
     private Vector3 _savedPosition;
+    private Quaternion _savedRotation;
+    private Vector3 _lastLockPosition, _releasePosition;
+    private Quaternion _lastLockRotation, _releaseRotation;
+    private bool _wasLocked;
+    private float _releaseStarted = float.NegativeInfinity;
     private float _savedFov;
     private bool _renderOffsetApplied;
     private bool _subscribed;
@@ -96,7 +101,7 @@ public class CameraManager : MonoBehaviour
     /// <summary>初期化済みなら描画前後の補正イベントを再登録する。</summary>
     private void OnEnable() { if (_initialized) SubscribeRendering(); }
     /// <summary>描画購読を解除し、回避・勝利の一時カメラ補正を消去する。</summary>
-    private void OnDisable() { UnsubscribeRendering(); _fovStarted = float.NegativeInfinity; StopFinalBlowFeedback(); }
+    private void OnDisable() { UnsubscribeRendering(); _fovStarted = _releaseStarted = float.NegativeInfinity; _wasLocked = false; StopFinalBlowFeedback(); }
     /// <summary>出力カメラの描画前後で一時補正を適用・解除するイベントを重複なく登録する。</summary>
     private void SubscribeRendering()
     {
@@ -115,14 +120,26 @@ public class CameraManager : MonoBehaviour
         RestoreCamera();
     }
     // Cinemachineと手動ロックオンの更新後、描画する瞬間だけ小さな補正を重ねる。
-    /// <summary>Cinemachine更新後の出力構図を保存し、その描画だけImpulseとFOV補正を重ねる。</summary>
+    /// <summary>Cinemachine更新後の構図を保存し、その描画だけ解除時の補間・Impulse・FOV補正を重ねる。</summary>
     private void BeginRendering(ScriptableRenderContext context, Camera camera)
     {
         if (camera != _outputCamera || _config == null) return;
         RestoreCamera();
         _savedPosition = camera.transform.position;
+        _savedRotation = camera.transform.rotation;
         _savedFov = camera.fieldOfView;
         _renderOffsetApplied = true;
+        // Brainは通常どおり復帰させ、出力する構図だけ直前のロックオン姿勢から短く繋ぐ。
+        if (!_finalBlowPlaying && _lookOnCamera != null && !_lookOnCamera.IsLockOn)
+        {
+            float release = (Time.unscaledTime - _releaseStarted) / _config.LockOnReleaseBlendDuration;
+            if (release >= 0f && release < 1f)
+            {
+                float blend = Mathf.SmoothStep(0f, 1f, release);
+                camera.transform.position = Vector3.Lerp(_releasePosition, _savedPosition, blend);
+                camera.transform.rotation = Quaternion.Slerp(_releaseRotation, _savedRotation, blend);
+            }
+        }
         if (_combatImpulse != null && CinemachineImpulseManager.Instance.GetImpulseAt(
             _savedPosition, false, 2, out var offset, out var rotation))
             camera.transform.position += Vector3.ClampMagnitude(offset, .15f);
@@ -135,16 +152,17 @@ public class CameraManager : MonoBehaviour
         else if (progress >= 0f && progress < 1f)
             camera.fieldOfView = Mathf.Clamp(_savedFov + _config.JustAvoidFOVOffset * Mathf.Sin(progress * Mathf.PI), 1f, 179f);
     }
-    /// <summary>出力カメラの描画終了後に元の位置とFOVを戻し、次のカメラ更新に補正を持ち越さない。</summary>
+    /// <summary>描画終了後に位置・回転・FOVを戻し、次のCinemachine更新に補正を持ち越さない。</summary>
     private void EndRendering(ScriptableRenderContext context, Camera camera)
     {
         if (camera == _outputCamera) RestoreCamera();
     }
-    /// <summary>描画用に保存した位置とFOVを一度だけ復元する。</summary>
+    /// <summary>描画用に保存した位置・回転・FOVを一度だけ復元する。</summary>
     private void RestoreCamera()
     {
         if (!_renderOffsetApplied || _outputCamera == null) return;
         _outputCamera.transform.position = _savedPosition;
+        _outputCamera.transform.rotation = _savedRotation;
         _outputCamera.fieldOfView = _savedFov;
         _renderOffsetApplied = false;
     }
@@ -152,8 +170,21 @@ public class CameraManager : MonoBehaviour
     /// <summary>勝利中は専用仮想カメラを進行し、それ以外はLock-Onの手動追従を更新する。</summary>
     private void LateUpdate()
     {
-        if (_finalBlowPlaying) { _victoryRig?.Tick(Time.unscaledTime); return; }
+        if (_finalBlowPlaying) { _releaseStarted = float.NegativeInfinity; _wasLocked = false; _victoryRig?.Tick(Time.unscaledTime); return; }
         _lockOnCameraMover?.LateUpdate();
+        bool locked = _lookOnCamera != null && _lookOnCamera.IsLockOn;
+        if (_wasLocked && !locked)
+        {
+            _releaseStarted = Time.unscaledTime;
+            _releasePosition = _lastLockPosition;
+            _releaseRotation = _lastLockRotation;
+        }
+        if (locked && _outputCamera != null)
+        {
+            _lastLockPosition = _outputCamera.transform.position;
+            _lastLockRotation = _outputCamera.transform.rotation;
+        }
+        _wasLocked = locked;
     }
 
     /// <summary>Lock-On開始入力をこのカメラ管理へ接続する。</summary>
