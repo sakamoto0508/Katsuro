@@ -30612,6 +30612,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 17211850135981662, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: _enableNormalHeavyPose
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1889450424323499715, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
       propertyPath: _characterEffect
       value: 

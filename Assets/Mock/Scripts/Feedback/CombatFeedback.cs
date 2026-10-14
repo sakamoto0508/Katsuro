@@ -429,6 +429,7 @@ public sealed class CombatFeedback : MonoBehaviour
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
         if (_enemyOwner != null)
         {
+            _enemyAnimation?.DiagnoseNormalHitRequest(info, useBoneReaction);
             bool normal = !info.IsJustAvoidCounter;
             if (normal && useBoneReaction)
             {
@@ -466,6 +467,7 @@ public sealed class CombatFeedback : MonoBehaviour
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
         }
+        _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
         _cameraFeedback?.PlayHitFeedback(strongFeedback, info.HitPoint);
     }
 

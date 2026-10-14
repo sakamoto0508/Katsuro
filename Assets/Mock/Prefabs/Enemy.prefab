@@ -490,6 +490,8 @@ MonoBehaviour:
   _reactionDuration: 0.16
   _enemyHeavyReactionDuration: 0.22
   _enemyAttackReactionScale: 0.55
+  _enemyReactionImpactFraction: 0.16
+  _enemyReactionFollowThroughFraction: 0.14
   _enemyLightFlashStrength: 0.18
   _enemyHeavyFlashStrength: 0.28
   _justAvoidBodyFlashStrength: 0.2
@@ -513,6 +515,14 @@ MonoBehaviour:
   _lightHitWeight: 0.6
   _reactionBlendIn: 0.08
   _reactionBlendOut: 0.08
+  _enableNormalHeavyPose: 1
+  _normalHitWeight: 0.8
+  _normalHitImpactWeight: 0.9
+  _normalHitBlendIn: 0.035
+  _normalHitHold: 0.065
+  _normalHitBlendOut: 0.14
+  _normalHitProceduralScale: 0.35
+  _diagnoseNormalHeavyPose: 0
 --- !u!114 &5670774338998710203
 MonoBehaviour:
   m_ObjectHideFlags: 0

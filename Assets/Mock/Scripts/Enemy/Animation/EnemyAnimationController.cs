@@ -45,8 +45,11 @@ public class EnemyAnimationController : MonoBehaviour
     private bool _enableNormalHeavyPose;
     /// <summary>通常Heavyの上半身Override Layerの最大重み。</summary>
     [SerializeField, Range(0f, 1f), Tooltip("通常Heavyの上半身ポーズの最大重み。")]
-    private float _normalHitWeight = .65f;
-    /// <summary>命中時に半分の重みを与えた後、ピークへ移行する時間。</summary>
+    private float _normalHitWeight = .8f;
+    /// <summary>命中した瞬間に与えるピーク重みの割合。HitStop中にも衝撃姿勢を見せる。</summary>
+    [SerializeField, Range(.5f, 1f), Tooltip("命中時のポーズ重みの割合。HitStop中はこの姿勢を保持し、解除後にピークへ接続します。")]
+    private float _normalHitImpactWeight = .9f;
+    /// <summary>命中時の衝撃姿勢からピークへ移行する時間。</summary>
     [SerializeField, Range(.02f, .08f), Tooltip("被弾ポーズがピークに達する時間（秒）。")]
     private float _normalHitBlendIn = .035f;
     /// <summary>上半身の衝撃姿勢を保持する時間。HitStop時間は含まない。</summary>
@@ -61,6 +64,13 @@ public class EnemyAnimationController : MonoBehaviour
     private int _normalHitLayer = -1;
     private float _normalHitElapsed, _normalHitTarget, _normalHitStart;
     private bool _normalHitActive;
+#if UNITY_EDITOR
+    /// <summary>通常Heavyの命中要求と描画後4フレームを記録する検証スイッチ。製品ビルドには含めない。</summary>
+    [SerializeField, Tooltip("検証用。通常Heavyの条件・成否・理由・HitStop・描画後4フレームのStateと重みをConsoleへ記録します。")]
+    private bool _diagnoseNormalHeavyPose;
+    private Coroutine _normalHitDiagnostic;
+    private string _normalHitResult;
+#endif
     /// <summary>通常Heavy用の視覚ポーズLayer重み。AIの行動不能状態とは別。</summary>
     public float NormalHitPoseWeight => _animator != null && _normalHitLayer >= 0 ? _animator.GetLayerWeight(_normalHitLayer) : 0f;
     /// <summary>C案で加算するProcedural反応の倍率。</summary>
@@ -181,16 +191,85 @@ public class EnemyAnimationController : MonoBehaviour
     public bool TryPlayNormalHeavyPose(float duringAttackScale)
     {
         int state = Animator.StringToHash("NormalHeavyHit.Pose");
-        if (!_enableNormalHeavyPose || IsReacting || _animator == null || !_animator.isActiveAndEnabled ||
-            _normalHitLayer < 0 || !_animator.HasState(_normalHitLayer, state)) return false;
+        if (!_enableNormalHeavyPose) return RejectNormalHeavyPose("C案無効");
+        if (IsReacting) return RejectNormalHeavyPose("追撃専用Reaction中");
+        if (_animator == null || !_animator.isActiveAndEnabled) return RejectNormalHeavyPose("Animator未初期化または無効");
+        if (_normalHitLayer < 0) return RejectNormalHeavyPose("NormalHeavyHit Layerなし");
+        if (!_animator.HasState(_normalHitLayer, state)) return RejectNormalHeavyPose("NormalHeavyHit.Pose Stateなし");
         _normalHitTarget = Mathf.Clamp01(_normalHitWeight) * Mathf.Clamp01(duringAttackScale);
-        _normalHitStart = _normalHitActive ? NormalHitPoseWeight : _normalHitTarget * .5f;
+        float impact = _normalHitTarget * Mathf.Clamp01(_normalHitImpactWeight);
+        // 再被弾も衝撃姿勢まで戻すが、前回の角度を加算して累積させない。
+        _normalHitStart = _normalHitActive ? Mathf.Max(NormalHitPoseWeight, impact) : impact;
         _normalHitElapsed = 0f;
         _normalHitActive = true;
         _animator.Play(state, _normalHitLayer, 0f);
         _animator.SetLayerWeight(_normalHitLayer, _normalHitStart);
+        RecordNormalHeavyPoseResult("成功");
         return true;
     }
+
+    /// <summary>被弾ポーズを開始できない理由を検証用に記録し、従来のProcedural処理へ戻す。</summary>
+    private bool RejectNormalHeavyPose(string reason)
+    {
+#if UNITY_EDITOR
+        if (_diagnoseNormalHeavyPose) RecordNormalHeavyPoseResult("失敗: " + reason);
+#endif
+        return false;
+    }
+
+    /// <summary>Editorの診断が有効なときだけ、通常Heavyポーズ開始の成否と理由を保持する。</summary>
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    private void RecordNormalHeavyPoseResult(string result)
+    {
+#if UNITY_EDITOR
+        if (_diagnoseNormalHeavyPose) _normalHitResult = result;
+#endif
+    }
+
+    /// <summary>通常Heavy命中の条件を記録し、Layer開始前に追撃や骨反応無効の理由を区別する。</summary>
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public void DiagnoseNormalHitRequest(DamageInfo info, bool useBoneReaction)
+    {
+#if UNITY_EDITOR
+        if (!_diagnoseNormalHeavyPose || !info.IsHeavy) return;
+        _normalHitResult = info.IsJustAvoidCounter ? "対象外: JustAvoid追撃" :
+            !useBoneReaction ? "対象外: useBoneReaction=false" : "未要求";
+        Debug.Log($"[NormalHeavyHit] request IsHeavy={info.IsHeavy} counter={info.IsJustAvoidCounter} useBoneReaction={useBoneReaction} enabled={_enableNormalHeavyPose} attack={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
+#endif
+    }
+
+    /// <summary>HitStop適用後の成否と状態、および自然なAnimator評価後の4フレームをEditorだけで記録する。</summary>
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    public void DiagnoseNormalHitAfterHitStop(DamageInfo info)
+    {
+#if UNITY_EDITOR
+        if (!_diagnoseNormalHeavyPose || !info.IsHeavy) return;
+        LogNormalHeavyPoseSnapshot("HitStop要求後");
+        if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
+        _normalHitDiagnostic = StartCoroutine(SampleNormalHeavyPoseDiagnostic());
+#endif
+    }
+
+#if UNITY_EDITOR
+    /// <summary>通常の描画完了後にStateとLayer重みを取得する。Animatorの強制更新は行わない。</summary>
+    private System.Collections.IEnumerator SampleNormalHeavyPoseDiagnostic()
+    {
+        for (int frame = 1; frame <= 4; frame++)
+        {
+            yield return new WaitForEndOfFrame();
+            LogNormalHeavyPoseSnapshot("描画後" + frame);
+        }
+        _normalHitDiagnostic = null;
+    }
+
+    /// <summary>ポーズ開始の結果、State、重み、経過時間、Animator速度と攻撃状態をまとめて記録する。</summary>
+    private void LogNormalHeavyPoseSnapshot(string phase)
+    {
+        if (_animator == null) return;
+        bool pose = _normalHitLayer >= 0 && _animator.GetCurrentAnimatorStateInfo(_normalHitLayer).IsName("NormalHeavyHit.Pose");
+        Debug.Log($"[NormalHeavyHit] {phase} result={_normalHitResult} layer={_normalHitLayer} state={(pose ? "NormalHeavyHit.Pose" : "未評価/別State")} weight={NormalHitPoseWeight:F3} target={_normalHitTarget:F3} elapsed={_normalHitElapsed:F3} speed={_animator.speed:F3} hitStop={(_animator.speed == 0f)} attack={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
+    }
+#endif
 
     /// <summary>Animator評価前に通常被弾Layerの重みを更新する。HitStop中は同じ時計・重みを保持する。</summary>
     private void Update()
@@ -215,7 +294,14 @@ public class EnemyAnimationController : MonoBehaviour
     }
 
     /// <summary>非表示・破棄へ通常被弾ポーズを持ち越さない。</summary>
-    private void OnDisable() => CancelNormalHitPose();
+    private void OnDisable()
+    {
+        CancelNormalHitPose();
+#if UNITY_EDITOR
+        if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
+        _normalHitDiagnostic = null;
+#endif
+    }
 
     /// <summary>
     /// 速度をスムージング付きで Animator に反映する。
