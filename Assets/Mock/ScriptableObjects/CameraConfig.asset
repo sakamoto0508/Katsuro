@@ -12,14 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
   m_Name: CameraConfig
   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
+  _lockOnSideOffset: 0
+  _lockOnTargetWeight: 1
+  _lockOnReleaseBlendDuration: 0.22
+  _lockOnObstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  _lightHitCameraStrength: 0.012
+  _heavyHitCameraStrength: 0.055
+  _counterHitCameraStrength: 0.075
+  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.12}
+  _cameraDuration: 0.12
+  _justAvoidFOVOffset: 1.5
+  _justAvoidFOVDuration: 0.18
   _cameraDistance: 2.52
   _cameraHeight: 2.98
   _positionSmooth: 6
   _rotationSmooth: 20
   _lookAtHeight: 1.62
   _cameraCollisionRadius: 0.3
-  _lightHitCameraStrength: 0.025
-  _heavyHitCameraStrength: 0.055
-  _cameraDuration: 0.12
-  _justAvoidFOVOffset: 1.5
-  _justAvoidFOVDuration: 0.18

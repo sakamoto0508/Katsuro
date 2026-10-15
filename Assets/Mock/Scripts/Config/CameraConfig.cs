@@ -45,6 +45,16 @@ public class CameraConfig : ScriptableObject
     /// <summary>Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。</summary>
     [UnityEngine.Tooltip("Heavy命中時のカメラ衝撃の強さ。大きいほど揺れが強くなる。")]
     [SerializeField, Range(0f, .15f)] private float _heavyHitCameraStrength = .055f;
+    /// <summary>Just Avoid追撃のカメラ衝撃。通常Heavyと別に設定する。</summary>
+    [SerializeField, Range(0f, .15f), Tooltip("追撃命中のImpulse強度。追従位置や注視点は変更しません。")]
+    private float _counterHitCameraStrength = .075f;
+    /// <summary>命中衝撃の継続時間。X=Light、Y=Heavy、Z=追撃。</summary>
+    [SerializeField, Tooltip("Camera Impulse時間（秒）。X=Light、Y=Heavy、Z=追撃。")]
+    private Vector3 _hitCameraDurations = new Vector3(.065f, .095f, .12f);
+    /// <summary>命中種別のカメラ衝撃の強さを取得する。</summary>
+    public float GetHitCameraStrength(bool heavy, bool counter) => counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
+    /// <summary>命中種別の短い衝撃時間を取得する。</summary>
+    public float GetHitCameraDuration(bool heavy, bool counter) => Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
     /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
     [UnityEngine.Tooltip("命中時カメラ衝撃の継続時間（秒）。")]
     [SerializeField, Min(.01f)] private float _cameraDuration = .12f;

@@ -7,6 +7,7 @@ Shader "Katsuro/CombatGlow"
         _GhostTime("Ghost time", Float) = 0
         _GhostSway("Ghost sway", Range(0,0.03)) = 0.009
         _GhostFlowSpeed("Ghost flow speed", Float) = 1.2
+        _HitRim("被弾Overlayの輪郭強調", Float) = 0
     }
     SubShader
     {
@@ -25,7 +26,7 @@ Shader "Katsuro/CombatGlow"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
             float4 _Tint;
-            float _Ghost;
+            float _Ghost, _HitRim;
             float _GhostTime, _GhostSway, _GhostFlowSpeed;
             struct Attributes { float3 positionOS : POSITION; float3 normalOS : NORMAL; float4 color : COLOR; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 normalWS : TEXCOORD0; float3 positionWS : TEXCOORD1; float4 color : COLOR; };
@@ -58,6 +59,8 @@ Shader "Katsuro/CombatGlow"
                     color.a *= (.07 + rim * .48) * lerp(.35, 1, haze);
                 }
                 else if (_Ghost < -.5) color *= input.color;
+                // 通常被弾のOverlayだけ輪郭を中心にする。回避・バフの既存Materialは0のまま。
+                if (_HitRim > .5) color.a *= .08 + rim * .92;
                 return color;
             }
             ENDHLSL

@@ -75,11 +75,11 @@ public class CameraManager : MonoBehaviour
     }
 
     /// <summary>攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。</summary>
-    public void PlayHitFeedback(bool heavy, Vector3 contactPoint)
+    public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false)
     {
-        if (!_initialized || !isActiveAndEnabled || _combatImpulse == null || _config == null) return;
-        float strength = heavy ? _config.HeavyHitCameraStrength : _config.LightHitCameraStrength;
-        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.CameraDuration;
+        if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying || _combatImpulse == null || _config == null) return;
+        float strength = _config.GetHitCameraStrength(heavy, counter);
+        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter);
         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
     }
     /// <summary>Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。</summary>
@@ -140,7 +140,7 @@ public class CameraManager : MonoBehaviour
                 camera.transform.rotation = Quaternion.Slerp(_releaseRotation, _savedRotation, blend);
             }
         }
-        if (_combatImpulse != null && CinemachineImpulseManager.Instance.GetImpulseAt(
+        if (!_finalBlowPlaying && _combatImpulse != null && CinemachineImpulseManager.Instance.GetImpulseAt(
             _savedPosition, false, 2, out var offset, out var rotation))
             camera.transform.position += Vector3.ClampMagnitude(offset, .15f);
         float progress = (Time.unscaledTime - _fovStarted) / Mathf.Max(.01f, _config.JustAvoidFOVDuration);

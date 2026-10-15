@@ -26,11 +26,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _AfterGlowAlpha: 0.012
-    - _BodyAlpha: 0.065
+    - _BodyAlpha: 0.055
     - _BodyWidth: 0.085
     - _Brightness: 1.05
     - _CoreBrightness: 2.25
-    - _CoreWidth: 0.019
+    - _CoreWidth: 0.014
     - _EdgeFade: 0.12
     - _FadePower: 1.8
     - _TailFade: 0.3

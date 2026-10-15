@@ -92,7 +92,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _duration
-      value: 0.075
+      value: 0.065
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _bladeBase
@@ -100,11 +100,11 @@ PrefabInstance:
       objectReference: {fileID: 3345332562367348435}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _brightness
-      value: 0.95
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _heavyDuration
-      value: 0.105
+      value: 0.085
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _trailMaterial
@@ -116,7 +116,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _counterDuration
-      value: 0.105
+      value: 0.09
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _heavyBrightness
@@ -124,7 +124,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9300000110, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: _counterBrightness
-      value: 1.32
+      value: 1.05
       objectReference: {fileID: 0}
     - target: {fileID: 45149086753798285, guid: 7d67aeebef4771e40909e454d645ca12, type: 3}
       propertyPath: m_Name
@@ -482,7 +482,7 @@ MonoBehaviour:
   _flashDuration: 0.15
   _afterImageTint: {r: 0.75, g: 0.9, b: 1, a: 0.3}
   _flashTint: {r: 0.85, g: 0.95, b: 1, a: 0.65}
-  _hitFlashDuration: 0.055
+  _hitFlashDuration: 0.028
   _justAvoidFlashDuration: 0.09
   _justAvoidFlashSize: 0.35
   _lightReactionAngle: 7.5
@@ -492,8 +492,8 @@ MonoBehaviour:
   _enemyAttackReactionScale: 0.55
   _enemyReactionImpactFraction: 0.16
   _enemyReactionFollowThroughFraction: 0.14
-  _enemyLightFlashStrength: 0.18
-  _enemyHeavyFlashStrength: 0.28
+  _enemyLightFlashStrength: 0.05
+  _enemyHeavyFlashStrength: 0.1
   _justAvoidBodyFlashStrength: 0.2
   _justAvoidCounterHitStop: 0.14
 --- !u!114 &17211850135981662

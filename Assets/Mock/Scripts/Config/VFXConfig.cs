@@ -114,11 +114,56 @@ public class VFXConfig : ScriptableObject
     [SerializeField, Range(1f, 1.4f)] private float _counterHitVFXSpeed = 1.3f;
     /// <summary>Just Avoid追撃命中VFXの粒子サイズ補正。</summary>
     [UnityEngine.Tooltip("Just Avoid追撃命中VFXの粒子サイズ補正。")]
-    [SerializeField, Range(1f, 1.2f)] private float _counterHitVFXSize = 1.05f;
+    [SerializeField, Range(.7f, 1.2f)] private float _counterHitVFXSize = .9f;
     /// <summary>Just Avoid追撃命中VFXの粒子速度補正。</summary>
     public float CounterHitVFXSpeed => _counterHitVFXSpeed;
     /// <summary>Just Avoid追撃命中VFXの粒子サイズ補正。</summary>
     public float CounterHitVFXSize => _counterHitVFXSize;
+    /// <summary>追撃の血粒子数倍率。Slash Lineには掛けない。</summary>
+    [SerializeField, Range(1f, 2f), Tooltip("Just Avoid追撃の血粒子数倍率。")]
+    private float _counterHitVFXAmount = 1.6f;
+    /// <summary>追撃の血の広がり。通常Heavyよりまとまった斬り抜け方向を作る。</summary>
+    [SerializeField, Range(.2f, 1.3f), Tooltip("追撃の血飛沫Cone角度へ掛ける倍率。")]
+    private float _counterHitVFXSpread = .85f;
+    /// <summary>追撃の血粒子数倍率。</summary>
+    public float CounterHitVFXAmount => _counterHitVFXAmount;
+    /// <summary>追撃の血のCone角度倍率。</summary>
+    public float CounterHitVFXSpread => _counterHitVFXSpread;
+    /// <summary>追撃の接触点だけに与えるHDR輝度。サイズや透明度とは独立する。</summary>
+    [SerializeField, Range(1f, 6f), Tooltip("追撃Contact FlashのHDR輝度。小さい接触点だけを一瞬強調します。")]
+    private float _counterContactIntensity = 3.2f;
+    /// <summary>追撃の接触Flashに掛けるHDR輝度。</summary>
+    public float CounterContactIntensity => _counterContactIntensity;
+    /// <summary>追撃の血の寿命倍率。白い線が消えた後に短い血の余韻を残す。</summary>
+    [SerializeField, Range(.5f, 1.2f), Tooltip("追撃の血飛沫寿命倍率。Slash Lineには適用しません。")]
+    private float _counterBloodLifetime = .78f;
+    /// <summary>追撃の方向性を示す血の筋だけを伸ばす倍率。</summary>
+    [SerializeField, Range(1f, 2f), Tooltip("追撃BloodStreaksの長さ倍率。粒子数や白い線の幅は増やしません。")]
+    private float _counterBloodStreakLength = 1.3f;
+    /// <summary>追撃の血飛沫の赤黒い基準色。煙状粒子には適用しない。</summary>
+    [SerializeField, Tooltip("追撃の血の色。通常攻撃の色とMaterialは維持します。")]
+    private Color _counterBloodTint = new Color(.55f, .024f, .035f, .85f);
+    /// <summary>追撃の血飛沫寿命倍率。</summary>
+    public float CounterBloodLifetime => _counterBloodLifetime;
+    /// <summary>追撃の方向性を示す血の筋の長さ倍率。</summary>
+    public float CounterBloodStreakLength => _counterBloodStreakLength;
+    /// <summary>追撃の血の基準色。</summary>
+    public Color CounterBloodTint => _counterBloodTint;
+    /// <summary>接触点のFlashサイズ。X=Light、Y=Heavy、Z=追撃。</summary>
+    [SerializeField, Tooltip("接触Flashのサイズ（m）。命中点だけを強調します。")]
+    private Vector3 _contactFlashSizes = new Vector3(.065f, .085f, .11f);
+    /// <summary>接触Flashの実時間寿命。血飛沫と被弾姿勢を早く見せる。</summary>
+    [SerializeField, Tooltip("接触Flash寿命（秒）。X=Light、Y=Heavy、Z=追撃。")]
+    private Vector3 _contactFlashDurations = new Vector3(.018f, .028f, .036f);
+    /// <summary>接触Flashの透明度。X=Light、Y=Heavy、Z=追撃。</summary>
+    [SerializeField, Tooltip("接触Flashの強度。X=Light、Y=Heavy、Z=追撃。")]
+    private Vector3 _contactFlashStrengths = new Vector3(.2f, .32f, .42f);
+    /// <summary>攻撃種別に対応する接触Flashのサイズ・寿命・強度を返す。</summary>
+    public Vector3 GetContactFlashStyle(bool heavy, bool counter)
+    {
+        int index = counter ? 2 : heavy ? 1 : 0;
+        return new Vector3(Mathf.Max(.01f, _contactFlashSizes[index]), Mathf.Max(.01f, _contactFlashDurations[index]), Mathf.Clamp01(_contactFlashStrengths[index]));
+    }
     /// <summary>斬撃線のワールド長。XはLight、YはHeavy、Zは追撃。</summary>
     [SerializeField, Tooltip("命中斬撃線の長さ（m）。X=Light、Y=Heavy、Z=Just Avoid追撃。")]
     private Vector3 _slashLineLengths = new Vector3(.72f, .95f, 1.1f);

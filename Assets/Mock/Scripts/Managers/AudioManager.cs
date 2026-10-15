@@ -483,20 +483,16 @@ public class AudioManager : MonoBehaviour
         if (string.IsNullOrEmpty(seName)) return;
         if (_seDict.TryGetValue(seName, out var clip))
         {
-            var src = GetAvailableSfxSource();
-            if (src != null)
-            {
-                src.clip = clip;
-                _sfxBaseVolumes[src] = Mathf.Clamp01(volume);
-                src.volume = _sfxBaseVolumes[src] * SEVolume * MasterVolume;
-                src.Play();
-            }
+            PlaySE(clip, volume);
         }
         else
         {
             Debug.LogWarning($"指定された SE '{seName}' が見つかりません。");
         }
     }
+
+    /// <summary>登録名のClipを取得する。最後の命中音とFinal Blow音の同一素材の二重再生を判定する。</summary>
+    public AudioClip GetSEClip(string name) => !string.IsNullOrEmpty(name) && _seDict.TryGetValue(name, out var clip) ? clip : null;
 
     /// <summary>
     /// 利用可能な SFX 用 AudioSource を取得する。
@@ -521,6 +517,19 @@ public class AudioManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    /// <summary>指定Clipを既存SEプールから再生する。先頭の間だけを除き、ユーザー音量とMixer経路は維持する。</summary>
+    public void PlaySE(AudioClip clip, float volume = 1f, float startSeconds = 0f)
+    {
+        if (clip == null) return;
+        var src = GetAvailableSfxSource();
+        if (src == null) return;
+        src.clip = clip;
+        src.timeSamples = Mathf.Clamp(Mathf.RoundToInt(Mathf.Max(0f, startSeconds) * clip.frequency), 0, Mathf.Max(0, clip.samples - 1));
+        _sfxBaseVolumes[src] = Mathf.Clamp01(volume);
+        src.volume = _sfxBaseVolumes[src] * SEVolume * MasterVolume;
+        src.Play();
     }
 
     /// <summary>

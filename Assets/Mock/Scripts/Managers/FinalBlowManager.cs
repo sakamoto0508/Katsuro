@@ -148,7 +148,7 @@ public class FinalBlowManager : MonoBehaviour
     /// <summary>演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。</summary>
     private void Cleanup()
     {
-        _cameraFeedback?.GetComponent<VictoryContrast>()?.Cancel();
+        if (_cameraFeedback != null) _cameraFeedback.GetComponent<VictoryContrast>()?.Cancel();
         if (_presentation != null) _presentation.ResetPresentation();
         if (_cameraFeedback != null) _cameraFeedback.StopFinalBlowFeedback();
         if (_finalBlowText != null) _finalBlowText.DOKill();

@@ -94,6 +94,9 @@ public sealed class CombatFeedback : MonoBehaviour
     private ParticleSystem.MinMaxCurve[][] _hitSizes;
     private ParticleSystem.MinMaxCurve[][] _hitSpeeds;
     private ParticleSystem.MinMaxCurve[][] _hitLifetimes;
+    private ParticleSystem.MinMaxCurve[][] _hitDelays;
+    private ParticleSystem.MinMaxGradient[][] _hitColors;
+    private float[][] _hitLengths;
     private ParticleSystemRenderer[][] _hitSlashRenderers;
     private GameObject[] _hitRoots;
     private float[] _hitStarted;
@@ -162,6 +165,7 @@ public sealed class CombatFeedback : MonoBehaviour
     {
         if (shader == null) return;
         _normalFlashMaterial = new Material(shader) { name = "Enemy Normal Hit Overlay" };
+        _normalFlashMaterial.SetFloat("_HitRim", 1f);
         _normalFlashRenderers = new SkinnedMeshRenderer[_renderers.Length];
         for (int i = 0; i < _renderers.Length; i++)
         {
@@ -184,15 +188,15 @@ public sealed class CombatFeedback : MonoBehaviour
     private void BeginNormalHitFlash(bool heavy)
     {
         _normalFlashHeavy = heavy;
-        _normalFlashLength = _hitFlashDuration;
-        _normalFlashUntil = Time.unscaledTime + _normalFlashLength;
+        _normalFlashLength = _hitFlashDuration * (heavy ? 1f : .7f);
+        _normalFlashUntil = FeedbackVisualTime.Now + _normalFlashLength;
     }
 
     /// <summary>元MeshのBlendShapeを追従し、攻撃種別に応じた光を減衰させて終了時に非表示にする。</summary>
     private void UpdateNormalHitFlash()
     {
         if (_normalFlashMaterial == null) return;
-        float fade = Mathf.Clamp01((_normalFlashUntil - Time.unscaledTime) / Mathf.Max(.01f, _normalFlashLength));
+        float fade = Mathf.Clamp01((_normalFlashUntil - FeedbackVisualTime.Now) / Mathf.Max(.01f, _normalFlashLength));
         _normalFlashMaterial.SetColor("_Tint", new Color(1f, .75f, .6f, fade * (_normalFlashHeavy ? _enemyHeavyFlashStrength : _enemyLightFlashStrength)));
         for (int i = 0; i < _normalFlashRenderers.Length; i++)
         {
@@ -448,7 +452,12 @@ public sealed class CombatFeedback : MonoBehaviour
                 _hitUntil = 0f;
                 if (_enemyAnimation == null || !_enemyAnimation.IsReacting) BeginNormalHitFlash(info.IsHeavy);
             }
-            else _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
+            else
+            {
+                // 追撃専用の被弾Poseを全身の旧Flashで覆わず、閃光の中心を接触点へ限定する。
+                _hitUntil = 0f;
+                BeginNormalHitFlash(true);
+            }
         }
         else
         {
@@ -458,17 +467,30 @@ public sealed class CombatFeedback : MonoBehaviour
             _hitUntil = Time.unscaledTime + Mathf.Max(.01f, _reactionDuration);
         }
         Refresh();
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, info.IsJustAvoidCounter ? .12f : strongFeedback ? .10f : .075f, Mathf.Min(_hitFlashDuration, info.IsJustAvoidCounter ? .04f : .03f), info.IsJustAvoidCounter ? .5f : strongFeedback ? .4f : .3f, new Color(.93f, .96f, 1f));
+        Vector3 contact = _vfxConfig != null ? _vfxConfig.GetContactFlashStyle(info.IsHeavy, info.IsJustAvoidCounter) : new Vector3(.075f, .025f, .3f);
+        Color contactTint = new Color(.93f, .96f, 1f);
+        if (info.IsJustAvoidCounter && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
+        contactTint.a = 1f;
+        _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
         PlayHitVFX(info);
         var config = _audio != null ? _audio.AudioConfig : null;
-        _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
+        AudioClip hitClip = config != null ? config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter) : null;
+        // Final Blowが同じ衝撃Clipをこの命中処理の直後に鳴らす場合は、音を二重に重ねない。
+        bool finalBlowOwnsSound = _enemyOwner != null && _enemyOwner.HpRatio <= 0f &&
+            FinalBlowManager.Instance != null && FinalBlowManager.Instance.isActiveAndEnabled &&
+            hitClip != null && config != null && hitClip == _audio.GetSEClip(config.EnemyDeadSound);
+        if (!finalBlowOwnsSound)
+        {
+            if (hitClip != null) _audio.PlaySE(hitClip, config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
+            else _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
+        }
         if (_hitStop != null)
         {
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
         }
         _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
-        _cameraFeedback?.PlayHitFeedback(strongFeedback, info.HitPoint);
+        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter);
     }
 
     /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
@@ -481,6 +503,9 @@ public sealed class CombatFeedback : MonoBehaviour
         _hitAngles = new float[4][]; _hitSizes = new ParticleSystem.MinMaxCurve[4][];
         _hitSpeeds = new ParticleSystem.MinMaxCurve[4][];
         _hitLifetimes = new ParticleSystem.MinMaxCurve[4][];
+        _hitDelays = new ParticleSystem.MinMaxCurve[4][];
+        _hitColors = new ParticleSystem.MinMaxGradient[4][];
+        _hitLengths = new float[4][];
         _hitSlashRenderers = new ParticleSystemRenderer[4][];
         for (int i = 0; i < 4; i++)
         {
@@ -492,6 +517,9 @@ public sealed class CombatFeedback : MonoBehaviour
             _hitSizes[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
             _hitSpeeds[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
             _hitLifetimes[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            _hitDelays[i] = new ParticleSystem.MinMaxCurve[_hitParticles[i].Length];
+            _hitColors[i] = new ParticleSystem.MinMaxGradient[_hitParticles[i].Length];
+            _hitLengths[i] = new float[_hitParticles[i].Length];
             _hitSlashRenderers[i] = new ParticleSystemRenderer[_hitParticles[i].Length];
             for (int j = 0; j < _hitParticles[i].Length; j++)
             {
@@ -503,6 +531,9 @@ public sealed class CombatFeedback : MonoBehaviour
                 _hitSizes[i][j] = particle.main.startSize;
                 _hitSpeeds[i][j] = particle.main.startSpeed;
                 _hitLifetimes[i][j] = particle.main.startLifetime;
+                _hitDelays[i][j] = particle.main.startDelay;
+                _hitColors[i][j] = particle.main.startColor;
+                _hitLengths[i][j] = particle.GetComponent<ParticleSystemRenderer>().lengthScale;
                 if (particle.name == "SlashLine") _hitSlashRenderers[i][j] = particle.GetComponent<ParticleSystemRenderer>();
                 var main = particle.main;
                 main.loop = false; main.playOnAwake = false; main.useUnscaledTime = true; main.stopAction = ParticleSystemStopAction.None;
@@ -529,7 +560,10 @@ public sealed class CombatFeedback : MonoBehaviour
             particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
             bool slash = _hitSlashRenderers[i][j] != null;
-            float amount = slash ? 1f : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            float amount = slash ? 1f : info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXAmount : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            // 煙状の血だけ控えめにし、被弾姿勢と接触位置を隠さない。
+            if (particle.name == "BloodMist") amount *= .5f;
+            if (info.IsJustAvoidCounter && particle.name == "BloodMist") amount *= .25f;
             var emission = particle.emission;
             for (int b = 0; b < _hitBursts[i][j].Length; b++)
             {
@@ -543,11 +577,16 @@ public sealed class CombatFeedback : MonoBehaviour
                 emission.SetBurst(b, burst);
             }
             var shape = particle.shape;
-            shape.angle = _hitAngles[i][j] * (strongFeedback ? _vfxConfig.HeavyHitVFXSpread : 1f);
+            // 斬撃線はConeの乱数で曲げず、取得した刀の進行方向へ向ける。
+            shape.angle = slash ? 0f : _hitAngles[i][j] * (info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSpread : strongFeedback ? _vfxConfig.HeavyHitVFXSpread : 1f);
             var main = particle.main;
             main.startSize = ScaleHitCurve(_hitSizes[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSize : strongFeedback ? _vfxConfig.HeavyHitVFXSize : 1f);
             main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXSpeed : strongFeedback ? _vfxConfig.HeavyHitVFXSpeed : 1f);
-            main.startLifetime = ScaleHitCurve(_hitLifetimes[i][j], info.IsJustAvoidCounter ? .9f : info.IsHeavy ? 1.05f : 1f);
+            main.startLifetime = ScaleHitCurve(_hitLifetimes[i][j], info.IsJustAvoidCounter ? _vfxConfig.CounterBloodLifetime : info.IsHeavy ? 1.05f : 1f);
+            main.startColor = _hitColors[i][j];
+            main.startDelay = _hitDelays[i][j];
+            if (info.IsJustAvoidCounter && !slash && particle.name != "BloodMist") main.startColor = _vfxConfig.CounterBloodTint;
+            if (info.IsJustAvoidCounter && particle.name == "BloodStreaks") main.startDelay = 0f;
             if (slash)
             {
                 Vector3 style = _vfxConfig.GetSlashLineStyle(info.IsHeavy, info.IsJustAvoidCounter);
@@ -555,7 +594,13 @@ public sealed class CombatFeedback : MonoBehaviour
                 main.startSize = style.y / Mathf.Max(.01f, rootScale);
                 main.startLifetime = style.z;
                 _hitSlashRenderers[i][j].lengthScale = style.x / style.y;
-                main.startColor = new Color(.88f, .94f, 1f, info.IsJustAvoidCounter ? .95f : info.IsHeavy ? .9f : .8f);
+                main.startColor = info.IsHeavy && !info.IsJustAvoidCounter ? new Color(.97f, .9f, .75f, .65f) : new Color(.88f, .94f, 1f, info.IsJustAvoidCounter ? .85f : .6f);
+            }
+            else
+            {
+                // Pool再利用ごとに元の長さへ戻し、追撃の筋だけ方向に沿って伸ばす。
+                var renderer = particle.GetComponent<ParticleSystemRenderer>();
+                renderer.lengthScale = _hitLengths[i][j] * (info.IsJustAvoidCounter && particle.name == "BloodStreaks" ? _vfxConfig.CounterBloodStreakLength : 1f);
             }
             particle.Play(false);
         }

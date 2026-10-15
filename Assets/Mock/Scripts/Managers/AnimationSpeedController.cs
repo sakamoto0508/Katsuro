@@ -31,8 +31,13 @@ public sealed class AnimationSpeedController : MonoBehaviour
     /// <param name="seconds">実時間で計測する有効秒数。</param>
     public void SetTemporary(float multiplier, float seconds)
     {
-        temporary = Mathf.Max(0f, multiplier);
-        expires = Time.realtimeSinceStartup + Mathf.Max(0f, seconds);
+        float now = Time.realtimeSinceStartup;
+        float nextSpeed = Mathf.Max(0f, multiplier);
+        float nextExpires = now + Mathf.Max(0f, seconds);
+        // 短いHitStopの追加で、まだ有効な長い完全停止を短縮しない。
+        // Slowと完全停止の切り替えは従来の要求を優先する。
+        expires = temporary == 0f && nextSpeed == 0f && now < expires ? Mathf.Max(expires, nextExpires) : nextExpires;
+        temporary = nextSpeed;
         Refresh();
     }
 

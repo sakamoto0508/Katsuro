@@ -35,9 +35,9 @@ Shader "Katsuro/BladeTrail"
             float _CoreWidth, _CoreBrightness, _BodyAlpha, _BodyWidth, _AfterGlowAlpha;
             float _EdgeFade, _TailFade, _TipBrightness, _Brightness, _FadePower;
             CBUFFER_END
-            struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 color:COLOR; };
-            struct V { float4 positionCS:SV_POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 color:COLOR; };
-            V Vert(A a) { V o; o.positionCS=TransformObjectToHClip(a.positionOS); o.uv=a.uv; o.dynamics=a.dynamics; o.color=a.color*_Tint; return o; }
+            struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; };
+            struct V { float4 positionCS:SV_POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; };
+            V Vert(A a) { V o; o.positionCS=TransformObjectToHClip(a.positionOS); o.uv=a.uv; o.dynamics=a.dynamics; o.highlight=a.highlight; o.color=a.color*_Tint; return o; }
             float4 Frag(V i):SV_Target
             {
                 // UV.y spans only the outer blade segment selected by SwordTrail.
@@ -48,13 +48,13 @@ Shader "Katsuro/BladeTrail"
                 float tip = lerp(.2,_TipBrightness,smoothstep(.3,.9,blade));
                 float width = max(.02,_BodyWidth*i.dynamics.y*lerp(.75,1,saturate(i.dynamics.x)));
                 float bodyShape = exp(-pow((blade-.75)/width,2));
-                float bodyA = i.color.a * _BodyAlpha * bodyShape * edge * tail;
+                float bodyA = i.color.a * _BodyAlpha * bodyShape * edge * tail * i.highlight.w;
                 float coreShape = exp(-pow((blade-.9)/max(.005,_CoreWidth),2));
                 // Only the fresh half retains the bright core; older samples
                 // use the faint body/glow and the compounded vertex + shader fade.
-                float coreA = i.color.a * .82 * coreShape * edge * (1-smoothstep(.12,.55,age));
+                float coreA = i.color.a * .82 * coreShape * edge * i.highlight.x * (1-smoothstep(.08,1,i.highlight.z));
                 float glowShape = exp(-pow((blade-.75)/(width*1.1),2));
-                float glowA = i.color.a * _AfterGlowAlpha * glowShape * edge * tail * smoothstep(.08,.3,age);
+                float glowA = i.color.a * _AfterGlowAlpha * glowShape * edge * tail * smoothstep(.08,.3,age) * i.highlight.y;
                 float3 steel = i.color.rgb * _Brightness;
                 float3 coreColor = lerp(steel,float3(1,1.015,1.035)*dot(steel,float3(.2126,.7152,.0722)),.8);
                 float3 rgb = coreColor*_CoreBrightness*coreA + steel*tip*bodyA + steel*float3(.8,.85,.92)*glowA;

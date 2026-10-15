@@ -53,6 +53,15 @@ public sealed class SwordTrail : MonoBehaviour
     /// <summary>通常の明るさへ掛けるJust Avoid追撃の追加倍率。</summary>
     [UnityEngine.Tooltip("通常の明るさへ掛けるJust Avoid追撃の追加倍率。")]
     [SerializeField, Range(1f, 2f)] private float _counterBrightness = 1.35f;
+    /// <summary>追撃の振りのピークだけに掛ける細いコアの強度。残光や幅には掛けない。</summary>
+    [SerializeField, Range(0f, 4f), Tooltip("追撃の高速区間だけ強まる細いコア。軌跡全体は明るくしません。")]
+    private float _counterCoreIntensity = 2.6f;
+    /// <summary>追撃の明るいコアが消える実時間。残光の寿命とは独立する。</summary>
+    [SerializeField, Range(.015f, .06f), Tooltip("追撃コアの寿命（秒）。HitStop中も短く減衰します。")]
+    private float _counterCoreDuration = .026f;
+    /// <summary>追撃の淡い外側と残光の表示倍率。高輝度コアから分離して抑える。</summary>
+    [SerializeField, Range(0f, 1f), Tooltip("追撃の外側・残光の倍率。細いコアの強さとは独立します。")]
+    private float _counterAfterglow = .3f;
     // 旧Prefabの幅設定を保持する。端点未設定の場合だけ使う。
     /// <summary>刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。</summary>
     [UnityEngine.Tooltip("刃先Transform未設定時だけ使う旧互換の軌跡端点距離（Unity単位）。通常Inspectorでは非表示。")]
@@ -61,10 +70,12 @@ public sealed class SwordTrail : MonoBehaviour
     private readonly Vector3[] bases = new Vector3[Capacity], tips = new Vector3[Capacity];
     private readonly float[] times = new float[Capacity];
     private readonly float[] lifetimes = new float[Capacity], strengths = new float[Capacity], sampleWidths = new float[Capacity];
+    private readonly Vector3[] accents = new Vector3[Capacity];
     private const int CurveSteps = 3;
     private readonly Vector3[] vertices = new Vector3[Capacity * CurveSteps * 2];
     private readonly Vector2[] uvs = new Vector2[Capacity * CurveSteps * 2];
     private readonly Vector2[] dynamics = new Vector2[Capacity * CurveSteps * 2];
+    private readonly Vector4[] highlights = new Vector4[Capacity * CurveSteps * 2];
     private readonly Color[] colors = new Color[Capacity * CurveSteps * 2];
     private readonly int[] triangles = new int[(Capacity * CurveSteps - 1) * 6];
     private int count;
@@ -126,6 +137,9 @@ public sealed class SwordTrail : MonoBehaviour
         float now = FeedbackVisualTime.Now;
         Vector3 ownerPosition = owner != null ? owner.position : Vector3.zero;
         float delta = now - previousTime;
+        // 低FPSの短い間隔は補間し、長い停止・移動ジャンプは別の軌跡として始める。
+        if (hasPrevious && (delta > .12f || (ownerPosition - previousOwnerPosition).sqrMagnitude > 4f))
+        { count = 0; hasPrevious = false; speedStrength = 0f; }
         float speed = hasPrevious && delta > .0001f ? ((b - previousTip) - (ownerPosition - previousOwnerPosition)).magnitude / delta : 0f;
         previousTip = b; previousOwnerPosition = ownerPosition; previousTime = now; hasPrevious = true;
         float target = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_minimumSpeed, Mathf.Max(_minimumSpeed + .1f, _fullSpeed), speed));
@@ -144,7 +158,11 @@ public sealed class SwordTrail : MonoBehaviour
         bases[count] = a; tips[count] = b; times[count] = now;
         lifetimes[count] = duration * Mathf.Lerp(.6f, 1f, speedStrength);
         strengths[count] = speedStrength * power;
-        sampleWidths[count] = style == AttackStyle.Light ? 1f : style == AttackStyle.Heavy ? 1.04f : 1.08f;
+        sampleWidths[count] = style == AttackStyle.Heavy ? 1.02f : 1f;
+        bool counter = style == AttackStyle.JustAvoidCounter;
+        accents[count] = counter
+            ? new Vector3(.08f + _counterCoreIntensity * Mathf.Pow(speedStrength, 4f), _counterAfterglow, _counterCoreDuration)
+            : new Vector3(style == AttackStyle.Heavy ? .9f : .6f, 1f, duration * .45f);
         count++;
     }
     /// <summary>履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。</summary>
@@ -158,6 +176,7 @@ public sealed class SwordTrail : MonoBehaviour
     {
         bases[destination] = bases[source]; tips[destination] = tips[source]; times[destination] = times[source];
         lifetimes[destination] = lifetimes[source]; strengths[destination] = strengths[source]; sampleWidths[destination] = sampleWidths[source];
+        accents[destination] = accents[source];
     }
     /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
     private void LateUpdate()
@@ -167,6 +186,11 @@ public sealed class SwordTrail : MonoBehaviour
         int live = 0;
         for (int i = 0; i < count; i++)
             if (now - times[i] < lifetimes[i]) { CopySample(i, live); live++; }
+        // 15〜20fpsで寿命よりフレーム間隔が長くても、直前位置から短い線を作れるよう種だけ残す。
+        if (live == 0 && count > 0 && emitting && now - times[count - 1] < .12f)
+        {
+            CopySample(count - 1, 0); strengths[0] = 0f; times[0] = now; lifetimes[0] = .01f; live = 1;
+        }
         count = live;
         if (emitting) Sample();
         mesh.Clear();
@@ -182,6 +206,9 @@ public sealed class SwordTrail : MonoBehaviour
             float age = Mathf.Clamp01((now - Mathf.Lerp(times[i], times[j], t)) / Mathf.Max(.01f, Mathf.Lerp(lifetimes[i], lifetimes[j], t)));
             uvs[v] = new Vector2(age, 0); uvs[v + 1] = new Vector2(age, 1);
             dynamics[v] = dynamics[v + 1] = new Vector2(Mathf.Clamp01(strength), Mathf.Lerp(sampleWidths[i], sampleWidths[j], t));
+            Vector3 accent = Vector3.Lerp(accents[i], accents[j], t);
+            float coreAge = Mathf.Max(0f, now - Mathf.Lerp(times[i], times[j], t)) / Mathf.Max(.01f, accent.z);
+            highlights[v] = highlights[v + 1] = new Vector4(accent.x, accent.y, coreAge, accent.y);
             Color color = _color; color.r *= _brightness * strength; color.g *= _brightness * strength; color.b *= _brightness * strength;
             color.a *= Mathf.Clamp01(strength) * Mathf.Pow(1f - age, _fade);
             colors[v] = colors[v + 1] = color;
@@ -193,6 +220,7 @@ public sealed class SwordTrail : MonoBehaviour
         mesh.SetVertices(vertices, 0, points * 2);
         mesh.SetUVs(0, uvs, 0, points * 2);
         mesh.SetUVs(1, dynamics, 0, points * 2);
+        mesh.SetUVs(2, highlights, 0, points * 2);
         mesh.SetColors(colors, 0, points * 2);
         mesh.SetTriangles(triangles, 0, (points - 1) * 6, 0);
         mesh.RecalculateBounds();

@@ -18,8 +18,10 @@ MonoBehaviour:
   _lockOnObstacleMask:
     serializedVersion: 2
     m_Bits: 4294967291
-  _lightHitCameraStrength: 0.025
+  _lightHitCameraStrength: 0.012
   _heavyHitCameraStrength: 0.055
+  _counterHitCameraStrength: 0.075
+  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.12}
   _cameraDuration: 0.12
   _justAvoidFOVOffset: 1.5
   _justAvoidFOVDuration: 0.18

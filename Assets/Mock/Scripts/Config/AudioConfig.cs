@@ -29,6 +29,27 @@ public class AudioConfig : ScriptableObject
     /// <summary>通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。</summary>
     [UnityEngine.Tooltip("通常Heavy命中時にAudioManagerのSE一覧から検索する登録名。")]
     [SerializeField] private string _heavyHitSound = "Damage";
+    /// <summary>通常Lightの接触音。未設定なら従来の登録名を使う。</summary>
+    [SerializeField, Tooltip("Light命中音。既存SEプールとユーザー音量設定を使います。")]
+    private AudioClip _lightHitClip;
+    /// <summary>通常Heavyの衝撃音。物理命中時だけ再生する。</summary>
+    [SerializeField, Tooltip("Heavy命中音。空振りでは再生しません。")]
+    private AudioClip _heavyHitClip;
+    /// <summary>追撃の接触音。ジャスト回避成功時の音とは別の命中音。</summary>
+    [SerializeField, Tooltip("Just Avoid追撃の命中音。成功演出のSEは変更しません。")]
+    private AudioClip _counterHitClip;
+    /// <summary>命中音の基準音量。X=Light、Y=Heavy、Z=追撃。ユーザー音量をさらに合成する。</summary>
+    [SerializeField, Tooltip("命中音量。X=Light、Y=Heavy、Z=追撃。")]
+    private Vector3 _hitVolumes = new Vector3(.7f, .9f, .65f);
+    /// <summary>素材先頭の間を除く再生開始位置。音程や音源そのものは変更しない。</summary>
+    [SerializeField, Tooltip("再生開始位置（秒）。X=Light、Y=Heavy、Z=追撃。")]
+    private Vector3 _hitStartOffsets = new Vector3(.04f, 0f, .195f);
+    /// <summary>命中種別のClipを取得する。追撃音が未設定ならHeavyへ戻す。</summary>
+    public AudioClip GetHitClip(bool heavy, bool counter) => counter ? (_counterHitClip != null ? _counterHitClip : _heavyHitClip) : heavy ? _heavyHitClip : _lightHitClip;
+    /// <summary>ユーザー音量へ掛ける命中種別の基準音量を取得する。</summary>
+    public float GetHitVolume(bool heavy, bool counter) => Mathf.Clamp01(_hitVolumes[counter ? 2 : heavy ? 1 : 0]);
+    /// <summary>選択Clipの先頭の間を除く開始位置を取得する。</summary>
+    public float GetHitStartOffset(bool heavy, bool counter) => Mathf.Max(0f, _hitStartOffsets[counter && _counterHitClip != null ? 2 : heavy || counter ? 1 : 0]);
     /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>
     public string JustAvoidSound => _justAvoidSound;
     /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>
