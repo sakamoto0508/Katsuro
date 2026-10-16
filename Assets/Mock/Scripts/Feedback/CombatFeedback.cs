@@ -88,6 +88,10 @@ public sealed class CombatFeedback : MonoBehaviour
     private JustAvoidScreenDistortion _screenDistortion;
     private HitStopManager _hitStop;
     private ContactPulse _contactPulse;
+    private JustAvoidCounterCutVFX[] _counterCuts;
+    private int _nextCounterCut;
+    private JustAvoidCounterCutVFX[] _counterFirstCuts;
+    private int _nextCounterFirstCut;
     private ParticleSystem[][] _hitParticles;
     private ParticleSystem.Burst[][][] _hitBursts;
     private float[][] _hitAngles;
@@ -430,7 +434,10 @@ public sealed class CombatFeedback : MonoBehaviour
         float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
         bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
         if (info.IsJustAvoidCounter && info.Instigator != null)
+        {
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
+            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint);
+        }
         if (_enemyOwner != null)
         {
             _enemyAnimation?.DiagnoseNormalHitRequest(info, useBoneReaction);
@@ -456,7 +463,7 @@ public sealed class CombatFeedback : MonoBehaviour
             {
                 // 追撃専用の被弾Poseを全身の旧Flashで覆わず、閃光の中心を接触点へ限定する。
                 _hitUntil = 0f;
-                BeginNormalHitFlash(true);
+                BeginNormalHitFlash(!info.IsCounterFirst);
             }
         }
         else
@@ -468,35 +475,55 @@ public sealed class CombatFeedback : MonoBehaviour
         }
         Refresh();
         Vector3 contact = _vfxConfig != null ? _vfxConfig.GetContactFlashStyle(info.IsHeavy, info.IsJustAvoidCounter) : new Vector3(.075f, .025f, .3f);
+        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
+        if (info.IsCounterFirst && counterPresentation != null) contact = counterPresentation.FirstContact;
         Color contactTint = new Color(.93f, .96f, 1f);
-        if (info.IsJustAvoidCounter && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
+        if (info.IsJustAvoidCounter && !info.IsCounterFirst && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
         contactTint.a = 1f;
-        _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
-        PlayHitVFX(info);
+        var cuts = info.IsCounterFirst ? _counterFirstCuts : _counterCuts;
+        bool dedicatedCut = info.IsJustAvoidCounter && cuts != null;
+        if (dedicatedCut)
+        {
+            int slot = info.IsCounterFirst ? _nextCounterFirstCut : _nextCounterCut;
+            cuts[slot].Play(info.HitPoint, info.SlashDirection, info.HitNormal);
+            if (cuts[slot].UsesLocalContactFlash)
+                _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
+            if (info.IsCounterFirst) _nextCounterFirstCut = (slot + 1) % cuts.Length;
+            else _nextCounterCut = (slot + 1) % cuts.Length;
+        }
+        else
+        {
+            _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
+            PlayHitVFX(info);
+        }
         var config = _audio != null ? _audio.AudioConfig : null;
-        AudioClip hitClip = config != null ? config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter) : null;
+        AudioClip hitClip = config != null ? (info.IsCounterFirst ? config.GetCounterFirstClip() : config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter)) : null;
         // Final Blowが同じ衝撃Clipをこの命中処理の直後に鳴らす場合は、音を二重に重ねない。
         bool finalBlowOwnsSound = _enemyOwner != null && _enemyOwner.HpRatio <= 0f &&
             FinalBlowManager.Instance != null && FinalBlowManager.Instance.isActiveAndEnabled &&
             hitClip != null && config != null && hitClip == _audio.GetSEClip(config.EnemyDeadSound);
         if (!finalBlowOwnsSound)
         {
-            if (hitClip != null) _audio.PlaySE(hitClip, config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
+            if (hitClip != null) _audio.PlaySE(hitClip, info.IsCounterFirst ? config.CounterFirstHitVolume : config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), info.IsCounterFirst ? config.CounterFirstHitOffset : config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
             else _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
         }
         if (_hitStop != null)
         {
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
+            if (info.IsJustAvoidCounter && counterPresentation != null) duration = counterPresentation.GetStrike(info.CounterStrike).HitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
         }
         _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
-        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter);
+        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter, info.IsCounterFirst);
     }
 
     /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
     private void PrepareContactFeedback()
     {
         _contactPulse = new ContactPulse(gameObject.layer);
+        var counter = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
+        _counterCuts = CreateCounterPool(counter != null ? counter.FinisherCFX : null);
+        _counterFirstCuts = CreateCounterPool(counter != null ? counter.FirstCFX : null);
         if (_vfxConfig == null || _vfxConfig.HitVFX == null) return;
         _hitRoots = new GameObject[4]; _hitParticles = new ParticleSystem[4][]; _hitStarted = new float[4];
         _hitBursts = new ParticleSystem.Burst[4][][];
@@ -540,6 +567,19 @@ public sealed class CombatFeedback : MonoBehaviour
             }
         }
     }
+    /// <summary>段ごとの専用CFXを初期化時に固定数だけ作り、命中時の生成と破棄を避ける。</summary>
+    private JustAvoidCounterCutVFX[] CreateCounterPool(JustAvoidCounterCutVFX prefab)
+    {
+        if (prefab == null) return null;
+        var pool = new JustAvoidCounterCutVFX[4];
+        for (int i = 0; i < pool.Length; i++)
+        {
+            pool[i] = Instantiate(prefab);
+            foreach (var child in pool[i].GetComponentsInChildren<Transform>(true)) child.gameObject.layer = gameObject.layer;
+            pool[i].Stop();
+        }
+        return pool;
+    }
     /// <summary>再利用する命中Prefabを接触位置へ配置し、攻撃種別に応じた粒子量と速度で再生する。</summary>
     private void PlayHitVFX(DamageInfo info)
     {
@@ -561,6 +601,7 @@ public sealed class CombatFeedback : MonoBehaviour
             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
             bool slash = _hitSlashRenderers[i][j] != null;
             float amount = slash ? 1f : info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXAmount : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
+            if (info.IsCounterFirst && !slash && _vfxConfig.CounterPresentation != null) amount *= _vfxConfig.CounterPresentation.FirstBloodAmount;
             // 煙状の血だけ控えめにし、被弾姿勢と接触位置を隠さない。
             if (particle.name == "BloodMist") amount *= .5f;
             if (info.IsJustAvoidCounter && particle.name == "BloodMist") amount *= .25f;
@@ -590,6 +631,7 @@ public sealed class CombatFeedback : MonoBehaviour
             if (slash)
             {
                 Vector3 style = _vfxConfig.GetSlashLineStyle(info.IsHeavy, info.IsJustAvoidCounter);
+                if (info.IsCounterFirst) style = _vfxConfig.GetSlashLineStyle(false, false);
                 float rootScale = _hitRoots[i].transform.localScale.x;
                 main.startSize = style.y / Mathf.Max(.01f, rootScale);
                 main.startLifetime = style.z;
@@ -632,6 +674,8 @@ public sealed class CombatFeedback : MonoBehaviour
         UpdateJustAvoid();
         _contactPulse?.Update();
         UpdateHitVFX();
+        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) cut.Tick();
+        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) cut.Tick();
     }
 
     /// <summary>AnimatorだけのHitStopでは粒子を進め、ゲーム全体のPauseでは遅延を含め粒子と寿命時計を止める。</summary>
@@ -721,6 +765,8 @@ public sealed class CombatFeedback : MonoBehaviour
         _justAvoidContrast?.Cancel();
         StopJustAvoid();
         _contactPulse?.Stop();
+        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) cut.Stop();
+        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) cut.Stop();
         if (_hitRoots != null) for (int i = 0; i < _hitRoots.Length; i++) StopHitVFX(i);
         RemoveOffset();
         CancelNormalHitReaction();
@@ -735,6 +781,8 @@ public sealed class CombatFeedback : MonoBehaviour
         if (_normalFlashRenderers != null) foreach (var overlay in _normalFlashRenderers) if (overlay != null) Destroy(overlay.gameObject);
         if (_normalFlashMaterial != null) Destroy(_normalFlashMaterial);
         _contactPulse?.Dispose();
+        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) Destroy(cut.gameObject);
+        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) Destroy(cut.gameObject);
         if (_hitRoots != null) foreach (var root in _hitRoots) if (root != null) Destroy(root);
         if (_afterImageMeshes != null)
             foreach (var mesh in _afterImageMeshes) if (mesh != null) Destroy(mesh);

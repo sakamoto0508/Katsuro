@@ -1,0 +1,13 @@
+using UnityEngine;using UnityEditor;using System;using System.Linq;using System.Reflection;
+public static class CounterFinalVerify {
+ public static object Main(){
+  var config=AssetDatabase.LoadAssetAtPath<JustAvoidCounterConfig>("Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset");
+  var result=new {playing=EditorApplication.isPlaying,scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene().path,dirty=UnityEngine.SceneManagement.SceneManager.GetActiveScene().isDirty,compiling=EditorApplication.isCompiling,
+   firstCFX=AssetDatabase.GetAssetPath(config.FirstCFX),secondCFX=AssetDatabase.GetAssetPath(config.FinisherCFX),
+   materials=new[]{"JustAvoidCounterFirstCut","JustAvoidCounterCut","JustAvoidCounterBlood"}.Select(n=>{var m=AssetDatabase.LoadAssetAtPath<Material>("Assets/Mock/Effects/"+n+".mat");return new {name=n,shader=m.shader.name,zTest=m.GetFloat("_ZTest"),gain=m.HasProperty("_BloodGain")?m.GetFloat("_BloodGain"):0,errors=ShaderUtil.GetShaderMessages(m.shader).Where(s=>s.severity==UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error).Select(s=>s.message).ToArray()};}).ToArray(),
+   particles=new[]{config.FirstCFX,config.FinisherCFX}.SelectMany(fx=>fx.GetComponentsInChildren<ParticleSystem>(true).Select(ps=>new{name=fx.name+"/"+ps.name,space=ps.main.simulationSpace.ToString(),sizeMin=ps.main.startSize.constantMin,sizeMax=ps.main.startSize.constantMax,material=AssetDatabase.GetAssetPath(ps.GetComponent<ParticleSystemRenderer>().sharedMaterial)})).ToArray()};
+  var flags=BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.FlattenHierarchy;var assembly=typeof(Editor).Assembly;var sizeType=assembly.GetType("UnityEditor.GameViewSizes");var sizes=sizeType.GetProperty("instance",flags).GetValue(null);var group=sizeType.GetProperty("currentGroup",flags).GetValue(sizes);var view=EditorWindow.GetWindow(assembly.GetType("UnityEditor.GameView"));view.GetType().GetProperty("selectedSizeIndex",flags).SetValue(view,SessionState.GetInt("CounterValidationGameViewIndex",3));int added=SessionState.GetInt("CounterValidationGameViewAdded",-1);if(added>=0&&(bool)group.GetType().GetMethod("IsCustomSize").Invoke(group,new object[]{added})){int custom=(int)group.GetType().GetMethod("TotalIndexToCustomIndex").Invoke(group,new object[]{added});group.GetType().GetMethod("RemoveCustomSize").Invoke(group,new object[]{added});SessionState.EraseInt("CounterValidationGameViewAdded");}
+  System.IO.File.WriteAllText("Artifacts/JustAvoidCounter/PlayMode/AssetVerification.json",Newtonsoft.Json.JsonConvert.SerializeObject(result,Newtonsoft.Json.Formatting.Indented));return result;
+ }
+}
+

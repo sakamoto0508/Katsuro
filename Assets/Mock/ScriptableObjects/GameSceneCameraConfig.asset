@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
   m_Name: GameSceneCameraConfig
   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
+  _counterFirstCameraStrength: 0.018
+  _counterFirstCameraDuration: 0.055
   _lockOnSideOffset: 1.65
   _lockOnTargetWeight: 1
   _lockOnReleaseBlendDuration: 0.3
@@ -20,8 +22,8 @@ MonoBehaviour:
     m_Bits: 4294967291
   _lightHitCameraStrength: 0.012
   _heavyHitCameraStrength: 0.055
-  _counterHitCameraStrength: 0.075
-  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.12}
+  _counterHitCameraStrength: 0.085
+  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.105}
   _cameraDuration: 0.12
   _justAvoidFOVOffset: 1.5
   _justAvoidFOVDuration: 0.18

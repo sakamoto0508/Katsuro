@@ -75,11 +75,11 @@ public class CameraManager : MonoBehaviour
     }
 
     /// <summary>攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。</summary>
-    public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false)
+    public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false, bool counterFirst = false)
     {
         if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying || _combatImpulse == null || _config == null) return;
-        float strength = _config.GetHitCameraStrength(heavy, counter);
-        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter);
+        float strength = _config.GetHitCameraStrength(heavy, counter, counterFirst);
+        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter, counterFirst);
         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
     }
     /// <summary>Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。</summary>

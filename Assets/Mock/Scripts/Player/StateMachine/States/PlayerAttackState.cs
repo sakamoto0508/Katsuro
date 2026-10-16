@@ -196,8 +196,8 @@ public abstract class PlayerAttackState : PlayerState
     /// <summary>次段に進める余地があるか判定する。</summary>
     private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
 
-    /// <summary>現在または遷移先の通常攻撃Clipが終端前か確認し、時間による早期終了を抑える。</summary>
-    /// <returns>通常攻撃タグを持つStateが再生途中ならtrue。</returns>
+    /// <summary>現在または遷移先の攻撃Clipが終端前か確認し、追撃の段階識別も早期終了から守る。</summary>
+    /// <returns>通常攻撃またはJust Avoid追撃のStateが再生途中ならtrue。</returns>
     private bool IsNormalAttackStillPlaying()
     {
         if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;
@@ -205,6 +205,7 @@ public abstract class PlayerAttackState : PlayerState
             ? _attackAnimator.GetNextAnimatorStateInfo(0) : _attackAnimator.GetCurrentAnimatorStateInfo(0);
         // Finished events remain the primary exit. The clip-length timer is only a
         // fallback after animation completion, rather than cutting off a slower clip.
-        return state.IsTag(NormalAttackSpeedState.AttackTag) && state.normalizedTime < 1f;
+        return (state.IsTag(NormalAttackSpeedState.AttackTag)
+            || state.IsTag(PlayerAttacker.JustAvoidCounterTag)) && state.normalizedTime < 1f;
     }
 }

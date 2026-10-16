@@ -5,6 +5,13 @@ using UnityEngine;
 /// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
 public class AudioConfig : ScriptableObject
 {
+    [Header("Just Avoid Counter / First contact")]
+    [SerializeField] private AudioClip _counterFirstHitClip;
+    [SerializeField, Range(0f, 1f)] private float _counterFirstHitVolume = .52f;
+    [SerializeField, Min(0f)] private float _counterFirstHitOffset = .04f;
+    public AudioClip GetCounterFirstClip() => _counterFirstHitClip != null ? _counterFirstHitClip : _lightHitClip;
+    public float CounterFirstHitVolume => _counterFirstHitVolume;
+    public float CounterFirstHitOffset => _counterFirstHitOffset;
     /// <summary>ゲーム開始操作で再生するSEの登録名。</summary>
     public string StartSE => _startSE;
     /// <summary>タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。</summary>

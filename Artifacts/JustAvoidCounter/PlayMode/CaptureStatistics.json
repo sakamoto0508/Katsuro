@@ -1,0 +1,32 @@
+{
+  "Bright-All": {
+    "frames": 24,
+    "median_interval_ms": 32.3,
+    "max_interval_ms": 37.0
+  },
+  "Bright-BloodOnly": {
+    "frames": 25,
+    "median_interval_ms": 30.9,
+    "max_interval_ms": 61.6
+  },
+  "Bright-CutOnly": {
+    "frames": 25,
+    "median_interval_ms": 30.3,
+    "max_interval_ms": 37.7
+  },
+  "Dark-All": {
+    "frames": 26,
+    "median_interval_ms": 28.1,
+    "max_interval_ms": 53.7
+  },
+  "Near-All": {
+    "frames": 30,
+    "median_interval_ms": 25.7,
+    "max_interval_ms": 31.0
+  },
+  "RedGrass-All": {
+    "frames": 26,
+    "median_interval_ms": 30.2,
+    "max_interval_ms": 36.2
+  }
+}

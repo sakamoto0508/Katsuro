@@ -1,11 +1,13 @@
 using UnityEngine;
 
-/// <summary>刀身の切先側だけを時間方向につなぎ、細い軌跡を短く残す。</summary>
+/// <summary>刀身端点の履歴を共有し、通常の細い軌跡と追撃専用の白銀Ribbonを描く。</summary>
 [DisallowMultipleComponent]
 public sealed class SwordTrail : MonoBehaviour
 {
     /// <summary>通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。</summary>
     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
+    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
+    private JustAvoidCounterStrike counterStrike;
     /// <summary>通常攻撃の刀軌跡を残す時間（秒）。</summary>
     [UnityEngine.Tooltip("通常攻撃の刀軌跡を残す時間（秒）。")]
     [Header("刀身の軌跡")]
@@ -89,20 +91,42 @@ public sealed class SwordTrail : MonoBehaviour
     private Vector3 previousTip, previousOwnerPosition;
     private float previousTime, speedStrength;
     private bool hasPrevious;
+    private CounterSlashPresentation counterSlash;
+    private JustAvoidCounterAnimation counterAnimation;
+    private bool counterWindow, counterSuppressed, captureCounterHit;
 
     /// <summary>共有先を含む刀の軌跡を攻撃種別の持続時間・明るさへ切り替える。</summary>
-    public void SetStyle(AttackStyle value)
+    public void SetStyle(AttackStyle value, JustAvoidCounterStrike strike = JustAvoidCounterStrike.None)
     {
-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value); return; }
+        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value, strike); return; }
+        if (counterSlash != null && (style != value || counterStrike != strike))
+        {
+            if (style == AttackStyle.JustAvoidCounter || value == AttackStyle.JustAvoidCounter)
+            { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; }
+            counterSlash.Configure(value == AttackStyle.JustAvoidCounter && _counterPresentation != null
+                ? _counterPresentation.GetStrike(strike) : null);
+        }
         style = value;
+        counterStrike = strike;
+        if (value != AttackStyle.JustAvoidCounter) counterWindow = false;
     }
     /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
     public void SetActive(bool active)
     {
         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetActive(active); return; }
+        // Counter visuals follow the existing counter State, without extending the hitbox.
+        if (!active && counterWindow) return;
         if (!initialized || emitting == active) return;
         emitting = active;
-        if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; Sample(); }
+        if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
+    }
+    /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
+    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point)
+    {
+        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point); return; }
+        if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
+        counterSlash.Hit(point, FeedbackVisualTime.Now);
+        captureCounterHit = true;
     }
     /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
     /// <returns>軌跡の描画リソースを使用可能になった場合はtrue。</returns>
@@ -118,13 +142,16 @@ public sealed class SwordTrail : MonoBehaviour
         material = _trailMaterial;
         if (material == null) { material = new Material(shader); ownsMaterial = true; }
         mesh = new Mesh { name = "Blade Trail Surface" }; mesh.MarkDynamic();
-        owner = GetComponentInParent<Animator>()?.transform;
+        owner = GetComponentInParent<Animator>(true)?.transform;
         surface = new GameObject("Blade Trail Surface", typeof(MeshFilter), typeof(MeshRenderer));
         surface.layer = gameObject.layer;
         // Keep sampled vertices in world space; do not transform the history with the blade.
         surface.GetComponent<MeshFilter>().sharedMesh = mesh;
         var renderer = surface.GetComponent<MeshRenderer>(); renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; renderer.receiveShadows = false;
+        counterSlash = new CounterSlashPresentation(renderer, material);
+        counterAnimation = owner != null ? owner.GetComponent<JustAvoidCounterAnimation>() : null;
+        GameManager.OnGameStateChanged += OnGameStateChanged;
         initialized = true;
         return true;
     }
@@ -133,15 +160,18 @@ public sealed class SwordTrail : MonoBehaviour
     {
         Vector3 realBase = _bladeBase != null ? _bladeBase.position : transform.position;
         Vector3 b = _tip != null ? _tip.position : transform.position + transform.up * _width;
-        Vector3 a = Vector3.Lerp(realBase, b, _bladeTrailStart);
+        bool silverSlash = counterSlash != null && counterSlash.Enabled;
+        Vector3 a = Vector3.Lerp(realBase, b, silverSlash ? counterSlash.Settings.BladeStart : _bladeTrailStart);
+        Vector3 physicalTip = b;
+        if (silverSlash) b += (b - realBase) * counterSlash.Settings.TipExtension;
         float now = FeedbackVisualTime.Now;
         Vector3 ownerPosition = owner != null ? owner.position : Vector3.zero;
         float delta = now - previousTime;
         // 低FPSの短い間隔は補間し、長い停止・移動ジャンプは別の軌跡として始める。
         if (hasPrevious && (delta > .12f || (ownerPosition - previousOwnerPosition).sqrMagnitude > 4f))
         { count = 0; hasPrevious = false; speedStrength = 0f; }
-        float speed = hasPrevious && delta > .0001f ? ((b - previousTip) - (ownerPosition - previousOwnerPosition)).magnitude / delta : 0f;
-        previousTip = b; previousOwnerPosition = ownerPosition; previousTime = now; hasPrevious = true;
+        float speed = hasPrevious && delta > .0001f ? ((physicalTip - previousTip) - (ownerPosition - previousOwnerPosition)).magnitude / delta : 0f;
+        previousTip = physicalTip; previousOwnerPosition = ownerPosition; previousTime = now; hasPrevious = true;
         float target = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_minimumSpeed, Mathf.Max(_minimumSpeed + .1f, _fullSpeed), speed));
         speedStrength = Mathf.MoveTowards(speedStrength, target, Mathf.Max(0f, delta) * (target > speedStrength ? 30f : 60f));
         if (count > 0 && (a - bases[count - 1]).sqrMagnitude + (b - tips[count - 1]).sqrMagnitude < .000004f) return;
@@ -149,20 +179,25 @@ public sealed class SwordTrail : MonoBehaviour
         {
             // Keep one invisible seed at the current blade, rather than bridging
             // a long pause to the next fast sample.
-            if (count == 0) { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = .01f; strengths[0] = 0f; sampleWidths[0] = 1f; count = 1; }
+            if (count == 0 || (silverSlash && count == 1 && strengths[0] <= 0f))
+            { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = silverSlash ? .12f : .01f; strengths[0] = 0f; sampleWidths[0] = 1f; accents[0] = Vector3.zero; count = 1; }
             return;
         }
         if (count == Capacity) RemoveOldest();
         float duration = style == AttackStyle.JustAvoidCounter ? _counterDuration : style == AttackStyle.Heavy ? _heavyDuration : _duration;
         float power = style == AttackStyle.JustAvoidCounter ? _counterBrightness : style == AttackStyle.Heavy ? _heavyBrightness : 1f;
+        var counterSettings = style == AttackStyle.JustAvoidCounter && _counterPresentation != null ? _counterPresentation.GetStrike(counterStrike) : null;
+        if (counterSettings != null) { duration = counterSettings.TrailDuration; power = counterSettings.TrailBrightness; }
         bases[count] = a; tips[count] = b; times[count] = now;
         lifetimes[count] = duration * Mathf.Lerp(.6f, 1f, speedStrength);
         strengths[count] = speedStrength * power;
         sampleWidths[count] = style == AttackStyle.Heavy ? 1.02f : 1f;
+        if (counterSettings != null) sampleWidths[count] = counterSettings.TrailWidth;
         bool counter = style == AttackStyle.JustAvoidCounter;
         accents[count] = counter
             ? new Vector3(.08f + _counterCoreIntensity * Mathf.Pow(speedStrength, 4f), _counterAfterglow, _counterCoreDuration)
             : new Vector3(style == AttackStyle.Heavy ? .9f : .6f, 1f, duration * .45f);
+        if (counterSettings != null) accents[count] = new Vector3(.15f + counterSettings.CoreIntensity * speedStrength * speedStrength, counterSettings.Afterglow, counterSettings.CoreDuration);
         count++;
     }
     /// <summary>履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。</summary>
@@ -182,7 +217,9 @@ public sealed class SwordTrail : MonoBehaviour
     private void LateUpdate()
     {
         if (!initialized || mesh == null || FeedbackVisualTime.IsPaused) return;
+        UpdateCounterWindow();
         float now = FeedbackVisualTime.Now;
+        counterSlash.Advance(now, times, count, ref previousTime);
         int live = 0;
         for (int i = 0; i < count; i++)
             if (now - times[i] < lifetimes[i]) { CopySample(i, live); live++; }
@@ -192,7 +229,9 @@ public sealed class SwordTrail : MonoBehaviour
             CopySample(count - 1, 0); strengths[0] = 0f; times[0] = now; lifetimes[0] = .01f; live = 1;
         }
         count = live;
-        if (emitting) Sample();
+        if (emitting && (!counterSlash.IsHolding(now) || captureCounterHit)) Sample();
+        captureCounterHit = false;
+        counterSlash.Apply(now);
         mesh.Clear();
         if (count < 2) return;
         int points = (count - 1) * CurveSteps + 1;
@@ -202,15 +241,26 @@ public sealed class SwordTrail : MonoBehaviour
             float t = (p - i * CurveSteps) / (float)CurveSteps;
             int v = p * 2;
             vertices[v] = InterpolateBlade(bases, i, t); vertices[v + 1] = InterpolateBlade(tips, i, t);
+            float along = p / (float)(points - 1);
+            if (counterSlash.Enabled)
+            {
+                vertices[v + 1] = CounterSlashPresentation.CurvedTip(vertices[v], tips[i] - bases[i], tips[j] - bases[j], t);
+                // Anchor the sheet at the swept tip. Taper geometry at both temporal ends.
+                Vector3 blade = vertices[v + 1] - vertices[v];
+                vertices[v] = vertices[v + 1] - blade * Mathf.Lerp(sampleWidths[i], sampleWidths[j], t) * CounterSlashPresentation.Taper(along);
+            }
             float strength = Mathf.Lerp(strengths[i], strengths[j], t);
             float age = Mathf.Clamp01((now - Mathf.Lerp(times[i], times[j], t)) / Mathf.Max(.01f, Mathf.Lerp(lifetimes[i], lifetimes[j], t)));
             uvs[v] = new Vector2(age, 0); uvs[v + 1] = new Vector2(age, 1);
-            dynamics[v] = dynamics[v + 1] = new Vector2(Mathf.Clamp01(strength), Mathf.Lerp(sampleWidths[i], sampleWidths[j], t));
+            dynamics[v] = dynamics[v + 1] = new Vector2(Mathf.Clamp01(strength), counterSlash.Enabled ? along : Mathf.Lerp(sampleWidths[i], sampleWidths[j], t));
             Vector3 accent = Vector3.Lerp(accents[i], accents[j], t);
             float coreAge = Mathf.Max(0f, now - Mathf.Lerp(times[i], times[j], t)) / Mathf.Max(.01f, accent.z);
+            if (counterSlash.Enabled) coreAge = counterSlash.CoreAge(Mathf.Max(0f, now - Mathf.Lerp(times[i], times[j], t)), now) / Mathf.Max(.033f, accent.z);
             highlights[v] = highlights[v + 1] = new Vector4(accent.x, accent.y, coreAge, accent.y);
             Color color = _color; color.r *= _brightness * strength; color.g *= _brightness * strength; color.b *= _brightness * strength;
             color.a *= Mathf.Clamp01(strength) * Mathf.Pow(1f - age, _fade);
+            // Counter shader owns its single temporal fade. Do not multiply the old tiny body alpha again.
+            if (counterSlash.Enabled) color = new Color(_brightness * strength, _brightness * strength, _brightness * strength, 1f);
             colors[v] = colors[v + 1] = color;
             if (p == points - 1) continue;
             int index = p * 6;
@@ -225,6 +275,30 @@ public sealed class SwordTrail : MonoBehaviour
         mesh.SetTriangles(triangles, 0, (points - 1) * 6, 0);
         mesh.RecalculateBounds();
     }
+    private void UpdateCounterWindow()
+    {
+        var strike = counterAnimation != null ? counterAnimation.Strike : JustAvoidCounterStrike.None;
+        bool requested = !counterSuppressed && strike != JustAvoidCounterStrike.None && _counterPresentation != null &&
+            _counterPresentation.GetStrike(strike).SlashMaterial != null;
+        if (requested)
+        {
+            if (!counterWindow || counterStrike != strike)
+            {
+                SetStyle(AttackStyle.JustAvoidCounter, strike);
+                // A hitbox event may have already started this same trail earlier in the frame.
+                if (!emitting) SetActive(true);
+                counterWindow = true;
+            }
+        }
+        else if (counterWindow) { counterWindow = false; emitting = false; }
+    }
+    private void OnGameStateChanged(GameManager.GameState state)
+    {
+        if (state == GameManager.GameState.Pause) return;
+        counterSuppressed = state != GameManager.GameState.InGame;
+        if (counterSuppressed && counterSlash.Enabled)
+        { counterWindow = false; emitting = false; count = 0; hasPrevious = false; mesh.Clear(); counterSlash.Reset(FeedbackVisualTime.Now); }
+    }
     /// <summary>記録済みの刀身端点を補間し、低FPSでも軌跡の折れ角を抑える。長い移動は直線補間に限定する。</summary>
     private Vector3 InterpolateBlade(Vector3[] samples, int i, float t)
     {
@@ -234,7 +308,7 @@ public sealed class SwordTrail : MonoBehaviour
         return .5f * ((2f * b) + (-a + c) * t + (2f * a - 5f * b + 4f * c - d) * t * t + (-a + 3f * b - 3f * c + d) * t * t * t);
     }
     /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
-    private void OnDisable() { emitting = false; count = 0; if (mesh != null) mesh.Clear(); }
+    private void OnDisable() { emitting = false; counterWindow = captureCounterHit = false; count = 0; if (mesh != null) mesh.Clear(); counterSlash?.Reset(FeedbackVisualTime.Now); }
     /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
-    private void OnDestroy() { if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
 }

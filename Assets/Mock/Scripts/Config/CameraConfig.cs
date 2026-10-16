@@ -4,6 +4,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
 public class CameraConfig : ScriptableObject
 {
+    [Header("Just Avoid Counter / First contact")]
+    [SerializeField, Range(0f, .15f)] private float _counterFirstCameraStrength = .018f;
+    [SerializeField, Min(.01f)] private float _counterFirstCameraDuration = .055f;
     /// <summary>追従カメラとPlayerの基準水平距離（Unity単位）。</summary>
     public float CameraDistance => _cameraDistance;
     /// <summary>Player位置からの追従カメラの基準高さ（Unity単位）。</summary>
@@ -52,9 +55,9 @@ public class CameraConfig : ScriptableObject
     [SerializeField, Tooltip("Camera Impulse時間（秒）。X=Light、Y=Heavy、Z=追撃。")]
     private Vector3 _hitCameraDurations = new Vector3(.065f, .095f, .12f);
     /// <summary>命中種別のカメラ衝撃の強さを取得する。</summary>
-    public float GetHitCameraStrength(bool heavy, bool counter) => counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
+    public float GetHitCameraStrength(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraStrength : counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
     /// <summary>命中種別の短い衝撃時間を取得する。</summary>
-    public float GetHitCameraDuration(bool heavy, bool counter) => Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
+    public float GetHitCameraDuration(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraDuration : Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
     /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
     [UnityEngine.Tooltip("命中時カメラ衝撃の継続時間（秒）。")]
     [SerializeField, Min(.01f)] private float _cameraDuration = .12f;

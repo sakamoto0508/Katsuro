@@ -15,15 +15,17 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
     private Animator _animator;
     private int _stateHash;
     private bool _finished, _contacted;
+    public JustAvoidCounterStrike Strike { get; private set; }
 
     /// <summary>速度パラメータを操作するAnimatorを同じオブジェクトから取得する。</summary>
     private void Awake() => _animator = GetComponent<Animator>();
 
     /// <summary>追撃Stateの所有権を記録し、命中・終了フラグと振りかぶり速度を初期化する。</summary>
-    public void BeginCounter(int stateHash)
+    public void BeginCounter(int stateHash, JustAvoidCounterStrike strike)
     {
         if (_animator == null) _animator = GetComponent<Animator>();
         _stateHash = stateHash;
+        Strike = strike;
         _finished = _contacted = false;
         _animator.SetFloat(SpeedHash, _counterWindupSpeed);
     }
@@ -82,6 +84,7 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
     {
         _finished = true;
         _stateHash = 0;
+        Strike = JustAvoidCounterStrike.None;
         if (_animator == null) _animator = GetComponent<Animator>();
         if (_animator != null && _animator.runtimeAnimatorController != null) _animator.SetFloat(SpeedHash, 1f);
     }

@@ -786,6 +786,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b815ad2610b51740aefe8430c8726f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterSpeedState
+  _strike: 2
 --- !u!1101 &-5713138126319579397
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -3282,6 +3283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b815ad2610b51740aefe8430c8726f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterSpeedState
+  _strike: 1
 --- !u!1102 &6959973655620138973
 AnimatorState:
   serializedVersion: 6

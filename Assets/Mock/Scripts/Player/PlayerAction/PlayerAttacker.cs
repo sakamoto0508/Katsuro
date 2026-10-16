@@ -61,6 +61,8 @@ public sealed class PlayerAttacker : IDisposable
     private bool _isSwordReady;
     private bool _isDrawingSword;
     private bool _isHitboxActive;
+    private bool _hitboxIsCounter;
+    private JustAvoidCounterStrike _hitboxCounterStrike;
     private readonly HashSet<IDamageable> _hitTargets = new();
     private float _currentClipDamage;
 
@@ -162,7 +164,9 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
     public void EnableWeaponHitbox()
     {
-        _weapon?.SetTrailStyle(IsJustAvoidCounterAttack ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
+        _hitboxIsCounter = IsJustAvoidCounterAttack;
+        _hitboxCounterStrike = _hitboxIsCounter ? (_ownerAnimator.GetComponent<JustAvoidCounterAnimation>()?.Strike ?? JustAvoidCounterStrike.None) : JustAvoidCounterStrike.None;
+        _weapon?.SetTrailStyle(_hitboxIsCounter ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light, _hitboxCounterStrike);
         _hitTargets.Clear();
         _isHitboxActive = true;
         _weapon?.EnableHitbox();
@@ -267,7 +271,7 @@ public sealed class PlayerAttacker : IDisposable
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
             _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack,
             _weapon != null ? _weapon.GetSlashDirection(other) : Vector3.zero,
-            isJustAvoidCounter: IsJustAvoidCounterAttack);
+            isJustAvoidCounter: _hitboxIsCounter, counterStrike: _hitboxCounterStrike);
 
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)

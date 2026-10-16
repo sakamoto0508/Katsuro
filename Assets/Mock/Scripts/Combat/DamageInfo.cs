@@ -6,7 +6,7 @@ using UnityEngine;
 public readonly struct DamageInfo
 {
     /// <summary>命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。</summary>
-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false)
+    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false, JustAvoidCounterStrike counterStrike = JustAvoidCounterStrike.None)
     {
         DamageAmount = damageAmount;
         HitPoint = hitPoint;
@@ -16,6 +16,7 @@ public readonly struct DamageInfo
         IsHeavy = isHeavy;
         SlashDirection = slashDirection;
         IsJustAvoidCounter = isJustAvoidCounter;
+        CounterStrike = isJustAvoidCounter ? counterStrike : JustAvoidCounterStrike.None;
     }
 
     /// <summary>演出の強度区分。ダメージ計算には使わない。</summary>
@@ -23,6 +24,8 @@ public readonly struct DamageInfo
 
     /// <summary>Just Avoid専用の追撃Animationから成立した命中。通常Heavyとは独立。</summary>
     public bool IsJustAvoidCounter { get; }
+    public JustAvoidCounterStrike CounterStrike { get; }
+    public bool IsCounterFirst => IsJustAvoidCounter && CounterStrike == JustAvoidCounterStrike.First;
 
     /// <summary>最終的に与えるダメージ量。</summary>
     public float DamageAmount { get; }

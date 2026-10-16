@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb3009adcf5fc8944a6cbf8b5b181821, type: 3}
   m_Name: AudioConfig
   m_EditorClassIdentifier: Assembly-CSharp::AudioConfig
+  _counterFirstHitClip: {fileID: 8300000, guid: 7bd5b9971a877de4d8bca4df57d77e92, type: 3}
+  _counterFirstHitVolume: 0.52
+  _counterFirstHitOffset: 0.04
   _lightHitSound: Damage
   _heavyHitSound: Damage
   _lightHitClip: {fileID: 8300000, guid: 7bd5b9971a877de4d8bca4df57d77e92, type: 3}
   _heavyHitClip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
   _counterHitClip: {fileID: 8300000, guid: 00de4c24f2eed784b84357e4412c6434, type: 3}
-  _hitVolumes: {x: 0.7, y: 0.9, z: 0.65}
+  _hitVolumes: {x: 0.7, y: 0.9, z: 0.88}
   _hitStartOffsets: {x: 0.04, y: 0, z: 0.195}
   _justAvoidSound: 
   _titleBGM: TitleBGM

@@ -1,0 +1,10 @@
+[
+  "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+  "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat.meta",
+  "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+  "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat.meta",
+  "Assets/Mock/Resources/CounterSwordSlash.shader",
+  "Assets/Mock/Resources/CounterSwordSlash.shader.meta",
+  "Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs",
+  "Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs.meta"
+]

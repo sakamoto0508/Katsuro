@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
   m_Name: VFXConfig
   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _screenDistortionEnable: 1
   _distortionDuration: 0.14
   _distortionMaxRadius: 1.15

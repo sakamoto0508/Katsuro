@@ -58,9 +58,9 @@ public sealed class PlayerWeapon
     public void DisableHitbox() => SetHitboxActive(false);
 
     /// <summary>保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。</summary>
-    public void SetTrailStyle(SwordTrail.AttackStyle style)
+    public void SetTrailStyle(SwordTrail.AttackStyle style, JustAvoidCounterStrike strike = JustAvoidCounterStrike.None)
     {
-        foreach (var trail in _trails.Values) trail.SetStyle(style);
+        foreach (var trail in _trails.Values) trail.SetStyle(style, strike);
     }
 
     /// <summary>武器がヒットした際の通知先を登録する。</summary>

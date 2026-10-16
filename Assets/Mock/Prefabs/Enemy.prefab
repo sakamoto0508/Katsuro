@@ -515,6 +515,7 @@ MonoBehaviour:
   _lightHitWeight: 0.6
   _reactionBlendIn: 0.08
   _reactionBlendOut: 0.08
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _enableNormalHeavyPose: 1
   _normalHitWeight: 0.8
   _normalHitImpactWeight: 0.9

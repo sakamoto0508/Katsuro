@@ -1,0 +1,118 @@
+{
+  "playing": false,
+  "compiling": false,
+  "graphicsAPI": "Direct3D12",
+  "trails": [
+    {
+      "name": "collider1",
+      "shared": null,
+      "bladeBase": "TrailBladeBase",
+      "tip": "TrailBladeTip",
+      "legacyMaterial": "Assets/Mock/Resources/SwordTrailSteel.mat"
+    },
+    {
+      "name": "collider2",
+      "shared": "collider1",
+      "bladeBase": "TrailBladeBase",
+      "tip": "TrailBladeTip",
+      "legacyMaterial": "Assets/Mock/Resources/SwordTrailSteel.mat"
+    },
+    {
+      "name": "collider3",
+      "shared": "collider1",
+      "bladeBase": "TrailBladeBase",
+      "tip": "TrailBladeTip",
+      "legacyMaterial": "Assets/Mock/Resources/SwordTrailSteel.mat"
+    },
+    {
+      "name": "collider4",
+      "shared": "collider1",
+      "bladeBase": "TrailBladeBase",
+      "tip": "TrailBladeTip",
+      "legacyMaterial": "Assets/Mock/Resources/SwordTrailSteel.mat"
+    },
+    {
+      "name": "collider5",
+      "shared": "collider1",
+      "bladeBase": "TrailBladeBase",
+      "tip": "TrailBladeTip",
+      "legacyMaterial": "Assets/Mock/Resources/SwordTrailSteel.mat"
+    }
+  ],
+  "materials": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+      "shader": "Assets/Mock/Resources/CounterSwordSlash.shader",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": [],
+      "properties": {
+        "_CoreTint": "(1.65, 1.8, 2.05, 1)",
+        "_SheetTint": "(0.48, 0.68, 0.95, 1)",
+        "_CoreWidth": 0.11,
+        "_CorePosition": 0.66,
+        "_SheetIntensity": 0.7,
+        "_SheetSoftness": 0.14,
+        "_EdgeIntensity": 2.4,
+        "_EdgeWidth": 0.05,
+        "_AfterglowIntensity": 0.7,
+        "_ImpactGain": 0.7,
+        "_ContactRadius": 0.28,
+        "_ExposureWeight": 0.0,
+        "_Intensity": 1.0,
+        "_ContactPoint": "(0, 0, 0, 1)",
+        "_Impact": 0.0
+      }
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+      "shader": "Assets/Mock/Resources/CounterSwordSlash.shader",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": [],
+      "properties": {
+        "_CoreTint": "(2, 2.15, 2.4, 1)",
+        "_SheetTint": "(0.65, 0.85, 1.15, 1)",
+        "_CoreWidth": 0.16,
+        "_CorePosition": 0.66,
+        "_SheetIntensity": 1.15,
+        "_SheetSoftness": 0.1,
+        "_EdgeIntensity": 3.1,
+        "_EdgeWidth": 0.075,
+        "_AfterglowIntensity": 0.95,
+        "_ImpactGain": 1.0,
+        "_ContactRadius": 0.38,
+        "_ExposureWeight": 0.0,
+        "_Intensity": 1.15,
+        "_ContactPoint": "(0, 0, 0, 1)",
+        "_Impact": 0.0
+      }
+    }
+  ],
+  "cfx": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "UsesLocalContactFlash": true,
+      "bloodCount": 3
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "UsesLocalContactFlash": true,
+      "bloodCount": 3
+    }
+  ],
+  "hitStop": [
+    0.045,
+    0.155
+  ],
+  "pureMathTests": {
+    "historyFreeze": true,
+    "holdDeadline": true,
+    "coreRecovery": true,
+    "taper": true,
+    "rotationalArc": true,
+    "opposingArcFallback": true,
+    "geometryChecks": 2379
+  },
+  "scope": "Asset API, shader compile and pure CPU math only. No Play Mode or Scene visual test."
+}

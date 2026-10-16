@@ -1,0 +1,3 @@
+PASS Animator _strike -> Hitbox latch -> WeaponHitboxRelay -> PlayerAttacker -> DamageInfo -> dedicated CFX stage 1; SweepDirection preserved; duplicate suppressed
+PASS Animator _strike -> Hitbox latch -> WeaponHitboxRelay -> PlayerAttacker -> DamageInfo -> dedicated CFX stage 2; SweepDirection preserved; duplicate suppressed
+PASS Second impact chest delta=16.01723 degrees; no transition; frozen pose held; follow through changes pose; cancel clears layer/offsets

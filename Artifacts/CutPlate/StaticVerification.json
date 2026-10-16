@@ -1,0 +1,14 @@
+{
+  "intentional_changes": [
+    "Assets/Mock/Effects/JustAvoidCounterCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "Assets/Mock/Resources/JustAvoidCounterCut.shader"
+  ],
+  "other_baseline_files_unchanged": 40,
+  "Prefab": "Only _cutSize changed. Blood, hierarchy and external references identical",
+  "CSharp": "All unchanged; pool, time, gameplay and animation unchanged",
+  "Shader": "Both Material passes compiled; see EditorVerification.json",
+  "RuntimeVisualTest": "Not performed; no Play Mode, gameplay inputs or capture requested by Codex"
+}

@@ -4,6 +4,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
 public class VFXConfig : ScriptableObject
 {
+    [Header("Just Avoid Counter / Two strikes")]
+    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
+    public JustAvoidCounterConfig CounterPresentation => _counterPresentation;
     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
     [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
     [Header("Just Avoid / Screen Distortion")]

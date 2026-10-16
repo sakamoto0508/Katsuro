@@ -678,6 +678,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _duration: 0.065
   _bladeBase: {fileID: 3307967605631511118}
   _tip: {fileID: 4640826797573995834}
@@ -836,6 +837,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _duration: 0.065
   _bladeBase: {fileID: 3307967605631511118}
   _tip: {fileID: 4640826797573995834}
@@ -994,6 +996,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _duration: 0.065
   _bladeBase: {fileID: 3307967605631511118}
   _tip: {fileID: 4640826797573995834}
@@ -1172,6 +1175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _duration: 0.065
   _bladeBase: {fileID: 3307967605631511118}
   _tip: {fileID: 4640826797573995834}
@@ -1220,6 +1224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
+  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _duration: 0.065
   _bladeBase: {fileID: 3307967605631511118}
   _tip: {fileID: 4640826797573995834}

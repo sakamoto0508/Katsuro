@@ -39,6 +39,10 @@ public class EnemyAnimationController : MonoBehaviour
     private bool _reactionConfigured;
     private float _reactionElapsed, _reactionDuration, _reactionWeight, _reactionStartWeight;
     private bool _initialized;
+    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
+    private float _activeReactionBlendIn;
+    private CounterHitPose _counterPose;
+    private float _visibleReactionDuration;
     /// <summary>A/C比較用。通常Heavyだけ上半身ポーズを重ねる。弱攻撃と追撃には使用しない。</summary>
     [Header("通常Heavy HitReaction / A-C比較")]
     [SerializeField, Tooltip("C案の上半身被弾ポーズを使用。オフで従来のProceduralのみ。")]
@@ -82,6 +86,7 @@ public class EnemyAnimationController : MonoBehaviour
         if (_initialized) return;
         _initialized = true;
         _animator = GetComponent<Animator>();
+        _counterPose = new CounterHitPose(transform, _animator);
         _normalHitLayer = _animator.GetLayerIndex("NormalHeavyHit");
         CancelNormalHitPose();
         _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
@@ -129,22 +134,40 @@ public class EnemyAnimationController : MonoBehaviour
         if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
         CancelNormalHitPose();
         int direction = GetHitDirection(transform, info);
-        string state = _reactionLayerName + ".Heavy" + HitDirections[direction];
+        string state = _reactionLayerName + (info.IsCounterFirst ? ".Light" : ".Heavy") + HitDirections[direction];
         if (!_animator.HasState(_reactionLayer, Animator.StringToHash(state))) return false;
         IsReacting = true;
         IsHeavyReacting = true;
         _reactionElapsed = 0f;
         _reactionDuration = _heavyHitDuration;
         _reactionWeight = 1f;
+        _activeReactionBlendIn = _reactionBlendIn;
+        if (_counterPresentation != null)
+        {
+            _reactionWeight = info.IsCounterFirst ? _counterPresentation.FirstReactionWeight : 1f;
+            if (!info.IsCounterFirst) _activeReactionBlendIn = _counterPresentation.SecondReactionBlendIn;
+        }
         // Blend from the visible layer weight, including consecutive counter hits.
         _reactionStartWeight = _animator.GetLayerWeight(_reactionLayer);
+        if (_counterPresentation != null && info.IsCounterFirst)
+            _reactionStartWeight = Mathf.Min(_reactionStartWeight, _reactionWeight);
+        if (_counterPresentation != null && !info.IsCounterFirst)
+            _reactionStartWeight = Mathf.Max(_reactionStartWeight, _counterPresentation.SecondReactionImpactWeight);
+        _animator.SetLayerWeight(_reactionLayer, _reactionStartWeight);
         _animator.SetInteger("HitDirection", direction);
         _animator.SetInteger("HitType", 1);
         _animator.SetBool("IsJustAvoidCounter", true);
         _animator.SetFloat("HitPlaybackSpeed", 1f / _reactionDuration);
-        _animator.SetTrigger("HitReaction");
-        // Consume the request before CombatFeedback freezes Animator.speed for HitStop.
+        _counterPose?.Clear();
+        // A zero-time trigger evaluation leaves the old transition pose during HitStop.
+        // Evaluate the actual impact sample directly on the dedicated layer before freezing.
+        _animator.ResetTrigger("HitReaction");
+        var style = _counterPresentation != null ? _counterPresentation.GetStrike(info.CounterStrike) : null;
+        _visibleReactionDuration = style != null ? Mathf.Min(_reactionDuration, style.PoseDuration) : _reactionDuration;
+        _animator.Play(Animator.StringToHash(state), _reactionLayer, style != null ? style.ImpactPoseTime : .05f);
+        if (info.IsCounterFirst) { _reactionStartWeight = _reactionWeight; _animator.SetLayerWeight(_reactionLayer, _reactionWeight); }
         _animator.Update(0f);
+        if (style != null) _counterPose?.Begin(info, style, _visibleReactionDuration);
         return true;
     }
 
@@ -166,10 +189,10 @@ public class EnemyAnimationController : MonoBehaviour
     {
         if (!IsReacting) return false;
         _reactionElapsed += deltaTime * Mathf.Max(0f, _animator.speed);
-        float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / _reactionBlendIn));
-        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _reactionDuration) / _reactionBlendOut));
+        float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / Mathf.Max(.01f, _activeReactionBlendIn)));
+        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _visibleReactionDuration) / _reactionBlendOut));
         _animator.SetLayerWeight(_reactionLayer, Mathf.Lerp(_reactionStartWeight, _reactionWeight, blendIn) * (1f - fade));
-        // Movement remains held until the visible reaction has fully blended out.
+        // Keep the original gameplay hold even when the first strike's visual pose ends earlier.
         if (_reactionElapsed < _reactionDuration + _reactionBlendOut) return false;
         CancelHitReaction();
         return true;
@@ -178,6 +201,7 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。</summary>
     public void CancelHitReaction()
     {
+        _counterPose?.Clear();
         CancelNormalHitPose();
         IsReacting = IsHeavyReacting = false;
         if (!_reactionConfigured) return;
@@ -274,6 +298,7 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>Animator評価前に通常被弾Layerの重みを更新する。HitStop中は同じ時計・重みを保持する。</summary>
     private void Update()
     {
+        _counterPose?.RemoveOffsets();
         if (!_normalHitActive) return;
         if (!_enableNormalHeavyPose || IsReacting) { CancelNormalHitPose(); return; }
         _normalHitElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
@@ -296,11 +321,18 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>非表示・破棄へ通常被弾ポーズを持ち越さない。</summary>
     private void OnDisable()
     {
+        _counterPose?.Clear();
         CancelNormalHitPose();
 #if UNITY_EDITOR
         if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
         _normalHitDiagnostic = null;
 #endif
+    }
+
+    /// <summary>HitStop中は命中姿勢を保持し、解除後は既存Reaction時計で胸・肩・頭・腰のFollow Throughを重ねる。</summary>
+    private void LateUpdate()
+    {
+        if (IsReacting) _counterPose?.Apply(_reactionElapsed);
     }
 
     /// <summary>

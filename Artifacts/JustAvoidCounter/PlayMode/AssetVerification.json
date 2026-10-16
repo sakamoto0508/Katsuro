@@ -1,0 +1,75 @@
+{
+  "playing": false,
+  "scene": "Assets/Mock/Scenes/GameScene.unity",
+  "dirty": false,
+  "compiling": false,
+  "firstCFX": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+  "secondCFX": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+  "materials": [
+    {
+      "name": "JustAvoidCounterFirstCut",
+      "shader": "Katsuro/JustAvoidCounterCut",
+      "zTest": 8.0,
+      "gain": 0.0,
+      "errors": []
+    },
+    {
+      "name": "JustAvoidCounterCut",
+      "shader": "Katsuro/JustAvoidCounterCut",
+      "zTest": 8.0,
+      "gain": 0.0,
+      "errors": []
+    },
+    {
+      "name": "JustAvoidCounterBlood",
+      "shader": "Katsuro/JustAvoidCounterBlood",
+      "zTest": 8.0,
+      "gain": 0.4,
+      "errors": []
+    }
+  ],
+  "particles": [
+    {
+      "name": "JustAvoidCounterFirstCutCFX/Crimson Threads",
+      "space": "World",
+      "sizeMin": 0.065,
+      "sizeMax": 0.09,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    },
+    {
+      "name": "JustAvoidCounterFirstCutCFX/Dark Blood Drops",
+      "space": "World",
+      "sizeMin": 0.06,
+      "sizeMax": 0.09,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    },
+    {
+      "name": "JustAvoidCounterFirstCutCFX/Late Fine Drops",
+      "space": "World",
+      "sizeMin": 0.022,
+      "sizeMax": 0.04,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    },
+    {
+      "name": "JustAvoidCounterFinisherCFX/Crimson Threads",
+      "space": "World",
+      "sizeMin": 0.085,
+      "sizeMax": 0.12,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    },
+    {
+      "name": "JustAvoidCounterFinisherCFX/Dark Blood Drops",
+      "space": "World",
+      "sizeMin": 0.075,
+      "sizeMax": 0.12,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    },
+    {
+      "name": "JustAvoidCounterFinisherCFX/Late Fine Drops",
+      "space": "World",
+      "sizeMin": 0.024,
+      "sizeMax": 0.045,
+      "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat"
+    }
+  ]
+}

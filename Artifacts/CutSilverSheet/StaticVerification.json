@@ -1,0 +1,18 @@
+{
+  "intentional_changes": [
+    "Assets/Mock/Effects/JustAvoidCounterCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "Assets/Mock/Resources/JustAvoidCounterCut.shader"
+  ],
+  "other_observed_changes_preserved": [
+    "Assets/Mock/UI/KatsuroUIFont.asset"
+  ],
+  "preserved_baseline_files": 39,
+  "prefabs": "Only _cutSize changed; particles and references identical",
+  "CSharp": "Unchanged including VFX clock, pool and combat code",
+  "Blood": "All shader, material, particle settings unchanged",
+  "Shader": "Both material passes synchronously compiled in Editor; see EditorVerification.json",
+  "visual_tests": "Not performed. Existing user-started Play Mode was not started, stopped or controlled."
+}

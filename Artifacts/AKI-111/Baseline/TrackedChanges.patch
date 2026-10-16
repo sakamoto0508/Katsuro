@@ -1,0 +1,1880 @@
+diff --git a/Assets/Mock/AnimationController/Player.controller b/Assets/Mock/AnimationController/Player.controller
+index 67e984a..bdca9fd 100644
+--- a/Assets/Mock/AnimationController/Player.controller
++++ b/Assets/Mock/AnimationController/Player.controller
+@@ -786,6 +786,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 9b815ad2610b51740aefe8430c8726f3, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterSpeedState
++  _strike: 2
+ --- !u!1101 &-5713138126319579397
+ AnimatorStateTransition:
+   m_ObjectHideFlags: 1
+@@ -3282,6 +3283,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 9b815ad2610b51740aefe8430c8726f3, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterSpeedState
++  _strike: 1
+ --- !u!1102 &6959973655620138973
+ AnimatorState:
+   serializedVersion: 6
+diff --git a/Assets/Mock/Prefabs/Enemy.prefab b/Assets/Mock/Prefabs/Enemy.prefab
+index 042bfb6..b0eb3ed 100644
+--- a/Assets/Mock/Prefabs/Enemy.prefab
++++ b/Assets/Mock/Prefabs/Enemy.prefab
+@@ -515,6 +515,7 @@ MonoBehaviour:
+   _lightHitWeight: 0.6
+   _reactionBlendIn: 0.08
+   _reactionBlendOut: 0.08
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _enableNormalHeavyPose: 1
+   _normalHitWeight: 0.8
+   _normalHitImpactWeight: 0.9
+diff --git a/Assets/Mock/Prefabs/Player.prefab b/Assets/Mock/Prefabs/Player.prefab
+index e58988d..512aac2 100644
+--- a/Assets/Mock/Prefabs/Player.prefab
++++ b/Assets/Mock/Prefabs/Player.prefab
+@@ -678,6 +678,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _duration: 0.065
+   _bladeBase: {fileID: 3307967605631511118}
+   _tip: {fileID: 4640826797573995834}
+@@ -836,6 +837,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _duration: 0.065
+   _bladeBase: {fileID: 3307967605631511118}
+   _tip: {fileID: 4640826797573995834}
+@@ -994,6 +996,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _duration: 0.065
+   _bladeBase: {fileID: 3307967605631511118}
+   _tip: {fileID: 4640826797573995834}
+@@ -1172,6 +1175,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _duration: 0.065
+   _bladeBase: {fileID: 3307967605631511118}
+   _tip: {fileID: 4640826797573995834}
+@@ -1220,6 +1224,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 1fae8f58a2984bdc9c7aad6426535e94, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: Assembly-CSharp::SwordTrail
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _duration: 0.065
+   _bladeBase: {fileID: 3307967605631511118}
+   _tip: {fileID: 4640826797573995834}
+diff --git a/Assets/Mock/ScriptableObjects/AudioConfig.asset b/Assets/Mock/ScriptableObjects/AudioConfig.asset
+index 5ce2161..0976306 100644
+--- a/Assets/Mock/ScriptableObjects/AudioConfig.asset
++++ b/Assets/Mock/ScriptableObjects/AudioConfig.asset
+@@ -12,12 +12,15 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: cb3009adcf5fc8944a6cbf8b5b181821, type: 3}
+   m_Name: AudioConfig
+   m_EditorClassIdentifier: Assembly-CSharp::AudioConfig
++  _counterFirstHitClip: {fileID: 8300000, guid: 7bd5b9971a877de4d8bca4df57d77e92, type: 3}
++  _counterFirstHitVolume: 0.52
++  _counterFirstHitOffset: 0.04
+   _lightHitSound: Damage
+   _heavyHitSound: Damage
+   _lightHitClip: {fileID: 8300000, guid: 7bd5b9971a877de4d8bca4df57d77e92, type: 3}
+   _heavyHitClip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
+   _counterHitClip: {fileID: 8300000, guid: 00de4c24f2eed784b84357e4412c6434, type: 3}
+-  _hitVolumes: {x: 0.7, y: 0.9, z: 0.65}
++  _hitVolumes: {x: 0.7, y: 0.9, z: 0.88}
+   _hitStartOffsets: {x: 0.04, y: 0, z: 0.195}
+   _justAvoidSound: 
+   _titleBGM: TitleBGM
+diff --git a/Assets/Mock/ScriptableObjects/CameraConfig.asset b/Assets/Mock/ScriptableObjects/CameraConfig.asset
+index 77d7852..c3773f3 100644
+--- a/Assets/Mock/ScriptableObjects/CameraConfig.asset
++++ b/Assets/Mock/ScriptableObjects/CameraConfig.asset
+@@ -12,6 +12,8 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
+   m_Name: CameraConfig
+   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
++  _counterFirstCameraStrength: 0.018
++  _counterFirstCameraDuration: 0.055
+   _lockOnSideOffset: 0
+   _lockOnTargetWeight: 1
+   _lockOnReleaseBlendDuration: 0.22
+@@ -20,8 +22,8 @@ MonoBehaviour:
+     m_Bits: 4294967291
+   _lightHitCameraStrength: 0.012
+   _heavyHitCameraStrength: 0.055
+-  _counterHitCameraStrength: 0.075
+-  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.12}
++  _counterHitCameraStrength: 0.085
++  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.105}
+   _cameraDuration: 0.12
+   _justAvoidFOVOffset: 1.5
+   _justAvoidFOVDuration: 0.18
+diff --git a/Assets/Mock/ScriptableObjects/GameSceneCameraConfig.asset b/Assets/Mock/ScriptableObjects/GameSceneCameraConfig.asset
+index 08a7fbc..d316de4 100644
+--- a/Assets/Mock/ScriptableObjects/GameSceneCameraConfig.asset
++++ b/Assets/Mock/ScriptableObjects/GameSceneCameraConfig.asset
+@@ -12,6 +12,8 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 604db47b3fb0d254b96bce2e9d95f1e5, type: 3}
+   m_Name: GameSceneCameraConfig
+   m_EditorClassIdentifier: Assembly-CSharp::CameraConfig
++  _counterFirstCameraStrength: 0.018
++  _counterFirstCameraDuration: 0.055
+   _lockOnSideOffset: 1.65
+   _lockOnTargetWeight: 1
+   _lockOnReleaseBlendDuration: 0.3
+@@ -20,8 +22,8 @@ MonoBehaviour:
+     m_Bits: 4294967291
+   _lightHitCameraStrength: 0.012
+   _heavyHitCameraStrength: 0.055
+-  _counterHitCameraStrength: 0.075
+-  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.12}
++  _counterHitCameraStrength: 0.085
++  _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.105}
+   _cameraDuration: 0.12
+   _justAvoidFOVOffset: 1.5
+   _justAvoidFOVDuration: 0.18
+diff --git a/Assets/Mock/ScriptableObjects/VFXConfig.asset b/Assets/Mock/ScriptableObjects/VFXConfig.asset
+index 24f053c..b4da92c 100644
+--- a/Assets/Mock/ScriptableObjects/VFXConfig.asset
++++ b/Assets/Mock/ScriptableObjects/VFXConfig.asset
+@@ -12,6 +12,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
+   m_Name: VFXConfig
+   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
++  _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+   _screenDistortionEnable: 1
+   _distortionDuration: 0.14
+   _distortionMaxRadius: 1.15
+diff --git a/Assets/Mock/Scripts/Camera/CameraManager.cs b/Assets/Mock/Scripts/Camera/CameraManager.cs
+index a2586b3..642cd84 100644
+--- a/Assets/Mock/Scripts/Camera/CameraManager.cs
++++ b/Assets/Mock/Scripts/Camera/CameraManager.cs
+@@ -75,11 +75,11 @@ public class CameraManager : MonoBehaviour
+     }
+ 
+     /// <summary>攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。</summary>
+-    public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false)
++    public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false, bool counterFirst = false)
+     {
+         if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying || _combatImpulse == null || _config == null) return;
+-        float strength = _config.GetHitCameraStrength(heavy, counter);
+-        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter);
++        float strength = _config.GetHitCameraStrength(heavy, counter, counterFirst);
++        _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter, counterFirst);
+         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
+     }
+     /// <summary>Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。</summary>
+diff --git a/Assets/Mock/Scripts/Combat/DamageInfo.cs b/Assets/Mock/Scripts/Combat/DamageInfo.cs
+index 8efdcc4..ba73366 100644
+--- a/Assets/Mock/Scripts/Combat/DamageInfo.cs
++++ b/Assets/Mock/Scripts/Combat/DamageInfo.cs
+@@ -6,7 +6,7 @@ using UnityEngine;
+ public readonly struct DamageInfo
+ {
+     /// <summary>命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。</summary>
+-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false)
++    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false, JustAvoidCounterStrike counterStrike = JustAvoidCounterStrike.None)
+     {
+         DamageAmount = damageAmount;
+         HitPoint = hitPoint;
+@@ -16,6 +16,7 @@ public readonly struct DamageInfo
+         IsHeavy = isHeavy;
+         SlashDirection = slashDirection;
+         IsJustAvoidCounter = isJustAvoidCounter;
++        CounterStrike = isJustAvoidCounter ? counterStrike : JustAvoidCounterStrike.None;
+     }
+ 
+     /// <summary>演出の強度区分。ダメージ計算には使わない。</summary>
+@@ -23,6 +24,8 @@ public readonly struct DamageInfo
+ 
+     /// <summary>Just Avoid専用の追撃Animationから成立した命中。通常Heavyとは独立。</summary>
+     public bool IsJustAvoidCounter { get; }
++    public JustAvoidCounterStrike CounterStrike { get; }
++    public bool IsCounterFirst => IsJustAvoidCounter && CounterStrike == JustAvoidCounterStrike.First;
+ 
+     /// <summary>最終的に与えるダメージ量。</summary>
+     public float DamageAmount { get; }
+diff --git a/Assets/Mock/Scripts/Config/AudioConfig.cs b/Assets/Mock/Scripts/Config/AudioConfig.cs
+index a5b383b..1deca53 100644
+--- a/Assets/Mock/Scripts/Config/AudioConfig.cs
++++ b/Assets/Mock/Scripts/Config/AudioConfig.cs
+@@ -5,6 +5,13 @@ using UnityEngine;
+ /// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
+ public class AudioConfig : ScriptableObject
+ {
++    [Header("Just Avoid Counter / First contact")]
++    [SerializeField] private AudioClip _counterFirstHitClip;
++    [SerializeField, Range(0f, 1f)] private float _counterFirstHitVolume = .52f;
++    [SerializeField, Min(0f)] private float _counterFirstHitOffset = .04f;
++    public AudioClip GetCounterFirstClip() => _counterFirstHitClip != null ? _counterFirstHitClip : _lightHitClip;
++    public float CounterFirstHitVolume => _counterFirstHitVolume;
++    public float CounterFirstHitOffset => _counterFirstHitOffset;
+     /// <summary>ゲーム開始操作で再生するSEの登録名。</summary>
+     public string StartSE => _startSE;
+     /// <summary>タイトル画面で再生するBGMの登録名。AudioManagerの一覧と一致させる。</summary>
+diff --git a/Assets/Mock/Scripts/Config/CameraConfig.cs b/Assets/Mock/Scripts/Config/CameraConfig.cs
+index 26a7256..6850b88 100644
+--- a/Assets/Mock/Scripts/Config/CameraConfig.cs
++++ b/Assets/Mock/Scripts/Config/CameraConfig.cs
+@@ -4,6 +4,9 @@ using UnityEngine;
+ [CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
+ public class CameraConfig : ScriptableObject
+ {
++    [Header("Just Avoid Counter / First contact")]
++    [SerializeField, Range(0f, .15f)] private float _counterFirstCameraStrength = .018f;
++    [SerializeField, Min(.01f)] private float _counterFirstCameraDuration = .055f;
+     /// <summary>追従カメラとPlayerの基準水平距離（Unity単位）。</summary>
+     public float CameraDistance => _cameraDistance;
+     /// <summary>Player位置からの追従カメラの基準高さ（Unity単位）。</summary>
+@@ -52,9 +55,9 @@ public class CameraConfig : ScriptableObject
+     [SerializeField, Tooltip("Camera Impulse時間（秒）。X=Light、Y=Heavy、Z=追撃。")]
+     private Vector3 _hitCameraDurations = new Vector3(.065f, .095f, .12f);
+     /// <summary>命中種別のカメラ衝撃の強さを取得する。</summary>
+-    public float GetHitCameraStrength(bool heavy, bool counter) => counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
++    public float GetHitCameraStrength(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraStrength : counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
+     /// <summary>命中種別の短い衝撃時間を取得する。</summary>
+-    public float GetHitCameraDuration(bool heavy, bool counter) => Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
++    public float GetHitCameraDuration(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraDuration : Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
+     /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
+     [UnityEngine.Tooltip("命中時カメラ衝撃の継続時間（秒）。")]
+     [SerializeField, Min(.01f)] private float _cameraDuration = .12f;
+diff --git a/Assets/Mock/Scripts/Config/VFXConfig.cs b/Assets/Mock/Scripts/Config/VFXConfig.cs
+index 1169039..b638588 100644
+--- a/Assets/Mock/Scripts/Config/VFXConfig.cs
++++ b/Assets/Mock/Scripts/Config/VFXConfig.cs
+@@ -4,6 +4,9 @@ using UnityEngine;
+ [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
+ public class VFXConfig : ScriptableObject
+ {
++    [Header("Just Avoid Counter / Two strikes")]
++    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
++    public JustAvoidCounterConfig CounterPresentation => _counterPresentation;
+     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
+     [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
+     [Header("Just Avoid / Screen Distortion")]
+diff --git a/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs b/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
+index b24e129..88ba685 100644
+--- a/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
++++ b/Assets/Mock/Scripts/Enemy/Animation/EnemyAnimationController.cs
+@@ -39,6 +39,10 @@ public class EnemyAnimationController : MonoBehaviour
+     private bool _reactionConfigured;
+     private float _reactionElapsed, _reactionDuration, _reactionWeight, _reactionStartWeight;
+     private bool _initialized;
++    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
++    private float _activeReactionBlendIn;
++    private CounterHitPose _counterPose;
++    private float _visibleReactionDuration;
+     /// <summary>A/C比較用。通常Heavyだけ上半身ポーズを重ねる。弱攻撃と追撃には使用しない。</summary>
+     [Header("通常Heavy HitReaction / A-C比較")]
+     [SerializeField, Tooltip("C案の上半身被弾ポーズを使用。オフで従来のProceduralのみ。")]
+@@ -82,6 +86,7 @@ public class EnemyAnimationController : MonoBehaviour
+         if (_initialized) return;
+         _initialized = true;
+         _animator = GetComponent<Animator>();
++        _counterPose = new CounterHitPose(transform, _animator);
+         _normalHitLayer = _animator.GetLayerIndex("NormalHeavyHit");
+         CancelNormalHitPose();
+         _reactionLayer = _animator.GetLayerIndex(_reactionLayerName);
+@@ -129,22 +134,40 @@ public class EnemyAnimationController : MonoBehaviour
+         if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
+         CancelNormalHitPose();
+         int direction = GetHitDirection(transform, info);
+-        string state = _reactionLayerName + ".Heavy" + HitDirections[direction];
++        string state = _reactionLayerName + (info.IsCounterFirst ? ".Light" : ".Heavy") + HitDirections[direction];
+         if (!_animator.HasState(_reactionLayer, Animator.StringToHash(state))) return false;
+         IsReacting = true;
+         IsHeavyReacting = true;
+         _reactionElapsed = 0f;
+         _reactionDuration = _heavyHitDuration;
+         _reactionWeight = 1f;
++        _activeReactionBlendIn = _reactionBlendIn;
++        if (_counterPresentation != null)
++        {
++            _reactionWeight = info.IsCounterFirst ? _counterPresentation.FirstReactionWeight : 1f;
++            if (!info.IsCounterFirst) _activeReactionBlendIn = _counterPresentation.SecondReactionBlendIn;
++        }
+         // Blend from the visible layer weight, including consecutive counter hits.
+         _reactionStartWeight = _animator.GetLayerWeight(_reactionLayer);
++        if (_counterPresentation != null && info.IsCounterFirst)
++            _reactionStartWeight = Mathf.Min(_reactionStartWeight, _reactionWeight);
++        if (_counterPresentation != null && !info.IsCounterFirst)
++            _reactionStartWeight = Mathf.Max(_reactionStartWeight, _counterPresentation.SecondReactionImpactWeight);
++        _animator.SetLayerWeight(_reactionLayer, _reactionStartWeight);
+         _animator.SetInteger("HitDirection", direction);
+         _animator.SetInteger("HitType", 1);
+         _animator.SetBool("IsJustAvoidCounter", true);
+         _animator.SetFloat("HitPlaybackSpeed", 1f / _reactionDuration);
+-        _animator.SetTrigger("HitReaction");
+-        // Consume the request before CombatFeedback freezes Animator.speed for HitStop.
++        _counterPose?.Clear();
++        // A zero-time trigger evaluation leaves the old transition pose during HitStop.
++        // Evaluate the actual impact sample directly on the dedicated layer before freezing.
++        _animator.ResetTrigger("HitReaction");
++        var style = _counterPresentation != null ? _counterPresentation.GetStrike(info.CounterStrike) : null;
++        _visibleReactionDuration = style != null ? Mathf.Min(_reactionDuration, style.PoseDuration) : _reactionDuration;
++        _animator.Play(Animator.StringToHash(state), _reactionLayer, style != null ? style.ImpactPoseTime : .05f);
++        if (info.IsCounterFirst) { _reactionStartWeight = _reactionWeight; _animator.SetLayerWeight(_reactionLayer, _reactionWeight); }
+         _animator.Update(0f);
++        if (style != null) _counterPose?.Begin(info, style, _visibleReactionDuration);
+         return true;
+     }
+ 
+@@ -166,10 +189,10 @@ public class EnemyAnimationController : MonoBehaviour
+     {
+         if (!IsReacting) return false;
+         _reactionElapsed += deltaTime * Mathf.Max(0f, _animator.speed);
+-        float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / _reactionBlendIn));
+-        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _reactionDuration) / _reactionBlendOut));
++        float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / Mathf.Max(.01f, _activeReactionBlendIn)));
++        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _visibleReactionDuration) / _reactionBlendOut));
+         _animator.SetLayerWeight(_reactionLayer, Mathf.Lerp(_reactionStartWeight, _reactionWeight, blendIn) * (1f - fade));
+-        // Movement remains held until the visible reaction has fully blended out.
++        // Keep the original gameplay hold even when the first strike's visual pose ends earlier.
+         if (_reactionElapsed < _reactionDuration + _reactionBlendOut) return false;
+         CancelHitReaction();
+         return true;
+@@ -178,6 +201,7 @@ public class EnemyAnimationController : MonoBehaviour
+     /// <summary>被弾状態・専用パラメータ・Layer重みを解除し、死亡や中断に反応を持ち越さない。</summary>
+     public void CancelHitReaction()
+     {
++        _counterPose?.Clear();
+         CancelNormalHitPose();
+         IsReacting = IsHeavyReacting = false;
+         if (!_reactionConfigured) return;
+@@ -274,6 +298,7 @@ public class EnemyAnimationController : MonoBehaviour
+     /// <summary>Animator評価前に通常被弾Layerの重みを更新する。HitStop中は同じ時計・重みを保持する。</summary>
+     private void Update()
+     {
++        _counterPose?.RemoveOffsets();
+         if (!_normalHitActive) return;
+         if (!_enableNormalHeavyPose || IsReacting) { CancelNormalHitPose(); return; }
+         _normalHitElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
+@@ -296,6 +321,7 @@ public class EnemyAnimationController : MonoBehaviour
+     /// <summary>非表示・破棄へ通常被弾ポーズを持ち越さない。</summary>
+     private void OnDisable()
+     {
++        _counterPose?.Clear();
+         CancelNormalHitPose();
+ #if UNITY_EDITOR
+         if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
+@@ -303,6 +329,12 @@ public class EnemyAnimationController : MonoBehaviour
+ #endif
+     }
+ 
++    /// <summary>HitStop中は命中姿勢を保持し、解除後は既存Reaction時計で胸・肩・頭・腰のFollow Throughを重ねる。</summary>
++    private void LateUpdate()
++    {
++        if (IsReacting) _counterPose?.Apply(_reactionElapsed);
++    }
++
+     /// <summary>
+     /// 速度をスムージング付きで Animator に反映する。
+     /// </summary>
+diff --git a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+index b595bdc..72ca700 100644
+--- a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+@@ -88,6 +88,10 @@ public sealed class CombatFeedback : MonoBehaviour
+     private JustAvoidScreenDistortion _screenDistortion;
+     private HitStopManager _hitStop;
+     private ContactPulse _contactPulse;
++    private JustAvoidCounterCutVFX[] _counterCuts;
++    private int _nextCounterCut;
++    private JustAvoidCounterCutVFX[] _counterFirstCuts;
++    private int _nextCounterFirstCut;
+     private ParticleSystem[][] _hitParticles;
+     private ParticleSystem.Burst[][][] _hitBursts;
+     private float[][] _hitAngles;
+@@ -456,7 +460,7 @@ public sealed class CombatFeedback : MonoBehaviour
+             {
+                 // 追撃専用の被弾Poseを全身の旧Flashで覆わず、閃光の中心を接触点へ限定する。
+                 _hitUntil = 0f;
+-                BeginNormalHitFlash(true);
++                BeginNormalHitFlash(!info.IsCounterFirst);
+             }
+         }
+         else
+@@ -468,35 +472,53 @@ public sealed class CombatFeedback : MonoBehaviour
+         }
+         Refresh();
+         Vector3 contact = _vfxConfig != null ? _vfxConfig.GetContactFlashStyle(info.IsHeavy, info.IsJustAvoidCounter) : new Vector3(.075f, .025f, .3f);
++        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
++        if (info.IsCounterFirst && counterPresentation != null) contact = counterPresentation.FirstContact;
+         Color contactTint = new Color(.93f, .96f, 1f);
+-        if (info.IsJustAvoidCounter && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
++        if (info.IsJustAvoidCounter && !info.IsCounterFirst && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
+         contactTint.a = 1f;
+-        _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
+-        PlayHitVFX(info);
++        var cuts = info.IsCounterFirst ? _counterFirstCuts : _counterCuts;
++        bool dedicatedCut = info.IsJustAvoidCounter && cuts != null;
++        if (dedicatedCut)
++        {
++            int slot = info.IsCounterFirst ? _nextCounterFirstCut : _nextCounterCut;
++            cuts[slot].Play(info.HitPoint, info.SlashDirection, info.HitNormal);
++            if (info.IsCounterFirst) _nextCounterFirstCut = (slot + 1) % cuts.Length;
++            else _nextCounterCut = (slot + 1) % cuts.Length;
++        }
++        else
++        {
++            _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
++            PlayHitVFX(info);
++        }
+         var config = _audio != null ? _audio.AudioConfig : null;
+-        AudioClip hitClip = config != null ? config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter) : null;
++        AudioClip hitClip = config != null ? (info.IsCounterFirst ? config.GetCounterFirstClip() : config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter)) : null;
+         // Final Blowが同じ衝撃Clipをこの命中処理の直後に鳴らす場合は、音を二重に重ねない。
+         bool finalBlowOwnsSound = _enemyOwner != null && _enemyOwner.HpRatio <= 0f &&
+             FinalBlowManager.Instance != null && FinalBlowManager.Instance.isActiveAndEnabled &&
+             hitClip != null && config != null && hitClip == _audio.GetSEClip(config.EnemyDeadSound);
+         if (!finalBlowOwnsSound)
+         {
+-            if (hitClip != null) _audio.PlaySE(hitClip, config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
++            if (hitClip != null) _audio.PlaySE(hitClip, info.IsCounterFirst ? config.CounterFirstHitVolume : config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), info.IsCounterFirst ? config.CounterFirstHitOffset : config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
+             else _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
+         }
+         if (_hitStop != null)
+         {
+             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
++            if (info.IsJustAvoidCounter && counterPresentation != null) duration = counterPresentation.GetStrike(info.CounterStrike).HitStop;
+             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
+         }
+         _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
+-        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter);
++        _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter, info.IsCounterFirst);
+     }
+ 
+     /// <summary>VFX設定の命中Prefabと、再利用する接触Flashの表示リソースを準備する。</summary>
+     private void PrepareContactFeedback()
+     {
+         _contactPulse = new ContactPulse(gameObject.layer);
++        var counter = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
++        _counterCuts = CreateCounterPool(counter != null ? counter.FinisherCFX : null);
++        _counterFirstCuts = CreateCounterPool(counter != null ? counter.FirstCFX : null);
+         if (_vfxConfig == null || _vfxConfig.HitVFX == null) return;
+         _hitRoots = new GameObject[4]; _hitParticles = new ParticleSystem[4][]; _hitStarted = new float[4];
+         _hitBursts = new ParticleSystem.Burst[4][][];
+@@ -540,6 +562,19 @@ public sealed class CombatFeedback : MonoBehaviour
+             }
+         }
+     }
++    /// <summary>段ごとの専用CFXを初期化時に固定数だけ作り、命中時の生成と破棄を避ける。</summary>
++    private JustAvoidCounterCutVFX[] CreateCounterPool(JustAvoidCounterCutVFX prefab)
++    {
++        if (prefab == null) return null;
++        var pool = new JustAvoidCounterCutVFX[4];
++        for (int i = 0; i < pool.Length; i++)
++        {
++            pool[i] = Instantiate(prefab);
++            foreach (var child in pool[i].GetComponentsInChildren<Transform>(true)) child.gameObject.layer = gameObject.layer;
++            pool[i].Stop();
++        }
++        return pool;
++    }
+     /// <summary>再利用する命中Prefabを接触位置へ配置し、攻撃種別に応じた粒子量と速度で再生する。</summary>
+     private void PlayHitVFX(DamageInfo info)
+     {
+@@ -561,6 +596,7 @@ public sealed class CombatFeedback : MonoBehaviour
+             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
+             bool slash = _hitSlashRenderers[i][j] != null;
+             float amount = slash ? 1f : info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXAmount : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
++            if (info.IsCounterFirst && !slash && _vfxConfig.CounterPresentation != null) amount *= _vfxConfig.CounterPresentation.FirstBloodAmount;
+             // 煙状の血だけ控えめにし、被弾姿勢と接触位置を隠さない。
+             if (particle.name == "BloodMist") amount *= .5f;
+             if (info.IsJustAvoidCounter && particle.name == "BloodMist") amount *= .25f;
+@@ -590,6 +626,7 @@ public sealed class CombatFeedback : MonoBehaviour
+             if (slash)
+             {
+                 Vector3 style = _vfxConfig.GetSlashLineStyle(info.IsHeavy, info.IsJustAvoidCounter);
++                if (info.IsCounterFirst) style = _vfxConfig.GetSlashLineStyle(false, false);
+                 float rootScale = _hitRoots[i].transform.localScale.x;
+                 main.startSize = style.y / Mathf.Max(.01f, rootScale);
+                 main.startLifetime = style.z;
+@@ -632,6 +669,8 @@ public sealed class CombatFeedback : MonoBehaviour
+         UpdateJustAvoid();
+         _contactPulse?.Update();
+         UpdateHitVFX();
++        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) cut.Tick();
++        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) cut.Tick();
+     }
+ 
+     /// <summary>AnimatorだけのHitStopでは粒子を進め、ゲーム全体のPauseでは遅延を含め粒子と寿命時計を止める。</summary>
+@@ -721,6 +760,8 @@ public sealed class CombatFeedback : MonoBehaviour
+         _justAvoidContrast?.Cancel();
+         StopJustAvoid();
+         _contactPulse?.Stop();
++        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) cut.Stop();
++        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) cut.Stop();
+         if (_hitRoots != null) for (int i = 0; i < _hitRoots.Length; i++) StopHitVFX(i);
+         RemoveOffset();
+         CancelNormalHitReaction();
+@@ -735,6 +776,8 @@ public sealed class CombatFeedback : MonoBehaviour
+         if (_normalFlashRenderers != null) foreach (var overlay in _normalFlashRenderers) if (overlay != null) Destroy(overlay.gameObject);
+         if (_normalFlashMaterial != null) Destroy(_normalFlashMaterial);
+         _contactPulse?.Dispose();
++        if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) Destroy(cut.gameObject);
++        if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) Destroy(cut.gameObject);
+         if (_hitRoots != null) foreach (var root in _hitRoots) if (root != null) Destroy(root);
+         if (_afterImageMeshes != null)
+             foreach (var mesh in _afterImageMeshes) if (mesh != null) Destroy(mesh);
+diff --git a/Assets/Mock/Scripts/Feedback/SwordTrail.cs b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+index 96a2cf1..1de8440 100644
+--- a/Assets/Mock/Scripts/Feedback/SwordTrail.cs
++++ b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+@@ -6,6 +6,8 @@ public sealed class SwordTrail : MonoBehaviour
+ {
+     /// <summary>通常・強攻撃・追撃で刀の軌跡の持続時間と表示量を選び分ける。</summary>
+     public enum AttackStyle { Light, Heavy, JustAvoidCounter }
++    [SerializeField] private JustAvoidCounterConfig _counterPresentation;
++    private JustAvoidCounterStrike counterStrike;
+     /// <summary>通常攻撃の刀軌跡を残す時間（秒）。</summary>
+     [UnityEngine.Tooltip("通常攻撃の刀軌跡を残す時間（秒）。")]
+     [Header("刀身の軌跡")]
+@@ -91,10 +93,11 @@ public sealed class SwordTrail : MonoBehaviour
+     private bool hasPrevious;
+ 
+     /// <summary>共有先を含む刀の軌跡を攻撃種別の持続時間・明るさへ切り替える。</summary>
+-    public void SetStyle(AttackStyle value)
++    public void SetStyle(AttackStyle value, JustAvoidCounterStrike strike = JustAvoidCounterStrike.None)
+     {
+-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value); return; }
++        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.SetStyle(value, strike); return; }
+         style = value;
++        counterStrike = strike;
+     }
+     /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
+     public void SetActive(bool active)
+@@ -155,14 +158,18 @@ public sealed class SwordTrail : MonoBehaviour
+         if (count == Capacity) RemoveOldest();
+         float duration = style == AttackStyle.JustAvoidCounter ? _counterDuration : style == AttackStyle.Heavy ? _heavyDuration : _duration;
+         float power = style == AttackStyle.JustAvoidCounter ? _counterBrightness : style == AttackStyle.Heavy ? _heavyBrightness : 1f;
++        var counterSettings = style == AttackStyle.JustAvoidCounter && _counterPresentation != null ? _counterPresentation.GetStrike(counterStrike) : null;
++        if (counterSettings != null) { duration = counterSettings.TrailDuration; power = counterSettings.TrailBrightness; }
+         bases[count] = a; tips[count] = b; times[count] = now;
+         lifetimes[count] = duration * Mathf.Lerp(.6f, 1f, speedStrength);
+         strengths[count] = speedStrength * power;
+         sampleWidths[count] = style == AttackStyle.Heavy ? 1.02f : 1f;
++        if (counterSettings != null) sampleWidths[count] = counterSettings.TrailWidth;
+         bool counter = style == AttackStyle.JustAvoidCounter;
+         accents[count] = counter
+             ? new Vector3(.08f + _counterCoreIntensity * Mathf.Pow(speedStrength, 4f), _counterAfterglow, _counterCoreDuration)
+             : new Vector3(style == AttackStyle.Heavy ? .9f : .6f, 1f, duration * .45f);
++        if (counterSettings != null) accents[count] = new Vector3(.15f + counterSettings.CoreIntensity * speedStrength * speedStrength, counterSettings.Afterglow, counterSettings.CoreDuration);
+         count++;
+     }
+     /// <summary>履歴が上限に達したときに最古のサンプルを捨て、残りを前へ詰める。</summary>
+diff --git a/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs b/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
+index 7c91da4..863fb13 100644
+--- a/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
++++ b/Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs
+@@ -15,15 +15,17 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
+     private Animator _animator;
+     private int _stateHash;
+     private bool _finished, _contacted;
++    public JustAvoidCounterStrike Strike { get; private set; }
+ 
+     /// <summary>速度パラメータを操作するAnimatorを同じオブジェクトから取得する。</summary>
+     private void Awake() => _animator = GetComponent<Animator>();
+ 
+     /// <summary>追撃Stateの所有権を記録し、命中・終了フラグと振りかぶり速度を初期化する。</summary>
+-    public void BeginCounter(int stateHash)
++    public void BeginCounter(int stateHash, JustAvoidCounterStrike strike)
+     {
+         if (_animator == null) _animator = GetComponent<Animator>();
+         _stateHash = stateHash;
++        Strike = strike;
+         _finished = _contacted = false;
+         _animator.SetFloat(SpeedHash, _counterWindupSpeed);
+     }
+@@ -82,6 +84,7 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
+     {
+         _finished = true;
+         _stateHash = 0;
++        Strike = JustAvoidCounterStrike.None;
+         if (_animator == null) _animator = GetComponent<Animator>();
+         if (_animator != null && _animator.runtimeAnimatorController != null) _animator.SetFloat(SpeedHash, 1f);
+     }
+diff --git a/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs b/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs
+index 4f736a2..7a724b8 100644
+--- a/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs
++++ b/Assets/Mock/Scripts/Player/JustAvoidCounterSpeedState.cs
+@@ -3,11 +3,12 @@ using UnityEngine;
+ /// <summary>タグ付き追撃Stateの入退場だけを通知する。</summary>
+ public sealed class JustAvoidCounterSpeedState : StateMachineBehaviour
+ {
++    [SerializeField] private JustAvoidCounterStrike _strike;
+     /// <summary>ベースLayerの追撃State開始を通知し、そのStateに速度制御の所有権を渡す。</summary>
+     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+     {
+         if (layerIndex == 0 && stateInfo.IsTag(PlayerAttacker.JustAvoidCounterTag))
+-            animator.GetComponent<JustAvoidCounterAnimation>()?.BeginCounter(stateInfo.fullPathHash);
++            animator.GetComponent<JustAvoidCounterAnimation>()?.BeginCounter(stateInfo.fullPathHash, _strike);
+     }
+ 
+     /// <summary>ベースLayerの終了Stateを通知し、所有者に一致する追撃速度だけを解除する。</summary>
+diff --git a/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs b/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs
+index 9133679..3323a7f 100644
+--- a/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs
++++ b/Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs
+@@ -61,6 +61,8 @@ public sealed class PlayerAttacker : IDisposable
+     private bool _isSwordReady;
+     private bool _isDrawingSword;
+     private bool _isHitboxActive;
++    private bool _hitboxIsCounter;
++    private JustAvoidCounterStrike _hitboxCounterStrike;
+     private readonly HashSet<IDamageable> _hitTargets = new();
+     private float _currentClipDamage;
+ 
+@@ -162,7 +164,9 @@ public sealed class PlayerAttacker : IDisposable
+     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
+     public void EnableWeaponHitbox()
+     {
+-        _weapon?.SetTrailStyle(IsJustAvoidCounterAttack ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
++        _hitboxIsCounter = IsJustAvoidCounterAttack;
++        _hitboxCounterStrike = _hitboxIsCounter ? (_ownerAnimator.GetComponent<JustAvoidCounterAnimation>()?.Strike ?? JustAvoidCounterStrike.None) : JustAvoidCounterStrike.None;
++        _weapon?.SetTrailStyle(_hitboxIsCounter ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light, _hitboxCounterStrike);
+         _hitTargets.Clear();
+         _isHitboxActive = true;
+         _weapon?.EnableHitbox();
+@@ -267,7 +271,7 @@ public sealed class PlayerAttacker : IDisposable
+         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal,
+             _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsStrongAttack,
+             _weapon != null ? _weapon.GetSlashDirection(other) : Vector3.zero,
+-            isJustAvoidCounter: IsJustAvoidCounterAttack);
++            isJustAvoidCounter: _hitboxIsCounter, counterStrike: _hitboxCounterStrike);
+ 
+         // Debug: ログ出力（ダメージが発生する場合）
+         if (damage > 0f)
+diff --git a/Assets/Mock/Scripts/Player/PlayerWeapon.cs b/Assets/Mock/Scripts/Player/PlayerWeapon.cs
+index 9f9894e..21642f0 100644
+--- a/Assets/Mock/Scripts/Player/PlayerWeapon.cs
++++ b/Assets/Mock/Scripts/Player/PlayerWeapon.cs
+@@ -58,9 +58,9 @@ public sealed class PlayerWeapon
+     public void DisableHitbox() => SetHitboxActive(false);
+ 
+     /// <summary>保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。</summary>
+-    public void SetTrailStyle(SwordTrail.AttackStyle style)
++    public void SetTrailStyle(SwordTrail.AttackStyle style, JustAvoidCounterStrike strike = JustAvoidCounterStrike.None)
+     {
+-        foreach (var trail in _trails.Values) trail.SetStyle(style);
++        foreach (var trail in _trails.Values) trail.SetStyle(style, strike);
+     }
+ 
+     /// <summary>武器がヒットした際の通知先を登録する。</summary>
+diff --git a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs
+index b4f0b14..4878d86 100644
+--- a/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs
++++ b/Assets/Mock/Scripts/Player/StateMachine/States/PlayerAttackState.cs
+@@ -196,8 +196,8 @@ public abstract class PlayerAttackState : PlayerState
+     /// <summary>次段に進める余地があるか判定する。</summary>
+     private bool CanQueueNextCombo() => _comboStepIndex + 1 < MaxComboSteps;
+ 
+-    /// <summary>現在または遷移先の通常攻撃Clipが終端前か確認し、時間による早期終了を抑える。</summary>
+-    /// <returns>通常攻撃タグを持つStateが再生途中ならtrue。</returns>
++    /// <summary>現在または遷移先の攻撃Clipが終端前か確認し、追撃の段階識別も早期終了から守る。</summary>
++    /// <returns>通常攻撃またはJust Avoid追撃のStateが再生途中ならtrue。</returns>
+     private bool IsNormalAttackStillPlaying()
+     {
+         if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;
+@@ -205,6 +205,7 @@ public abstract class PlayerAttackState : PlayerState
+             ? _attackAnimator.GetNextAnimatorStateInfo(0) : _attackAnimator.GetCurrentAnimatorStateInfo(0);
+         // Finished events remain the primary exit. The clip-length timer is only a
+         // fallback after animation completion, rather than cutting off a slower clip.
+-        return state.IsTag(NormalAttackSpeedState.AttackTag) && state.normalizedTime < 1f;
++        return (state.IsTag(NormalAttackSpeedState.AttackTag)
++            || state.IsTag(PlayerAttacker.JustAvoidCounterTag)) && state.normalizedTime < 1f;
+     }
+ }
+diff --git a/Assets/Mock/UI/KatsuroUIFont.asset b/Assets/Mock/UI/KatsuroUIFont.asset
+index baf7d6b..254254c 100644
+--- a/Assets/Mock/UI/KatsuroUIFont.asset
++++ b/Assets/Mock/UI/KatsuroUIFont.asset
+@@ -81,7 +81,1177 @@ MonoBehaviour:
+   m_FontFeatureTable:
+     m_MultipleSubstitutionRecords: []
+     m_LigatureSubstitutionRecords: []
+-    m_GlyphPairAdjustmentRecords: []
++    m_GlyphPairAdjustmentRecords:
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -4.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 9
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -6
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 23
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -9
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 66
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 36
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 130
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 131
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 132
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 133
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 134
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 135
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 136
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 194
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 196
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 198
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 397
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 414
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 416
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 418
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 442
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 444
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 448
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 450
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 486
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 506
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 590
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 828
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 837
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 847
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 949
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1139
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1141
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1143
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1267
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1427
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1429
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1431
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1433
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1435
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1437
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1439
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1441
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1443
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1445
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1447
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1449
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1531
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1532
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1533
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1534
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1535
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1536
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1537
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1538
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1645
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1646
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1647
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1648
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1649
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1650
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1651
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1652
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1692
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1693
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1694
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1695
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1696
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -12.75
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 45
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -12.75
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 246
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -12.75
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 520
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -12.75
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 825
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -12.75
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 941
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -18
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 15
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -18
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 17
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -18
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 1790
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -4.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 942
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -4.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 960
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 4.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 146
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
++    - m_FirstAdjustmentRecord:
++        m_GlyphIndex: 65
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: -10.5
++          m_YAdvance: 0
++      m_SecondAdjustmentRecord:
++        m_GlyphIndex: 840
++        m_GlyphValueRecord:
++          m_XPlacement: 0
++          m_YPlacement: 0
++          m_XAdvance: 0
++          m_YAdvance: 0
++      m_FeatureLookupFlags: 0
+     m_MarkToBaseAdjustmentRecords: []
+     m_MarkToMarkAdjustmentRecords: []
+   m_ShouldReimportFontFeatures: 0

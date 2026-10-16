@@ -1,0 +1,108 @@
+{
+  "status": "Static checks passed; Unity Shader import/compilation and visual tests NOT performed",
+  "baseline_asset_files": 45,
+  "changed_since_task_start": [
+    "Assets/Mock/Effects/JustAvoidCounterCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCut.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "Assets/Mock/Resources/JustAvoidCounterCut.shader",
+    "Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs"
+  ],
+  "preserved_baseline_files": 39,
+  "prefab_change_only": "_cutSize (Blood, hierarchy, GUIDs and component references unchanged)",
+  "materials": [
+    {
+      "material": "Assets\\Mock\\Effects\\JustAvoidCounterFirstCut.mat",
+      "values": {
+        "_Age": 0.0,
+        "_AirStrength": 0.025,
+        "_CoreGain": 1.45,
+        "_CoreWidth": 0.13,
+        "_EdgeContrast": 0.5,
+        "_FlashDuration": 0.07,
+        "_FlashHold": 0.018,
+        "_FlashStrength": 1.2,
+        "_GlowDuration": 0.235,
+        "_LineDuration": 0.17,
+        "_LineHold": 0.045,
+        "_MinCorePixels": 1.3,
+        "_SweepDuration": 0.028,
+        "_ZTest": 4.0,
+        "_ImpactBoost": 0.4,
+        "_TaperStrength": 0.8,
+        "_BladeCurve": 0.06,
+        "_GlowWidth": 0.27,
+        "_GlowIntensity": 0.22
+      }
+    },
+    {
+      "material": "Assets\\Mock\\Effects\\JustAvoidCounterCut.mat",
+      "values": {
+        "_Age": 0.0,
+        "_AirStrength": 0.12,
+        "_CoreGain": 1.75,
+        "_CoreWidth": 0.17,
+        "_EdgeContrast": 0.6,
+        "_FlashDuration": 0.105,
+        "_FlashHold": 0.025,
+        "_FlashStrength": 1.65,
+        "_GlowDuration": 0.32,
+        "_LineDuration": 0.25,
+        "_LineHold": 0.16,
+        "_MinCorePixels": 1.5,
+        "_SweepDuration": 0.045,
+        "_ZTest": 4.0,
+        "_ImpactBoost": 0.65,
+        "_TaperStrength": 1.2,
+        "_BladeCurve": 0.12,
+        "_GlowWidth": 0.36,
+        "_GlowIntensity": 0.28
+      }
+    }
+  ],
+  "references": [
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterCut.mat",
+      "to": "Assets\\Mock\\Resources\\JustAvoidCounterCut.shader"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFirstCut.mat",
+      "to": "Assets\\Mock\\Resources\\JustAvoidCounterCut.shader"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterCutQuad.asset"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterFirstCut.mat"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "to": "Assets\\Mock\\Scripts\\Feedback\\JustAvoidCounterCutVFX.cs"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterBlood.mat"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterCutQuad.asset"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "to": "Assets\\Mock\\Scripts\\Feedback\\JustAvoidCounterCutVFX.cs"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterBlood.mat"
+    },
+    {
+      "from": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "to": "Assets\\Mock\\Effects\\JustAvoidCounterCut.mat"
+    }
+  ],
+  "csharp_compile": "Unity 6000.2.7f2 bundled Roslyn + existing Assembly-CSharp.rsp, exit 0, 9 existing warnings",
+  "shader_check": "Balanced ShaderLab/HLSL delimiters, known HDRP include and exposure API, matching property names; not a GPU compile"
+}

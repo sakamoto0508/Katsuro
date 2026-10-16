@@ -1,0 +1,38 @@
+{
+  "materials": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCut.mat",
+      "passCompiled": true,
+      "shader": "Assets/Mock/Resources/JustAvoidCounterCut.shader",
+      "width": 0.165,
+      "length": 0.9,
+      "sheetWidth": 0.25,
+      "sheetIntensity": 0.5,
+      "fade": 0.095,
+      "residual": 0.075,
+      "depth": 4.0,
+      "errors": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterCut.mat",
+      "passCompiled": true,
+      "shader": "Assets/Mock/Resources/JustAvoidCounterCut.shader",
+      "width": 0.28,
+      "length": 0.98,
+      "sheetWidth": 0.48,
+      "sheetIntensity": 1.2,
+      "fade": 0.12,
+      "residual": 0.11,
+      "depth": 4.0,
+      "errors": []
+    }
+  ],
+  "hitStop": [
+    0.045,
+    0.155
+  ],
+  "poolPrefabs": [
+    "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab"
+  ]
+}

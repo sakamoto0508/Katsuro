@@ -1,0 +1,73 @@
+{
+    "MonoBehaviour": {
+        "m_Enabled": true,
+        "m_EditorHideFlags": 0,
+        "m_Name": "JustAvoidCounterConfig",
+        "m_EditorClassIdentifier": "Assembly-CSharp::JustAvoidCounterConfig",
+        "First": {
+            "SlashMaterial": {
+                "fileID": 2100000,
+                "guid": "0f18038a8180f4140939f8e48a02d6f0",
+                "type": 2
+            },
+            "BladeStart": 0.2800000011920929,
+            "TipExtension": 0.05999999865889549,
+            "TrailDuration": 0.23000000417232514,
+            "TrailBrightness": 1.2999999523162842,
+            "TrailWidth": 0.949999988079071,
+            "CoreIntensity": 2.200000047683716,
+            "CoreDuration": 0.0949999988079071,
+            "Afterglow": 0.4000000059604645,
+            "HitStop": 0.04500000178813934,
+            "ImpactPoseTime": 0.05000000074505806,
+            "PoseDuration": 0.18000000715255738,
+            "TorsoImpact": 9.0,
+            "TorsoFollowThrough": 4.0,
+            "HeadRecoil": 5.0,
+            "HipFollowThrough": 1.5,
+            "FollowThroughPeak": 0.07000000029802323
+        },
+        "Second": {
+            "SlashMaterial": {
+                "fileID": 2100000,
+                "guid": "9f567260a1ed1db459ed31f4b9307227",
+                "type": 2
+            },
+            "BladeStart": 0.11999999731779099,
+            "TipExtension": 0.14000000059604646,
+            "TrailDuration": 0.36000001430511477,
+            "TrailBrightness": 1.600000023841858,
+            "TrailWidth": 1.149999976158142,
+            "CoreIntensity": 3.5999999046325685,
+            "CoreDuration": 0.18000000715255738,
+            "Afterglow": 0.6000000238418579,
+            "HitStop": 0.1550000011920929,
+            "ImpactPoseTime": 0.05000000074505806,
+            "PoseDuration": 0.4000000059604645,
+            "TorsoImpact": 14.0,
+            "TorsoFollowThrough": 24.0,
+            "HeadRecoil": 9.0,
+            "HipFollowThrough": 4.0,
+            "FollowThroughPeak": 0.14000000059604646
+        },
+        "FirstCFX": {
+            "fileID": 7056513741744720959,
+            "guid": "32c10a2d55e7042419059ce756c563c7",
+            "type": 3
+        },
+        "FinisherCFX": {
+            "fileID": 4245033305927409411,
+            "guid": "692d64caa2172da4c9a57444d668def2",
+            "type": 3
+        },
+        "FirstContact": {
+            "x": 0.09000000357627869,
+            "y": 0.04500000178813934,
+            "z": 0.5
+        },
+        "FirstBloodAmount": 0.5,
+        "FirstReactionWeight": 0.41999998688697817,
+        "SecondReactionBlendIn": 0.03500000014901161,
+        "SecondReactionImpactWeight": 0.8500000238418579
+    }
+}

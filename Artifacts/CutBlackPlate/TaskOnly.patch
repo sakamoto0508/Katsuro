@@ -1,0 +1,51 @@
+diff --git a/Artifacts/CutBlackPlate/Baseline/JustAvoidCounterCut.shader b/Assets/Mock/Resources/JustAvoidCounterCut.shader
+index e5ef89c..2a81082 100644
+--- a/Artifacts/CutBlackPlate/Baseline/JustAvoidCounterCut.shader
++++ b/Assets/Mock/Resources/JustAvoidCounterCut.shader
+@@ -36,6 +36,8 @@ Shader "Katsuro/JustAvoidCounterCut"
+         _FlashDuration("Contact flare ends at (seconds)", Float) = .07
+         [Header(Depth)]
+         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("Cut depth test (LEqual recommended)", Float) = 4
++        [Header(Diagnostics)]
++        [Enum(Normal,0,Solid Magenta,1,Core Mask,2,Sheet Mask,3,Flash Mask,4)] _DebugMode("Cut debug view (return to Normal after inspection)", Float) = 0
+         [HideInInspector] _Age("Age seconds (pool clock)", Float) = 0
+     }
+     SubShader
+@@ -62,6 +64,7 @@ Shader "Katsuro/JustAvoidCounterCut"
+             float _SheetWidth, _SheetLength, _SheetIntensity, _SheetSoftness, _StrikeMultiplier;
+             float _GlowWidth, _GlowIntensity, _ResidualGlowDuration, _AirStrength, _EdgeContrast;
+             float _FlashDuration, _FlashStrength, _FlashHold;
++            float _DebugMode;
+             CBUFFER_END
+             struct A { float3 vertex:POSITION; float2 uv:TEXCOORD0; };
+             struct V { float4 pos:SV_POSITION; float2 uv:TEXCOORD0; };
+@@ -76,6 +79,8 @@ Shader "Katsuro/JustAvoidCounterCut"
+             }
+             float4 Frag(V i):SV_Target
+             {
++                // Bypass all masks and exposure: show the depth-tested renderer footprint.
++                if (_DebugMode>.5 && _DebugMode<1.5) return float4(1,0,1,1);
+                 float2 p=i.uv*2-1;
+                 float x=p.x/max(.01,_CoreLength);
+                 float age=max(0,_Age);
+@@ -135,8 +140,20 @@ Shader "Katsuro/JustAvoidCounterCut"
+                 float2 flashSize=max(abs(_FlashSize.xy),float2(.005,.005));
+                 float contact=exp(-pow(p.x/flashSize.x,2)-pow(p.y/flashSize.y,2));
+                 contact+=exp(-pow(p.x/(flashSize.x*.25),2)-pow(p.y/(flashSize.y*1.65),2))*.18;
++                float contactMask=contact*(1-smoothstep(max(0,_FlashHold),
++                    max(_FlashHold+.001,_FlashDuration),age));
+                 contact*=max(0,_FlashStrength)*(1-smoothstep(max(0,_FlashHold),
+                     max(_FlashHold+.001,_FlashDuration),age));
++                // Premultiplied white masks: outside the mask alpha is zero, not a black card.
++                // Retain shape and lifetime, excluding color, intensity and camera exposure.
++                if (_DebugMode>1.5)
++                {
++                    float mask;
++                    if (_DebugMode<2.5) mask=saturate(core);
++                    else if (_DebugMode<3.5) mask=saturate(sheetMask*sheetSegment*sheetTaper*sheetHeel*sheetLife);
++                    else mask=saturate(contactMask);
++                    return float4(mask,mask,mask,mask);
++                }
+                 float alpha=saturate(core*.95+edge*_EdgeContrast+contact*.75+sheet*.32+glow+air);
+                 // Keep the localized contact brighter than the sustained full-length blade.
+                 float3 emission=_Tint.rgb*(core*_CoreGain*impact+head*.3+contact*(1+_CoreGain*.9)*.72)
