@@ -59,14 +59,21 @@ Shader "Katsuro/CounterImpactStroke"
                 float feather=1-smoothstep(.15,.95,abs(y));
                 float contactFocus=lerp(.22,1.15,Gaussian((x-.5)/.18));
                 float pixel=max(.0001,fwidth(y));
-                // A narrow contact-centered incision, not a uniformly white longitudinal band.
-                float core=Gaussian(y/max(max(.01,_CoreWidth),pixel*_MinCorePixels))*_CoreIntensity*coreLife*contactFocus;
+                // Crisp blade ridge with a bounded pixel floor, rather than a Gaussian light cloud.
+                float radius=max(max(.01,_CoreWidth),pixel*_MinCorePixels);
+                float coreShape=1-smoothstep(radius*.3,radius+pixel*.3,abs(y));
+                float core=coreShape*_CoreIntensity*coreLife*contactFocus;
                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
                 float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
-                float frontWhite=(brightEdge*feather+tip)*_FrontIntensity*coreLife;
+                // A small, short forward glint is hotter than the sustained incision.
+                float frontLife=1-smoothstep(.008,max(.04,_ExtensionDuration*2),age);
+                float frontWhite=(brightEdge*feather+tip*(1.5+_CoreIntensity))*_FrontIntensity*coreLife*frontLife;
                 float facet=lerp(1,lerp(.18,.8,smoothstep(-.75,.7,y))+Gaussian((y-.4)/.08)*.25,_FacetContrast);
                 float face=Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);
                 float3 rgb=(_WhiteTint.rgb*(core+frontWhite)+_SteelTint.rgb*face)*longitudinal*border*_StrokeIntensity;
+                // The rear heel leaves rapidly; keep the contact and forward blade readable.
+                float rearLife=1-smoothstep(0,max(.025,_ExtensionDuration*1.8),age);
+                rgb*=lerp(rearLife,1,smoothstep(.12,.5,x));
                 rgb*=lerp(1,GetCurrentExposureMultiplier(),saturate(_ExposureWeight));
                 // Emissive transparency: unlit pixels contribute no RGB and no occluding alpha.
                 return float4(max(0,rgb),0);

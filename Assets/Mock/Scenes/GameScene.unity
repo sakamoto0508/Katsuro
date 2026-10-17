@@ -30640,6 +30640,14 @@ PrefabInstance:
       propertyPath: '_playerWeaponColliders.Array.data[4]'
       value: 
       objectReference: {fileID: 1379936911}
+    - target: {fileID: 3588325835272936073, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 3588325835272936073, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0614799
+      objectReference: {fileID: 0}
     - target: {fileID: 3671526264821687900, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -30684,6 +30692,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5056879597082990713, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5056879597082990713, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.06148
+      objectReference: {fileID: 0}
     - target: {fileID: 5878546654812417642, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.6
@@ -30701,6 +30717,54 @@ PrefabInstance:
       value: "\nBinding warning: Some generic clip(s) animate transforms that are
         already bound by a Humanoid avatar. These transforms can only be changed
         by Humanoid clips.\n\tTransform 'RightArm'\n\tFrom animation clip 'ARPG_Halberd_Attack_Combo4'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171213420269057482, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.1498897
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171213420269057482, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171213420269057482, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0614796
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171213420269057482, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.1498897
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0614797
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.199
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376607100840415067, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.006
+      objectReference: {fileID: 0}
+    - target: {fileID: 8986415417217918788, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 8986415417217918788, guid: 97374b217629a1445aeaa060b1a6939d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0614797
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

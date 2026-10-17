@@ -1,0 +1,87 @@
+{
+  "playing": false,
+  "compiling": false,
+  "graphicsAPI": "Direct3D12",
+  "mats": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+      "shader": "Assets/Mock/Resources/CounterSwordSlash.shader",
+      "compiled": true,
+      "renderQueue": 3010,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+      "shader": "Assets/Mock/Resources/CounterSwordSlash.shader",
+      "compiled": true,
+      "renderQueue": 3010,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "shader": "Assets/Mock/Resources/CounterImpactStroke.shader",
+      "compiled": true,
+      "renderQueue": 3011,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "shader": "Assets/Mock/Resources/CounterImpactStroke.shader",
+      "compiled": true,
+      "renderQueue": 3011,
+      "messages": []
+    }
+  ],
+  "samplers": 1,
+  "bloodOrigins": [
+    {
+      "prefab": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "emitters": [
+        {
+          "name": "Crimson Threads",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        },
+        {
+          "name": "Dark Blood Drops",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        },
+        {
+          "name": "Late Fine Drops",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        }
+      ]
+    },
+    {
+      "prefab": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "emitters": [
+        {
+          "name": "Crimson Threads",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        },
+        {
+          "name": "Dark Blood Drops",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        },
+        {
+          "name": "Late Fine Drops",
+          "offsetFromContact": "(0, 0, 0)",
+          "shapeOffset": "(0, 0, 0)",
+          "simulationSpace": "World"
+        }
+      ]
+    }
+  ],
+  "geometryChecks": 54,
+  "directionTests": true,
+  "scope": "Asset API, shader compilation, pure math only; no Scene or Play Mode test."
+}

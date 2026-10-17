@@ -42,12 +42,9 @@ internal sealed class CounterImpactStroke
 
     public static Vector3 ResolveDirection(Vector3 sweep, Vector3 history)
     {
-        if (sweep.sqrMagnitude<.000001f) return history.normalized;
-        Vector3 direction=sweep.normalized;
-        // Never cancel a valid sweep by averaging an older, opposing segment into it.
-        if (history.sqrMagnitude>.000001f && Vector3.Dot(direction,history.normalized)>.25f)
-            direction=(direction*.65f+history.normalized*.35f).normalized;
-        return direction;
+        // Use exactly the same accepted sweep as Blood. Averaging an older curved
+        // history here can tilt the straight incision away from that contact direction.
+        return sweep.sqrMagnitude>=.000001f ? sweep.normalized : history.normalized;
     }
 
     public static Vector3 BladeVertex(Vector3 point, Vector3 direction, Vector3 side, float length, float width, float u, float across)
