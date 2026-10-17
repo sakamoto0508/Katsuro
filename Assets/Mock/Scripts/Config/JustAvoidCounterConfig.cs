@@ -22,6 +22,17 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
         [Range(.033f, .3f), Tooltip("各軌跡サンプルのコア寿命。命中時の表示保持はHitStop時間を読み取り別途行います。")]
         public float CoreDuration = .055f;
         [Range(0f, 1f)] public float Afterglow = .22f;
+        [Header("Impact straight blade (presentation only)")]
+        public Material StrokeMaterial;
+        [Range(.2f, 3f), Tooltip("命中点を通る直線の長さ(m)。前方へ移動しません。")]
+        public float StrokeLength = 1.35f;
+        [Range(.01f, .4f), Tooltip("先細り斬撃板の最大幅(m)。芯の幅はStroke Materialで調整します。")]
+        public float StrokeWidth = .09f;
+        [Range(.033f, .2f), Tooltip("白い芯が消えるまでの秒数。既存HitStopは変更しません。")]
+        public float StrokeCoreDuration = .055f;
+        [Range(.05f, .4f), Tooltip("青い面と残光も消えるまでの秒数。Pause中は停止します。")]
+        public float StrokeDuration = .14f;
+        [Range(0f, 3f)] public float StrokeIntensity = 1f;
         [Min(0f)] public float HitStop = .045f;
         [Header("Counter impact pose (presentation only)")]
         [Range(0f, .25f), Tooltip("被弾Clipを命中時に評価する正規化位置。Eventや拘束時間は変更しません。")]

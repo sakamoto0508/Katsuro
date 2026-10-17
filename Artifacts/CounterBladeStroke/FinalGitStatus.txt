@@ -1,0 +1,18 @@
+ M Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat
+ M Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat
+ M Assets/Mock/Resources/CounterSwordSlash.shader
+ M Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+ M Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+ M Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+ M Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
+ M Assets/Mock/Scripts/Feedback/SwordTrail.cs
+?? Artifacts/CounterBladeStroke/
+?? Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
+?? Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat.meta
+?? Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
+?? Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat.meta
+?? Assets/Mock/Resources/CounterImpactStroke.shader
+?? Assets/Mock/Resources/CounterImpactStroke.shader.meta
+?? Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+?? Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs.meta
+?? CounterBladeStrokeChanges.md

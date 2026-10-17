@@ -1,0 +1,283 @@
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat b/Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat
+index 9dbdc92..94fbcd3 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat
++++ b/Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat
+@@ -25,21 +25,23 @@ Material:
+     m_TexEnvs: []
+     m_Ints: []
+     m_Floats:
+-    - _AfterglowIntensity: 0.95
++    - _AfterglowIntensity: 0.4
+     - _ContactRadius: 0.38
+     - _CorePosition: 0.66
+-    - _CoreWidth: 0.16
+-    - _EdgeIntensity: 3.1
+-    - _EdgeWidth: 0.075
++    - _CoreWidth: 0.045
++    - _EdgeIntensity: 1.1
++    - _EdgeWidth: 0.032
+     - _ExposureWeight: 0
++    - _FacetContrast: 0.75
+     - _Impact: 0
+-    - _ImpactGain: 1
+-    - _Intensity: 1.15
+-    - _SheetIntensity: 1.15
+-    - _SheetSoftness: 0.1
++    - _ImpactGain: 0.2
++    - _Intensity: 0.9
++    - _SheetIntensity: 0.38
++    - _SheetSoftness: 0.22
++    - _WhiteFrontSpan: 0.35
+     m_Colors:
+     - _ContactPoint: {r: 0, g: 0, b: 0, a: 1}
+-    - _CoreTint: {r: 2, g: 2.15, b: 2.4, a: 1}
+-    - _SheetTint: {r: 0.65, g: 0.85, b: 1.15, a: 1}
++    - _CoreTint: {r: 0.9, g: 1.05, b: 1.3, a: 1}
++    - _SheetTint: {r: 0.12, g: 0.32, b: 0.58, a: 1}
+   m_BuildTextureStacks: []
+   m_AllowLocking: 1
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat b/Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat
+index c645eb8..5c17628 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat
++++ b/Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat
+@@ -25,21 +25,23 @@ Material:
+     m_TexEnvs: []
+     m_Ints: []
+     m_Floats:
+-    - _AfterglowIntensity: 0.7
++    - _AfterglowIntensity: 0.28
+     - _ContactRadius: 0.28
+     - _CorePosition: 0.66
+-    - _CoreWidth: 0.11
+-    - _EdgeIntensity: 2.4
+-    - _EdgeWidth: 0.05
++    - _CoreWidth: 0.035
++    - _EdgeIntensity: 0.75
++    - _EdgeWidth: 0.022
+     - _ExposureWeight: 0
++    - _FacetContrast: 0.75
+     - _Impact: 0
+-    - _ImpactGain: 0.7
+-    - _Intensity: 1
+-    - _SheetIntensity: 0.7
+-    - _SheetSoftness: 0.14
++    - _ImpactGain: 0.12
++    - _Intensity: 0.8
++    - _SheetIntensity: 0.25
++    - _SheetSoftness: 0.22
++    - _WhiteFrontSpan: 0.3
+     m_Colors:
+     - _ContactPoint: {r: 0, g: 0, b: 0, a: 1}
+-    - _CoreTint: {r: 1.65, g: 1.8, b: 2.05, a: 1}
+-    - _SheetTint: {r: 0.48, g: 0.68, b: 0.95, a: 1}
++    - _CoreTint: {r: 0.9, g: 1.05, b: 1.3, a: 1}
++    - _SheetTint: {r: 0.1, g: 0.28, b: 0.5, a: 1}
+   m_BuildTextureStacks: []
+   m_AllowLocking: 1
+diff --git a/Assets/Mock/Resources/CounterSwordSlash.shader b/Assets/Mock/Resources/CounterSwordSlash.shader
+index 4443009..09f70a4 100644
+--- a/Assets/Mock/Resources/CounterSwordSlash.shader
++++ b/Assets/Mock/Resources/CounterSwordSlash.shader
+@@ -10,6 +10,8 @@ Shader "Katsuro/CounterSwordSlash"
+         _SheetSoftness("Surface edge softness", Range(.02,.3)) = .12
+         _EdgeIntensity("Bright blade edge intensity", Range(0,5)) = 2.2
+         _EdgeWidth("Bright blade edge width", Range(.01,.2)) = .06
++        _WhiteFrontSpan("White restricted to fresh front", Range(.1,1)) = .32
++        _FacetContrast("Blue steel facet contrast", Range(0,1)) = .65
+         _AfterglowIntensity("Directional afterglow intensity", Range(0,2)) = .45
+         _ImpactGain("Short impact brightness boost", Range(0,3)) = .7
+         _ContactRadius("Local contact boost radius (m)", Range(.05,1)) = .3
+@@ -41,6 +43,7 @@ Shader "Katsuro/CounterSwordSlash"
+             float4 _CoreTint, _SheetTint, _ContactPoint;
+             float _CoreWidth, _CorePosition, _SheetIntensity, _SheetSoftness;
+             float _EdgeIntensity, _EdgeWidth, _AfterglowIntensity, _ImpactGain;
++            float _WhiteFrontSpan, _FacetContrast;
+             float _ContactRadius, _ExposureWeight, _Intensity, _Impact;
+             CBUFFER_END
+             struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; };
+@@ -60,11 +63,14 @@ Shader "Katsuro/CounterSwordSlash"
+                 float border=smoothstep(0,max(.02,_SheetSoftness),blade)*(1-smoothstep(.98,1,blade));
+                 // One temporal fade; core leaves before the silver surface and trailing glow.
+                 float coreLife=1-smoothstep(.25,1,saturate(i.highlight.z));
+-                float surfaceLife=1-smoothstep(.3,1,age);
++                float surfaceLife=1-smoothstep(.08,.85,age);
+                 float residual=smoothstep(.15,.6,age)*(1-smoothstep(.65,1,age));
+-                float core=Gaussian((blade-_CorePosition)/max(.01,_CoreWidth))*max(0,i.highlight.x)*coreLife;
+-                float edge=Gaussian((blade-.955)/max(.01,_EdgeWidth))*_EdgeIntensity*coreLife;
+-                float surface=sin(blade*PI)*_SheetIntensity*surfaceLife;
++                float whiteFront=smoothstep(1-max(.1,_WhiteFrontSpan),.99,along);
++                float whiteLife=coreLife*(1-smoothstep(.1,.65,age));
++                float core=Gaussian((blade-_CorePosition)/max(.01,_CoreWidth))*max(0,i.highlight.x)*whiteLife*whiteFront;
++                float edge=Gaussian((blade-.955)/max(.01,_EdgeWidth))*_EdgeIntensity*whiteLife*whiteFront;
++                float facet=lerp(1,lerp(.25,.85,smoothstep(.15,.8,blade))+Gaussian((blade-.78)/.045)*.22,_FacetContrast);
++                float surface=sin(blade*PI)*_SheetIntensity*surfaceLife*facet;
+                 float wake=Gaussian((blade-.7)/.28)*_AfterglowIntensity*max(0,i.highlight.y)*residual*lerp(.4,1,along);
+                 float3 distanceToContact=(i.world-_ContactPoint.xyz)/max(.05,_ContactRadius);
+                 float localContact=exp(-dot(distanceToContact,distanceToContact));
+diff --git a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+index 7d71d55..7fe9b8a 100644
+--- a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
++++ b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+@@ -16,12 +16,18 @@ MonoBehaviour:
+     SlashMaterial: {fileID: 2100000, guid: 0f18038a8180f4140939f8e48a02d6f0, type: 2}
+     BladeStart: 0.28
+     TipExtension: 0.06
+-    TrailDuration: 0.23
+-    TrailBrightness: 1.3
+-    TrailWidth: 0.95
+-    CoreIntensity: 2.2
+-    CoreDuration: 0.095
+-    Afterglow: 0.4
++    TrailDuration: 0.18
++    TrailBrightness: 0.7
++    TrailWidth: 0.85
++    CoreIntensity: 0.7
++    CoreDuration: 0.07
++    Afterglow: 0.18
++    StrokeMaterial: {fileID: 2100000, guid: 1cf801deffc38f34fbb3de6f333dff78, type: 2}
++    StrokeLength: 1.35
++    StrokeWidth: 0.085
++    StrokeCoreDuration: 0.055
++    StrokeDuration: 0.14
++    StrokeIntensity: 1
+     HitStop: 0.045
+     ImpactPoseTime: 0.05
+     PoseDuration: 0.18
+@@ -34,12 +40,18 @@ MonoBehaviour:
+     SlashMaterial: {fileID: 2100000, guid: 9f567260a1ed1db459ed31f4b9307227, type: 2}
+     BladeStart: 0.12
+     TipExtension: 0.14
+-    TrailDuration: 0.36
+-    TrailBrightness: 1.6
+-    TrailWidth: 1.15
+-    CoreIntensity: 3.6
+-    CoreDuration: 0.18
+-    Afterglow: 0.6
++    TrailDuration: 0.25
++    TrailBrightness: 0.9
++    TrailWidth: 1
++    CoreIntensity: 1.1
++    CoreDuration: 0.1
++    Afterglow: 0.26
++    StrokeMaterial: {fileID: 2100000, guid: a97ee332d330f104ba18ee6f45d7b150, type: 2}
++    StrokeLength: 2.1
++    StrokeWidth: 0.15
++    StrokeCoreDuration: 0.09
++    StrokeDuration: 0.23
++    StrokeIntensity: 1.25
+     HitStop: 0.155
+     ImpactPoseTime: 0.05
+     PoseDuration: 0.4
+diff --git a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+index a06109c..d89ee50 100644
+--- a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
++++ b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+@@ -22,6 +22,17 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
+         [Range(.033f, .3f), Tooltip("各軌跡サンプルのコア寿命。命中時の表示保持はHitStop時間を読み取り別途行います。")]
+         public float CoreDuration = .055f;
+         [Range(0f, 1f)] public float Afterglow = .22f;
++        [Header("Impact straight blade (presentation only)")]
++        public Material StrokeMaterial;
++        [Range(.2f, 3f), Tooltip("命中点を通る直線の長さ(m)。前方へ移動しません。")]
++        public float StrokeLength = 1.35f;
++        [Range(.01f, .4f), Tooltip("先細り斬撃板の最大幅(m)。芯の幅はStroke Materialで調整します。")]
++        public float StrokeWidth = .09f;
++        [Range(.033f, .2f), Tooltip("白い芯が消えるまでの秒数。既存HitStopは変更しません。")]
++        public float StrokeCoreDuration = .055f;
++        [Range(.05f, .4f), Tooltip("青い面と残光も消えるまでの秒数。Pause中は停止します。")]
++        public float StrokeDuration = .14f;
++        [Range(0f, 3f)] public float StrokeIntensity = 1f;
+         [Min(0f)] public float HitStop = .045f;
+         [Header("Counter impact pose (presentation only)")]
+         [Range(0f, .25f), Tooltip("被弾Clipを命中時に評価する正規化位置。Eventや拘束時間は変更しません。")]
+diff --git a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+index 4a1a741..aa10870 100644
+--- a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+@@ -436,7 +436,7 @@ public sealed class CombatFeedback : MonoBehaviour
+         if (info.IsJustAvoidCounter && info.Instigator != null)
+         {
+             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
+-            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint);
++            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection);
+         }
+         if (_enemyOwner != null)
+         {
+diff --git a/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs b/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
+index 897e351..c5e7f1f 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
+@@ -11,6 +11,7 @@ internal sealed class CounterSlashPresentation
+     private float lastUpdate, holdStart, holdUntil;
+     private bool contacted;
+     private Vector3 contact;
++    private CounterImpactStroke stroke;
+     public JustAvoidCounterConfig.Strike Settings { get; private set; }
+     public bool Enabled => Settings != null && Settings.SlashMaterial != null;
+ 
+@@ -33,6 +34,7 @@ internal sealed class CounterSlashPresentation
+         holdStart = holdUntil = 0f;
+         contacted = false;
+         renderer.SetPropertyBlock(null);
++        stroke?.Hide();
+     }
+ 
+     public bool IsHolding(float now) => Enabled && contacted && now < holdUntil;
+@@ -67,12 +69,17 @@ internal sealed class CounterSlashPresentation
+ 
+     public void Apply(float now)
+     {
++        stroke?.Tick(now);
+         if (!Enabled) return;
+         float impact = contacted ? 1f - Mathf.SmoothStep(0f, 1f, Mathf.Max(0f, now - holdUntil) / .065f) : 0f;
+         block.SetVector(ContactId, new Vector4(contact.x, contact.y, contact.z, 1f));
+         block.SetFloat(ImpactId, impact);
+         renderer.SetPropertyBlock(block);
+     }
++    public void PrepareStroke(int layer) { if (stroke == null) stroke = new CounterImpactStroke(layer); }
++    public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
++    { if (Enabled) stroke?.Show(Settings, point, direction, bladeAxis, view, now); }
++    public void Dispose() => stroke?.Dispose();
+ 
+     public static float Taper(float along)
+     {
+diff --git a/Assets/Mock/Scripts/Feedback/SwordTrail.cs b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+index 603e05f..8c06f76 100644
+--- a/Assets/Mock/Scripts/Feedback/SwordTrail.cs
++++ b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+@@ -121,11 +121,18 @@ public sealed class SwordTrail : MonoBehaviour
+         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
+     }
+     /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
+-    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point)
++    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
+     {
+-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point); return; }
++        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point, sweepDirection); return; }
+         if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
+         counterSlash.Hit(point, FeedbackVisualTime.Now);
++        Vector3 history = count > 1 ? tips[count - 1] - tips[Mathf.Max(0, count - 4)]
++            : (_tip != null && hasPrevious ? _tip.position - previousTip : Vector3.zero);
++        Vector3 direction = CounterImpactStroke.ResolveDirection(sweepDirection, history);
++        Vector3 bladeAxis = _tip != null && _bladeBase != null ? _tip.position - _bladeBase.position : transform.up;
++        var camera = Camera.main;
++        Vector3 view = camera != null ? camera.transform.position - point : -transform.forward;
++        counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
+         captureCounterHit = true;
+     }
+     /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
+@@ -150,6 +157,7 @@ public sealed class SwordTrail : MonoBehaviour
+         var renderer = surface.GetComponent<MeshRenderer>(); renderer.sharedMaterial = material;
+         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; renderer.receiveShadows = false;
+         counterSlash = new CounterSlashPresentation(renderer, material);
++        if (_counterPresentation != null) counterSlash.PrepareStroke(gameObject.layer);
+         counterAnimation = owner != null ? owner.GetComponent<JustAvoidCounterAnimation>() : null;
+         GameManager.OnGameStateChanged += OnGameStateChanged;
+         initialized = true;
+@@ -310,5 +318,5 @@ public sealed class SwordTrail : MonoBehaviour
+     /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
+     private void OnDisable() { emitting = false; counterWindow = captureCounterHit = false; count = 0; if (mesh != null) mesh.Clear(); counterSlash?.Reset(FeedbackVisualTime.Now); }
+     /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
+-    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
++    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; counterSlash?.Dispose(); if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+ }

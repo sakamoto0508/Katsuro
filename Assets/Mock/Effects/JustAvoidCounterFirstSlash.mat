@@ -25,21 +25,23 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _AfterglowIntensity: 0.7
+    - _AfterglowIntensity: 0.28
     - _ContactRadius: 0.28
     - _CorePosition: 0.66
-    - _CoreWidth: 0.11
-    - _EdgeIntensity: 2.4
-    - _EdgeWidth: 0.05
+    - _CoreWidth: 0.035
+    - _EdgeIntensity: 0.75
+    - _EdgeWidth: 0.022
     - _ExposureWeight: 0
+    - _FacetContrast: 0.75
     - _Impact: 0
-    - _ImpactGain: 0.7
-    - _Intensity: 1
-    - _SheetIntensity: 0.7
-    - _SheetSoftness: 0.14
+    - _ImpactGain: 0.12
+    - _Intensity: 0.8
+    - _SheetIntensity: 0.25
+    - _SheetSoftness: 0.22
+    - _WhiteFrontSpan: 0.3
     m_Colors:
     - _ContactPoint: {r: 0, g: 0, b: 0, a: 1}
-    - _CoreTint: {r: 1.65, g: 1.8, b: 2.05, a: 1}
-    - _SheetTint: {r: 0.48, g: 0.68, b: 0.95, a: 1}
+    - _CoreTint: {r: 0.9, g: 1.05, b: 1.3, a: 1}
+    - _SheetTint: {r: 0.1, g: 0.28, b: 0.5, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

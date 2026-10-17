@@ -11,6 +11,7 @@ internal sealed class CounterSlashPresentation
     private float lastUpdate, holdStart, holdUntil;
     private bool contacted;
     private Vector3 contact;
+    private CounterImpactStroke stroke;
     public JustAvoidCounterConfig.Strike Settings { get; private set; }
     public bool Enabled => Settings != null && Settings.SlashMaterial != null;
 
@@ -33,6 +34,7 @@ internal sealed class CounterSlashPresentation
         holdStart = holdUntil = 0f;
         contacted = false;
         renderer.SetPropertyBlock(null);
+        stroke?.Hide();
     }
 
     public bool IsHolding(float now) => Enabled && contacted && now < holdUntil;
@@ -67,12 +69,17 @@ internal sealed class CounterSlashPresentation
 
     public void Apply(float now)
     {
+        stroke?.Tick(now);
         if (!Enabled) return;
         float impact = contacted ? 1f - Mathf.SmoothStep(0f, 1f, Mathf.Max(0f, now - holdUntil) / .065f) : 0f;
         block.SetVector(ContactId, new Vector4(contact.x, contact.y, contact.z, 1f));
         block.SetFloat(ImpactId, impact);
         renderer.SetPropertyBlock(block);
     }
+    public void PrepareStroke(int layer) { if (stroke == null) stroke = new CounterImpactStroke(layer); }
+    public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
+    { if (Enabled) stroke?.Show(Settings, point, direction, bladeAxis, view, now); }
+    public void Dispose() => stroke?.Dispose();
 
     public static float Taper(float along)
     {

@@ -436,7 +436,7 @@ public sealed class CombatFeedback : MonoBehaviour
         if (info.IsJustAvoidCounter && info.Instigator != null)
         {
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
-            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint);
+            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection);
         }
         if (_enemyOwner != null)
         {

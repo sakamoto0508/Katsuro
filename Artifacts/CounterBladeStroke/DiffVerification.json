@@ -1,0 +1,41 @@
+{
+  "changed": [
+    "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+    "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs",
+    "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "Assets/Mock/Resources/CounterSwordSlash.shader",
+    "Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset",
+    "Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs"
+  ],
+  "configChanges": [
+    "First.TrailDuration",
+    "First.TrailBrightness",
+    "First.TrailWidth",
+    "First.CoreIntensity",
+    "First.CoreDuration",
+    "First.Afterglow",
+    "First.StrokeMaterial.instanceID",
+    "First.StrokeMaterial.fileID",
+    "First.StrokeMaterial.guid",
+    "First.StrokeMaterial.type",
+    "First.StrokeWidth",
+    "Second.TrailDuration",
+    "Second.TrailBrightness",
+    "Second.TrailWidth",
+    "Second.CoreIntensity",
+    "Second.CoreDuration",
+    "Second.Afterglow",
+    "Second.StrokeMaterial.instanceID",
+    "Second.StrokeMaterial.fileID",
+    "Second.StrokeMaterial.guid",
+    "Second.StrokeMaterial.type",
+    "Second.StrokeLength",
+    "Second.StrokeWidth",
+    "Second.StrokeCoreDuration",
+    "Second.StrokeDuration",
+    "Second.StrokeIntensity"
+  ],
+  "otherInitialAssetsUnchanged": true
+}

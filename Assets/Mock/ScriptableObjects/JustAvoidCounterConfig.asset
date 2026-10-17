@@ -16,12 +16,18 @@ MonoBehaviour:
     SlashMaterial: {fileID: 2100000, guid: 0f18038a8180f4140939f8e48a02d6f0, type: 2}
     BladeStart: 0.28
     TipExtension: 0.06
-    TrailDuration: 0.23
-    TrailBrightness: 1.3
-    TrailWidth: 0.95
-    CoreIntensity: 2.2
-    CoreDuration: 0.095
-    Afterglow: 0.4
+    TrailDuration: 0.18
+    TrailBrightness: 0.7
+    TrailWidth: 0.85
+    CoreIntensity: 0.7
+    CoreDuration: 0.07
+    Afterglow: 0.18
+    StrokeMaterial: {fileID: 2100000, guid: 1cf801deffc38f34fbb3de6f333dff78, type: 2}
+    StrokeLength: 1.35
+    StrokeWidth: 0.085
+    StrokeCoreDuration: 0.055
+    StrokeDuration: 0.14
+    StrokeIntensity: 1
     HitStop: 0.045
     ImpactPoseTime: 0.05
     PoseDuration: 0.18
@@ -34,12 +40,18 @@ MonoBehaviour:
     SlashMaterial: {fileID: 2100000, guid: 9f567260a1ed1db459ed31f4b9307227, type: 2}
     BladeStart: 0.12
     TipExtension: 0.14
-    TrailDuration: 0.36
-    TrailBrightness: 1.6
-    TrailWidth: 1.15
-    CoreIntensity: 3.6
-    CoreDuration: 0.18
-    Afterglow: 0.6
+    TrailDuration: 0.25
+    TrailBrightness: 0.9
+    TrailWidth: 1
+    CoreIntensity: 1.1
+    CoreDuration: 0.1
+    Afterglow: 0.26
+    StrokeMaterial: {fileID: 2100000, guid: a97ee332d330f104ba18ee6f45d7b150, type: 2}
+    StrokeLength: 2.1
+    StrokeWidth: 0.15
+    StrokeCoreDuration: 0.09
+    StrokeDuration: 0.23
+    StrokeIntensity: 1.25
     HitStop: 0.155
     ImpactPoseTime: 0.05
     PoseDuration: 0.4

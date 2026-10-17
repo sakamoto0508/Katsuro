@@ -10,6 +10,8 @@ Shader "Katsuro/CounterSwordSlash"
         _SheetSoftness("Surface edge softness", Range(.02,.3)) = .12
         _EdgeIntensity("Bright blade edge intensity", Range(0,5)) = 2.2
         _EdgeWidth("Bright blade edge width", Range(.01,.2)) = .06
+        _WhiteFrontSpan("White restricted to fresh front", Range(.1,1)) = .32
+        _FacetContrast("Blue steel facet contrast", Range(0,1)) = .65
         _AfterglowIntensity("Directional afterglow intensity", Range(0,2)) = .45
         _ImpactGain("Short impact brightness boost", Range(0,3)) = .7
         _ContactRadius("Local contact boost radius (m)", Range(.05,1)) = .3
@@ -41,6 +43,7 @@ Shader "Katsuro/CounterSwordSlash"
             float4 _CoreTint, _SheetTint, _ContactPoint;
             float _CoreWidth, _CorePosition, _SheetIntensity, _SheetSoftness;
             float _EdgeIntensity, _EdgeWidth, _AfterglowIntensity, _ImpactGain;
+            float _WhiteFrontSpan, _FacetContrast;
             float _ContactRadius, _ExposureWeight, _Intensity, _Impact;
             CBUFFER_END
             struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; };
@@ -60,11 +63,14 @@ Shader "Katsuro/CounterSwordSlash"
                 float border=smoothstep(0,max(.02,_SheetSoftness),blade)*(1-smoothstep(.98,1,blade));
                 // One temporal fade; core leaves before the silver surface and trailing glow.
                 float coreLife=1-smoothstep(.25,1,saturate(i.highlight.z));
-                float surfaceLife=1-smoothstep(.3,1,age);
+                float surfaceLife=1-smoothstep(.08,.85,age);
                 float residual=smoothstep(.15,.6,age)*(1-smoothstep(.65,1,age));
-                float core=Gaussian((blade-_CorePosition)/max(.01,_CoreWidth))*max(0,i.highlight.x)*coreLife;
-                float edge=Gaussian((blade-.955)/max(.01,_EdgeWidth))*_EdgeIntensity*coreLife;
-                float surface=sin(blade*PI)*_SheetIntensity*surfaceLife;
+                float whiteFront=smoothstep(1-max(.1,_WhiteFrontSpan),.99,along);
+                float whiteLife=coreLife*(1-smoothstep(.1,.65,age));
+                float core=Gaussian((blade-_CorePosition)/max(.01,_CoreWidth))*max(0,i.highlight.x)*whiteLife*whiteFront;
+                float edge=Gaussian((blade-.955)/max(.01,_EdgeWidth))*_EdgeIntensity*whiteLife*whiteFront;
+                float facet=lerp(1,lerp(.25,.85,smoothstep(.15,.8,blade))+Gaussian((blade-.78)/.045)*.22,_FacetContrast);
+                float surface=sin(blade*PI)*_SheetIntensity*surfaceLife*facet;
                 float wake=Gaussian((blade-.7)/.28)*_AfterglowIntensity*max(0,i.highlight.y)*residual*lerp(.4,1,along);
                 float3 distanceToContact=(i.world-_ContactPoint.xyz)/max(.05,_ContactRadius);
                 float localContact=exp(-dot(distanceToContact,distanceToContact));

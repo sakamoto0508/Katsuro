@@ -121,11 +121,18 @@ public sealed class SwordTrail : MonoBehaviour
         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
     }
     /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
-    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point)
+    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
     {
-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point); return; }
+        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point, sweepDirection); return; }
         if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
         counterSlash.Hit(point, FeedbackVisualTime.Now);
+        Vector3 history = count > 1 ? tips[count - 1] - tips[Mathf.Max(0, count - 4)]
+            : (_tip != null && hasPrevious ? _tip.position - previousTip : Vector3.zero);
+        Vector3 direction = CounterImpactStroke.ResolveDirection(sweepDirection, history);
+        Vector3 bladeAxis = _tip != null && _bladeBase != null ? _tip.position - _bladeBase.position : transform.up;
+        var camera = Camera.main;
+        Vector3 view = camera != null ? camera.transform.position - point : -transform.forward;
+        counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
         captureCounterHit = true;
     }
     /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
@@ -150,6 +157,7 @@ public sealed class SwordTrail : MonoBehaviour
         var renderer = surface.GetComponent<MeshRenderer>(); renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; renderer.receiveShadows = false;
         counterSlash = new CounterSlashPresentation(renderer, material);
+        if (_counterPresentation != null) counterSlash.PrepareStroke(gameObject.layer);
         counterAnimation = owner != null ? owner.GetComponent<JustAvoidCounterAnimation>() : null;
         GameManager.OnGameStateChanged += OnGameStateChanged;
         initialized = true;
@@ -310,5 +318,5 @@ public sealed class SwordTrail : MonoBehaviour
     /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
     private void OnDisable() { emitting = false; counterWindow = captureCounterHit = false; count = 0; if (mesh != null) mesh.Clear(); counterSlash?.Reset(FeedbackVisualTime.Now); }
     /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
-    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; counterSlash?.Dispose(); if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
 }
