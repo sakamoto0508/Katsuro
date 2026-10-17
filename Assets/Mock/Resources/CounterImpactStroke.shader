@@ -15,6 +15,8 @@ Shader "Katsuro/CounterImpactStroke"
         _ExposureWeight("Scene exposure influence", Range(0,1)) = 0
         [HideInInspector] _StrokeAge("Age", Float) = 0
         [HideInInspector] _CoreDuration("Core duration", Float) = .055
+        [HideInInspector] _CoreHold("Core hold until", Float) = .01
+        [HideInInspector] _PeakDuration("Contact peak ends at", Float) = .04
         [HideInInspector] _Duration("Total duration", Float) = .14
         [HideInInspector] _StrokeIntensity("Strike intensity", Float) = 1
     }
@@ -40,7 +42,7 @@ Shader "Katsuro/CounterImpactStroke"
             float4 _WhiteTint, _SteelTint;
             float _CoreWidth, _MinCorePixels, _CoreIntensity, _FrontIntensity, _SurfaceIntensity, _FacetContrast;
             float _EdgeSoftness, _ExtensionDuration, _ExposureWeight;
-            float _StrokeAge, _CoreDuration, _Duration, _StrokeIntensity;
+            float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _Duration, _StrokeIntensity;
             CBUFFER_END
             struct A { float3 position:POSITION; float2 uv:TEXCOORD0; };
             struct V { float4 position:SV_POSITION; float2 uv:TEXCOORD0; };
@@ -50,7 +52,8 @@ Shader "Katsuro/CounterImpactStroke"
             {
                 float x=saturate(i.uv.x), y=i.uv.y*2-1;
                 float age=max(0,_StrokeAge);
-                float coreLife=1-smoothstep(.01,max(.033,_CoreDuration),age);
+                float coreEnd=max(.033,_CoreDuration);
+                float coreLife=1-smoothstep(clamp(_CoreHold,0,coreEnd-.001),coreEnd,age);
                 float faceLife=1-smoothstep(.015,max(.05,_Duration),age);
                 float residual=smoothstep(.02,max(.033,_CoreDuration),age)*faceLife;
                 float front=lerp(.8,1,smoothstep(0,max(.005,_ExtensionDuration),age));
@@ -66,7 +69,7 @@ Shader "Katsuro/CounterImpactStroke"
                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
                 float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
                 // A small, short forward glint is hotter than the sustained incision.
-                float frontLife=1-smoothstep(.008,max(.04,_ExtensionDuration*2),age);
+                float frontLife=1-smoothstep(.008,max(.02,_PeakDuration),age);
                 float frontWhite=(brightEdge*feather+tip*(1.5+_CoreIntensity))*_FrontIntensity*coreLife*frontLife;
                 float facet=lerp(1,lerp(.18,.8,smoothstep(-.75,.7,y))+Gaussian((y-.4)/.08)*.25,_FacetContrast);
                 float face=Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);

@@ -73,6 +73,8 @@ public sealed class SwordTrail : MonoBehaviour
     private readonly float[] times = new float[Capacity];
     private readonly float[] lifetimes = new float[Capacity], strengths = new float[Capacity], sampleWidths = new float[Capacity];
     private readonly Vector3[] accents = new Vector3[Capacity];
+    // Velocity metadata for the same fixed history; no independent trajectory sampler.
+    private readonly Vector3[] counterTipVelocities = new Vector3[Capacity];
     private const int CurveSteps = 3;
     private readonly Vector3[] vertices = new Vector3[Capacity * CurveSteps * 2];
     private readonly Vector2[] uvs = new Vector2[Capacity * CurveSteps * 2];
@@ -126,12 +128,27 @@ public sealed class SwordTrail : MonoBehaviour
         if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point, sweepDirection); return; }
         if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
         counterSlash.Hit(point, FeedbackVisualTime.Now);
-        Vector3 history = count > 1 ? tips[count - 1] - tips[Mathf.Max(0, count - 4)]
-            : (_tip != null && hasPrevious ? _tip.position - previousTip : Vector3.zero);
-        Vector3 direction = CounterImpactStroke.ResolveDirection(sweepDirection, history);
+        float now=FeedbackVisualTime.Now;
+        Vector3 recent=Vector3.zero;
+        if(count>0 && now-times[count-1]<=.08f)
+        {
+            recent=counterTipVelocities[count-1];
+            if(count>1 && now-times[count-2]<=.08f && recent.sqrMagnitude>.01f &&
+                counterTipVelocities[count-2].sqrMagnitude>.01f && Vector3.Dot(recent.normalized,counterTipVelocities[count-2].normalized)>.9f)
+                recent=(recent.normalized*2f+counterTipVelocities[count-2].normalized).normalized*recent.magnitude;
+        }
+        float delta=now-previousTime;
+        Vector3 ownerDelta=owner!=null?owner.position-previousOwnerPosition:Vector3.zero;
+        Vector3 instantaneous=_tip!=null && hasPrevious && delta>.0001f && delta<=.08f
+            ? ((_tip.position-previousTip)-ownerDelta)/delta : Vector3.zero;
+        Vector3 direction=CounterImpactStroke.SelectMotionDirection(instantaneous,recent,sweepDirection,_minimumSpeed);
         Vector3 bladeAxis = _tip != null && _bladeBase != null ? _tip.position - _bladeBase.position : transform.up;
         var camera = Camera.main;
         Vector3 view = camera != null ? camera.transform.position - point : -transform.forward;
+        var settings=counterSlash.Settings;
+        float reliableSpeed=Mathf.Max(.1f,_minimumSpeed);
+        direction=CounterImpactStroke.ProjectDirection(direction,recent.sqrMagnitude>=reliableSpeed*reliableSpeed?recent:sweepDirection,view,
+            settings.StrokeMinProjection,settings.StrokeMaxProjectionAngle);
         counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
         captureCounterHit = true;
     }
@@ -179,6 +196,8 @@ public sealed class SwordTrail : MonoBehaviour
         if (hasPrevious && (delta > .12f || (ownerPosition - previousOwnerPosition).sqrMagnitude > 4f))
         { count = 0; hasPrevious = false; speedStrength = 0f; }
         float speed = hasPrevious && delta > .0001f ? ((physicalTip - previousTip) - (ownerPosition - previousOwnerPosition)).magnitude / delta : 0f;
+        Vector3 counterVelocity=silverSlash && hasPrevious && delta>.0001f
+            ? ((physicalTip-previousTip)-(ownerPosition-previousOwnerPosition))/delta : Vector3.zero;
         previousTip = physicalTip; previousOwnerPosition = ownerPosition; previousTime = now; hasPrevious = true;
         float target = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(_minimumSpeed, Mathf.Max(_minimumSpeed + .1f, _fullSpeed), speed));
         speedStrength = Mathf.MoveTowards(speedStrength, target, Mathf.Max(0f, delta) * (target > speedStrength ? 30f : 60f));
@@ -188,7 +207,7 @@ public sealed class SwordTrail : MonoBehaviour
             // Keep one invisible seed at the current blade, rather than bridging
             // a long pause to the next fast sample.
             if (count == 0 || (silverSlash && count == 1 && strengths[0] <= 0f))
-            { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = silverSlash ? .12f : .01f; strengths[0] = 0f; sampleWidths[0] = 1f; accents[0] = Vector3.zero; count = 1; }
+            { bases[0] = a; tips[0] = b; times[0] = now; lifetimes[0] = silverSlash ? .12f : .01f; strengths[0] = 0f; sampleWidths[0] = 1f; accents[0] = Vector3.zero; counterTipVelocities[0]=Vector3.zero; count = 1; }
             return;
         }
         if (count == Capacity) RemoveOldest();
@@ -197,6 +216,7 @@ public sealed class SwordTrail : MonoBehaviour
         var counterSettings = style == AttackStyle.JustAvoidCounter && _counterPresentation != null ? _counterPresentation.GetStrike(counterStrike) : null;
         if (counterSettings != null) { duration = counterSettings.TrailDuration; power = counterSettings.TrailBrightness; }
         bases[count] = a; tips[count] = b; times[count] = now;
+        counterTipVelocities[count]=counterVelocity;
         lifetimes[count] = duration * Mathf.Lerp(.6f, 1f, speedStrength);
         strengths[count] = speedStrength * power;
         sampleWidths[count] = style == AttackStyle.Heavy ? 1.02f : 1f;
@@ -220,6 +240,7 @@ public sealed class SwordTrail : MonoBehaviour
         bases[destination] = bases[source]; tips[destination] = tips[source]; times[destination] = times[source];
         lifetimes[destination] = lifetimes[source]; strengths[destination] = strengths[source]; sampleWidths[destination] = sampleWidths[source];
         accents[destination] = accents[source];
+        counterTipVelocities[destination]=counterTipVelocities[source];
     }
     /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
     private void LateUpdate()
@@ -234,7 +255,7 @@ public sealed class SwordTrail : MonoBehaviour
         // 15〜20fpsで寿命よりフレーム間隔が長くても、直前位置から短い線を作れるよう種だけ残す。
         if (live == 0 && count > 0 && emitting && now - times[count - 1] < .12f)
         {
-            CopySample(count - 1, 0); strengths[0] = 0f; times[0] = now; lifetimes[0] = .01f; live = 1;
+            CopySample(count - 1, 0); strengths[0] = 0f; counterTipVelocities[0]=Vector3.zero; times[0] = now; lifetimes[0] = .01f; live = 1;
         }
         count = live;
         if (emitting && (!counterSlash.IsHolding(now) || captureCounterHit)) Sample();

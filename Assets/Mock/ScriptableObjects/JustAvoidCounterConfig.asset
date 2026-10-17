@@ -23,11 +23,15 @@ MonoBehaviour:
     CoreDuration: 0.07
     Afterglow: 0.18
     StrokeMaterial: {fileID: 2100000, guid: 1cf801deffc38f34fbb3de6f333dff78, type: 2}
-    StrokeLength: 1.2
+    StrokeLength: 1.4
     StrokeWidth: 0.068
-    StrokeCoreDuration: 0.065
-    StrokeDuration: 0.13
+    StrokeCoreHold: 0.035
+    StrokeCoreDuration: 0.105
+    StrokePeakDuration: 0.05
+    StrokeDuration: 0.185
     StrokeIntensity: 1.1
+    StrokeMinProjection: 0.55
+    StrokeMaxProjectionAngle: 20
     HitStop: 0.045
     ImpactPoseTime: 0.05
     PoseDuration: 0.18
@@ -49,9 +53,13 @@ MonoBehaviour:
     StrokeMaterial: {fileID: 2100000, guid: a97ee332d330f104ba18ee6f45d7b150, type: 2}
     StrokeLength: 2.05
     StrokeWidth: 0.135
-    StrokeCoreDuration: 0.09
-    StrokeDuration: 0.21
+    StrokeCoreHold: 0.155
+    StrokeCoreDuration: 0.205
+    StrokePeakDuration: 0.065
+    StrokeDuration: 0.275
     StrokeIntensity: 1.1
+    StrokeMinProjection: 0.55
+    StrokeMaxProjectionAngle: 20
     HitStop: 0.155
     ImpactPoseTime: 0.05
     PoseDuration: 0.4

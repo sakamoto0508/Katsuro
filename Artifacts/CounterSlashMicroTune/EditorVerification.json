@@ -1,0 +1,56 @@
+{
+  "playing": false,
+  "changes": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "property": "_CoreIntensity",
+      "before": 2.9,
+      "after": 3.05
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "property": "_FrontIntensity",
+      "before": 1.0,
+      "after": 1.08
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "property": "_SurfaceIntensity",
+      "before": 0.65,
+      "after": 0.56
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "property": "_CoreWidth",
+      "before": 0.035,
+      "after": 0.031
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "property": "_FrontIntensity",
+      "before": 1.15,
+      "after": 1.2
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "property": "_FacetContrast",
+      "before": 0.6,
+      "after": 0.65
+    }
+  ],
+  "shaders": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "shader": "Assets/Mock/Resources/CounterImpactStroke.shader",
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "shader": "Assets/Mock/Resources/CounterImpactStroke.shader",
+      "compiled": true,
+      "messages": []
+    }
+  ],
+  "scope": "Material API and shader compilation only; no Play Mode test."
+}

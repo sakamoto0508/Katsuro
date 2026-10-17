@@ -26,14 +26,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _CoreDuration: 0.055
-    - _CoreIntensity: 2.9
+    - _CoreIntensity: 3.05
     - _CoreWidth: 0.028
     - _Duration: 0.14
     - _EdgeSoftness: 0.4
     - _ExposureWeight: 0
     - _ExtensionDuration: 0.01
     - _FacetContrast: 0.6
-    - _FrontIntensity: 1
+    - _FrontIntensity: 1.08
     - _MinCorePixels: 0.55
     - _StrokeAge: 0
     - _StrokeIntensity: 1

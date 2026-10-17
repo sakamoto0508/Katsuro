@@ -28,11 +28,19 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
         public float StrokeLength = 1.35f;
         [Range(.01f, .4f), Tooltip("先細り斬撃板の最大幅(m)。芯の幅はStroke Materialで調整します。")]
         public float StrokeWidth = .09f;
-        [Range(.033f, .2f), Tooltip("白い芯が消えるまでの秒数。既存HitStopは変更しません。")]
+        [Range(0f, .2f), Tooltip("命中から白銀コアを保持する表示上の秒数。AnimatorやHitStopは操作しません。")]
+        public float StrokeCoreHold = .033f;
+        [Range(.033f, .3f), Tooltip("命中から白い芯が消えるまでの秒数。Hold以降に減衰します。")]
         public float StrokeCoreDuration = .055f;
+        [Range(.02f, .12f), Tooltip("前縁・切先の鮮烈なピークが消えるまでの秒数。芯の保持とは独立。")]
+        public float StrokePeakDuration = .05f;
         [Range(.05f, .4f), Tooltip("青い面と残光も消えるまでの秒数。Pause中は停止します。")]
         public float StrokeDuration = .14f;
         [Range(0f, 3f)] public float StrokeIntensity = 1f;
+        [Range(0f, .8f), Tooltip("視線平面への投影長がこの割合未満の場合だけ補正。0で無効。")]
+        public float StrokeMinProjection = .55f;
+        [Range(0f, 30f), Tooltip("実斬撃方向から表示軸を回す上限角度。水平固定せず命中点も動かしません。0で無効。")]
+        public float StrokeMaxProjectionAngle = 20f;
         [Min(0f)] public float HitStop = .045f;
         [Header("Counter impact pose (presentation only)")]
         [Range(0f, .25f), Tooltip("被弾Clipを命中時に評価する正規化位置。Eventや拘束時間は変更しません。")]
@@ -49,6 +57,7 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
     public Strike First = new Strike();
     public Strike Second = new Strike { TrailDuration = .16f, TrailBrightness = 1.2f,
         TrailWidth = .8f, CoreIntensity = 3.2f, CoreDuration = .09f, Afterglow = .38f, HitStop = .155f,
+        StrokeCoreHold = .155f, StrokeCoreDuration = .205f, StrokePeakDuration = .065f, StrokeDuration = .275f,
         TorsoImpact = 14f, TorsoFollowThrough = 24f, HeadRecoil = 9f, HipFollowThrough = 4f, FollowThroughPeak = .14f, PoseDuration = .4f };
     [Tooltip("1撃目の白銀の切断線・接触光・深紅の血。通常HitVFXとは別に再利用する。")]
     public JustAvoidCounterCutVFX FirstCFX;

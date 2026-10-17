@@ -1,0 +1,105 @@
+{
+    "Material": {
+        "serializedVersion": "8",
+        "m_Name": "JustAvoidCounterFinisherStroke",
+        "m_Shader": {
+            "fileID": 4800000,
+            "guid": "3f859aa42b6160b47bc0de6f757732e6",
+            "type": 3
+        },
+        "m_Parent": {
+            "instanceID": 0
+        },
+        "m_ModifiedSerializedProperties": 0,
+        "m_ValidKeywords": [],
+        "m_InvalidKeywords": [],
+        "m_LightmapFlags": 4,
+        "m_EnableInstancingVariants": false,
+        "m_DoubleSidedGI": false,
+        "m_CustomRenderQueue": -1,
+        "stringTagMap": {},
+        "disabledShaderPasses": [],
+        "m_LockedProperties": "",
+        "m_SavedProperties": {
+            "serializedVersion": "3",
+            "m_TexEnvs": [],
+            "m_Ints": [],
+            "m_Floats": [
+                {
+                    "first": "_CoreDuration",
+                    "second": 0.054999999701976779
+                },
+                {
+                    "first": "_CoreIntensity",
+                    "second": 2.4000000953674318
+                },
+                {
+                    "first": "_CoreWidth",
+                    "second": 0.03500000014901161
+                },
+                {
+                    "first": "_Duration",
+                    "second": 0.14000000059604646
+                },
+                {
+                    "first": "_EdgeSoftness",
+                    "second": 0.3799999952316284
+                },
+                {
+                    "first": "_ExposureWeight",
+                    "second": 0.0
+                },
+                {
+                    "first": "_ExtensionDuration",
+                    "second": 0.02199999988079071
+                },
+                {
+                    "first": "_FacetContrast",
+                    "second": 0.6000000238418579
+                },
+                {
+                    "first": "_FrontIntensity",
+                    "second": 1.149999976158142
+                },
+                {
+                    "first": "_MinCorePixels",
+                    "second": 0.6499999761581421
+                },
+                {
+                    "first": "_StrokeAge",
+                    "second": 0.0
+                },
+                {
+                    "first": "_StrokeIntensity",
+                    "second": 1.0
+                },
+                {
+                    "first": "_SurfaceIntensity",
+                    "second": 0.6499999761581421
+                }
+            ],
+            "m_Colors": [
+                {
+                    "first": "_SteelTint",
+                    "second": {
+                        "r": 0.17000000178813935,
+                        "g": 0.36000001430511477,
+                        "b": 0.5299999713897705,
+                        "a": 1.0
+                    }
+                },
+                {
+                    "first": "_WhiteTint",
+                    "second": {
+                        "r": 0.949999988079071,
+                        "g": 1.0800000429153443,
+                        "b": 1.2400000095367432,
+                        "a": 1.0
+                    }
+                }
+            ]
+        },
+        "m_BuildTextureStacks": [],
+        "m_AllowLocking": true
+    }
+}

@@ -1,0 +1,44 @@
+{
+  "changed": [
+    "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+    "Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs",
+    "Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset",
+    "Assets/Mock/Resources/CounterImpactStroke.shader"
+  ],
+  "configChanges": [
+    {
+      "path": "First.StrokeLength",
+      "before": 1.2000000476837158,
+      "after": 1.399999976158142
+    },
+    {
+      "path": "First.StrokeCoreHold",
+      "before": 0.032999999821186066,
+      "after": 0.03500000014901161
+    },
+    {
+      "path": "First.StrokeCoreDuration",
+      "before": 0.06499999761581421,
+      "after": 0.10499999672174454
+    },
+    {
+      "path": "First.StrokeDuration",
+      "before": 0.12999999523162842,
+      "after": 0.1850000023841858
+    },
+    {
+      "path": "Second.StrokeCoreDuration",
+      "before": 0.09000000357627869,
+      "after": 0.20499999821186066
+    },
+    {
+      "path": "Second.StrokeDuration",
+      "before": 0.20999999344348907,
+      "after": 0.2750000059604645
+    }
+  ],
+  "otherInitialAssetsUnchanged": true,
+  "firstStrokeMaterialIdenticalToStart": true
+}
