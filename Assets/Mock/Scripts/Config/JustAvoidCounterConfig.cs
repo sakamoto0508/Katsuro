@@ -34,6 +34,8 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
         public float StrokeCoreDuration = .055f;
         [Range(.02f, .12f), Tooltip("前縁・切先の鮮烈なピークが消えるまでの秒数。芯の保持とは独立。")]
         public float StrokePeakDuration = .05f;
+        [Range(1f, 3f), Tooltip("命中直後だけ白銀コアに掛ける倍率。1で無効。面・残光の強度は変えません。Peak Duration内に元の輝度へ戻ります。")]
+        public float StrokeHitPeak = 1f;
         [Range(.05f, .4f), Tooltip("青い面と残光も消えるまでの秒数。Pause中は停止します。")]
         public float StrokeDuration = .14f;
         [Range(0f, 3f)] public float StrokeIntensity = 1f;
@@ -52,6 +54,8 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
         [Range(0f, 12f)] public float HeadRecoil = 5f;
         [Range(0f, 8f)] public float HipFollowThrough = 1.5f;
         [Range(.03f, .25f)] public float FollowThroughPeak = .07f;
+        [Range(0f, .08f), Tooltip("停止解除後、崩れの最大姿勢を短く保つ秒数。Pose Duration内で復帰し、行動不能時間は延長しません。")]
+        public float FollowThroughHold = 0f;
     }
 
     public Strike First = new Strike();

@@ -17,6 +17,7 @@ Shader "Katsuro/CounterImpactStroke"
         [HideInInspector] _CoreDuration("Core duration", Float) = .055
         [HideInInspector] _CoreHold("Core hold until", Float) = .01
         [HideInInspector] _PeakDuration("Contact peak ends at", Float) = .04
+        [HideInInspector] _HitPeak("Impact core peak multiplier", Float) = 1
         [HideInInspector] _Duration("Total duration", Float) = .14
         [HideInInspector] _StrokeIntensity("Strike intensity", Float) = 1
     }
@@ -42,7 +43,7 @@ Shader "Katsuro/CounterImpactStroke"
             float4 _WhiteTint, _SteelTint;
             float _CoreWidth, _MinCorePixels, _CoreIntensity, _FrontIntensity, _SurfaceIntensity, _FacetContrast;
             float _EdgeSoftness, _ExtensionDuration, _ExposureWeight;
-            float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _Duration, _StrokeIntensity;
+            float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _HitPeak, _Duration, _StrokeIntensity;
             CBUFFER_END
             struct A { float3 position:POSITION; float2 uv:TEXCOORD0; };
             struct V { float4 position:SV_POSITION; float2 uv:TEXCOORD0; };
@@ -65,7 +66,10 @@ Shader "Katsuro/CounterImpactStroke"
                 // Crisp blade ridge with a bounded pixel floor, rather than a Gaussian light cloud.
                 float radius=max(max(.01,_CoreWidth),pixel*_MinCorePixels);
                 float coreShape=1-smoothstep(radius*.3,radius+pixel*.3,abs(y));
-                float core=coreShape*_CoreIntensity*coreLife*contactFocus;
+                // Preserve the peak over one 30fps interval, then release it by time, not frame count.
+                float peakEnd=max(.02,_PeakDuration);
+                float hitPeak=1+(clamp(_HitPeak,1,3)-1)*(1-smoothstep(min(1.0/30.0,peakEnd*.65),peakEnd,age));
+                float core=coreShape*_CoreIntensity*coreLife*contactFocus*hitPeak;
                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
                 float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
                 // A small, short forward glint is hotter than the sustained incision.

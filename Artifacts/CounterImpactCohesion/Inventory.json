@@ -1,0 +1,416 @@
+{
+  "playing": false,
+  "effects": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "duration": 0.43,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            5.0,
+            6.2
+          ],
+          "size": [
+            0.065,
+            0.09
+          ],
+          "life": [
+            0.28,
+            0.36
+          ],
+          "delay": [
+            0.0,
+            0.012
+          ],
+          "shape": "Cone",
+          "angle": 14.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 7.0,
+          "velocityScale": 0.045,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 6
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        },
+        {
+          "name": "Dark Blood Drops",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            2.3,
+            3.4
+          ],
+          "size": [
+            0.06,
+            0.09
+          ],
+          "life": [
+            0.22,
+            0.31
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "shape": "Cone",
+          "angle": 14.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 1.8,
+          "velocityScale": 0.035,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 6
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        },
+        {
+          "name": "Late Fine Drops",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            1.5,
+            2.4
+          ],
+          "size": [
+            0.022,
+            0.04
+          ],
+          "life": [
+            0.24,
+            0.31
+          ],
+          "delay": [
+            0.0,
+            0.025
+          ],
+          "shape": "Cone",
+          "angle": 19.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 1.4,
+          "velocityScale": 0.035,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 7
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        }
+      ]
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "duration": 0.6,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            6.3,
+            7.8
+          ],
+          "size": [
+            0.085,
+            0.12
+          ],
+          "life": [
+            0.34,
+            0.45
+          ],
+          "delay": [
+            0.0,
+            0.018
+          ],
+          "shape": "Cone",
+          "angle": 18.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 8.0,
+          "velocityScale": 0.055,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 9
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        },
+        {
+          "name": "Dark Blood Drops",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            2.3,
+            4.4
+          ],
+          "size": [
+            0.075,
+            0.12
+          ],
+          "life": [
+            0.22,
+            0.4
+          ],
+          "delay": [
+            0.0,
+            0.012
+          ],
+          "shape": "Cone",
+          "angle": 18.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 2.8,
+          "velocityScale": 0.035,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 9
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        },
+        {
+          "name": "Late Fine Drops",
+          "space": "World",
+          "useUnscaledTime": true,
+          "duration": 0.7,
+          "maxParticles": 48,
+          "speed": [
+            1.5,
+            3.2
+          ],
+          "size": [
+            0.024,
+            0.045
+          ],
+          "life": [
+            0.24,
+            0.43
+          ],
+          "delay": [
+            0.0,
+            0.055
+          ],
+          "shape": "Cone",
+          "angle": 24.0,
+          "radius": 0.035,
+          "randomDirectionAmount": 0.0,
+          "sphericalDirectionAmount": 0.0,
+          "renderer": "Stretch",
+          "lengthScale": 1.4,
+          "velocityScale": 0.035,
+          "cameraVelocityScale": 0.0,
+          "bursts": [
+            {
+              "time": 0.0,
+              "minCount": 0,
+              "maxCount": 15
+            }
+          ],
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "localPosition": "(0, 0, 0)"
+        }
+      ]
+    }
+  ],
+  "controllers": [
+    {
+      "path": "Assets/Mock/AnimationController/Enemy.controller",
+      "layers": [
+        {
+          "name": "Base Layer",
+          "defaultWeight": 0.0,
+          "blendingMode": 0,
+          "mask": "",
+          "states": [
+            {
+              "name": "Idle",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "Assets/Mock/Animation/Enemy/Idle/ARPG_Halberd_Idle1.anim",
+              "length": 0.9833334
+            },
+            {
+              "name": "BackStep",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "Assets/Mock/Animation/Enemy/BackStep/ARPG_Halberd_Evade_Backward.anim",
+              "length": 0.983333349
+            },
+            {
+              "name": "Move 0",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "Assets/Mock/AnimationController/Enemy.controller",
+              "length": null
+            },
+            {
+              "name": "ARPG_Halberd_Death2",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Death2.anim",
+              "length": 1.23333335
+            }
+          ]
+        },
+        {
+          "name": "HitReaction",
+          "defaultWeight": 0.0,
+          "blendingMode": 0,
+          "mask": "Assets/Mock/AnimationController/Enemy.controller",
+          "states": [
+            {
+              "name": "Empty",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "",
+              "length": null
+            },
+            {
+              "name": "LightFront",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "LightBack",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit3.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "LightLeft",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "LightRight",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "HeavyFront",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "HeavyBack",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit4.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "HeavyLeft",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim",
+              "length": 0.8166667
+            },
+            {
+              "name": "HeavyRight",
+              "speed": 0.8166667,
+              "speedParameter": "HitPlaybackSpeed",
+              "speedParameterActive": true,
+              "motion": "Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim",
+              "length": 0.8166667
+            }
+          ]
+        },
+        {
+          "name": "NormalHeavyHit",
+          "defaultWeight": 0.0,
+          "blendingMode": 0,
+          "mask": "Assets/Mock/AnimationController/NormalHeavyHitUpperBody.mask",
+          "states": [
+            {
+              "name": "Pose",
+              "speed": 1.0,
+              "speedParameter": "",
+              "speedParameterActive": false,
+              "motion": "Assets/Mock/AnimationController/NormalHeavyHitPose.anim",
+              "length": 0.4
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "enemies": [
+    {
+      "path": "Assets/Mock/Prefabs/Enemy.prefab",
+      "controller": "Assets/Mock/AnimationController/Enemy.controller",
+      "isHuman": true,
+      "counter": "Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset",
+      "heavyHitDuration": 0.4,
+      "blendOut": 0.08
+    }
+  ]
+}

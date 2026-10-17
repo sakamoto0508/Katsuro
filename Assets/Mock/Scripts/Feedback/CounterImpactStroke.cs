@@ -15,6 +15,7 @@ internal sealed class CounterImpactStroke
     private static readonly int CoreId = Shader.PropertyToID("_CoreDuration");
     private static readonly int HoldId = Shader.PropertyToID("_CoreHold");
     private static readonly int PeakId = Shader.PropertyToID("_PeakDuration");
+    private static readonly int HitPeakId = Shader.PropertyToID("_HitPeak");
     private static readonly int DurationId = Shader.PropertyToID("_Duration");
     private static readonly int IntensityId = Shader.PropertyToID("_StrokeIntensity");
     private float started, duration;
@@ -95,6 +96,7 @@ internal sealed class CounterImpactStroke
         block.SetFloat(CoreId,Mathf.Max(.033f,settings.StrokeCoreDuration));
         block.SetFloat(HoldId,Mathf.Clamp(settings.StrokeCoreHold,0f,Mathf.Max(.032f,settings.StrokeCoreDuration-.001f)));
         block.SetFloat(PeakId,Mathf.Clamp(settings.StrokePeakDuration,.02f,Mathf.Max(.033f,settings.StrokeCoreDuration)));
+        block.SetFloat(HitPeakId,Mathf.Clamp(settings.StrokeHitPeak,1f,3f));
         duration=Mathf.Max(settings.StrokeCoreDuration+.01f,settings.StrokeDuration);
         block.SetFloat(DurationId,duration); block.SetFloat(IntensityId,Mathf.Max(0f,settings.StrokeIntensity));
         started=now; active=true; renderer.enabled=true; Tick(now);

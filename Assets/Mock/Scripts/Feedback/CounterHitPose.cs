@@ -52,16 +52,17 @@ internal sealed class CounterHitPose
     {
         RemoveOffsets();
         if (_style == null) return;
-        float peak = Mathf.Min(_duration * .6f, _style.FollowThroughPeak);
-        float toFollow = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / Mathf.Max(.01f, peak)));
-        float fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(peak, _duration, elapsed));
-        Vector3 torso = Vector3.Lerp(_impactAxis * _style.TorsoImpact, _followAxis * _style.TorsoFollowThrough, toFollow) * fade;
         foreach (var bone in _bones)
         {
             if (bone.Transform == null || bone.Transform.parent == null) continue;
-            Vector3 rotation = bone.Kind == 0 ? torso * bone.Weight : bone.Kind == 1
-                ? Vector3.Lerp(-_impactAxis * _style.HeadRecoil, _followAxis * (_style.HeadRecoil * .65f), toFollow) * (fade * bone.Weight)
-                : _followAxis * (_style.HipFollowThrough * Mathf.Lerp(.25f, 1f, toFollow) * fade);
+            // Chest leads; head and hips settle slightly later, all on the existing reaction clock.
+            float delay = bone.Kind == 1 ? _style.FollowThroughPeak * .12f : bone.Kind == 2 ? _style.FollowThroughPeak * .2f : 0f;
+            Vector2 envelope = EvaluateEnvelope(elapsed, _duration, _style.FollowThroughPeak, _style.FollowThroughHold, delay);
+            Vector3 rotation = bone.Kind == 0
+                ? Vector3.Lerp(_impactAxis * _style.TorsoImpact, _followAxis * _style.TorsoFollowThrough, envelope.x) * (envelope.y * bone.Weight)
+                : bone.Kind == 1
+                ? Vector3.Lerp(-_impactAxis * _style.HeadRecoil, _followAxis * (_style.HeadRecoil * .65f), envelope.x) * (envelope.y * bone.Weight)
+                : _followAxis * (_style.HipFollowThrough * Mathf.Lerp(.25f, 1f, envelope.x) * envelope.y);
             bone.Base = bone.Transform.localRotation;
             Vector3 worldAxis = _root.TransformDirection(rotation);
             Vector3 localAxis = bone.Transform.parent.InverseTransformDirection(worldAxis);
@@ -69,6 +70,19 @@ internal sealed class CounterHitPose
             bone.Transform.localRotation = bone.Applied;
             bone.HasOffset = true;
         }
+    }
+
+    // x = impact-to-collapse blend, y = recovery weight. Every bone returns by the same visual end.
+    public static Vector2 EvaluateEnvelope(float elapsed, float duration, float peak, float hold, float delay)
+    {
+        duration = Mathf.Max(.01f, duration);
+        delay = Mathf.Clamp(delay, 0f, duration * .15f);
+        float localEnd = duration - delay;
+        peak = Mathf.Clamp(peak, .001f, localEnd * .6f);
+        float age = Mathf.Max(0f, elapsed - delay);
+        float recovery = Mathf.Min(localEnd - .001f, peak + Mathf.Clamp(hold, 0f, .08f));
+        return new Vector2(Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(age / peak)),
+            1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(recovery, localEnd, age)));
     }
 
     public void RemoveOffsets()

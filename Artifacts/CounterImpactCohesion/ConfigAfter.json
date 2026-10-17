@@ -1,0 +1,105 @@
+{
+    "MonoBehaviour": {
+        "m_Enabled": true,
+        "m_EditorHideFlags": 0,
+        "m_Name": "JustAvoidCounterConfig",
+        "m_EditorClassIdentifier": "Assembly-CSharp::JustAvoidCounterConfig",
+        "First": {
+            "SlashMaterial": {
+                "fileID": 2100000,
+                "guid": "0f18038a8180f4140939f8e48a02d6f0",
+                "type": 2
+            },
+            "BladeStart": 0.2800000011920929,
+            "TipExtension": 0.05999999865889549,
+            "TrailDuration": 0.18000000715255738,
+            "TrailBrightness": 0.699999988079071,
+            "TrailWidth": 0.8500000238418579,
+            "CoreIntensity": 0.699999988079071,
+            "CoreDuration": 0.07000000029802323,
+            "Afterglow": 0.18000000715255738,
+            "StrokeMaterial": {
+                "fileID": 2100000,
+                "guid": "1cf801deffc38f34fbb3de6f333dff78",
+                "type": 2
+            },
+            "StrokeLength": 1.399999976158142,
+            "StrokeWidth": 0.06800000369548798,
+            "StrokeCoreHold": 0.03500000014901161,
+            "StrokeCoreDuration": 0.10499999672174454,
+            "StrokePeakDuration": 0.05999999865889549,
+            "StrokeHitPeak": 1.649999976158142,
+            "StrokeDuration": 0.1850000023841858,
+            "StrokeIntensity": 1.100000023841858,
+            "StrokeMinProjection": 0.550000011920929,
+            "StrokeMaxProjectionAngle": 20.0,
+            "HitStop": 0.04500000178813934,
+            "ImpactPoseTime": 0.05000000074505806,
+            "PoseDuration": 0.2199999988079071,
+            "TorsoImpact": 9.0,
+            "TorsoFollowThrough": 7.0,
+            "HeadRecoil": 5.0,
+            "HipFollowThrough": 1.5,
+            "FollowThroughPeak": 0.054999999701976779,
+            "FollowThroughHold": 0.017999999225139619
+        },
+        "Second": {
+            "SlashMaterial": {
+                "fileID": 2100000,
+                "guid": "9f567260a1ed1db459ed31f4b9307227",
+                "type": 2
+            },
+            "BladeStart": 0.11999999731779099,
+            "TipExtension": 0.14000000059604646,
+            "TrailDuration": 0.25,
+            "TrailBrightness": 0.8999999761581421,
+            "TrailWidth": 1.0,
+            "CoreIntensity": 1.100000023841858,
+            "CoreDuration": 0.10000000149011612,
+            "Afterglow": 0.25999999046325686,
+            "StrokeMaterial": {
+                "fileID": 2100000,
+                "guid": "a97ee332d330f104ba18ee6f45d7b150",
+                "type": 2
+            },
+            "StrokeLength": 2.049999952316284,
+            "StrokeWidth": 0.13500000536441804,
+            "StrokeCoreHold": 0.1550000011920929,
+            "StrokeCoreDuration": 0.20499999821186067,
+            "StrokePeakDuration": 0.07999999821186066,
+            "StrokeHitPeak": 2.049999952316284,
+            "StrokeDuration": 0.2750000059604645,
+            "StrokeIntensity": 1.100000023841858,
+            "StrokeMinProjection": 0.550000011920929,
+            "StrokeMaxProjectionAngle": 20.0,
+            "HitStop": 0.1550000011920929,
+            "ImpactPoseTime": 0.05000000074505806,
+            "PoseDuration": 0.4000000059604645,
+            "TorsoImpact": 14.0,
+            "TorsoFollowThrough": 24.0,
+            "HeadRecoil": 9.0,
+            "HipFollowThrough": 4.0,
+            "FollowThroughPeak": 0.0949999988079071,
+            "FollowThroughHold": 0.03500000014901161
+        },
+        "FirstCFX": {
+            "fileID": 7056513741744720959,
+            "guid": "32c10a2d55e7042419059ce756c563c7",
+            "type": 3
+        },
+        "FinisherCFX": {
+            "fileID": 4245033305927409411,
+            "guid": "692d64caa2172da4c9a57444d668def2",
+            "type": 3
+        },
+        "FirstContact": {
+            "x": 0.09000000357627869,
+            "y": 0.04500000178813934,
+            "z": 0.5
+        },
+        "FirstBloodAmount": 0.5,
+        "FirstReactionWeight": 0.5799999833106995,
+        "SecondReactionBlendIn": 0.03500000014901161,
+        "SecondReactionImpactWeight": 0.8500000238418579
+    }
+}

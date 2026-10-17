@@ -56,7 +56,7 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 0
-    scalar: 0.018
+    scalar: 0
     minScalar: 0
     maxCurve:
       serializedVersion: 2
@@ -116,8 +116,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.45
-      minScalar: 0.34
+      scalar: 0.38
+      minScalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -169,8 +169,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 7.8
-      minScalar: 6.3
+      scalar: 9.6
+      minScalar: 8.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -287,8 +287,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.12
-      minScalar: 0.085
+      scalar: 0.135
+      minScalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -665,7 +665,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 18
+    angle: 14
     length: 0.02
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -980,7 +980,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 9
+        scalar: 7
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -4869,7 +4869,7 @@ ParticleSystemRenderer:
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
   m_VelocityScale: 0.055
-  m_LengthScale: 8
+  m_LengthScale: 9
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -4949,9 +4949,9 @@ ParticleSystem:
   autoRandomSeed: 0
   startDelay:
     serializedVersion: 2
-    minMaxState: 0
-    scalar: 0.055
-    minScalar: 0
+    minMaxState: 3
+    scalar: 0.09
+    minScalar: 0.065
     maxCurve:
       serializedVersion: 2
       m_Curve:
@@ -9935,6 +9935,7 @@ MonoBehaviour:
   _cutSize: {x: 3.4, y: 1.2}
   _minimumProjectedLength: 0.75
   _surfaceOffset: 0.025
+  _bloodOutwardBias: 0.3
 --- !u!1 &8685955269296376921
 GameObject:
   m_ObjectHideFlags: 0

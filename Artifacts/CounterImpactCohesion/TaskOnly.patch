@@ -1,0 +1,407 @@
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab b/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
+index 806df82..f4fa286 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
++++ b/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
+@@ -56,7 +56,7 @@ ParticleSystem:
+   startDelay:
+     serializedVersion: 2
+     minMaxState: 0
+-    scalar: 0.018
++    scalar: 0
+     minScalar: 0
+     maxCurve:
+       serializedVersion: 2
+@@ -116,8 +116,8 @@ ParticleSystem:
+     startLifetime:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.45
+-      minScalar: 0.34
++      scalar: 0.38
++      minScalar: 0.3
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -169,8 +169,8 @@ ParticleSystem:
+     startSpeed:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 7.8
+-      minScalar: 6.3
++      scalar: 9.6
++      minScalar: 8.2
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -287,8 +287,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.12
+-      minScalar: 0.085
++      scalar: 0.135
++      minScalar: 0.1
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -665,7 +665,7 @@ ParticleSystem:
+     serializedVersion: 6
+     enabled: 1
+     type: 4
+-    angle: 18
++    angle: 14
+     length: 0.02
+     boxThickness: {x: 0, y: 0, z: 0}
+     radiusThickness: 1
+@@ -980,7 +980,7 @@ ParticleSystem:
+       countCurve:
+         serializedVersion: 2
+         minMaxState: 0
+-        scalar: 9
++        scalar: 7
+         minScalar: 30
+         maxCurve:
+           serializedVersion: 2
+@@ -4869,7 +4869,7 @@ ParticleSystemRenderer:
+   m_MaxParticleSize: 0.5
+   m_CameraVelocityScale: 0
+   m_VelocityScale: 0.055
+-  m_LengthScale: 8
++  m_LengthScale: 9
+   m_SortingFudge: 0
+   m_NormalDirection: 1
+   m_ShadowBias: 0
+@@ -4949,9 +4949,9 @@ ParticleSystem:
+   autoRandomSeed: 0
+   startDelay:
+     serializedVersion: 2
+-    minMaxState: 0
+-    scalar: 0.055
+-    minScalar: 0
++    minMaxState: 3
++    scalar: 0.09
++    minScalar: 0.065
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -9935,6 +9935,7 @@ MonoBehaviour:
+   _cutSize: {x: 3.4, y: 1.2}
+   _minimumProjectedLength: 0.75
+   _surfaceOffset: 0.025
++  _bloodOutwardBias: 0.3
+ --- !u!1 &8685955269296376921
+ GameObject:
+   m_ObjectHideFlags: 0
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab b/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
+index ed08835..ca8d1cf 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
++++ b/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
+@@ -145,7 +145,7 @@ ParticleSystem:
+   startDelay:
+     serializedVersion: 2
+     minMaxState: 0
+-    scalar: 0.012
++    scalar: 0
+     minScalar: 0
+     maxCurve:
+       serializedVersion: 2
+@@ -205,8 +205,8 @@ ParticleSystem:
+     startLifetime:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.36
+-      minScalar: 0.28
++      scalar: 0.3
++      minScalar: 0.23
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -258,8 +258,8 @@ ParticleSystem:
+     startSpeed:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 6.2
+-      minScalar: 5
++      scalar: 7.6
++      minScalar: 6.4
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -376,8 +376,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.09
+-      minScalar: 0.065
++      scalar: 0.095
++      minScalar: 0.07
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -754,7 +754,7 @@ ParticleSystem:
+     serializedVersion: 6
+     enabled: 1
+     type: 4
+-    angle: 14
++    angle: 10
+     length: 0.02
+     boxThickness: {x: 0, y: 0, z: 0}
+     radiusThickness: 1
+@@ -1069,7 +1069,7 @@ ParticleSystem:
+       countCurve:
+         serializedVersion: 2
+         minMaxState: 0
+-        scalar: 6
++        scalar: 5
+         minScalar: 30
+         maxCurve:
+           serializedVersion: 2
+@@ -4958,7 +4958,7 @@ ParticleSystemRenderer:
+   m_MaxParticleSize: 0.5
+   m_CameraVelocityScale: 0
+   m_VelocityScale: 0.045
+-  m_LengthScale: 7
++  m_LengthScale: 7.5
+   m_SortingFudge: 0
+   m_NormalDirection: 1
+   m_ShadowBias: 0
+@@ -5038,9 +5038,9 @@ ParticleSystem:
+   autoRandomSeed: 0
+   startDelay:
+     serializedVersion: 2
+-    minMaxState: 0
+-    scalar: 0.025
+-    minScalar: 0
++    minMaxState: 3
++    scalar: 0.05
++    minScalar: 0.035
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -9935,6 +9935,7 @@ MonoBehaviour:
+   _cutSize: {x: 2.15, y: 0.76}
+   _minimumProjectedLength: 0.7
+   _surfaceOffset: 0.025
++  _bloodOutwardBias: 0.22
+ --- !u!1 &9193390559110832520
+ GameObject:
+   m_ObjectHideFlags: 0
+diff --git a/Assets/Mock/Resources/CounterImpactStroke.shader b/Assets/Mock/Resources/CounterImpactStroke.shader
+index eb6f63c..ccd07a7 100644
+--- a/Assets/Mock/Resources/CounterImpactStroke.shader
++++ b/Assets/Mock/Resources/CounterImpactStroke.shader
+@@ -17,6 +17,7 @@ Shader "Katsuro/CounterImpactStroke"
+         [HideInInspector] _CoreDuration("Core duration", Float) = .055
+         [HideInInspector] _CoreHold("Core hold until", Float) = .01
+         [HideInInspector] _PeakDuration("Contact peak ends at", Float) = .04
++        [HideInInspector] _HitPeak("Impact core peak multiplier", Float) = 1
+         [HideInInspector] _Duration("Total duration", Float) = .14
+         [HideInInspector] _StrokeIntensity("Strike intensity", Float) = 1
+     }
+@@ -42,7 +43,7 @@ Shader "Katsuro/CounterImpactStroke"
+             float4 _WhiteTint, _SteelTint;
+             float _CoreWidth, _MinCorePixels, _CoreIntensity, _FrontIntensity, _SurfaceIntensity, _FacetContrast;
+             float _EdgeSoftness, _ExtensionDuration, _ExposureWeight;
+-            float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _Duration, _StrokeIntensity;
++            float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _HitPeak, _Duration, _StrokeIntensity;
+             CBUFFER_END
+             struct A { float3 position:POSITION; float2 uv:TEXCOORD0; };
+             struct V { float4 position:SV_POSITION; float2 uv:TEXCOORD0; };
+@@ -65,7 +66,10 @@ Shader "Katsuro/CounterImpactStroke"
+                 // Crisp blade ridge with a bounded pixel floor, rather than a Gaussian light cloud.
+                 float radius=max(max(.01,_CoreWidth),pixel*_MinCorePixels);
+                 float coreShape=1-smoothstep(radius*.3,radius+pixel*.3,abs(y));
+-                float core=coreShape*_CoreIntensity*coreLife*contactFocus;
++                // Preserve the peak over one 30fps interval, then release it by time, not frame count.
++                float peakEnd=max(.02,_PeakDuration);
++                float hitPeak=1+(clamp(_HitPeak,1,3)-1)*(1-smoothstep(min(1.0/30.0,peakEnd*.65),peakEnd,age));
++                float core=coreShape*_CoreIntensity*coreLife*contactFocus*hitPeak;
+                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
+                 float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
+                 // A small, short forward glint is hotter than the sustained incision.
+diff --git a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+index 27b05ff..b401212 100644
+--- a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
++++ b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+@@ -27,19 +27,21 @@ MonoBehaviour:
+     StrokeWidth: 0.068
+     StrokeCoreHold: 0.035
+     StrokeCoreDuration: 0.105
+-    StrokePeakDuration: 0.05
++    StrokePeakDuration: 0.06
++    StrokeHitPeak: 1.65
+     StrokeDuration: 0.185
+     StrokeIntensity: 1.1
+     StrokeMinProjection: 0.55
+     StrokeMaxProjectionAngle: 20
+     HitStop: 0.045
+     ImpactPoseTime: 0.05
+-    PoseDuration: 0.18
++    PoseDuration: 0.22
+     TorsoImpact: 9
+-    TorsoFollowThrough: 4
++    TorsoFollowThrough: 7
+     HeadRecoil: 5
+     HipFollowThrough: 1.5
+-    FollowThroughPeak: 0.07
++    FollowThroughPeak: 0.055
++    FollowThroughHold: 0.018
+   Second:
+     SlashMaterial: {fileID: 2100000, guid: 9f567260a1ed1db459ed31f4b9307227, type: 2}
+     BladeStart: 0.12
+@@ -55,7 +57,8 @@ MonoBehaviour:
+     StrokeWidth: 0.135
+     StrokeCoreHold: 0.155
+     StrokeCoreDuration: 0.205
+-    StrokePeakDuration: 0.065
++    StrokePeakDuration: 0.08
++    StrokeHitPeak: 2.05
+     StrokeDuration: 0.275
+     StrokeIntensity: 1.1
+     StrokeMinProjection: 0.55
+@@ -67,11 +70,12 @@ MonoBehaviour:
+     TorsoFollowThrough: 24
+     HeadRecoil: 9
+     HipFollowThrough: 4
+-    FollowThroughPeak: 0.14
++    FollowThroughPeak: 0.095
++    FollowThroughHold: 0.035
+   FirstCFX: {fileID: 7056513741744720959, guid: 32c10a2d55e7042419059ce756c563c7, type: 3}
+   FinisherCFX: {fileID: 4245033305927409411, guid: 692d64caa2172da4c9a57444d668def2, type: 3}
+   FirstContact: {x: 0.09, y: 0.045, z: 0.5}
+   FirstBloodAmount: 0.5
+-  FirstReactionWeight: 0.42
++  FirstReactionWeight: 0.58
+   SecondReactionBlendIn: 0.035
+   SecondReactionImpactWeight: 0.85
+diff --git a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+index 3c964b0..ed1a845 100644
+--- a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
++++ b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+@@ -34,6 +34,8 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
+         public float StrokeCoreDuration = .055f;
+         [Range(.02f, .12f), Tooltip("前縁・切先の鮮烈なピークが消えるまでの秒数。芯の保持とは独立。")]
+         public float StrokePeakDuration = .05f;
++        [Range(1f, 3f), Tooltip("命中直後だけ白銀コアに掛ける倍率。1で無効。面・残光の強度は変えません。Peak Duration内に元の輝度へ戻ります。")]
++        public float StrokeHitPeak = 1f;
+         [Range(.05f, .4f), Tooltip("青い面と残光も消えるまでの秒数。Pause中は停止します。")]
+         public float StrokeDuration = .14f;
+         [Range(0f, 3f)] public float StrokeIntensity = 1f;
+@@ -52,6 +54,8 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
+         [Range(0f, 12f)] public float HeadRecoil = 5f;
+         [Range(0f, 8f)] public float HipFollowThrough = 1.5f;
+         [Range(.03f, .25f)] public float FollowThroughPeak = .07f;
++        [Range(0f, .08f), Tooltip("停止解除後、崩れの最大姿勢を短く保つ秒数。Pose Duration内で復帰し、行動不能時間は延長しません。")]
++        public float FollowThroughHold = 0f;
+     }
+ 
+     public Strike First = new Strike();
+diff --git a/Assets/Mock/Scripts/Feedback/CounterHitPose.cs b/Assets/Mock/Scripts/Feedback/CounterHitPose.cs
+index e04c739..a9ffb68 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterHitPose.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterHitPose.cs
+@@ -52,16 +52,17 @@ internal sealed class CounterHitPose
+     {
+         RemoveOffsets();
+         if (_style == null) return;
+-        float peak = Mathf.Min(_duration * .6f, _style.FollowThroughPeak);
+-        float toFollow = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / Mathf.Max(.01f, peak)));
+-        float fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(peak, _duration, elapsed));
+-        Vector3 torso = Vector3.Lerp(_impactAxis * _style.TorsoImpact, _followAxis * _style.TorsoFollowThrough, toFollow) * fade;
+         foreach (var bone in _bones)
+         {
+             if (bone.Transform == null || bone.Transform.parent == null) continue;
+-            Vector3 rotation = bone.Kind == 0 ? torso * bone.Weight : bone.Kind == 1
+-                ? Vector3.Lerp(-_impactAxis * _style.HeadRecoil, _followAxis * (_style.HeadRecoil * .65f), toFollow) * (fade * bone.Weight)
+-                : _followAxis * (_style.HipFollowThrough * Mathf.Lerp(.25f, 1f, toFollow) * fade);
++            // Chest leads; head and hips settle slightly later, all on the existing reaction clock.
++            float delay = bone.Kind == 1 ? _style.FollowThroughPeak * .12f : bone.Kind == 2 ? _style.FollowThroughPeak * .2f : 0f;
++            Vector2 envelope = EvaluateEnvelope(elapsed, _duration, _style.FollowThroughPeak, _style.FollowThroughHold, delay);
++            Vector3 rotation = bone.Kind == 0
++                ? Vector3.Lerp(_impactAxis * _style.TorsoImpact, _followAxis * _style.TorsoFollowThrough, envelope.x) * (envelope.y * bone.Weight)
++                : bone.Kind == 1
++                ? Vector3.Lerp(-_impactAxis * _style.HeadRecoil, _followAxis * (_style.HeadRecoil * .65f), envelope.x) * (envelope.y * bone.Weight)
++                : _followAxis * (_style.HipFollowThrough * Mathf.Lerp(.25f, 1f, envelope.x) * envelope.y);
+             bone.Base = bone.Transform.localRotation;
+             Vector3 worldAxis = _root.TransformDirection(rotation);
+             Vector3 localAxis = bone.Transform.parent.InverseTransformDirection(worldAxis);
+@@ -71,6 +72,19 @@ internal sealed class CounterHitPose
+         }
+     }
+ 
++    // x = impact-to-collapse blend, y = recovery weight. Every bone returns by the same visual end.
++    public static Vector2 EvaluateEnvelope(float elapsed, float duration, float peak, float hold, float delay)
++    {
++        duration = Mathf.Max(.01f, duration);
++        delay = Mathf.Clamp(delay, 0f, duration * .15f);
++        float localEnd = duration - delay;
++        peak = Mathf.Clamp(peak, .001f, localEnd * .6f);
++        float age = Mathf.Max(0f, elapsed - delay);
++        float recovery = Mathf.Min(localEnd - .001f, peak + Mathf.Clamp(hold, 0f, .08f));
++        return new Vector2(Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(age / peak)),
++            1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(recovery, localEnd, age)));
++    }
++
+     public void RemoveOffsets()
+     {
+         foreach (var bone in _bones)
+diff --git a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+index 054fb63..003da85 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+@@ -15,6 +15,7 @@ internal sealed class CounterImpactStroke
+     private static readonly int CoreId = Shader.PropertyToID("_CoreDuration");
+     private static readonly int HoldId = Shader.PropertyToID("_CoreHold");
+     private static readonly int PeakId = Shader.PropertyToID("_PeakDuration");
++    private static readonly int HitPeakId = Shader.PropertyToID("_HitPeak");
+     private static readonly int DurationId = Shader.PropertyToID("_Duration");
+     private static readonly int IntensityId = Shader.PropertyToID("_StrokeIntensity");
+     private float started, duration;
+@@ -95,6 +96,7 @@ internal sealed class CounterImpactStroke
+         block.SetFloat(CoreId,Mathf.Max(.033f,settings.StrokeCoreDuration));
+         block.SetFloat(HoldId,Mathf.Clamp(settings.StrokeCoreHold,0f,Mathf.Max(.032f,settings.StrokeCoreDuration-.001f)));
+         block.SetFloat(PeakId,Mathf.Clamp(settings.StrokePeakDuration,.02f,Mathf.Max(.033f,settings.StrokeCoreDuration)));
++        block.SetFloat(HitPeakId,Mathf.Clamp(settings.StrokeHitPeak,1f,3f));
+         duration=Mathf.Max(settings.StrokeCoreDuration+.01f,settings.StrokeDuration);
+         block.SetFloat(DurationId,duration); block.SetFloat(IntensityId,Mathf.Max(0f,settings.StrokeIntensity));
+         started=now; active=true; renderer.enabled=true; Tick(now);
+diff --git a/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+index 5ba01e7..29dc36d 100644
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+@@ -19,6 +19,8 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+     private float _minimumProjectedLength = .7f;
+     [SerializeField, Range(0f, .06f), Tooltip("HitPointから視線側へのCut専用の微小オフセット(m)。深度LEqualで面の干渉を緩和します。大きいと浮くため最小限にします。Bloodとダメージ座標は動かしません。")]
+     private float _surfaceOffset = .025f;
++    [SerializeField, Range(0f, .5f), Tooltip("血の進行軸だけを攻撃者から離れる側へ少量傾けます。斬撃方向に直交する成分を使用。HitPoint・旧Cut表示方向は変更しません。")]
++    private float _bloodOutwardBias;
+     private MaterialPropertyBlock _block;
+     private float _started;
+     private bool _playing;
+@@ -35,8 +37,9 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         if (_block == null) _block = new MaterialPropertyBlock();
+         if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
+         slash.Normalize();
+-        Vector3 up = Mathf.Abs(Vector3.Dot(slash, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
+-        transform.SetPositionAndRotation(point, Quaternion.LookRotation(slash, up));
++        Vector3 bloodDirection = ResolveBloodDirection(slash, normal, _bloodOutwardBias);
++        Vector3 bloodUp = Mathf.Abs(Vector3.Dot(bloodDirection, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
++        transform.SetPositionAndRotation(point, Quaternion.LookRotation(bloodDirection, bloodUp));
+         // Blood follows the physical blade direction. The fine light faces the viewing camera.
+         var camera = viewingCamera != null ? viewingCamera : Camera.main;
+         Vector3 facing = camera != null ? (camera.transform.position - point).normalized : -normal.normalized;
+@@ -79,4 +82,14 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+         gameObject.SetActive(false);
+     }
++
++    // The accepted player counter HitNormal points from the attacker to contact.
++    // Add only its cross-sweep component; never reverse the measured slash or move the origin.
++    public static Vector3 ResolveBloodDirection(Vector3 slash, Vector3 awayFromAttacker, float bias)
++    {
++        if (slash.sqrMagnitude < .0001f) return awayFromAttacker.sqrMagnitude > .0001f ? awayFromAttacker.normalized : Vector3.forward;
++        slash.Normalize();
++        Vector3 outward = Vector3.ProjectOnPlane(awayFromAttacker.normalized, slash);
++        return (slash + outward * Mathf.Clamp(bias, 0f, .5f)).normalized;
++    }
+ }

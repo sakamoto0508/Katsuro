@@ -1,0 +1,74 @@
+{
+  "playing": false,
+  "poseChecks": 606,
+  "bloodChecks": 12,
+  "effects": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "streakCount": 5.0,
+      "speed": [
+        6.4,
+        7.6
+      ],
+      "size": [
+        0.07,
+        0.095
+      ],
+      "spread": 10.0,
+      "lateDelay": [
+        0.035,
+        0.05
+      ]
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "streakCount": 7.0,
+      "speed": [
+        8.2,
+        9.6
+      ],
+      "size": [
+        0.1,
+        0.135
+      ],
+      "spread": 14.0,
+      "lateDelay": [
+        0.065,
+        0.09
+      ]
+    }
+  ],
+  "mats": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "renderQueue": 3011,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "renderQueue": 3011,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+      "renderQueue": 3005,
+      "compiled": true,
+      "messages": []
+    }
+  ],
+  "scope": "Asset APIs and pure functions only. No Scene, Play Mode, visual evaluation or runtime Animator validation."
+}

@@ -19,6 +19,8 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     private float _minimumProjectedLength = .7f;
     [SerializeField, Range(0f, .06f), Tooltip("HitPointから視線側へのCut専用の微小オフセット(m)。深度LEqualで面の干渉を緩和します。大きいと浮くため最小限にします。Bloodとダメージ座標は動かしません。")]
     private float _surfaceOffset = .025f;
+    [SerializeField, Range(0f, .5f), Tooltip("血の進行軸だけを攻撃者から離れる側へ少量傾けます。斬撃方向に直交する成分を使用。HitPoint・旧Cut表示方向は変更しません。")]
+    private float _bloodOutwardBias;
     private MaterialPropertyBlock _block;
     private float _started;
     private bool _playing;
@@ -35,8 +37,9 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         if (_block == null) _block = new MaterialPropertyBlock();
         if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
         slash.Normalize();
-        Vector3 up = Mathf.Abs(Vector3.Dot(slash, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
-        transform.SetPositionAndRotation(point, Quaternion.LookRotation(slash, up));
+        Vector3 bloodDirection = ResolveBloodDirection(slash, normal, _bloodOutwardBias);
+        Vector3 bloodUp = Mathf.Abs(Vector3.Dot(bloodDirection, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
+        transform.SetPositionAndRotation(point, Quaternion.LookRotation(bloodDirection, bloodUp));
         // Blood follows the physical blade direction. The fine light faces the viewing camera.
         var camera = viewingCamera != null ? viewingCamera : Camera.main;
         Vector3 facing = camera != null ? (camera.transform.position - point).normalized : -normal.normalized;
@@ -78,5 +81,15 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         _playing = false;
         if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         gameObject.SetActive(false);
+    }
+
+    // The accepted player counter HitNormal points from the attacker to contact.
+    // Add only its cross-sweep component; never reverse the measured slash or move the origin.
+    public static Vector3 ResolveBloodDirection(Vector3 slash, Vector3 awayFromAttacker, float bias)
+    {
+        if (slash.sqrMagnitude < .0001f) return awayFromAttacker.sqrMagnitude > .0001f ? awayFromAttacker.normalized : Vector3.forward;
+        slash.Normalize();
+        Vector3 outward = Vector3.ProjectOnPlane(awayFromAttacker.normalized, slash);
+        return (slash + outward * Mathf.Clamp(bias, 0f, .5f)).normalized;
     }
 }

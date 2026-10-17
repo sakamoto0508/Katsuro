@@ -27,19 +27,21 @@ MonoBehaviour:
     StrokeWidth: 0.068
     StrokeCoreHold: 0.035
     StrokeCoreDuration: 0.105
-    StrokePeakDuration: 0.05
+    StrokePeakDuration: 0.06
+    StrokeHitPeak: 1.65
     StrokeDuration: 0.185
     StrokeIntensity: 1.1
     StrokeMinProjection: 0.55
     StrokeMaxProjectionAngle: 20
     HitStop: 0.045
     ImpactPoseTime: 0.05
-    PoseDuration: 0.18
+    PoseDuration: 0.22
     TorsoImpact: 9
-    TorsoFollowThrough: 4
+    TorsoFollowThrough: 7
     HeadRecoil: 5
     HipFollowThrough: 1.5
-    FollowThroughPeak: 0.07
+    FollowThroughPeak: 0.055
+    FollowThroughHold: 0.018
   Second:
     SlashMaterial: {fileID: 2100000, guid: 9f567260a1ed1db459ed31f4b9307227, type: 2}
     BladeStart: 0.12
@@ -55,7 +57,8 @@ MonoBehaviour:
     StrokeWidth: 0.135
     StrokeCoreHold: 0.155
     StrokeCoreDuration: 0.205
-    StrokePeakDuration: 0.065
+    StrokePeakDuration: 0.08
+    StrokeHitPeak: 2.05
     StrokeDuration: 0.275
     StrokeIntensity: 1.1
     StrokeMinProjection: 0.55
@@ -67,11 +70,12 @@ MonoBehaviour:
     TorsoFollowThrough: 24
     HeadRecoil: 9
     HipFollowThrough: 4
-    FollowThroughPeak: 0.14
+    FollowThroughPeak: 0.095
+    FollowThroughHold: 0.035
   FirstCFX: {fileID: 7056513741744720959, guid: 32c10a2d55e7042419059ce756c563c7, type: 3}
   FinisherCFX: {fileID: 4245033305927409411, guid: 692d64caa2172da4c9a57444d668def2, type: 3}
   FirstContact: {x: 0.09, y: 0.045, z: 0.5}
   FirstBloodAmount: 0.5
-  FirstReactionWeight: 0.42
+  FirstReactionWeight: 0.58
   SecondReactionBlendIn: 0.035
   SecondReactionImpactWeight: 0.85
