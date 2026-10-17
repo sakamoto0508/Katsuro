@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 309f4f85a131d9745b70a024389485aa, type: 3}
+  m_Name: JustAvoidCounterConfig
+  m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterConfig
+  First:
+    SlashMaterial: {fileID: 2100000, guid: 0f18038a8180f4140939f8e48a02d6f0, type: 2}
+    BladeStart: 0.28
+    TipExtension: 0.06
+    TrailDuration: 0.18
+    TrailBrightness: 0.7
+    TrailWidth: 0.85
+    CoreIntensity: 0.7
+    CoreDuration: 0.07
+    Afterglow: 0.18
+    StrokeMaterial: {fileID: 2100000, guid: 1cf801deffc38f34fbb3de6f333dff78, type: 2}
+    StrokeLength: 1.35
+    StrokeWidth: 0.085
+    StrokeCoreDuration: 0.055
+    StrokeDuration: 0.14
+    StrokeIntensity: 1
+    HitStop: 0.045
+    ImpactPoseTime: 0.05
+    PoseDuration: 0.18
+    TorsoImpact: 9
+    TorsoFollowThrough: 4
+    HeadRecoil: 5
+    HipFollowThrough: 1.5
+    FollowThroughPeak: 0.07
+  Second:
+    SlashMaterial: {fileID: 2100000, guid: 9f567260a1ed1db459ed31f4b9307227, type: 2}
+    BladeStart: 0.12
+    TipExtension: 0.14
+    TrailDuration: 0.25
+    TrailBrightness: 0.9
+    TrailWidth: 1
+    CoreIntensity: 1.1
+    CoreDuration: 0.1
+    Afterglow: 0.26
+    StrokeMaterial: {fileID: 2100000, guid: a97ee332d330f104ba18ee6f45d7b150, type: 2}
+    StrokeLength: 2.1
+    StrokeWidth: 0.15
+    StrokeCoreDuration: 0.09
+    StrokeDuration: 0.23
+    StrokeIntensity: 1.25
+    HitStop: 0.155
+    ImpactPoseTime: 0.05
+    PoseDuration: 0.4
+    TorsoImpact: 14
+    TorsoFollowThrough: 24
+    HeadRecoil: 9
+    HipFollowThrough: 4
+    FollowThroughPeak: 0.14
+  FirstCFX: {fileID: 7056513741744720959, guid: 32c10a2d55e7042419059ce756c563c7, type: 3}
+  FinisherCFX: {fileID: 4245033305927409411, guid: 692d64caa2172da4c9a57444d668def2, type: 3}
+  FirstContact: {x: 0.09, y: 0.045, z: 0.5}
+  FirstBloodAmount: 0.5
+  FirstReactionWeight: 0.42
+  SecondReactionBlendIn: 0.035
+  SecondReactionImpactWeight: 0.85

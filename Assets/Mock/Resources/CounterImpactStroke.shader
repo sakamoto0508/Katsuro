@@ -10,7 +10,7 @@ Shader "Katsuro/CounterImpactStroke"
         _FrontIntensity("Forward tip and edge intensity", Range(0,4)) = 1.6
         _SurfaceIntensity("Blue face intensity", Range(0,2)) = .7
         _FacetContrast("Steel facet contrast", Range(0,1)) = .75
-        _EdgeSoftness("Outer transparency falloff", Range(.02,.4)) = .16
+        _EdgeSoftness("Outer transparency falloff", Range(.02,.6)) = .36
         _ExtensionDuration("Forward reveal duration (seconds)", Range(.005,.06)) = .018
         _ExposureWeight("Scene exposure influence", Range(0,1)) = 0
         [HideInInspector] _StrokeAge("Age", Float) = 0
@@ -54,16 +54,18 @@ Shader "Katsuro/CounterImpactStroke"
                 float faceLife=1-smoothstep(.015,max(.05,_Duration),age);
                 float residual=smoothstep(.02,max(.033,_CoreDuration),age)*faceLife;
                 float front=lerp(.8,1,smoothstep(0,max(.005,_ExtensionDuration),age));
-                float longitudinal=smoothstep(0,.12,x)*(1-smoothstep(front-.08,front,x));
+                float longitudinal=smoothstep(0,.18,x)*(1-smoothstep(front-.16,front,x));
                 float border=1-smoothstep(1-max(.02,_EdgeSoftness),1,abs(y));
-                float heel=smoothstep(0,.4,x);
+                float feather=1-smoothstep(.15,.95,abs(y));
+                float contactFocus=lerp(.22,1.15,Gaussian((x-.5)/.18));
                 float pixel=max(.0001,fwidth(y));
-                float core=Gaussian(y/max(max(.01,_CoreWidth),pixel*_MinCorePixels))*_CoreIntensity*coreLife*lerp(.3,1,heel);
+                // A narrow contact-centered incision, not a uniformly white longitudinal band.
+                float core=Gaussian(y/max(max(.01,_CoreWidth),pixel*_MinCorePixels))*_CoreIntensity*coreLife*contactFocus;
                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
-                float tip=Gaussian((x-(front-.1))/.085)*Gaussian(y/.28);
-                float frontWhite=(brightEdge+tip)*_FrontIntensity*coreLife;
+                float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
+                float frontWhite=(brightEdge*feather+tip)*_FrontIntensity*coreLife;
                 float facet=lerp(1,lerp(.18,.8,smoothstep(-.75,.7,y))+Gaussian((y-.4)/.08)*.25,_FacetContrast);
-                float face=Gaussian(y/.68)*_SurfaceIntensity*facet*(faceLife*.65+residual*.12);
+                float face=Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);
                 float3 rgb=(_WhiteTint.rgb*(core+frontWhite)+_SteelTint.rgb*face)*longitudinal*border*_StrokeIntensity;
                 rgb*=lerp(1,GetCurrentExposureMultiplier(),saturate(_ExposureWeight));
                 // Emissive transparency: unlit pixels contribute no RGB and no occluding alpha.

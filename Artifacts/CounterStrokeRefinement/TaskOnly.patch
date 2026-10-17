@@ -1,0 +1,159 @@
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat b/Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
+index de3ffdc..c117fc0 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
++++ b/Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
+@@ -26,20 +26,20 @@ Material:
+     m_Ints: []
+     m_Floats:
+     - _CoreDuration: 0.055
+-    - _CoreIntensity: 2.8
+-    - _CoreWidth: 0.065
++    - _CoreIntensity: 2.4
++    - _CoreWidth: 0.045
+     - _Duration: 0.14
+-    - _EdgeSoftness: 0.2
++    - _EdgeSoftness: 0.38
+     - _ExposureWeight: 0
+     - _ExtensionDuration: 0.022
+-    - _FacetContrast: 0.8
+-    - _FrontIntensity: 1.8
+-    - _MinCorePixels: 0.8
++    - _FacetContrast: 0.6
++    - _FrontIntensity: 1.15
++    - _MinCorePixels: 0.65
+     - _StrokeAge: 0
+     - _StrokeIntensity: 1
+-    - _SurfaceIntensity: 1.1
++    - _SurfaceIntensity: 0.65
+     m_Colors:
+-    - _SteelTint: {r: 0.18, g: 0.44, b: 0.74, a: 1}
+-    - _WhiteTint: {r: 1.15, g: 1.22, b: 1.32, a: 1}
++    - _SteelTint: {r: 0.17, g: 0.36, b: 0.53, a: 1}
++    - _WhiteTint: {r: 0.95, g: 1.08, b: 1.24, a: 1}
+   m_BuildTextureStacks: []
+   m_AllowLocking: 1
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat b/Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
+index f9e262e..b786025 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
++++ b/Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
+@@ -26,20 +26,20 @@ Material:
+     m_Ints: []
+     m_Floats:
+     - _CoreDuration: 0.055
+-    - _CoreIntensity: 2.4
+-    - _CoreWidth: 0.05
++    - _CoreIntensity: 2.6
++    - _CoreWidth: 0.04
+     - _Duration: 0.14
+-    - _EdgeSoftness: 0.2
++    - _EdgeSoftness: 0.4
+     - _ExposureWeight: 0
+     - _ExtensionDuration: 0.015
+-    - _FacetContrast: 0.8
+-    - _FrontIntensity: 1.3
+-    - _MinCorePixels: 0.8
++    - _FacetContrast: 0.6
++    - _FrontIntensity: 0.85
++    - _MinCorePixels: 0.6
+     - _StrokeAge: 0
+     - _StrokeIntensity: 1
+-    - _SurfaceIntensity: 0.8
++    - _SurfaceIntensity: 0.55
+     m_Colors:
+-    - _SteelTint: {r: 0.16, g: 0.4, b: 0.68, a: 1}
+-    - _WhiteTint: {r: 1.15, g: 1.22, b: 1.32, a: 1}
++    - _SteelTint: {r: 0.16, g: 0.34, b: 0.5, a: 1}
++    - _WhiteTint: {r: 0.95, g: 1.08, b: 1.24, a: 1}
+   m_BuildTextureStacks: []
+   m_AllowLocking: 1
+diff --git a/Assets/Mock/Resources/CounterImpactStroke.shader b/Assets/Mock/Resources/CounterImpactStroke.shader
+index eec1dae..e01f410 100644
+--- a/Assets/Mock/Resources/CounterImpactStroke.shader
++++ b/Assets/Mock/Resources/CounterImpactStroke.shader
+@@ -10,7 +10,7 @@ Shader "Katsuro/CounterImpactStroke"
+         _FrontIntensity("Forward tip and edge intensity", Range(0,4)) = 1.6
+         _SurfaceIntensity("Blue face intensity", Range(0,2)) = .7
+         _FacetContrast("Steel facet contrast", Range(0,1)) = .75
+-        _EdgeSoftness("Outer transparency falloff", Range(.02,.4)) = .16
++        _EdgeSoftness("Outer transparency falloff", Range(.02,.6)) = .36
+         _ExtensionDuration("Forward reveal duration (seconds)", Range(.005,.06)) = .018
+         _ExposureWeight("Scene exposure influence", Range(0,1)) = 0
+         [HideInInspector] _StrokeAge("Age", Float) = 0
+@@ -54,16 +54,18 @@ Shader "Katsuro/CounterImpactStroke"
+                 float faceLife=1-smoothstep(.015,max(.05,_Duration),age);
+                 float residual=smoothstep(.02,max(.033,_CoreDuration),age)*faceLife;
+                 float front=lerp(.8,1,smoothstep(0,max(.005,_ExtensionDuration),age));
+-                float longitudinal=smoothstep(0,.12,x)*(1-smoothstep(front-.08,front,x));
++                float longitudinal=smoothstep(0,.18,x)*(1-smoothstep(front-.16,front,x));
+                 float border=1-smoothstep(1-max(.02,_EdgeSoftness),1,abs(y));
+-                float heel=smoothstep(0,.4,x);
++                float feather=1-smoothstep(.15,.95,abs(y));
++                float contactFocus=lerp(.22,1.15,Gaussian((x-.5)/.18));
+                 float pixel=max(.0001,fwidth(y));
+-                float core=Gaussian(y/max(max(.01,_CoreWidth),pixel*_MinCorePixels))*_CoreIntensity*coreLife*lerp(.3,1,heel);
++                // A narrow contact-centered incision, not a uniformly white longitudinal band.
++                float core=Gaussian(y/max(max(.01,_CoreWidth),pixel*_MinCorePixels))*_CoreIntensity*coreLife*contactFocus;
+                 float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
+-                float tip=Gaussian((x-(front-.1))/.085)*Gaussian(y/.28);
+-                float frontWhite=(brightEdge+tip)*_FrontIntensity*coreLife;
++                float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
++                float frontWhite=(brightEdge*feather+tip)*_FrontIntensity*coreLife;
+                 float facet=lerp(1,lerp(.18,.8,smoothstep(-.75,.7,y))+Gaussian((y-.4)/.08)*.25,_FacetContrast);
+-                float face=Gaussian(y/.68)*_SurfaceIntensity*facet*(faceLife*.65+residual*.12);
++                float face=Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);
+                 float3 rgb=(_WhiteTint.rgb*(core+frontWhite)+_SteelTint.rgb*face)*longitudinal*border*_StrokeIntensity;
+                 rgb*=lerp(1,GetCurrentExposureMultiplier(),saturate(_ExposureWeight));
+                 // Emissive transparency: unlit pixels contribute no RGB and no occluding alpha.
+diff --git a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+index 7fe9b8a..b37b274 100644
+--- a/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
++++ b/Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
+@@ -23,11 +23,11 @@ MonoBehaviour:
+     CoreDuration: 0.07
+     Afterglow: 0.18
+     StrokeMaterial: {fileID: 2100000, guid: 1cf801deffc38f34fbb3de6f333dff78, type: 2}
+-    StrokeLength: 1.35
+-    StrokeWidth: 0.085
+-    StrokeCoreDuration: 0.055
+-    StrokeDuration: 0.14
+-    StrokeIntensity: 1
++    StrokeLength: 1.2
++    StrokeWidth: 0.072
++    StrokeCoreDuration: 0.07
++    StrokeDuration: 0.15
++    StrokeIntensity: 1.1
+     HitStop: 0.045
+     ImpactPoseTime: 0.05
+     PoseDuration: 0.18
+@@ -47,11 +47,11 @@ MonoBehaviour:
+     CoreDuration: 0.1
+     Afterglow: 0.26
+     StrokeMaterial: {fileID: 2100000, guid: a97ee332d330f104ba18ee6f45d7b150, type: 2}
+-    StrokeLength: 2.1
+-    StrokeWidth: 0.15
++    StrokeLength: 2.05
++    StrokeWidth: 0.135
+     StrokeCoreDuration: 0.09
+-    StrokeDuration: 0.23
+-    StrokeIntensity: 1.25
++    StrokeDuration: 0.21
++    StrokeIntensity: 1.1
+     HitStop: 0.155
+     ImpactPoseTime: 0.05
+     PoseDuration: 0.4
+diff --git a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+index ff95a47..544416d 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+@@ -53,8 +53,9 @@ internal sealed class CounterImpactStroke
+     public static Vector3 BladeVertex(Vector3 point, Vector3 direction, Vector3 side, float length, float width, float u, float across)
+     {
+         float taper=Mathf.Pow(Mathf.Max(0f,Mathf.Sin(Mathf.PI*u)),.8f)*Mathf.Lerp(.55f,1f,u);
+-        // Short rear heel, longer forward exit, with the contact fixed at u=.35.
+-        return point+direction*((u-.35f)*length)+side*(across*width*.5f*taper);
++        // Anchor the geometric center at the real contact. Direction comes from the reveal/light,
++        // rather than displacing the entire stroke forward beside the enemy.
++        return point+direction*((u-.5f)*length)+side*(across*width*.5f*taper);
+     }
+ 
+     public void Show(JustAvoidCounterConfig.Strike settings, Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)

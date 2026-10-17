@@ -53,8 +53,9 @@ internal sealed class CounterImpactStroke
     public static Vector3 BladeVertex(Vector3 point, Vector3 direction, Vector3 side, float length, float width, float u, float across)
     {
         float taper=Mathf.Pow(Mathf.Max(0f,Mathf.Sin(Mathf.PI*u)),.8f)*Mathf.Lerp(.55f,1f,u);
-        // Short rear heel, longer forward exit, with the contact fixed at u=.35.
-        return point+direction*((u-.35f)*length)+side*(across*width*.5f*taper);
+        // Anchor the geometric center at the real contact. Direction comes from the reveal/light,
+        // rather than displacing the entire stroke forward beside the enemy.
+        return point+direction*((u-.5f)*length)+side*(across*width*.5f*taper);
     }
 
     public void Show(JustAvoidCounterConfig.Strike settings, Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)

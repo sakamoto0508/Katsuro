@@ -1,0 +1,21 @@
+{
+  "changed": [
+    "Assets/Mock/Resources/CounterImpactStroke.shader",
+    "Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset",
+    "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+    "Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs"
+  ],
+  "configChanges": [
+    "First.StrokeLength",
+    "First.StrokeWidth",
+    "First.StrokeCoreDuration",
+    "First.StrokeDuration",
+    "First.StrokeIntensity",
+    "Second.StrokeLength",
+    "Second.StrokeWidth",
+    "Second.StrokeDuration",
+    "Second.StrokeIntensity"
+  ],
+  "otherInitialAssetsUnchanged": true
+}

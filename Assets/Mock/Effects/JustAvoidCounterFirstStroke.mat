@@ -26,20 +26,20 @@ Material:
     m_Ints: []
     m_Floats:
     - _CoreDuration: 0.055
-    - _CoreIntensity: 2.4
-    - _CoreWidth: 0.05
+    - _CoreIntensity: 2.6
+    - _CoreWidth: 0.04
     - _Duration: 0.14
-    - _EdgeSoftness: 0.2
+    - _EdgeSoftness: 0.4
     - _ExposureWeight: 0
     - _ExtensionDuration: 0.015
-    - _FacetContrast: 0.8
-    - _FrontIntensity: 1.3
-    - _MinCorePixels: 0.8
+    - _FacetContrast: 0.6
+    - _FrontIntensity: 0.85
+    - _MinCorePixels: 0.6
     - _StrokeAge: 0
     - _StrokeIntensity: 1
-    - _SurfaceIntensity: 0.8
+    - _SurfaceIntensity: 0.55
     m_Colors:
-    - _SteelTint: {r: 0.16, g: 0.4, b: 0.68, a: 1}
-    - _WhiteTint: {r: 1.15, g: 1.22, b: 1.32, a: 1}
+    - _SteelTint: {r: 0.16, g: 0.34, b: 0.5, a: 1}
+    - _WhiteTint: {r: 0.95, g: 1.08, b: 1.24, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
