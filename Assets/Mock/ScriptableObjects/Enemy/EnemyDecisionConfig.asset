@@ -29,14 +29,10 @@ MonoBehaviour:
   MidCandidates:
   - Action: 0
     Weight: 30
-  - Action: 9
-    Weight: 20
   - Action: 2
-    Weight: 20
+    Weight: 5
   NearCandidates:
   - Action: 3
     Weight: 50
-  - Action: 9
-    Weight: 20
   - Action: 1
-    Weight: 20
+    Weight: 10
