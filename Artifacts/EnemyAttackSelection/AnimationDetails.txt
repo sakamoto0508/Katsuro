@@ -1,0 +1,57 @@
+Assets/InportAssets/Universal Animation Library 2[Standard]/Universal Animation Library 2[Standard]/Unity/UAL2_Standard.fbx Generic=Generic root=root (UnityEngine.Transform)
+__preview__Armature|Hit_Knockback model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+__preview__Armature|Sword_Dash model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+__preview__Armature|Sword_Heavy_Combo model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+__preview__Armature|Sword_Regular_Combo model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+Armature|Hit_Knockback model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+Armature|Sword_Dash model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+Armature|Sword_Heavy_Combo model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+Armature|Sword_Regular_Combo model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 0.00000) delta=(0.00000, 0.00000, 0.00000)
+Assets/InportAssets/Universal Animation Library 2[Standard]/Universal Animation Library 2[Standard]/Unity/UAL2_Standard_RM.fbx Generic=Generic root=root (UnityEngine.Transform)
+__preview__Armature|Hit_Knockback model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 3.00000) delta=(0.00000, 0.00000, 3.00000)
+__preview__Armature|Sword_Dash model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, -3.69224) delta=(0.00000, 0.00000, -3.69224)
+__preview__Armature|Sword_Heavy_Combo model-space root start=(0.00000, 0.00000, 0.07584) end=(0.00000, 0.00000, -5.24845) delta=(0.00000, 0.00000, -5.32429)
+__preview__Armature|Sword_Regular_Combo model-space root start=(0.00000, 0.00000, 0.06622) end=(0.00000, 0.00000, -2.27630) delta=(0.00000, 0.00000, -2.34253)
+Armature|Hit_Knockback model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, 3.00000) delta=(0.00000, 0.00000, 3.00000)
+Armature|Sword_Dash model-space root start=(0.00000, 0.00000, 0.00000) end=(0.00000, 0.00000, -3.69224) delta=(0.00000, 0.00000, -3.69224)
+Armature|Sword_Heavy_Combo model-space root start=(0.00000, 0.00000, 0.07584) end=(0.00000, 0.00000, -5.24845) delta=(0.00000, 0.00000, -5.32429)
+Armature|Sword_Regular_Combo model-space root start=(0.00000, 0.00000, 0.06622) end=(0.00000, 0.00000, -2.27630) delta=(0.00000, 0.00000, -2.34253)
+Base Layer/Idle tag= motion=Assets/Mock/Animation/Enemy/Idle/ARPG_Halberd_Idle1.anim
+Base Layer/BackStep tag= motion=Assets/Mock/Animation/Enemy/BackStep/ARPG_Halberd_Evade_Backward.anim
+  event 0.9833333 AnimEvent_OnStepBackFinished
+Base Layer/Move 0 tag= motion=Assets/Mock/AnimationController/Enemy.controller
+Base Layer/ARPG_Halberd_Death2 tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Death2.anim
+  event 0.6166667 AnimEvent_OnSoundEffect
+Base Layer/Attacks/AttackHeavy2Start tag= motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1_Start.anim
+Base Layer/Attacks/AttackHeavy2 tag=NormalAttack motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy2/ARPG_Halberd_Attack_Heavy1.anim
+  event 0.2166667 AnimEvent_EnableWeaponHitbox
+  event 0.2333333 AnimEvent_OnSoundEffect
+  event 0.4666667 AnimEvent_DisableWeaponHitbox
+  event 1.083333 AnimEvent_OnAttackFinished
+Base Layer/Attacks/AttackHeavy1Start tag= motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1_Start.anim
+  event 0.2 AnimEvent_OnSoundEffect
+Base Layer/Attacks/AttackHeavy tag=NormalAttack motion=Assets/Mock/Animation/Enemy/HeavyAttack/Heavy1/ARPG_Samurai_Attack_Heavy1.anim
+  event 0.1666667 AnimEvent_OnSoundEffect
+  event 0.2 AnimEvent_EnableWeaponHitbox
+  event 0.4333333 AnimEvent_DisableWeaponHitbox
+  event 0.9333333 AnimEvent_OnAttackFinished
+Base Layer/Attacks/LightAttack1 tag=NormalAttack motion=Assets/Mock/Animation/Enemy/LightAttack/Attack1/ARPG_Halberd_Attack_Dodge.anim
+  event 0.55 AnimEvent_EnableWeaponHitbox
+  event 0.5833333 AnimEvent_OnSoundEffect
+  event 0.7166666 AnimEvent_DisableWeaponHitbox
+  event 1.466667 AnimEvent_OnAttackFinished
+Base Layer/Attacks/LightAttack2 tag=NormalAttack motion=Assets/Mock/Animation/Enemy/LightAttack/Attack2/ARPG_Halberd_Attack_Combo4.anim
+  event 0.4 AnimEvent_OnSoundEffect
+  event 0.45 AnimEvent_EnableWeaponHitbox
+  event 0.5833333 AnimEvent_DisableWeaponHitbox
+  event 1.266667 AnimEvent_OnAttackFinished
+HitReaction/Empty tag= motion=none
+HitReaction/LightFront tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim
+HitReaction/LightBack tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit3.anim
+HitReaction/LightLeft tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+HitReaction/LightRight tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+HitReaction/HeavyFront tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit1.anim
+HitReaction/HeavyBack tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit4.anim
+HitReaction/HeavyLeft tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+HitReaction/HeavyRight tag= motion=Assets/InportAssets/ARPGPack/ARPGHalberd/Animations/Humanoid/ARPG_Halberd_Hit2.anim
+NormalHeavyHit/Pose tag= motion=Assets/Mock/AnimationController/NormalHeavyHitPose.anim

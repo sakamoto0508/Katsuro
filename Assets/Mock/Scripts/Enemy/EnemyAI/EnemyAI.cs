@@ -35,7 +35,7 @@ public class EnemyAI
     /// <summary>現在の AI ステート</summary>
     private EnemyState _state = EnemyState.Idle;
     /// <summary>直前に実行した行動</summary>
-    private EnemyActionType _lastAction = EnemyActionType.Wait;
+    private EnemyDecision _lastDecision = new EnemyDecision(EnemyActionType.Wait);
     /// <summary>攻撃・怯みなど、次の Decision を行えない状態かどうか</summary>
     private bool _isBusy;
     /// <summary>観察中かどうか</summary>
@@ -99,9 +99,16 @@ public class EnemyAI
         TriggerDecision();
     }
 
-    /// <summary>
-    /// 現在の状況をもとに次の行動を決定する。
-    /// </summary>
+    /// <summary>実行できない候補は短い待機へ戻し、同じフレームの再抽選ループを避ける。</summary>
+    public void OnActionFailed()
+    {
+        _isBusy = false;
+        _state = EnemyState.Recovery;
+        _isObserving = true;
+        _observeTimer = Mathf.Max(.1f, _config != null ? _config.ObserveSeconds : 1f);
+    }
+
+    /// <summary>現在の距離と直前の行動・攻撃参照から次を選ぶ。</summary>
     private void TriggerDecision()
     {
         // 行動中、またはプレイヤー不在なら何もしない
@@ -114,26 +121,27 @@ public class EnemyAI
             _player.position);
 
         // DecisionMaker に行動選択を委譲
-        var action = _decisionMaker.Decide(
+        var action = _decisionMaker.DecideAction(
             distance,
-            _lastAction,
+            _lastDecision,
             _config);
 
-        CombatLog.Trace($"AI decide {action}");
+        CombatLog.Trace($"AI decide {action.Action} / {action.Attack?.name}");
 
-        _lastAction = action;
+        _lastDecision = action;
         ExecuteAction(action);
     }
 
     /// <summary>
     /// 決定された行動を EnemyController に指示する。
     /// </summary>
-    private void ExecuteAction(EnemyActionType action)
+    private void ExecuteAction(EnemyDecision decision)
     {
+        var action = decision.Action;
         switch (action)
         {
             case EnemyActionType.WarpAttack:
-                _controller.EnqueueAction(action);
+                _controller.EnqueueDecision(decision);
                 _state = EnemyState.Attack;
                 _isBusy = true;
                 break;
@@ -143,12 +151,15 @@ public class EnemyAI
                 break;
             case EnemyActionType.Thrust:
             case EnemyActionType.Slash:
+            case EnemyActionType.Slash2:
+            case EnemyActionType.HeavySlash2:
             case EnemyActionType.HeavySlash:
-                _controller.EnqueueAction(action);
+                _controller.EnqueueDecision(decision);
                 _state = EnemyState.Attack;
                 _isBusy = true;
                 break;
             case EnemyActionType.Wait:
+                _controller.EnqueueAction(EnemyActionType.Wait);
                 _state = EnemyState.Recovery;
                 _isObserving = true;
                 _observeTimer = _config != null ? _config.ObserveSeconds : 1.0f;

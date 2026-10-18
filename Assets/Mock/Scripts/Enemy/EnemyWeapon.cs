@@ -53,6 +53,18 @@ public sealed class EnemyWeapon
         set => _currentAttackDamage = value;
     }
 
+    /// <summary>初期化済みRelayを持つ有効なTrigger Colliderが存在するか。</summary>
+    public bool HasValidHitbox
+    {
+        get
+        {
+            foreach (var pair in _relayCache)
+                if (pair.Key != null && pair.Key.isTrigger && pair.Key.gameObject.activeInHierarchy && pair.Value != null)
+                    return true;
+            return false;
+        }
+    }
+
     /// <summary>ヒットボックスを有効化する。</summary>
     public void EnableHitbox() => SetHitboxActive(true);
 

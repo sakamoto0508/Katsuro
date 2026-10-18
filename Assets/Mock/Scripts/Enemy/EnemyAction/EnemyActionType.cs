@@ -2,16 +2,16 @@
 public enum EnemyActionType
 {
     //移動系
-    Approach,
-    StepBack,
-    WaitWalk,
+    Approach = 0,
+    StepBack = 1,
+    WaitWalk = 2,
     //攻撃系
-    Slash,
-    Slash2,
-    HeavySlash,
-    HeavySlash2,
-    Thrust,
-    WarpAttack,
+    Slash = 3,
+    Slash2 = 4,
+    HeavySlash = 5,
+    HeavySlash2 = 6,
+    Thrust = 7,
+    WarpAttack = 8,
     //様子見
-    Wait,
+    Wait = 9,
 }

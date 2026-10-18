@@ -355,6 +355,14 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>
     /// 指定トリガーを発火する。未設定名は無視する。
     /// </summary>
+    public bool HasTrigger(string trigger)
+    {
+        if (_animator == null || !_animator.isActiveAndEnabled || _animator.runtimeAnimatorController == null || string.IsNullOrEmpty(trigger)) return false;
+        foreach (var parameter in _animator.parameters)
+            if (parameter.name == trigger && parameter.type == AnimatorControllerParameterType.Trigger) return true;
+        return false;
+    }
+
     public void PlayTrigger(string animationName)
     {
         _animator?.SetTrigger(animationName);

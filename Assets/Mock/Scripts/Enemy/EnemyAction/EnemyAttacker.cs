@@ -36,6 +36,8 @@ public class EnemyAttacker : IDisposable
     private readonly HashSet<IDamageable> _hitTargets = new();
     private bool _isHitboxActive;
     private bool _currentIsHeavy;
+    private EnemyWeapon _currentWeapon;
+    private float _currentDamage;
     private HitStopManager _hitStop;
     private bool _initialized;
     private readonly Transform _ownerTransform;
@@ -51,46 +53,40 @@ public class EnemyAttacker : IDisposable
     }
 
     /// <summary>攻撃を実行する。攻撃データに基づき Animator トリガーを発火し、武器にダメージ値を設定します。</summary>
-    public void PerformAttack(EnemyActionType attackType)
+    public bool PerformAttack(EnemyActionType attackType)
     {
         var data = FindData(attackType);
         if (data == null)
         {
             Debug.LogWarning($"EnemyAttacker: no attack data found for action={attackType}");
-            return;
+            return false;
         }
 
-        PerformAttack(data, attackType == EnemyActionType.HeavySlash);
+        return PerformAttack(data);
     }
 
-    /// <summary>既存の攻撃Dataを使って通常と同じAnimator・武器を動かす。修練では同じ予備動作を反復できる。</summary>
-    public void PerformAttack(EnemyAttackData data, bool heavy)
+    /// <summary>旧呼び出し互換用。heavy引数にかかわらずデータ定義の強弱を使用する。</summary>
+    public bool PerformAttack(EnemyAttackData data, bool heavy) => PerformAttack(data);
+
+    /// <summary>選択済みデータを検証して実行する。強弱はデータを唯一の正とする。</summary>
+    public bool PerformAttack(EnemyAttackData data)
     {
-        if (data == null) return;
-        if (_animController != null)
+        DisableWeaponHitbox();
+        _currentWeapon = null;
+        if (data == null || _animController == null ||
+            !_animController.HasTrigger(data.AnimatorTrigger) || _weapons == null ||
+            data.HitboxIndex < 0 || data.HitboxIndex >= _weapons.Length ||
+            _weapons[data.HitboxIndex] == null || !_weapons[data.HitboxIndex].HasValidHitbox)
         {
-            // Animator トリガー名をそのまま使ってトリガーを発火する
-            if (!string.IsNullOrEmpty(data.AnimatorTrigger))
-            {
-                _animController.PlayTrigger(data.AnimatorTrigger);
-            }
-            else
-            {
-                Debug.LogWarning($"EnemyAttacker: attack data for {data.ActionType} has no AnimatorTrigger assigned.");
-            }
+            Debug.LogWarning($"EnemyAttacker: invalid attack data, Animator trigger or weapon: {data?.name}");
+            return false;
         }
-
-        _currentIsHeavy = heavy;
-
-        // 武器へダメージを設定（複数武器がある場合は hitboxIndex を使う）
-        if (_weapons != null && data.HitboxIndex >= 0 && data.HitboxIndex < _weapons.Length)
-        {
-            _weapons[data.HitboxIndex].CurrentAttackDamage = data.Damage;
-        }
-        else
-        {
-            CombatLog.Trace($"EnemyAttacker: perform {data.ActionType} damage={data.Damage} (no weapon assigned or invalid hitboxIndex={data.HitboxIndex})");
-        }
+        _currentIsHeavy = data.IsHeavy;
+        _currentWeapon = _weapons[data.HitboxIndex];
+        _currentDamage = data.Damage;
+        _currentWeapon.CurrentAttackDamage = _currentDamage;
+        _animController.PlayTrigger(data.AnimatorTrigger);
+        return true;
     }
 
     /// <summary>指定行動に対応する攻撃設定を候補から選ぶ。</summary>
@@ -112,14 +108,13 @@ public class EnemyAttacker : IDisposable
     /// <summary>攻撃フレームに合わせてヒットボックスを有効化し、ヒット済み管理を初期化。</summary>
     public void EnableWeaponHitbox()
     {
+        if (_currentWeapon == null || !_currentWeapon.HasValidHitbox) return;
         _hitTargets.Clear();
         _isHitboxActive = true;
-        if (_weapons == null) return;
-        foreach (var w in _weapons)
-        {
-            w?.SetTrailStyle(_currentIsHeavy ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
-            w?.EnableHitbox();
-        }
+        // OFF時にWeaponが威力を消去するため、各Event区間の開始で再設定する。
+        _currentWeapon.CurrentAttackDamage = _currentDamage;
+        _currentWeapon.SetTrailStyle(_currentIsHeavy ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light);
+        _currentWeapon.EnableHitbox();
     }
 
     /// <summary>ヒットボックスを無効化し、新規ヒットを発生させない。</summary>

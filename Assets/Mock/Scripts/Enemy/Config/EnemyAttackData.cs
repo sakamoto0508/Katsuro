@@ -4,6 +4,12 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Enemy/AttackData", fileName = "EnemyAttackData")]
 public class EnemyAttackData : ScriptableObject
 {
+    public enum AttackStrength { Light = 0, Heavy = 1 }
+
+    [SerializeField, Tooltip("攻撃の強弱。Animator名やActionTypeから推測しない。")]
+    private AttackStrength _strength;
+    public AttackStrength Strength => _strength;
+    public bool IsHeavy => _strength == AttackStrength.Heavy;
     /// <summary>この攻撃設定を使うEnemy行動の種類。</summary>
     public EnemyActionType ActionType => _actionType;
     /// <summary>この行動を開始するAnimator Trigger名。Controllerのパラメータと一致させる。</summary>
@@ -12,7 +18,7 @@ public class EnemyAttackData : ScriptableObject
     public float Damage => _damage;
     /// <summary>行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。</summary>
     public float Range => _range;
-    /// <summary>有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。</summary>
+    /// <summary>EnemyAttackerへ渡された武器グループの番号。現行Enemyは全刀Colliderをまとめた0番を使う。</summary>
     public int HitboxIndex => _hitboxIndex;
     /// <summary>Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
     public float HitboxEnableDelay => _hitboxEnableDelay;
@@ -31,8 +37,8 @@ public class EnemyAttackData : ScriptableObject
     /// <summary>行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。</summary>
     [UnityEngine.Tooltip("行動の想定射程（Unity単位）。現在の攻撃実行処理では直接参照しない設定。")]
     [SerializeField] private float _range;
-    /// <summary>有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。</summary>
-    [UnityEngine.Tooltip("有効にする武器Colliderの番号。現在の攻撃実行処理では直接参照しない設定。")]
+    /// <summary>EnemyAttackerへ渡された武器グループの番号。</summary>
+    [UnityEngine.Tooltip("武器グループ番号。現在のEnemyでは全刀Colliderをまとめた0を指定。Collider配列の番号ではない。")]
     [SerializeField] private int _hitboxIndex;
     /// <summary>Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。</summary>
     [UnityEngine.Tooltip("Hitbox有効化までの遅延設定（秒）。現行ではAnimation EventがON/OFFを管理する。")]

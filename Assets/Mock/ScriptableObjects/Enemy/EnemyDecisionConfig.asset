@@ -23,6 +23,7 @@ MonoBehaviour:
   WeightSlash: 0.5
   WeightBackstep: 0.1
   RepeatPenalty: 0.25
+  RepeatPenaltyPerAttack: 0
   FarCandidates:
   - Action: 0
     Weight: 30
@@ -33,6 +34,16 @@ MonoBehaviour:
     Weight: 5
   NearCandidates:
   - Action: 3
-    Weight: 50
+    Attack: {fileID: 11400000, guid: 4ca001fdc8b671941b6dda62d3dddcbf, type: 2}
+    Weight: 12.5
+  - Action: 3
+    Attack: {fileID: 11400000, guid: c958f190ac9187f4c8e5be61256b8980, type: 2}
+    Weight: 12.5
+  - Action: 3
+    Attack: {fileID: 11400000, guid: e46e2a1b9049f844f91a86e40bc32f09, type: 2}
+    Weight: 12.5
+  - Action: 3
+    Attack: {fileID: 11400000, guid: e2802607a4a07bd4f96a53e5bca36b48, type: 2}
+    Weight: 12.5
   - Action: 1
     Weight: 10

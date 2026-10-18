@@ -71,7 +71,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     [SerializeField, Min(0f)] private float _attackRootMotionScale = .18f;
     private int _attackAnimationHash;
     private EnemyAI _ai;
-    private EnemyActionType? _pendingAction;
+    private EnemyDecision? _pendingAction;
+    private bool _attackCompletionPending;
+    private float _attackElapsed;
     private CancellationToken _token;
     private bool _dead = false;
     private GameManager _game;
@@ -155,13 +157,17 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
         TrainingAttackInProgress = true; _mover?.FacePlayerInstant(); _mover?.HoldMovementForAttack();
-        _attacker?.PerformAttack(data, data.ActionType == EnemyActionType.HeavySlash);
-        return true;
+        bool started = _attacker != null && _attacker.PerformAttack(data);
+        TrainingAttackInProgress = started;
+        if (started) { _attackCompletionPending = true; _attackElapsed = 0f; }
+        else _mover?.ReleaseMovementAfterAttack();
+        return started;
     }
     /// <summary>課題変更時に武器と攻撃移動を止める。被弾Reactionの復帰は既存処理へ任せる。</summary>
     public void CancelTrainingAttack()
     {
         if (!IsTraining) return;
+        _attackCompletionPending = false;
         TrainingAttackInProgress = false; _pendingAction = null; _attacker?.DisableWeaponHitbox();
         _enemyAnimController?.InterruptAttackForHitReaction(); _mover?.ReleaseMovementAfterAttack();
     }
@@ -184,7 +190,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     /// </summary>
     public void EnqueueAction(EnemyActionType action)
     {
-        _pendingAction = action;
+        _pendingAction = new EnemyDecision(action);
+    }
+
+    public void EnqueueDecision(EnemyDecision decision)
+    {
+        _pendingAction = decision;
     }
 
     /// <summary>
@@ -216,6 +227,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             if (counter)
             {
                 _attacker?.DisableWeaponHitbox();
+                _attackCompletionPending = false;
                 _pendingAction = null;
                 _mover?.ReleaseMovementAfterReaction();
                 _mover?.InterruptMovementAction();
@@ -264,6 +276,22 @@ public class EnemyController : MonoBehaviour, IDamageable
             }
             else return;
         }
+        // 終了Event欠落/Triggerに遷移がない場合も、実際の攻撃Stateを割り込まず復帰する。
+        if (_attackCompletionPending && _animator != null)
+        {
+            _attackElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
+            if (_attackElapsed > 8f && !IsAttackAnimationActive && !_animator.IsInTransition(0) &&
+                !_animator.GetCurrentAnimatorStateInfo(0).IsTag("NormalAttack"))
+            {
+                Debug.LogWarning("Enemy attack finished without completion event; recovering AI.", this);
+                _enemyAnimController?.InterruptAttackForHitReaction();
+                _attacker?.DisableWeaponHitbox();
+                _attackCompletionPending = false;
+                _mover?.ReleaseMovementAfterAttack();
+                if (IsTraining) { TrainingAttackInProgress = false; TrainingAttackFinished?.Invoke(); }
+                else _ai?.OnActionFailed();
+            }
+        }
         // AI の Tick を先に呼び、意思決定を行わせる
         if (!IsTraining) _ai?.Tick(Time.deltaTime);
 
@@ -271,7 +299,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         // これにより WaitWalk 等が選択されたフレームで即座に振る舞いを反映できます。
         if (_pendingAction != null)
         {
-            var action = _pendingAction.Value;
+            var decision = _pendingAction.Value;
+            var action = decision.Action;
             _pendingAction = null;
             switch (action)
             {
@@ -282,20 +311,23 @@ public class EnemyController : MonoBehaviour, IDamageable
                     _mover?.StartPatrolWalk();
                     break;
                 case EnemyActionType.Slash:
-                    _mover?.FacePlayerInstant();
-                    _mover?.HoldMovementForAttack();
-                    _attacker?.PerformAttack(action);
-                    break;
-                case EnemyActionType.Thrust:
+                case EnemyActionType.Slash2:
                 case EnemyActionType.HeavySlash:
-                    _mover?.FacePlayerInstant();
-                    _mover?.HoldMovementForAttack();
-                    _attacker?.PerformAttack(action);
-                    break;
+                case EnemyActionType.HeavySlash2:
+                case EnemyActionType.Thrust:
                 case EnemyActionType.WarpAttack:
                     _mover?.FacePlayerInstant();
                     _mover?.HoldMovementForAttack();
-                    _attacker?.PerformAttack(action);
+                    bool started = _attacker != null && (decision.Attack != null
+                        ? _attacker.PerformAttack(decision.Attack)
+                        : _attacker.PerformAttack(action));
+                    _attackCompletionPending = started;
+                    _attackElapsed = 0f;
+                    if (!started)
+                    {
+                        _mover?.ReleaseMovementAfterAttack();
+                        _ai?.OnActionFailed();
+                    }
                     break;
                 case EnemyActionType.StepBack:
                     _mover?.StartStepBack();
@@ -321,6 +353,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         _enemyAnimController.CancelHitReaction();
         _mover?.ReleaseMovementAfterReaction();
         _enemyAnimController.PlayTrigger(_enemyAnimController.AnimName.EnemyDead);
+        _attackCompletionPending = false;
         _dead = true;
         _pendingAction = null;
         _attacker?.DisableWeaponHitbox();
@@ -378,7 +411,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         }
         var data = _attackData[attackIndex];
         if (data == null) return;
-        _attacker?.PerformAttack(data.ActionType);
+        _attacker?.PerformAttack(data);
     }
 
     /// <summary>
@@ -389,6 +422,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (_enemyAnimController != null && _enemyAnimController.IsHeavyReacting) return;
         if (_dead || (_game != null && !_game.IsCombatActive)) return;
+        _attackCompletionPending = false;
+        _attacker?.DisableWeaponHitbox();
         _ai?.OnAttackFinished();
         // 攻撃終了時に一時停止していた移動制御を復帰させる
         _mover?.ReleaseMovementAfterAttack();
