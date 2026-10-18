@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "command": "command run_script",
+  "data": {
+    "command": "run_script",
+    "parameters": {
+      "file": "Artifacts/UAL2Combo/ValidateUAL.cs",
+      "entry": "ValidateUAL.Run",
+      "timeout_ms": "60000"
+    },
+    "result": {
+      "diagnostics": [],
+      "compileMs": 1006,
+      "executeMs": 2194,
+      "assemblyName": "PipelineRunScript_ValidateUAL_45743cf4175e434089e63f32174322c0",
+      "success": true,
+      "result": null
+    },
+    "target": {
+      "host": "127.0.0.1",
+      "port": 7800,
+      "projectPath": "C:\\Unity game\\Katsuro"
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

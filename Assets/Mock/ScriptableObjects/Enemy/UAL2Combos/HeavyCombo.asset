@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06f256e550c8cdf4293581e661ce2957, type: 3}
+  m_Name: HeavyCombo
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackPattern
+  PatternName: HeavyCombo
+  Attack: {fileID: 11400000, guid: 40abbfd81b598cc4ba5087bc0b1d2ff0, type: 2}
+  AnimatorState: Base Layer.Attacks.HeavyCombo
+  WindupDuration: 0.75
+  WindupEndTime: 0.25
+  RecoveryDuration: 0.8
+  Timeout: 7
+  PlaybackSpeed: 0.8
+  RootMotionScale: 0.1

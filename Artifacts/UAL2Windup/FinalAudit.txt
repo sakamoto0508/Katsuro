@@ -1,0 +1,10 @@
+isPlaying=false isCompiling=false scriptCompilationFailed=false
+PASS unchanged from task start: Assets/Mock/Scenes/GameScene.unity
+PASS unchanged from task start: Assets/Mock/UI/KatsuroUIFont.asset
+PASS unchanged from task start: Assets/Mock/AnimationController/Enemy.controller
+PASS unchanged from task start: Assets/Mock/ScriptableObjects/Enemy/EnemyDecisionConfig.asset
+PASS unchanged from task start: Assets/Mock/ScriptableObjects/Enemy/EnemyDecisionConfig_ComboTest.asset
+PASS unchanged from task start: Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2RegularCombo.anim
+PASS unchanged from task start: Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2HeavyCombo.anim
+PASS Regular duration=0.35 prefix=0.15 windupSpeed=0.4285715 bodySpeed=0.85 rootScale=0.18
+PASS Heavy duration=0.5 prefix=0.25 windupSpeed=0.5 bodySpeed=0.85 rootScale=0.1

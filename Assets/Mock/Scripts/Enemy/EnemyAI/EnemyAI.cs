@@ -95,8 +95,17 @@ public class EnemyAI
     /// </summary>
     public void OnAttackFinished()
     {
+        _isObserving = false;
         _isBusy = false;
         TriggerDecision();
+    }
+
+    /// <summary>死亡・戦闘終了・追撃中断では予約だけ解除し、復帰通知まで抽選しない。</summary>
+    public void OnActionCancelled()
+    {
+        _isBusy = false;
+        _isObserving = false;
+        _state = EnemyState.Idle;
     }
 
     /// <summary>実行できない候補は短い待機へ戻し、同じフレームの再抽選ループを避ける。</summary>
@@ -126,7 +135,7 @@ public class EnemyAI
             _lastDecision,
             _config);
 
-        CombatLog.Trace($"AI decide {action.Action} / {action.Attack?.name}");
+        CombatLog.Trace($"AI decide {action.Action} / {(action.Pattern != null ? action.Pattern.PatternName : action.Attack?.name)}");
 
         _lastDecision = action;
         ExecuteAction(action);

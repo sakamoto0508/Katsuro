@@ -1,0 +1,8 @@
+Regular keep=False yaw=0 sum=(-0.87815, 0.00000, 2.89525) initial toeForward=(-0.0561, -0.1107, 0.1142) rootYawMotion=0
+Regular keep=False yaw=180 sum=(0.87816, 0.00000, -2.89525) initial toeForward=(0.0561, -0.1107, -0.1142) rootYawMotion=0
+Regular keep=True yaw=0 sum=(0.00430, 0.00000, -3.02549) initial toeForward=(0.0208, -0.1107, -0.1255) rootYawMotion=0
+Regular keep=True yaw=180 sum=(-0.00431, 0.00000, 3.02549) initial toeForward=(-0.0208, -0.1107, 0.1255) rootYawMotion=0
+Heavy keep=False yaw=0 sum=(-1.99039, 0.00000, 6.59345) initial toeForward=(-0.0556, -0.1107, 0.1144) rootYawMotion=0
+Heavy keep=False yaw=180 sum=(1.99040, 0.00000, -6.59345) initial toeForward=(0.0556, -0.1107, -0.1144) rootYawMotion=0
+Heavy keep=True yaw=0 sum=(-0.00241, 0.00000, -6.88733) initial toeForward=(0.0201, -0.1107, -0.1256) rootYawMotion=0
+Heavy keep=True yaw=180 sum=(0.00240, 0.00000, 6.88733) initial toeForward=(-0.0201, -0.1107, 0.1256) rootYawMotion=0

@@ -73,10 +73,7 @@ public class EnemyAttacker : IDisposable
     {
         DisableWeaponHitbox();
         _currentWeapon = null;
-        if (data == null || _animController == null ||
-            !_animController.HasTrigger(data.AnimatorTrigger) || _weapons == null ||
-            data.HitboxIndex < 0 || data.HitboxIndex >= _weapons.Length ||
-            _weapons[data.HitboxIndex] == null || !_weapons[data.HitboxIndex].HasValidHitbox)
+        if (!CanPerformAttack(data))
         {
             Debug.LogWarning($"EnemyAttacker: invalid attack data, Animator trigger or weapon: {data?.name}");
             return false;
@@ -88,6 +85,11 @@ public class EnemyAttacker : IDisposable
         _animController.PlayTrigger(data.AnimatorTrigger);
         return true;
     }
+
+    /// <summary>開始前に攻撃データ・Trigger・武器の参照を検証する。</summary>
+    public bool CanPerformAttack(EnemyAttackData data) => data != null && _animController != null &&
+        _animController.HasTrigger(data.AnimatorTrigger) && _weapons != null && data.HitboxIndex >= 0 &&
+        data.HitboxIndex < _weapons.Length && _weapons[data.HitboxIndex] != null && _weapons[data.HitboxIndex].HasValidHitbox;
 
     /// <summary>指定行動に対応する攻撃設定を候補から選ぶ。</summary>
     /// <returns>対応する攻撃設定。候補がなければnull。</returns>

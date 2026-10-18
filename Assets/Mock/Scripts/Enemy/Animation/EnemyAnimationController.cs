@@ -174,6 +174,7 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>攻撃用トリガーと攻撃再生を解除して被弾への短いBlendを要求する。死亡トリガーは保持する。</summary>
     public void InterruptAttackForHitReaction()
     {
+        GetComponent<EnemyController>()?.CancelAttackPattern(true);
         if (_animator == null) return;
         // Even when reaction clips are unavailable, cancel the outgoing attack.
         foreach (var parameter in _animator.parameters)

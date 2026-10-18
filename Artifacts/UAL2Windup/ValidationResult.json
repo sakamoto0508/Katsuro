@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "command": "command run_script",
+  "data": {
+    "command": "run_script",
+    "parameters": {
+      "file": "Artifacts/UAL2Windup/ValidateWindup.cs",
+      "entry": "ValidateWindup.Run",
+      "timeout_ms": "60000"
+    },
+    "result": {
+      "diagnostics": [],
+      "compileMs": 1291,
+      "executeMs": 23696,
+      "assemblyName": "PipelineRunScript_ValidateWindup_002c0d4665e74f66b6aef2d932726e7a",
+      "success": true,
+      "result": null
+    },
+    "target": {
+      "host": "127.0.0.1",
+      "port": 7800,
+      "projectPath": "C:\\Unity game\\Katsuro"
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

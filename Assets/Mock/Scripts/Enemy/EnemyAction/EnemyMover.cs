@@ -48,6 +48,11 @@ public class EnemyMover
     private bool _usingRootMotionStepBack;
     private bool _usingRootMotionAttack, _attackKinematic, _attackAgentRotation;
     private readonly float _attackRootMotionScale;
+    private float? _attackRootMotionScaleOverride;
+    public void SetAttackRootMotionScale(float? scale)
+    {
+        _attackRootMotionScaleOverride = scale.HasValue && float.IsFinite(scale.Value) ? Mathf.Max(0f, scale.Value) : null;
+    }
     private Vector3 _pendingAttackRootMotion;
     public bool IsUsingAttackRootMotion => _usingRootMotionAttack;
     /// <summary>攻撃の移動停止中だけ水平Root Motionを受け付ける。被弾と後退移動が優先中なら開始しない。</summary>
@@ -596,7 +601,7 @@ public class EnemyMover
         {
             if (_animator.speed <= 0f) { _pendingAttackRootMotion = Vector3.zero; return; }
             Vector3 delta = _animator.deltaPosition; delta.y = 0f;
-            _pendingAttackRootMotion += delta * _attackRootMotionScale;
+            _pendingAttackRootMotion += delta * (_attackRootMotionScaleOverride ?? _attackRootMotionScale);
             return;
         }
         if (!_usingRootMotionStepBack) return;

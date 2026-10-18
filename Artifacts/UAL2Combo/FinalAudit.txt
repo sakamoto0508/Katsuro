@@ -1,0 +1,4 @@
+isPlaying=False isCompiling=False scriptCompilationFailed=False
+Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2RegularCombo.anim dependencies=Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2RegularCombo.anim
+Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2HeavyCombo.anim dependencies=Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2HeavyCombo.anim
+Open scene=Assets/Mock/Scenes/GameScene.unity dirty=True

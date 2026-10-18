@@ -1,0 +1,17 @@
+UAL Sword names: Armature|Sword_Block, Armature|Sword_Dash, Armature|Sword_Heavy_Combo, Armature|Sword_Regular_A, Armature|Sword_Regular_A_Rec, Armature|Sword_Regular_B, Armature|Sword_Regular_B_Rec, Armature|Sword_Regular_C, Armature|Sword_Regular_Combo
+Regular speed=1 clipTimeAfter0.5s=0.5 globalSpeed=1
+Regular speed=0.85 clipTimeAfter0.5s=0.425 globalSpeed=1
+Regular candidate=ARPG_Samurai_Attack_Heavy1_Start human=True length=0.8166667 endToComboStartMeanBoneAngle=50.56227
+Regular candidate=ARPG_Samurai_Guard_Start human=True length=0.1166667 endToComboStartMeanBoneAngle=47.2798
+Regular candidate=ARPG_Samurai_Guard_B_Start human=True length=0.1166667 endToComboStartMeanBoneAngle=43.18669
+Regular candidate=ARPG_Samurai_Idle1_to_Idle2 human=True length=0.4833333 endToComboStartMeanBoneAngle=14.8342
+Regular candidate=Armature|Sword_Block human=True length=1.233333 endToComboStartMeanBoneAngle=1.049455
+Regular candidate=ARPG_Halberd_Attack_Heavy1_Start human=True length=0.8166667 endToComboStartMeanBoneAngle=46.45706
+Heavy speed=1 clipTimeAfter0.5s=0.5 globalSpeed=1
+Heavy speed=0.85 clipTimeAfter0.5s=0.425 globalSpeed=1
+Heavy candidate=ARPG_Samurai_Attack_Heavy1_Start human=True length=0.8166667 endToComboStartMeanBoneAngle=51.66409
+Heavy candidate=ARPG_Samurai_Guard_Start human=True length=0.1166667 endToComboStartMeanBoneAngle=48.46264
+Heavy candidate=ARPG_Samurai_Guard_B_Start human=True length=0.1166667 endToComboStartMeanBoneAngle=44.16777
+Heavy candidate=ARPG_Samurai_Idle1_to_Idle2 human=True length=0.4833333 endToComboStartMeanBoneAngle=14.85387
+Heavy candidate=Armature|Sword_Block human=True length=1.233333 endToComboStartMeanBoneAngle=2.339362
+Heavy candidate=ARPG_Halberd_Attack_Heavy1_Start human=True length=0.8166667 endToComboStartMeanBoneAngle=47.26237

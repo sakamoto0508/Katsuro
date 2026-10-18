@@ -1,0 +1,4 @@
+Regular applyRootMotion=False human=True hasRoot=True sum=(-0.221410, 0.000000, -3.017381) maxY=0 avatar=True
+Regular applyRootMotion=True human=True hasRoot=True sum=(-0.221410, 0.000000, -3.017381) maxY=0 avatar=True
+Heavy applyRootMotion=False human=True hasRoot=True sum=(-0.516194, 0.000000, -6.867958) maxY=0 avatar=True
+Heavy applyRootMotion=True human=True hasRoot=True sum=(-0.516194, 0.000000, -6.867958) maxY=0 avatar=True

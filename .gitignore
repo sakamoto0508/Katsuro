@@ -98,7 +98,12 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 Assets/InportAssets/
-Assets/Mock/Animation/
+# Keep imported animation copies ignored, except the authored enemy UAL2 combos.
+Assets/Mock/Animation/*
+!Assets/Mock/Animation/Enemy/
+Assets/Mock/Animation/Enemy/*
+!Assets/Mock/Animation/Enemy/UAL2Combos/
+!Assets/Mock/Animation/Enemy/UAL2Combos.meta
 Assets/Plugins/
 Assets/INab Studio/
 AgentScripts/

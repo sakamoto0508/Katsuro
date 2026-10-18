@@ -5,10 +5,12 @@ public readonly struct EnemyDecision
 {
     public EnemyActionType Action { get; }
     public EnemyAttackData Attack { get; }
-    public EnemyDecision(EnemyActionType action, EnemyAttackData attack = null)
+    public EnemyAttackPattern Pattern { get; }
+    public EnemyDecision(EnemyActionType action, EnemyAttackData attack = null, EnemyAttackPattern pattern = null)
     {
         Action = action;
-        Attack = IsAttackAction(action) ? attack : null;
+        Pattern = IsAttackAction(action) ? pattern : null;
+        Attack = IsAttackAction(action) && Pattern == null ? attack : null;
     }
     public static bool IsAttackAction(EnemyActionType action) =>
         action == EnemyActionType.Slash || action == EnemyActionType.Slash2 ||
@@ -44,7 +46,7 @@ public sealed class EnemyDecisionMaker
         {
             float weight = Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack);
             if (weight <= 0) continue;
-            fallback = new EnemyDecision(candidate.Action, candidate.Attack);
+            fallback = new EnemyDecision(candidate.Action, candidate.Attack, candidate.Pattern);
             remaining -= weight;
             if (remaining < 0) return fallback;
         }
@@ -56,8 +58,11 @@ public sealed class EnemyDecisionMaker
         float weight = candidate.Weight;
         if (float.IsNaN(weight) || float.IsInfinity(weight) || weight <= 0f) return 0f;
         if ((int)candidate.Action < (int)EnemyActionType.Approach || (int)candidate.Action > (int)EnemyActionType.Wait) return 0f;
-        bool repeat = perAttack && EnemyDecision.IsAttackAction(candidate.Action) && candidate.Attack != null
-            ? candidate.Attack == last.Attack : candidate.Action == last.Action;
+        if (candidate.Pattern != null && (!EnemyDecision.IsAttackAction(candidate.Action) || !candidate.Pattern.IsValid)) return 0f;
+        bool repeat = candidate.Action == last.Action;
+        if (perAttack && candidate.Pattern != null) repeat = candidate.Pattern == last.Pattern;
+        else if (perAttack && EnemyDecision.IsAttackAction(candidate.Action) && candidate.Attack != null)
+            repeat = last.Pattern == null && candidate.Attack == last.Attack;
         return repeat ? weight * penalty : weight;
     }
 }
