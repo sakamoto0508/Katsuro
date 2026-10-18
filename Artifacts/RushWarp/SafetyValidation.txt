@@ -1,0 +1,72 @@
+PASS Rush valid independent Pattern and AttackData
+PASS Rush Humanoid/root/state playback ownership
+PASS Rush one strike and one completion
+PASS Rush windup precedes damage window
+PASS Rush independent trigger transition
+PASS Rush isolated AI test config
+PASS Warp valid independent Pattern and AttackData
+PASS Warp Humanoid/root/state playback ownership
+PASS Warp one strike and one completion
+PASS Warp windup precedes damage window
+PASS Warp independent trigger transition
+PASS Warp isolated AI test config
+PASS Warp departure has no hit/root callbacks
+PASS Warp existing smoke and SE references resolve
+PASS Rush eligible at 4m
+PASS Rush excluded before draw outside min/max
+PASS Cooldown/unavailable predicate filters before draw
+PASS Selection weights respected: Rush=3001/4000 (3:1)
+PASS RepeatPenalty retained for rush
+PASS Clear behind point on temporary navmesh
+PASS Wall overlap rejected
+PASS Unbaked wall between player and destination rejected
+PASS Cliff/outside navmesh rejected
+PASS Navmesh edge capsule clearance rejected
+PASS Behind uses horizontal player forward
+PASS Moving player yields updated destination
+INFO before hold agent=True active=True onMesh=False rb=(10000.00, 0.00, 10004.00) target=(10002.00, 0.05, 9997.50)
+PASS Unregistered Edit Mode Agent.Warp fails closed and retains source
+PASS Agent enabled ownership restored after failed warp
+PASS Invalid teleport leaves source position
+PASS Rush maximum travel clamps accumulated path
+PASS Rush cannot exceed budget on later frames
+PASS HitStop discards pending movement
+PASS Rush wall sweep stops before collider
+PASS Rush player capsule sweep stops before overlap
+PASS Warp begins with a valid destination
+INFO Explicit arrival boundary in Edit Mode; native Agent.Warp success unverified
+PASS Vanish occurs at source with hitbox disabled
+PASS Reappearance precedes first damage by visible windup: 0.5833328
+PASS Warp strike deduplicates repeated contact
+PASS Warp completion releases AI/root/agent
+PASS Cooldown persists after successful warp
+PASS Warp begins with a valid destination
+PASS counter test reaches vanish
+PASS HitStop freezes hidden interval counter
+PASS Warp cleanup counter
+PASS Warp begins with a valid destination
+PASS death test reaches vanish
+PASS HitStop freezes hidden interval death
+PASS Warp cleanup death
+PASS Warp begins with a valid destination
+PASS disable test reaches vanish
+PASS HitStop freezes hidden interval disable
+PASS Warp cleanup disable
+PASS Warp begins with a valid destination
+PASS combat test reaches vanish
+PASS HitStop freezes hidden interval combat
+PASS Warp cleanup combat
+PASS Warp begins with a valid destination
+PASS blocked test reaches vanish
+PASS HitStop freezes hidden interval blocked
+PASS Late invalid destination aborts at source
+PASS Warp cleanup blocked
+PASS Warp begins with a valid destination
+PASS missing test reaches vanish
+PASS HitStop freezes hidden interval missing
+INFO Explicit arrival boundary in Edit Mode; native Agent.Warp success unverified
+PASS Warp cleanup missing
+PASS Warp begins with a valid destination
+PASS Cancellation restores exact original renderer enabled values
+PASS Warp begins with a valid destination
+PASS Destination invalid before vanish aborts while visible

@@ -104,6 +104,8 @@ Assets/Mock/Animation/*
 Assets/Mock/Animation/Enemy/*
 !Assets/Mock/Animation/Enemy/UAL2Combos/
 !Assets/Mock/Animation/Enemy/UAL2Combos.meta
+!Assets/Mock/Animation/Enemy/SpecialAttacks/
+!Assets/Mock/Animation/Enemy/SpecialAttacks.meta
 Assets/Plugins/
 Assets/INab Studio/
 AgentScripts/

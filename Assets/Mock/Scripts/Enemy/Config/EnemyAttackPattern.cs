@@ -20,12 +20,32 @@ public sealed class EnemyAttackPattern : ScriptableObject
     public float PlaybackSpeed = 1f;
     [Min(0f), Tooltip("このコンボだけの水平Root Motion倍率。通常単発の共通倍率は変更しない。")]
     public float RootMotionScale = .18f;
-    public float WindupSpeed => WindupDuration > 0f && WindupEndTime > 0f
-        ? WindupEndTime / WindupDuration : PlaybackSpeed;
+    [Header("Selection / travel")]
+    [Min(0f)] public float MinAttackDistance;
+    [Min(0f)] public float MaxAttackDistance = 1000f;
+    [Min(0f)] public float Cooldown;
+    [Min(0f), Tooltip("水平Root Motionの累計移動距離の上限。0は制限なし。")]
+    public float MaximumTravelDistance;
+    [Header("WarpAttack only")]
+    [Min(.1f)] public float TeleportDistance = 2.5f;
+    [Range(-90f, 90f)] public float TeleportAngleOffset;
+    [Min(0f)] public float DisappearDuration = .18f;
+    [Min(.1f), Tooltip("再出現後の攻撃予兆。WarpではWindupDurationは消失前、こちらは出現後の構え時間。")]
+    public float ReappearWindupDuration = .5f;
+    public AudioClip DisappearSound;
+    public AudioClip ReappearSound;
+    public GameObject WarpEffectPrefab;
+    public bool IsWarp => Attack != null && Attack.ActionType == EnemyActionType.WarpAttack;
+    public float ActiveWindupDuration => IsWarp ? ReappearWindupDuration : WindupDuration;
+    public float WindupSpeed => ActiveWindupDuration > 0f && WindupEndTime > 0f
+        ? WindupEndTime / ActiveWindupDuration : PlaybackSpeed;
     public int StateHash => Animator.StringToHash(AnimatorState ?? "");
     public bool IsValid => Attack != null && !string.IsNullOrWhiteSpace(Attack.AnimatorTrigger) &&
         !string.IsNullOrWhiteSpace(AnimatorState) && Valid(WindupDuration) && Valid(WindupEndTime) && Valid(RecoveryDuration) &&
-        Valid(Timeout) && Timeout > 0f && Valid(RootMotionScale) &&
+        Valid(Timeout) && Timeout > 0f && Valid(RootMotionScale) && Valid(Cooldown) &&
+        Valid(MinAttackDistance) && Valid(MaxAttackDistance) && MaxAttackDistance >= MinAttackDistance && Valid(MaximumTravelDistance) &&
+        (!IsWarp || (Valid(TeleportDistance) && TeleportDistance > 0f && float.IsFinite(TeleportAngleOffset) &&
+            Mathf.Abs(TeleportAngleOffset) <= 90f && Valid(DisappearDuration) && Valid(ReappearWindupDuration) && ReappearWindupDuration >= .1f)) &&
         float.IsFinite(PlaybackSpeed) && PlaybackSpeed >= .5f && PlaybackSpeed <= 1.5f;
     private static bool Valid(float value) => float.IsFinite(value) && value >= 0f;
 }

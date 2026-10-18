@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c8281621f51e584e805354391e86623, type: 3}
+  m_Name: EnemyDecisionConfig_WarpAttackTest
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDecisionConfig
+  FarDistance: 12
+  NearDistance: 3
+  ObserveSeconds: 0.3
+  ReconsiderInterval: 0.5
+  WeightWarpAttack: 10
+  WeightApproach: 30
+  WeightRush: 30
+  WeightObserve: 20
+  WeightSlash: 50
+  WeightBackstep: 20
+  RepeatPenalty: 1
+  RepeatPenaltyPerAttack: 0
+  FarCandidates:
+  - Action: 8
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
+    Weight: 1
+  MidCandidates:
+  - Action: 8
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
+    Weight: 1
+  NearCandidates:
+  - Action: 8
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
+    Weight: 1

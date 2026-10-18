@@ -1,0 +1,20 @@
+isPlaying=false isCompiling=false scriptCompilationFailed=false
+PASS task-start hash unchanged Assets/Mock/Scenes/GameScene.unity
+PASS task-start hash unchanged Assets/Mock/Prefabs/Enemy.prefab
+PASS task-start hash unchanged Assets/Mock/ScriptableObjects/Enemy/UAL2Combos/RegularCombo.asset
+PASS task-start hash unchanged Assets/Mock/ScriptableObjects/Enemy/UAL2Combos/HeavyCombo.asset
+PASS task-start hash unchanged Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2RegularCombo.anim
+PASS task-start hash unchanged Assets/Mock/Animation/Enemy/UAL2Combos/EnemyUAL2HeavyCombo.anim
+PASS task-start hash unchanged Assets/Mock/ScriptableObjects/Enemy/EnemyDecisionConfig_ComboTest.asset
+PASS standalone clip Assets/Mock/Animation/Enemy/SpecialAttacks/EnemyWarpDeparture.anim
+PASS standalone clip Assets/Mock/Animation/Enemy/SpecialAttacks/EnemyWarpAttack.anim
+PASS standalone clip Assets/Mock/Animation/Enemy/SpecialAttacks/EnemyRushAttack.anim
+PASS Enemy prefab scripts resolve; user Scene override retained
+INFO Smoke prefab components=Transform,VisualEffect,VFXRenderer,VFXPropertyBinder,VFXLossyTransformBinder
+PASS smoke VFX bound to spawn transform
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/WarpAttackData.asset
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/EnemyDecisionConfig_WarpAttackTest.asset
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/WarpAttack.asset
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/RushAttackData.asset
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/RushAttack.asset
+PASS data Assets/Mock/ScriptableObjects/Enemy/SpecialAttacks/EnemyDecisionConfig_RushAttackTest.asset

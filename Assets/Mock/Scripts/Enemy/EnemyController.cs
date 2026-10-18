@@ -91,6 +91,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         if (_initialized) return;
         _initialized = true;
         _game = game; _audio = audio; _finalBlow = finalBlow; _loader = loader;
+        _attackTarget = playerPosition;
         _damageNumbers = damageNumbers;
         _combatFeedback = GetComponent<CombatFeedback>();
         if (_combatFeedback != null) _combatFeedback.Init(audio, vfxConfig, cameraManager, hitStop, false);
@@ -290,8 +291,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         }
         if (IsAttackPatternActive)
         {
-            ObserveAttackPatternAnimation();
-            _patternRunner.Tick(Time.deltaTime * (_animator != null ? Mathf.Max(0f, _animator.speed) : 1f));
+            TickAttackPattern(Time.deltaTime * (_animator != null ? Mathf.Max(0f, _animator.speed) : 1f));
         }
         // 終了Event欠落/Triggerに遷移がない場合も、実際の攻撃Stateを割り込まず復帰する。
         if (_attackCompletionPending && _animator != null)
@@ -333,6 +333,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                 case EnemyActionType.HeavySlash2:
                 case EnemyActionType.Thrust:
                 case EnemyActionType.WarpAttack:
+                case EnemyActionType.RushAttack:
                     _mover?.FacePlayerInstant();
                     _mover?.HoldMovementForAttack();
                     if (decision.Pattern != null)

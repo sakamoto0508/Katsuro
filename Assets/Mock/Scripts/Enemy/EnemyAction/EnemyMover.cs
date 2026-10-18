@@ -54,6 +54,32 @@ public class EnemyMover
         _attackRootMotionScaleOverride = scale.HasValue && float.IsFinite(scale.Value) ? Mathf.Max(0f, scale.Value) : null;
     }
     private Vector3 _pendingAttackRootMotion;
+    private float _maximumAttackTravel, _attackTravel;
+    public void SetAttackTravelLimit(float maximum) { _maximumAttackTravel = Mathf.Max(0f, maximum); _attackTravel = 0f; }
+    public bool CanTeleportDuringAttack => _agent != null && _rb != null &&
+        (_agent.enabled || (_isMovementHeldForAttack && _prevAgentEnabled));
+    /// <summary>攻撃hold中だけAgent.Warpで移動し、結果を剛体へ同期。失敗時は元位置へ戻す。</summary>
+    public bool TryTeleportDuringAttack(Vector3 target)
+    {
+        if (!_isMovementHeldForAttack || !CanTeleportDuringAttack || !_rb.isKinematic ||
+            !float.IsFinite(target.x) || !float.IsFinite(target.y) || !float.IsFinite(target.z)) return false;
+        EndAttackRootMotion();
+        Vector3 origin = _rb.position;
+        bool success = false;
+        try
+        {
+            _agent.enabled = true;
+            success = _agent.isActiveAndEnabled && _agent.Warp(target) && _agent.isOnNavMesh;
+            if (!success && _agent.isActiveAndEnabled) _agent.Warp(origin);
+        }
+        finally
+        {
+            _agent.enabled = false;
+            _rb.position = success ? target : origin;
+            _enemyTransform.position = _rb.position;
+        }
+        return success;
+    }
     public bool IsUsingAttackRootMotion => _usingRootMotionAttack;
     /// <summary>攻撃の移動停止中だけ水平Root Motionを受け付ける。被弾と後退移動が優先中なら開始しない。</summary>
     public void BeginAttackRootMotion()
@@ -76,6 +102,7 @@ public class EnemyMover
         var delta = AttackRootMotionPhysics.LimitDisplacement(_rb, _pendingAttackRootMotion);
         _pendingAttackRootMotion = Vector3.zero;
         if (_rb == null) return;
+        if (_maximumAttackTravel > 0f) delta = Vector3.ClampMagnitude(delta, Mathf.Max(0f, _maximumAttackTravel - _attackTravel));
         // Retain the attack hold's kinematic Rigidbody and sweep before MovePosition.
         var position = _rb.position;
         UnityEngine.AI.NavMeshHit hit;
@@ -86,7 +113,9 @@ public class EnemyMover
             if (UnityEngine.AI.NavMesh.Raycast(start.position, start.position + delta, out hit, _agent.areaMask))
             { delta = hit.position - position; delta.y = 0f; }
         }
+        if (_maximumAttackTravel > 0f) delta = Vector3.ClampMagnitude(delta, Mathf.Max(0f, _maximumAttackTravel - _attackTravel));
         _rb.MovePosition(position + delta);
+        _attackTravel += delta.magnitude;
     }
     private bool _isStepBack;
     private bool _isPatrolWalking;
@@ -365,8 +394,12 @@ public class EnemyMover
         // 保存して無効化
         _prevAgentUpdatePosition = _agent.updatePosition;
         _agent.updatePosition = false;
-        _agent.isStopped = true;
-        try { _agent.velocity = Vector3.zero; _agent.nextPosition = _enemyTransform.position; } catch {}
+        if (_agent.isActiveAndEnabled && _agent.isOnNavMesh)
+        {
+            _agent.isStopped = true;
+            _agent.velocity = Vector3.zero;
+            _agent.nextPosition = _enemyTransform.position;
+        }
 
         // 完全に NavMeshAgent の干渉を避けるためコンポーネント自体を無効化しておく
         _prevAgentEnabled = _agent.enabled;

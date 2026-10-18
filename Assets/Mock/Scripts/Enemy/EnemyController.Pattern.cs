@@ -4,7 +4,21 @@ using UnityEngine;
 public partial class EnemyController
 {
     private EnemyAttackPatternRunner _patternRunner;
-    public bool IsAttackPatternActive => _patternRunner != null && _patternRunner.IsActive;
+    private Transform _attackTarget;
+    private readonly System.Collections.Generic.Dictionary<EnemyAttackPattern, float> _patternCooldowns = new();
+    public bool CanSelectAttackCandidate(EnemyDecisionConfig.ActionWeight candidate) => candidate.Pattern == null || CanUseAttackPattern(candidate.Pattern);
+    private bool CanUseAttackPattern(EnemyAttackPattern pattern)
+    {
+        if (pattern == null || !pattern.IsValid || (_patternCooldowns.TryGetValue(pattern, out float ready) && Time.time < ready)) return false;
+        if (_animator == null || _attacker == null || !_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
+        if (_attackTarget != null)
+        {
+            float distance = Vector3.Distance(transform.position, _attackTarget.position);
+            if (distance < pattern.MinAttackDistance || distance > pattern.MaxAttackDistance) return false;
+        }
+        return !pattern.IsWarp || TryFindWarpDestination(pattern, out _);
+    }
+    public bool IsAttackPatternActive => _preparingWarp != null || (_patternRunner != null && _patternRunner.IsActive);
 
     private void EnsurePatternRunner()
     {
@@ -19,16 +33,21 @@ public partial class EnemyController
         if (IsTraining || _dead || pattern == null || !pattern.IsValid || _animator == null || _attacker == null ||
             (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
         if (!_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
+        if (!CanUseAttackPattern(pattern)) return false;
         bool speedConfigured = false;
         foreach (var parameter in _animator.parameters)
             speedConfigured |= parameter.name == "EnemyComboPlaybackSpeed" && parameter.type == AnimatorControllerParameterType.Float;
         if (!speedConfigured) return false;
         EnsurePatternRunner();
         _attackCompletionPending = false;
-        if (!_patternRunner.Begin(pattern)) return false;
+        if (IsAttackPatternActive) return false;
+        if (pattern.IsWarp && !BeginWarpPreparation(pattern)) return false;
+        if (!pattern.IsWarp && !_patternRunner.Begin(pattern)) return false;
         _mover?.SetAttackRootMotionScale(pattern.RootMotionScale);
+        _mover?.SetAttackTravelLimit(pattern.MaximumTravelDistance);
+        _patternCooldowns[pattern] = Time.time + pattern.Cooldown;
         _attacker.DisableWeaponHitbox();
-        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.WindupSpeed);
+        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.IsWarp ? .1f / Mathf.Max(.1f, pattern.WindupDuration) : pattern.WindupSpeed);
         return true;
     }
 
@@ -57,7 +76,8 @@ public partial class EnemyController
     public void CancelAttackPattern(bool resumeAI = false)
     {
         if (!IsAttackPatternActive) return;
-        var pattern = _patternRunner.Pattern;
+        var pattern = _preparingWarp != null ? _preparingWarp : _patternRunner.Pattern;
+        _preparingWarp = null;
         _patternRunner.Cancel();
         ClearPatternExecution();
         _mover?.ReleaseMovementAfterAttack();
@@ -81,6 +101,8 @@ public partial class EnemyController
         _attacker?.DisableWeaponHitbox();
         _mover?.EndAttackRootMotion();
         _mover?.SetAttackRootMotionScale(null);
+        _mover?.SetAttackTravelLimit(0f);
+        ClearWarpPresentation();
     }
 
     private void ObserveAttackPatternAnimation()
@@ -125,5 +147,9 @@ public partial class EnemyController
     public void AnimEvent_ComboSound(AnimationEvent evt)
     {
         if (AcceptPatternEvent(evt) && _patternRunner.WindowActive && _patternRunner.WindowIndex == evt.intParameter) _audio?.PlaySE(evt.stringParameter);
+    }
+    public void AnimEvent_StopAttackRootMotion(AnimationEvent evt)
+    {
+        if (AcceptPatternEvent(evt)) { _attackAnimationHash = 0; _mover?.EndAttackRootMotion(); }
     }
 }

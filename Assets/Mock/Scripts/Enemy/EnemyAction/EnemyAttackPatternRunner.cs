@@ -27,7 +27,7 @@ public sealed class EnemyAttackPatternRunner
         WindowActive = false;
         _elapsed = 0f;
         _started = false;
-        CurrentPhase = pattern.WindupDuration > 0f && pattern.WindupEndTime > 0f ? Phase.Windup : Phase.Playing;
+        CurrentPhase = pattern.ActiveWindupDuration > 0f && pattern.WindupEndTime > 0f ? Phase.Windup : Phase.Playing;
         return true;
     }
     public void Tick(float deltaTime)
@@ -46,7 +46,7 @@ public sealed class EnemyAttackPatternRunner
         {
             case Phase.Windup:
                 // Trigger未消費・Animator停止などでも永久Busyにしない。
-                if (_elapsed >= Pattern.WindupDuration + 1f) Finish(false);
+                if (_elapsed >= Pattern.ActiveWindupDuration + 1f) Finish(false);
                 break;
             case Phase.Playing:
                 if (_elapsed >= Pattern.Timeout / Pattern.PlaybackSpeed) Finish(false);

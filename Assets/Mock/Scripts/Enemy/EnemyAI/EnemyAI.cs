@@ -133,7 +133,7 @@ public class EnemyAI
         var action = _decisionMaker.DecideAction(
             distance,
             _lastDecision,
-            _config);
+            _config, _controller.CanSelectAttackCandidate);
 
         CombatLog.Trace($"AI decide {action.Action} / {(action.Pattern != null ? action.Pattern.PatternName : action.Attack?.name)}");
 
@@ -150,6 +150,7 @@ public class EnemyAI
         switch (action)
         {
             case EnemyActionType.WarpAttack:
+            case EnemyActionType.RushAttack:
                 _controller.EnqueueDecision(decision);
                 _state = EnemyState.Attack;
                 _isBusy = true;

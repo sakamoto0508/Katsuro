@@ -29,14 +29,26 @@ MonoBehaviour:
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
     Weight: 30
+  - Action: 8
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
+    Weight: 2
   MidCandidates:
   - Action: 0
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
-    Weight: 30
+    Weight: 20
   - Action: 2
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
+    Weight: 2
+  - Action: 10
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: c8401f7cbf64d09488842dc10309d5ee, type: 2}
+    Weight: 5
+  - Action: 8
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
     Weight: 5
   NearCandidates:
   - Action: 3

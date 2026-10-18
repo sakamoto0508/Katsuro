@@ -14,4 +14,5 @@ public enum EnemyActionType
     WarpAttack = 8,
     //様子見
     Wait = 9,
+    RushAttack = 10,
 }

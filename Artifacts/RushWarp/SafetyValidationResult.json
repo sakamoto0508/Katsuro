@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "command": "command run_script",
+  "data": {
+    "command": "run_script",
+    "parameters": {
+      "file": "Artifacts/RushWarp/ValidateSafety.cs",
+      "entry": "ValidateSafety.Run",
+      "timeout_ms": "60000"
+    },
+    "result": {
+      "diagnostics": [],
+      "compileMs": 480,
+      "executeMs": 400,
+      "assemblyName": "PipelineRunScript_ValidateSafety_6c88bca073b24326969cbf21ed7cbd48",
+      "success": true,
+      "result": null
+    },
+    "target": {
+      "host": "127.0.0.1",
+      "port": 7800,
+      "projectPath": "C:\\Unity game\\Katsuro"
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

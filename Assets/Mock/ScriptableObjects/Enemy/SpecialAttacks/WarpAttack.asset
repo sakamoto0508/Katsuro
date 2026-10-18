@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06f256e550c8cdf4293581e661ce2957, type: 3}
+  m_Name: WarpAttack
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackPattern
+  PatternName: WarpAttack
+  Attack: {fileID: 11400000, guid: 20e4ec521fe8f9f4cbb498ebe06b2f5b, type: 2}
+  AnimatorState: Base Layer.Attacks.WarpAttack
+  WindupDuration: 0.35
+  WindupEndTime: 0.22
+  RecoveryDuration: 0.8
+  Timeout: 3
+  PlaybackSpeed: 0.9
+  RootMotionScale: 0.7
+  MinAttackDistance: 3
+  MaxAttackDistance: 18
+  Cooldown: 8
+  MaximumTravelDistance: 2
+  TeleportDistance: 2.5
+  TeleportAngleOffset: 0
+  DisappearDuration: 0.18
+  ReappearWindupDuration: 0.5
+  DisappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
+  ReappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
+  WarpEffectPrefab: {fileID: 991693034936716336, guid: 8e8d75741e69ca441bffcbae797e900d, type: 3}

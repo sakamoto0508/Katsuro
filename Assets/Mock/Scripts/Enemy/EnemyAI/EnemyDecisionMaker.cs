@@ -15,7 +15,7 @@ public readonly struct EnemyDecision
     public static bool IsAttackAction(EnemyActionType action) =>
         action == EnemyActionType.Slash || action == EnemyActionType.Slash2 ||
         action == EnemyActionType.HeavySlash || action == EnemyActionType.HeavySlash2 ||
-        action == EnemyActionType.Thrust || action == EnemyActionType.WarpAttack;
+        action == EnemyActionType.Thrust || action == EnemyActionType.WarpAttack || action == EnemyActionType.RushAttack;
 }
 
 /// <summary>距離帯の候補から既存の重み付き抽選で行動と攻撃データを選ぶ。</summary>
@@ -29,22 +29,23 @@ public sealed class EnemyDecisionMaker
     public EnemyActionType Decide(float distance, EnemyActionType lastAction, EnemyDecisionConfig config) =>
         DecideAction(distance, new EnemyDecision(lastAction), config).Action;
 
-    public EnemyDecision DecideAction(float distance, EnemyDecision last, EnemyDecisionConfig config)
+    public EnemyDecision DecideAction(float distance, EnemyDecision last, EnemyDecisionConfig config,
+        System.Func<EnemyDecisionConfig.ActionWeight, bool> canUse = null)
     {
         var wait = new EnemyDecision(EnemyActionType.Wait);
-        if (config == null) return wait;
+        if (config == null || !float.IsFinite(distance) || distance < 0f) return wait;
         var candidates = distance > config.FarDistance ? config.FarCandidates
             : distance > config.NearDistance ? config.MidCandidates : config.NearCandidates;
         if (candidates == null) return wait;
         float penalty = float.IsNaN(config.RepeatPenalty) ? 1f : Mathf.Clamp01(config.RepeatPenalty);
         double total = 0;
-        foreach (var candidate in candidates) total += Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack);
+        foreach (var candidate in candidates) total += Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, canUse);
         if (total <= 0) return wait;
         double remaining = _rand.NextDouble() * total;
         var fallback = wait;
         foreach (var candidate in candidates)
         {
-            float weight = Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack);
+            float weight = Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, canUse);
             if (weight <= 0) continue;
             fallback = new EnemyDecision(candidate.Action, candidate.Attack, candidate.Pattern);
             remaining -= weight;
@@ -53,12 +54,17 @@ public sealed class EnemyDecisionMaker
         return fallback;
     }
 
-    private static float Weight(EnemyDecisionConfig.ActionWeight candidate, EnemyDecision last, float penalty, bool perAttack)
+    private static float Weight(EnemyDecisionConfig.ActionWeight candidate, EnemyDecision last, float penalty, bool perAttack,
+        float distance, System.Func<EnemyDecisionConfig.ActionWeight, bool> canUse)
     {
         float weight = candidate.Weight;
         if (float.IsNaN(weight) || float.IsInfinity(weight) || weight <= 0f) return 0f;
-        if ((int)candidate.Action < (int)EnemyActionType.Approach || (int)candidate.Action > (int)EnemyActionType.Wait) return 0f;
+        if ((int)candidate.Action < 0 || (int)candidate.Action > (int)EnemyActionType.RushAttack) return 0f;
         if (candidate.Pattern != null && (!EnemyDecision.IsAttackAction(candidate.Action) || !candidate.Pattern.IsValid)) return 0f;
+        if (candidate.Pattern != null && (distance < candidate.Pattern.MinAttackDistance || distance > candidate.Pattern.MaxAttackDistance)) return 0f;
+        if ((candidate.Action == EnemyActionType.RushAttack || candidate.Action == EnemyActionType.WarpAttack) &&
+            (candidate.Pattern == null || candidate.Pattern.Attack.ActionType != candidate.Action)) return 0f;
+        if (canUse != null && !canUse(candidate)) return 0f;
         bool repeat = candidate.Action == last.Action;
         if (perAttack && candidate.Pattern != null) repeat = candidate.Pattern == last.Pattern;
         else if (perAttack && EnemyDecision.IsAttackAction(candidate.Action) && candidate.Attack != null)
