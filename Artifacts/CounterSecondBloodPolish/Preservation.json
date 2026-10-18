@@ -1,0 +1,50 @@
+[
+  {
+    "path": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Effects/JustAvoidCounterBlood.shader",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+    "unchanged": false
+  },
+  {
+    "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/ScriptableObjects/VFXConfig.asset",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Config/VFXConfig.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs",
+    "unchanged": true
+  },
+  {
+    "path": "Assets/Mock/Scripts/Feedback/SwordTrail.cs",
+    "unchanged": true
+  }
+]

@@ -1,0 +1,320 @@
+{
+  "playing": false,
+  "effects": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "duration": 0.43,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "speed": [
+            6.4,
+            7.6
+          ],
+          "size": [
+            0.105,
+            0.145
+          ],
+          "lifetime": [
+            0.23,
+            0.3
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 1.12
+            },
+            {
+              "t": 0.48,
+              "value": 1.0
+            },
+            {
+              "t": 0.8,
+              "value": 0.48
+            },
+            {
+              "t": 1.0,
+              "value": 0.06
+            }
+          ],
+          "count": 5.0,
+          "angle": 13.0,
+          "lengthScale": 7.0,
+          "velocityScale": 0.045
+        },
+        {
+          "name": "Dark Blood Drops",
+          "speed": [
+            2.3,
+            3.4
+          ],
+          "size": [
+            0.075,
+            0.105
+          ],
+          "lifetime": [
+            0.22,
+            0.31
+          ],
+          "delay": [
+            0.018,
+            0.032
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 0.9025
+            },
+            {
+              "t": 0.48,
+              "value": 0.688
+            },
+            {
+              "t": 0.8,
+              "value": 0.480000019
+            },
+            {
+              "t": 1.0,
+              "value": 0.35
+            }
+          ],
+          "count": 6.0,
+          "angle": 14.0,
+          "lengthScale": 1.8,
+          "velocityScale": 0.035
+        },
+        {
+          "name": "Late Fine Drops",
+          "speed": [
+            1.5,
+            2.4
+          ],
+          "size": [
+            0.026,
+            0.045
+          ],
+          "lifetime": [
+            0.24,
+            0.31
+          ],
+          "delay": [
+            0.055,
+            0.08
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 0.9025
+            },
+            {
+              "t": 0.48,
+              "value": 0.688
+            },
+            {
+              "t": 0.8,
+              "value": 0.480000019
+            },
+            {
+              "t": 1.0,
+              "value": 0.35
+            }
+          ],
+          "count": 7.0,
+          "angle": 19.0,
+          "lengthScale": 1.4,
+          "velocityScale": 0.035
+        }
+      ]
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "duration": 0.6,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "speed": [
+            8.2,
+            9.6
+          ],
+          "size": [
+            0.145,
+            0.195
+          ],
+          "lifetime": [
+            0.3,
+            0.38
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 1.12
+            },
+            {
+              "t": 0.48,
+              "value": 1.0
+            },
+            {
+              "t": 0.8,
+              "value": 0.48
+            },
+            {
+              "t": 1.0,
+              "value": 0.06
+            }
+          ],
+          "count": 7.0,
+          "angle": 18.0,
+          "lengthScale": 8.0,
+          "velocityScale": 0.055
+        },
+        {
+          "name": "Dark Blood Drops",
+          "speed": [
+            2.3,
+            4.4
+          ],
+          "size": [
+            0.09,
+            0.14
+          ],
+          "lifetime": [
+            0.22,
+            0.4
+          ],
+          "delay": [
+            0.035,
+            0.055
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 0.9025
+            },
+            {
+              "t": 0.48,
+              "value": 0.688
+            },
+            {
+              "t": 0.8,
+              "value": 0.480000019
+            },
+            {
+              "t": 1.0,
+              "value": 0.35
+            }
+          ],
+          "count": 9.0,
+          "angle": 18.0,
+          "lengthScale": 2.8,
+          "velocityScale": 0.035
+        },
+        {
+          "name": "Late Fine Drops",
+          "speed": [
+            1.5,
+            3.2
+          ],
+          "size": [
+            0.032,
+            0.055
+          ],
+          "lifetime": [
+            0.24,
+            0.43
+          ],
+          "delay": [
+            0.095,
+            0.135
+          ],
+          "sizeAtLife": [
+            {
+              "t": 0.0,
+              "value": 1.0
+            },
+            {
+              "t": 0.15,
+              "value": 0.9025
+            },
+            {
+              "t": 0.48,
+              "value": 0.688
+            },
+            {
+              "t": 0.8,
+              "value": 0.480000019
+            },
+            {
+              "t": 1.0,
+              "value": 0.35
+            }
+          ],
+          "count": 15.0,
+          "angle": 24.0,
+          "lengthScale": 1.4,
+          "velocityScale": 0.035
+        }
+      ]
+    }
+  ],
+  "mats": [
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+      "renderQueue": 3005,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+      "renderQueue": 3010,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "renderQueue": 3011,
+      "compiled": true,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "renderQueue": 3011,
+      "compiled": true,
+      "messages": []
+    }
+  ],
+  "scope": "Asset APIs, shader compiler and numeric curve inspection only. No Play Mode or visual test."
+}

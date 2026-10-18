@@ -1,0 +1,123 @@
+{
+    "MonoBehaviour": {
+        "m_Enabled": true,
+        "m_EditorHideFlags": 0,
+        "m_Name": "VFXConfig",
+        "m_EditorClassIdentifier": "Assembly-CSharp::VFXConfig",
+        "_lightBlood": {
+            "StreakCount": 3,
+            "DropletCount": 4,
+            "Width": 1.25,
+            "Speed": 1.0,
+            "Length": 1.0,
+            "Lifetime": 1.0,
+            "DirectionBias": 0.15000000596046449,
+            "SpawnOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        "_heavyBlood": {
+            "StreakCount": 4,
+            "DropletCount": 6,
+            "Width": 1.5,
+            "Speed": 1.149999976158142,
+            "Length": 1.25,
+            "Lifetime": 1.100000023841858,
+            "DirectionBias": 0.20000000298023225,
+            "SpawnOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        "_counterPresentation": {
+            "fileID": 11400000,
+            "guid": "bcade4df1e61f7d438a3c3ecef1a7767",
+            "type": 2
+        },
+        "_screenDistortionEnable": true,
+        "_distortionDuration": 0.14000000059604646,
+        "_distortionMaxRadius": 1.149999976158142,
+        "_distortionRadiusSpeed": 1.600000023841858,
+        "_distortionRingWidth": 0.029999999329447748,
+        "_distortionStrength": 0.006000000052154064,
+        "_distortionNoiseStrength": 0.0010000000474974514,
+        "_distortionNoiseScale": 24.0,
+        "_distortionFadePower": 1.5,
+        "_distortionEdgeTint": {
+            "r": 0.8999999761581421,
+            "g": 0.949999988079071,
+            "b": 1.0,
+            "a": 1.0
+        },
+        "_distortionEdgeTintStrength": 0.0,
+        "_justAvoidShockwavePrefab": {
+            "fileID": 3032302795391208821,
+            "guid": "2d005552031c1e446b7cad9273902f91",
+            "type": 3
+        },
+        "_shockwaveDuration": 0.25,
+        "_shockwaveEnable": false,
+        "_shockwaveStrength": 0.20000000298023225,
+        "_shockwaveSize": 0.5,
+        "_hitVFX": {
+            "fileID": 6802810917159284204,
+            "guid": "0606e9ce5afba844d8f73096112372ce",
+            "type": 3
+        },
+        "_hitVFXDuration": 0.41999998688697817,
+        "_heavyHitVFXAmount": 1.399999976158142,
+        "_heavyHitVFXSpread": 1.0499999523162842,
+        "_heavyHitVFXSize": 1.1200000047683716,
+        "_heavyHitVFXScale": 1.149999976158142,
+        "_heavyHitVFXSpeed": 1.25,
+        "_counterHitVFXSpeed": 1.399999976158142,
+        "_counterHitVFXSize": 0.8999999761581421,
+        "_counterHitVFXAmount": 1.2000000476837159,
+        "_counterHitVFXSpread": 0.44999998807907107,
+        "_counterContactIntensity": 3.200000047683716,
+        "_counterBloodLifetime": 0.7799999713897705,
+        "_counterBloodStreakLength": 1.2999999523162842,
+        "_counterBloodTint": {
+            "r": 0.550000011920929,
+            "g": 0.024000000208616258,
+            "b": 0.03500000014901161,
+            "a": 0.8500000238418579
+        },
+        "_contactFlashSizes": {
+            "x": 0.06499999761581421,
+            "y": 0.08500000089406967,
+            "z": 0.09000000357627869
+        },
+        "_contactFlashDurations": {
+            "x": 0.017999999225139619,
+            "y": 0.02800000086426735,
+            "z": 0.02500000037252903
+        },
+        "_contactFlashStrengths": {
+            "x": 0.20000000298023225,
+            "y": 0.3199999928474426,
+            "z": 0.6200000047683716
+        },
+        "_slashLineLengths": {
+            "x": 0.41999998688697817,
+            "y": 0.699999988079071,
+            "z": 0.6200000047683716
+        },
+        "_slashLineWidths": {
+            "x": 0.012000000104308129,
+            "y": 0.017999999225139619,
+            "z": 0.012000000104308129
+        },
+        "_slashLineDurations": {
+            "x": 0.054999999701976779,
+            "y": 0.08500000089406967,
+            "z": 0.054999999701976779
+        },
+        "_playEffectHeal": "Heal",
+        "_playEffectGhost": "Ghost",
+        "_playEffectBuff": "Buff"
+    }
+}

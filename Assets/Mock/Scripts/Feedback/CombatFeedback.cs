@@ -102,6 +102,9 @@ public sealed class CombatFeedback : MonoBehaviour
     private ParticleSystem.MinMaxGradient[][] _hitColors;
     private float[][] _hitLengths;
     private ParticleSystemRenderer[][] _hitSlashRenderers;
+    private Vector3[][] _hitLocalPositions;
+    private Quaternion[][] _hitLocalRotations;
+    private byte[][] _hitBloodKinds;
     private GameObject[] _hitRoots;
     private float[] _hitStarted;
     private int _nextHit;
@@ -433,10 +436,15 @@ public sealed class CombatFeedback : MonoBehaviour
         GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
         float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
         bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
+        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
+        bool bloodOnly = info.IsJustAvoidCounter && counterPresentation != null && counterPresentation.IsBloodOnlyDebug;
+        Vector3 counterBloodDirection = info.SlashDirection;
         if (info.IsJustAvoidCounter && info.Instigator != null)
         {
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
-            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection);
+            var trail = info.Instigator.GetComponentInChildren<SwordTrail>(true);
+            Vector3 measured = trail != null ? trail.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection) : Vector3.zero;
+            if (measured.sqrMagnitude > .0001f) counterBloodDirection = measured;
         }
         if (_enemyOwner != null)
         {
@@ -463,7 +471,7 @@ public sealed class CombatFeedback : MonoBehaviour
             {
                 // 追撃専用の被弾Poseを全身の旧Flashで覆わず、閃光の中心を接触点へ限定する。
                 _hitUntil = 0f;
-                BeginNormalHitFlash(!info.IsCounterFirst);
+                if (!bloodOnly) BeginNormalHitFlash(!info.IsCounterFirst);
             }
         }
         else
@@ -475,23 +483,31 @@ public sealed class CombatFeedback : MonoBehaviour
         }
         Refresh();
         Vector3 contact = _vfxConfig != null ? _vfxConfig.GetContactFlashStyle(info.IsHeavy, info.IsJustAvoidCounter) : new Vector3(.075f, .025f, .3f);
-        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
         if (info.IsCounterFirst && counterPresentation != null) contact = counterPresentation.FirstContact;
         Color contactTint = new Color(.93f, .96f, 1f);
         if (info.IsJustAvoidCounter && !info.IsCounterFirst && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
         contactTint.a = 1f;
         var cuts = info.IsCounterFirst ? _counterFirstCuts : _counterCuts;
         bool dedicatedCut = info.IsJustAvoidCounter && cuts != null;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (bloodOnly)
+        {
+            var source = counterPresentation.GetCFX(info.CounterStrike);
+            Debug.Log($"[CounterBlood] Request stage={info.CounterStrike} dedicatedPool={dedicatedCut} prefab={(source != null ? source.name : "NULL")} point={info.HitPoint:F3} direction={counterBloodDirection:F3}", this);
+            if (!dedicatedCut) Debug.LogWarning("[CounterBlood] Dedicated Blood pool missing. Mixed fallback HitVFX is suppressed in BloodOnly; check Counter Config / CFX references.", this);
+        }
+#endif
         if (dedicatedCut)
         {
             int slot = info.IsCounterFirst ? _nextCounterFirstCut : _nextCounterCut;
-            cuts[slot].Play(info.HitPoint, info.SlashDirection, info.HitNormal);
-            if (cuts[slot].UsesLocalContactFlash)
+            cuts[slot].ConfigureDebug(counterPresentation, info.CounterStrike);
+            cuts[slot].Play(info.HitPoint, counterBloodDirection, info.HitNormal);
+            if (!bloodOnly && cuts[slot].UsesLocalContactFlash)
                 _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
             if (info.IsCounterFirst) _nextCounterFirstCut = (slot + 1) % cuts.Length;
             else _nextCounterCut = (slot + 1) % cuts.Length;
         }
-        else
+        else if (!bloodOnly)
         {
             _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
             PlayHitVFX(info);
@@ -534,6 +550,9 @@ public sealed class CombatFeedback : MonoBehaviour
         _hitColors = new ParticleSystem.MinMaxGradient[4][];
         _hitLengths = new float[4][];
         _hitSlashRenderers = new ParticleSystemRenderer[4][];
+        _hitLocalPositions = new Vector3[4][];
+        _hitLocalRotations = new Quaternion[4][];
+        _hitBloodKinds = new byte[4][];
         for (int i = 0; i < 4; i++)
         {
             _hitRoots[i] = new GameObject("Contact VFX"); _hitRoots[i].SetActive(false);
@@ -548,9 +567,16 @@ public sealed class CombatFeedback : MonoBehaviour
             _hitColors[i] = new ParticleSystem.MinMaxGradient[_hitParticles[i].Length];
             _hitLengths[i] = new float[_hitParticles[i].Length];
             _hitSlashRenderers[i] = new ParticleSystemRenderer[_hitParticles[i].Length];
+            _hitLocalPositions[i] = new Vector3[_hitParticles[i].Length];
+            _hitLocalRotations[i] = new Quaternion[_hitParticles[i].Length];
+            _hitBloodKinds[i] = new byte[_hitParticles[i].Length];
             for (int j = 0; j < _hitParticles[i].Length; j++)
             {
                 var particle = _hitParticles[i][j];
+                _hitLocalPositions[i][j] = particle.transform.localPosition;
+                _hitLocalRotations[i][j] = particle.transform.localRotation;
+                string particleName = particle.name;
+                _hitBloodKinds[i][j] = particleName == "BloodStreaks" ? (byte)1 : particleName == "BloodDroplets" ? (byte)2 : (byte)0;
                 var emission = particle.emission;
                 _hitBursts[i][j] = new ParticleSystem.Burst[emission.burstCount];
                 emission.GetBursts(_hitBursts[i][j]);
@@ -600,6 +626,15 @@ public sealed class CombatFeedback : MonoBehaviour
             particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             // 再利用時もPrefabの初期値から計算し、強攻撃の倍率が蓄積しないようにする。
             bool slash = _hitSlashRenderers[i][j] != null;
+            byte bloodKind = _hitBloodKinds[i][j];
+            bool normalBlood = !info.IsJustAvoidCounter && _enemyOwner != null && bloodKind != 0;
+            var bloodStyle = normalBlood ? _vfxConfig.GetNormalBloodStyle(info.IsHeavy) : null;
+            // Always restore cached poses before applying a Blood-only presentation offset.
+            if (!slash)
+            {
+                particle.transform.localPosition = _hitLocalPositions[i][j];
+                particle.transform.localRotation = _hitLocalRotations[i][j];
+            }
             float amount = slash ? 1f : info.IsJustAvoidCounter ? _vfxConfig.CounterHitVFXAmount : strongFeedback ? _vfxConfig.HeavyHitVFXAmount : 1f;
             if (info.IsCounterFirst && !slash && _vfxConfig.CounterPresentation != null) amount *= _vfxConfig.CounterPresentation.FirstBloodAmount;
             // 煙状の血だけ控えめにし、被弾姿勢と接触位置を隠さない。
@@ -615,6 +650,8 @@ public sealed class CombatFeedback : MonoBehaviour
                 else if (count.mode == ParticleSystemCurveMode.TwoConstants)
                 { count.constantMin = Mathf.RoundToInt(count.constantMin); count.constantMax = Mathf.RoundToInt(count.constantMax); }
                 burst.count = count;
+                if (normalBlood && b == 0)
+                    burst.count = new ParticleSystem.MinMaxCurve(Mathf.Max(0, bloodKind == 1 ? bloodStyle.StreakCount : bloodStyle.DropletCount));
                 emission.SetBurst(b, burst);
             }
             var shape = particle.shape;
@@ -643,6 +680,17 @@ public sealed class CombatFeedback : MonoBehaviour
                 // Pool再利用ごとに元の長さへ戻し、追撃の筋だけ方向に沿って伸ばす。
                 var renderer = particle.GetComponent<ParticleSystemRenderer>();
                 renderer.lengthScale = _hitLengths[i][j] * (info.IsJustAvoidCounter && particle.name == "BloodStreaks" ? _vfxConfig.CounterBloodStreakLength : 1f);
+                if (normalBlood)
+                {
+                    main.startSize = ScaleHitCurve(_hitSizes[i][j], bloodStyle.Width);
+                    main.startSpeed = ScaleHitCurve(_hitSpeeds[i][j], bloodStyle.Speed);
+                    main.startLifetime = ScaleHitCurve(_hitLifetimes[i][j], bloodStyle.Lifetime);
+                    renderer.lengthScale = _hitLengths[i][j] * bloodStyle.Length;
+                    Vector3 bloodDirection = JustAvoidCounterCutVFX.ResolveBloodDirection(direction, info.HitNormal, bloodStyle.DirectionBias);
+                    Vector3 bloodPoint = JustAvoidCounterCutVFX.ResolveBloodSpawnPoint(info.HitPoint, direction, info.HitNormal, bloodStyle.SpawnOffset);
+                    Vector3 bloodUp = Mathf.Abs(Vector3.Dot(bloodDirection, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
+                    particle.transform.SetPositionAndRotation(bloodPoint, Quaternion.LookRotation(bloodDirection, bloodUp));
+                }
             }
             particle.Play(false);
         }

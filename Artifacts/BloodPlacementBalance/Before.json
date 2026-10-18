@@ -1,0 +1,392 @@
+{
+  "playing": false,
+  "effects": [
+    {
+      "path": "Assets/Mock/Effects/SwordHitVFX.prefab",
+      "rootActiveSelf": true,
+      "particles": [
+        {
+          "name": "BloodStreaks",
+          "activeSelf": true,
+          "parent": "SwordHitVFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            2.8,
+            4.2
+          ],
+          "size": [
+            0.035,
+            0.055
+          ],
+          "life": [
+            0.12,
+            0.19
+          ],
+          "delay": [
+            0.0,
+            0.012
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 23.0,
+          "lengthScale": 3.2,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/HitBlood.mat",
+          "shader": "Katsuro/HitBlood",
+          "count": [
+            5.0
+          ]
+        },
+        {
+          "name": "BloodDroplets",
+          "activeSelf": true,
+          "parent": "SwordHitVFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            2.2,
+            3.8
+          ],
+          "size": [
+            0.025,
+            0.055
+          ],
+          "life": [
+            0.2,
+            0.3
+          ],
+          "delay": [
+            0.0,
+            0.022
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 19.0,
+          "lengthScale": 1.5,
+          "velocityScale": 0.008,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/HitBlood.mat",
+          "shader": "Katsuro/HitBlood",
+          "count": [
+            8.0
+          ]
+        },
+        {
+          "name": "BloodMist",
+          "activeSelf": true,
+          "parent": "SwordHitVFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            0.4,
+            1.1
+          ],
+          "size": [
+            0.22,
+            0.35
+          ],
+          "life": [
+            0.14,
+            0.2
+          ],
+          "delay": [
+            0.0,
+            0.035
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 24.0,
+          "lengthScale": 3.8,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/HitBloodMist.mat",
+          "shader": "Katsuro/HitBlood",
+          "count": [
+            3.0
+          ]
+        },
+        {
+          "name": "SlashLine",
+          "activeSelf": true,
+          "parent": "SwordHitVFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            0.0,
+            0.3
+          ],
+          "size": [
+            0.0,
+            0.024
+          ],
+          "life": [
+            0.0,
+            0.1
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 15.0,
+          "lengthScale": 32.0,
+          "velocityScale": 0.0,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/HitSlash.mat",
+          "shader": "Katsuro/HitSlash",
+          "count": [
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+      "rootActiveSelf": false,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFirstCutCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            6.4,
+            7.6
+          ],
+          "size": [
+            0.105,
+            0.145
+          ],
+          "life": [
+            0.23,
+            0.3
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 13.0,
+          "lengthScale": 7.0,
+          "velocityScale": 0.045,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            5.0
+          ]
+        },
+        {
+          "name": "Dark Blood Drops",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFirstCutCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            2.3,
+            3.4
+          ],
+          "size": [
+            0.075,
+            0.105
+          ],
+          "life": [
+            0.22,
+            0.31
+          ],
+          "delay": [
+            0.018,
+            0.032
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 14.0,
+          "lengthScale": 1.8,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            6.0
+          ]
+        },
+        {
+          "name": "Late Fine Drops",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFirstCutCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            1.5,
+            2.4
+          ],
+          "size": [
+            0.026,
+            0.045
+          ],
+          "life": [
+            0.24,
+            0.31
+          ],
+          "delay": [
+            0.055,
+            0.08
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 19.0,
+          "lengthScale": 1.4,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            7.0
+          ]
+        }
+      ]
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+      "rootActiveSelf": false,
+      "particles": [
+        {
+          "name": "Crimson Threads",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFinisherCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            8.2,
+            9.6
+          ],
+          "size": [
+            0.145,
+            0.195
+          ],
+          "life": [
+            0.3,
+            0.38
+          ],
+          "delay": [
+            0.0,
+            0.0
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 18.0,
+          "lengthScale": 8.0,
+          "velocityScale": 0.055,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            7.0
+          ]
+        },
+        {
+          "name": "Dark Blood Drops",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFinisherCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            2.3,
+            4.4
+          ],
+          "size": [
+            0.09,
+            0.14
+          ],
+          "life": [
+            0.22,
+            0.4
+          ],
+          "delay": [
+            0.035,
+            0.055
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 18.0,
+          "lengthScale": 2.8,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            9.0
+          ]
+        },
+        {
+          "name": "Late Fine Drops",
+          "activeSelf": false,
+          "parent": "JustAvoidCounterFinisherCFX",
+          "localPosition": "(0, 0, 0)",
+          "localScale": "(1, 1, 1)",
+          "speed": [
+            1.5,
+            3.2
+          ],
+          "size": [
+            0.032,
+            0.055
+          ],
+          "life": [
+            0.24,
+            0.43
+          ],
+          "delay": [
+            0.095,
+            0.135
+          ],
+          "space": "World",
+          "playOnAwake": false,
+          "stop": "None",
+          "angle": 24.0,
+          "lengthScale": 1.4,
+          "velocityScale": 0.035,
+          "pivot": "(0, 0, 0)",
+          "freeformStretching": false,
+          "material": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+          "shader": "Katsuro/JustAvoidCounterBlood",
+          "count": [
+            15.0
+          ]
+        }
+      ]
+    }
+  ],
+  "colliders": [
+    {
+      "name": "Enemy",
+      "center": "(0, 0.91, 0)",
+      "radius": 0.38,
+      "height": 1.63,
+      "direction": 1
+    }
+  ]
+}

@@ -12,6 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 157182cc4f2fd9347ad4843885d70ffb, type: 3}
   m_Name: VFXConfig
   m_EditorClassIdentifier: Assembly-CSharp::VFXConfig
+  _lightBlood:
+    StreakCount: 3
+    DropletCount: 4
+    Width: 1.25
+    Speed: 1
+    Length: 1
+    Lifetime: 1
+    DirectionBias: 0.15
+    SpawnOffset: {x: 0, y: 0, z: 0}
+  _heavyBlood:
+    StreakCount: 4
+    DropletCount: 6
+    Width: 1.5
+    Speed: 1.15
+    Length: 1.25
+    Lifetime: 1.1
+    DirectionBias: 0.2
+    SpawnOffset: {x: 0, y: 0, z: 0}
   _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _screenDistortionEnable: 1
   _distortionDuration: 0.14

@@ -1,0 +1,195 @@
+{
+  "changed": [
+    "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+    "Assets/Mock/Effects/JustAvoidCounterBlood.shader",
+    "Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab",
+    "Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab",
+    "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "Assets/Mock/Scripts/Feedback/SwordTrail.cs"
+  ],
+  "parameterChanges": [
+    {
+      "strike": "First",
+      "emitter": "Crimson Threads",
+      "size": {
+        "before": [
+          0.07,
+          0.095
+        ],
+        "after": [
+          0.105,
+          0.145
+        ]
+      },
+      "delay": {
+        "before": 0,
+        "after": [
+          0,
+          0
+        ]
+      },
+      "angle": {
+        "before": 10,
+        "after": 13
+      },
+      "lengthScale": {
+        "before": 7.5,
+        "after": 7
+      }
+    },
+    {
+      "strike": "First",
+      "emitter": "Dark Blood Drops",
+      "size": {
+        "before": [
+          0.06,
+          0.09
+        ],
+        "after": [
+          0.075,
+          0.105
+        ]
+      },
+      "delay": {
+        "before": 0,
+        "after": [
+          0.018,
+          0.032
+        ]
+      },
+      "angle": {
+        "before": 14,
+        "after": 14
+      },
+      "lengthScale": {
+        "before": 1.8,
+        "after": 1.8
+      }
+    },
+    {
+      "strike": "First",
+      "emitter": "Late Fine Drops",
+      "size": {
+        "before": [
+          0.022,
+          0.04
+        ],
+        "after": [
+          0.026,
+          0.045
+        ]
+      },
+      "delay": {
+        "before": [
+          0.035,
+          0.05
+        ],
+        "after": [
+          0.055,
+          0.08
+        ]
+      },
+      "angle": {
+        "before": 19,
+        "after": 19
+      },
+      "lengthScale": {
+        "before": 1.4,
+        "after": 1.4
+      }
+    },
+    {
+      "strike": "Second",
+      "emitter": "Crimson Threads",
+      "size": {
+        "before": [
+          0.1,
+          0.135
+        ],
+        "after": [
+          0.145,
+          0.195
+        ]
+      },
+      "delay": {
+        "before": 0,
+        "after": [
+          0,
+          0
+        ]
+      },
+      "angle": {
+        "before": 14,
+        "after": 18
+      },
+      "lengthScale": {
+        "before": 9,
+        "after": 8
+      }
+    },
+    {
+      "strike": "Second",
+      "emitter": "Dark Blood Drops",
+      "size": {
+        "before": [
+          0.075,
+          0.12
+        ],
+        "after": [
+          0.09,
+          0.14
+        ]
+      },
+      "delay": {
+        "before": 0.012,
+        "after": [
+          0.035,
+          0.055
+        ]
+      },
+      "angle": {
+        "before": 18,
+        "after": 18
+      },
+      "lengthScale": {
+        "before": 2.8,
+        "after": 2.8
+      }
+    },
+    {
+      "strike": "Second",
+      "emitter": "Late Fine Drops",
+      "size": {
+        "before": [
+          0.024,
+          0.045
+        ],
+        "after": [
+          0.032,
+          0.055
+        ]
+      },
+      "delay": {
+        "before": [
+          0.065,
+          0.09
+        ],
+        "after": [
+          0.095,
+          0.135
+        ]
+      },
+      "angle": {
+        "before": 24,
+        "after": 24
+      },
+      "lengthScale": {
+        "before": 1.4,
+        "after": 1.4
+      }
+    }
+  ],
+  "particleCountsUnchanged": true,
+  "existingMaterialColorsGainDepthUnchanged": true,
+  "configAnimationsHitReactionSlashAssetsAndOtherInitialAssetsUnchanged": true
+}

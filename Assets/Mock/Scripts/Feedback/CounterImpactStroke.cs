@@ -110,5 +110,7 @@ internal sealed class CounterImpactStroke
         block.SetFloat(AgeId,age); renderer.SetPropertyBlock(block);
     }
     public void Hide() { active=false; renderer.enabled=false; }
+    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    public void SetDebugVisibility(bool hidden) { renderer.forceRenderingOff = hidden; }
     public void Dispose() { Object.Destroy(mesh); Object.Destroy(surface); }
 }

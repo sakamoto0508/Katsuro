@@ -4,6 +4,31 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
 public class VFXConfig : ScriptableObject
 {
+    [System.Serializable]
+    public sealed class NormalBloodStyle
+    {
+        [Min(0), Tooltip("SwordHitVFX/BloodStreaksの最初のBurst数。敵への通常攻撃だけ。")]
+        public int StreakCount = 3;
+        [Min(0), Tooltip("SwordHitVFX/BloodDropletsの最初のBurst数。")]
+        public int DropletCount = 4;
+        [Range(.25f, 2f), Tooltip("通常BloodのPrefabサイズ倍率。Heavyでは既存VFXルートScaleも掛かります。Slashには適用しません。")]
+        public float Width = 1.25f;
+        [Range(.25f, 2f), Tooltip("通常BloodのPrefab初速倍率。")]
+        public float Speed = 1f;
+        [Range(.25f, 2f), Tooltip("通常BloodのPrefab Stretch長倍率。")]
+        public float Length = 1f;
+        [Range(.5f, 1.5f), Tooltip("通常BloodのPrefab寿命倍率。Pool返却時間内に収めてください。")]
+        public float Lifetime = 1f;
+        [Range(0f, .5f), Tooltip("斬撃軸に直交する、攻撃者から離れる成分を追加する割合。")]
+        public float DirectionBias = .15f;
+        [Tooltip("Bloodだけの表示位置(m)。X=斬撃横成分の接線、Y=上、Z=攻撃者から離れる水平軸。合計最大0.10m。0でHitPointを維持。")]
+        public Vector3 SpawnOffset;
+    }
+    [Header("Enemy normal hit / Blood only (Counter uses its dedicated prefabs)")]
+    [SerializeField] private NormalBloodStyle _lightBlood = new NormalBloodStyle();
+    [SerializeField] private NormalBloodStyle _heavyBlood = new NormalBloodStyle
+        { StreakCount = 4, DropletCount = 6, Width = 1.5f, Speed = 1.15f, Length = 1.25f, Lifetime = 1.1f, DirectionBias = .2f };
+    public NormalBloodStyle GetNormalBloodStyle(bool heavy) => heavy ? _heavyBlood : _lightBlood;
     [Header("Just Avoid Counter / Two strikes")]
     [SerializeField] private JustAvoidCounterConfig _counterPresentation;
     public JustAvoidCounterConfig CounterPresentation => _counterPresentation;

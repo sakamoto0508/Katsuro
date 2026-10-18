@@ -287,8 +287,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.135
-      minScalar: 0.1
+      scalar: 0.10968749
+      minScalar: 0.081562504
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -665,7 +665,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 14
+    angle: 18
     length: 0.02
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -1047,20 +1047,47 @@ ParticleSystem:
           time: 0
           value: 1
           inSlope: 0
-          outSlope: -0.65
-          tangentMode: 0
+          outSlope: 0
+          tangentMode: 137
           weightedMode: 0
-          inWeight: 0
-          outWeight: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 0.12
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 137
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 0.35
+          value: 0.72
+          inSlope: -1.3333333
+          outSlope: -1.3333333
+          tangentMode: 137
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 0.6
+          value: 0.36
+          inSlope: -1.0153847
+          outSlope: -1.0153847
+          tangentMode: 137
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
-          value: 0.35
-          inSlope: -0.65
+          value: 0.06
+          inSlope: 0
           outSlope: 0
-          tangentMode: 0
+          tangentMode: 137
           weightedMode: 0
-          inWeight: 0
-          outWeight: 0
+          inWeight: 0.33333334
+          outWeight: 0.33333334
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
@@ -4869,7 +4896,7 @@ ParticleSystemRenderer:
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
   m_VelocityScale: 0.055
-  m_LengthScale: 9
+  m_LengthScale: 10.666667
   m_SortingFudge: 0
   m_NormalDirection: 1
   m_ShadowBias: 0
@@ -4950,8 +4977,8 @@ ParticleSystem:
   startDelay:
     serializedVersion: 2
     minMaxState: 3
-    scalar: 0.09
-    minScalar: 0.065
+    scalar: 0.135
+    minScalar: 0.095
     maxCurve:
       serializedVersion: 2
       m_Curve:
@@ -5181,8 +5208,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.045
-      minScalar: 0.024
+      scalar: 0.055
+      minScalar: 0.032
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9936,6 +9963,7 @@ MonoBehaviour:
   _minimumProjectedLength: 0.75
   _surfaceOffset: 0.025
   _bloodOutwardBias: 0.3
+  _bloodSpawnOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &8685955269296376921
 GameObject:
   m_ObjectHideFlags: 0
@@ -9991,9 +10019,9 @@ ParticleSystem:
   autoRandomSeed: 0
   startDelay:
     serializedVersion: 2
-    minMaxState: 0
-    scalar: 0.012
-    minScalar: 0
+    minMaxState: 3
+    scalar: 0.055
+    minScalar: 0.035
     maxCurve:
       serializedVersion: 2
       m_Curve:
@@ -10223,8 +10251,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.12
-      minScalar: 0.075
+      scalar: 0.14
+      minScalar: 0.09
       maxCurve:
         serializedVersion: 2
         m_Curve:

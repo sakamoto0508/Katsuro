@@ -1,0 +1,33 @@
+{
+  "changed": [
+    "Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs",
+    "Assets/Mock/Scripts/Feedback/CombatFeedback.cs",
+    "Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs",
+    "Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs",
+    "Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs",
+    "Assets/Mock/Scripts/Feedback/SwordTrail.cs"
+  ],
+  "variants": {
+    "Editor": {
+      "errors": 0,
+      "warnings": 9,
+      "diagnosticEnum": true,
+      "diagnosticLogStrings": true
+    },
+    "Development": {
+      "errors": 0,
+      "warnings": 9,
+      "diagnosticEnum": true,
+      "diagnosticLogStrings": true
+    },
+    "Release": {
+      "errors": 0,
+      "warnings": 9,
+      "diagnosticEnum": false,
+      "diagnosticLogStrings": false
+    }
+  },
+  "allInitialBloodAssetsUnchanged": true,
+  "allOtherInitialAssetsUnchanged": true,
+  "priorAKI112ChangesPreserved": true
+}

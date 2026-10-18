@@ -1,0 +1,91 @@
+diff --git a/Artifacts/CounterBloodActivation/Baseline/JustAvoidCounterCutVFX.cs b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+index 1d7f350..b814ad5 100644
+--- a/Artifacts/CounterBloodActivation/Baseline/JustAvoidCounterCutVFX.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+@@ -47,6 +47,7 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+ 
+     public void Play(Vector3 point, Vector3 slash, Vector3 normal, Camera viewingCamera = null)
+     {
++        LogBloodSnapshot("Acquired");
+         Stop();
+         if (_block == null) _block = new MaterialPropertyBlock();
+         if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
+@@ -75,12 +76,23 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         _cutRenderer.forceRenderingOff = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
+ #endif
+         gameObject.SetActive(true);
++        LogBloodSnapshot("RootEnabled");
++        // Both dedicated prefabs store the three Blood GameObjects inactive.
++        // They are direct children of this root; enabling the root alone cannot activate them.
++        // Keep the prepared world-space pose and playOnAwake=false, then explicitly play below.
++        ActivateBloodObjects();
++        LogBloodSnapshot("BloodEnabled");
+         _cutRenderer.enabled = !_useLocalContactFlash;
+         foreach (var ps in _blood) ps.Play(false);
+         LogBloodSnapshot("Play");
+         Tick();
+     }
+ 
++    private void ActivateBloodObjects()
++    {
++        foreach (var ps in _blood) ps.gameObject.SetActive(true);
++    }
++
+     public void Tick()
+     {
+         if (!_playing) return;
+@@ -88,10 +100,10 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+ #if UNITY_EDITOR || DEVELOPMENT_BUILD
+         bool bloodOnly = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
+         _cutRenderer.forceRenderingOff = bloodOnly;
+-        if (bloodOnly && _debugSample < 2 && age >= (_debugSample == 0 ? .05f : .18f))
++        while (bloodOnly && _debugSample < 3 && age >= (_debugSample == 0 ? .05f : _debugSample == 1 ? .1f : .2f))
+         {
+             _debugSample++;
+-            LogBloodSnapshot(_debugSample == 1 ? "After50ms" : "After180ms");
++            LogBloodSnapshot(_debugSample == 1 ? "After50ms" : _debugSample == 2 ? "After100ms" : "After200ms");
+         }
+ #endif
+         if (age >= _duration) { Stop(); return; }
+@@ -104,26 +116,27 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         }
+     }
+ 
+-    public void Stop()
++    public void Stop([System.Runtime.CompilerServices.CallerMemberName] string caller = "")
+     {
+         _playing = false;
+ #if UNITY_EDITOR || DEVELOPMENT_BUILD
+         if (_cutRenderer != null) _cutRenderer.forceRenderingOff = false;
+-        _debugSample = 2;
++        _debugSample = 3;
+ #endif
+         if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+         gameObject.SetActive(false);
++        LogBloodSnapshot("StopClearAndDeactivate", caller);
+     }
+ 
+     [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+-    private void LogBloodSnapshot(string phase)
++    private void LogBloodSnapshot(string phase, [System.Runtime.CompilerServices.CallerMemberName] string caller = "")
+     {
+ #if UNITY_EDITOR || DEVELOPMENT_BUILD
+         if (_debugConfig == null || !_debugConfig.IsBloodOnlyDebug) return;
+-        // Allocations and renderer lookups are restricted to three snapshots per diagnostic hit.
++        // Allocations and renderer lookups occur only at bounded diagnostic lifecycle checkpoints.
+         var text = new System.Text.StringBuilder(1024);
+         var camera = Camera.main;
+-        text.Append($"[CounterBlood] {phase} stage={_debugStrike} instance={name}#{GetInstanceID()} age={FeedbackVisualTime.Now - _started:F3}s position={transform.position:F3} direction={transform.forward:F3}");
++        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} instanceId={GetInstanceID()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
+         if (camera != null)
+             text.Append($" camera={camera.name} viewport={camera.WorldToViewportPoint(transform.position):F3} cameraDistance={Vector3.Distance(camera.transform.position, transform.position):F2}");
+         else text.Append(" camera=NULL");
+@@ -134,7 +147,7 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+             var renderer = ps.GetComponent<ParticleSystemRenderer>();
+             var material = renderer != null ? renderer.sharedMaterial : null;
+             var shader = material != null ? material.shader : null;
+-            text.Append($"\n{ps.name}: isPlaying={ps.isPlaying} isPaused={ps.isPaused} particleCount={ps.particleCount} active={ps.gameObject.activeInHierarchy}");
++            text.Append($"\n{ps.name}: blood.activeSelf={ps.gameObject.activeSelf} blood.activeInHierarchy={ps.gameObject.activeInHierarchy} isPlaying={ps.isPlaying} isEmitting={ps.isEmitting} isPaused={ps.isPaused} particleCount={ps.particleCount} emission.enabled={ps.emission.enabled}");
+             text.Append($" renderer={(renderer != null ? renderer.enabled.ToString() : "NULL")} forceOff={(renderer != null && renderer.forceRenderingOff)} material={(material != null ? material.name : "NULL")} shader={(shader != null ? shader.name : "NULL")} supported={(shader != null && shader.isSupported)}");
+             if (camera != null) text.Append($" cameraLayerVisible={((camera.cullingMask & (1 << ps.gameObject.layer)) != 0)}");
+         }

@@ -111,6 +111,7 @@ public sealed class SwordTrail : MonoBehaviour
         style = value;
         counterStrike = strike;
         if (value != AttackStyle.JustAvoidCounter) counterWindow = false;
+        counterSlash?.SetDebugVisibility(value == AttackStyle.JustAvoidCounter && _counterPresentation != null && _counterPresentation.IsBloodOnlyDebug);
     }
     /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
     public void SetActive(bool active)
@@ -123,10 +124,10 @@ public sealed class SwordTrail : MonoBehaviour
         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
     }
     /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
-    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
+    public Vector3 NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
     {
-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point, sweepDirection); return; }
-        if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
+        if (_sharedTrail != null && _sharedTrail != this) return _sharedTrail.NotifyCounterHit(strike, point, sweepDirection);
+        if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return Vector3.zero;
         counterSlash.Hit(point, FeedbackVisualTime.Now);
         float now=FeedbackVisualTime.Now;
         Vector3 recent=Vector3.zero;
@@ -142,6 +143,7 @@ public sealed class SwordTrail : MonoBehaviour
         Vector3 instantaneous=_tip!=null && hasPrevious && delta>.0001f && delta<=.08f
             ? ((_tip.position-previousTip)-ownerDelta)/delta : Vector3.zero;
         Vector3 direction=CounterImpactStroke.SelectMotionDirection(instantaneous,recent,sweepDirection,_minimumSpeed);
+        Vector3 physicalDirection = direction;
         Vector3 bladeAxis = _tip != null && _bladeBase != null ? _tip.position - _bladeBase.position : transform.up;
         var camera = Camera.main;
         Vector3 view = camera != null ? camera.transform.position - point : -transform.forward;
@@ -151,6 +153,8 @@ public sealed class SwordTrail : MonoBehaviour
             settings.StrokeMinProjection,settings.StrokeMaxProjectionAngle);
         counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
         captureCounterHit = true;
+        // Blood reuses the measured blade motion before the existing stroke-only camera correction.
+        return physicalDirection;
     }
     /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
     /// <returns>軌跡の描画リソースを使用可能になった場合はtrue。</returns>
@@ -245,7 +249,9 @@ public sealed class SwordTrail : MonoBehaviour
     /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
     private void LateUpdate()
     {
-        if (!initialized || mesh == null || FeedbackVisualTime.IsPaused) return;
+        if (!initialized || mesh == null) return;
+        counterSlash.SetDebugVisibility(style == AttackStyle.JustAvoidCounter && _counterPresentation != null && _counterPresentation.IsBloodOnlyDebug);
+        if (FeedbackVisualTime.IsPaused) return;
         UpdateCounterWindow();
         float now = FeedbackVisualTime.Now;
         counterSlash.Advance(now, times, count, ref previousTime);

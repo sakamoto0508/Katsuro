@@ -4,6 +4,22 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Config/Just Avoid Counter", fileName = "JustAvoidCounterConfig")]
 public sealed class JustAvoidCounterConfig : ScriptableObject
 {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    [Header("Counter VFX diagnostics (Editor / Development Build only)")]
+    [Tooltip("BloodOnlyは追撃1・2の血以外の命中VFXだけを隠します。白黒演出・HitStop・HitReactionは維持。比較時はPlayを停止して切り替えてください。")]
+    public CounterVFXDebugMode VFXDebugMode;
+#endif
+    public bool IsBloodOnlyDebug
+    {
+        get
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            return VFXDebugMode == CounterVFXDebugMode.BloodOnly;
+#else
+            return false;
+#endif
+        }
+    }
     [System.Serializable]
     public sealed class Strike
     {
@@ -81,3 +97,7 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
 
 /// <summary>命中窓を開いたStateが確定する演出段階。通常コンボ段数とは独立。</summary>
 public enum JustAvoidCounterStrike { None, First, Second }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+public enum CounterVFXDebugMode { Normal, BloodOnly }
+#endif

@@ -21,9 +21,25 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     private float _surfaceOffset = .025f;
     [SerializeField, Range(0f, .5f), Tooltip("血の進行軸だけを攻撃者から離れる側へ少量傾けます。斬撃方向に直交する成分を使用。HitPoint・旧Cut表示方向は変更しません。")]
     private float _bloodOutwardBias;
+    [SerializeField, Tooltip("Bloodだけの表示位置。X=斬撃の横成分に沿う接線、Y=上、Z=攻撃者から離れる水平軸(m)。合計最大0.10m。0で実HitPointを維持。Cut/判定は移動しません。")]
+    private Vector3 _bloodSpawnOffset;
     private MaterialPropertyBlock _block;
     private float _started;
     private bool _playing;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private JustAvoidCounterConfig _debugConfig;
+    private JustAvoidCounterStrike _debugStrike;
+    private int _debugSample;
+#endif
+
+    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    public void ConfigureDebug(JustAvoidCounterConfig config, JustAvoidCounterStrike strike)
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        _debugConfig = config;
+        _debugStrike = strike;
+#endif
+    }
 
     // Allocate with the pool instance, rather than on its first accepted hit.
     private void Awake()
@@ -33,13 +49,15 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
 
     public void Play(Vector3 point, Vector3 slash, Vector3 normal, Camera viewingCamera = null)
     {
+        LogBloodSnapshot("Acquired");
         Stop();
         if (_block == null) _block = new MaterialPropertyBlock();
         if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
         slash.Normalize();
         Vector3 bloodDirection = ResolveBloodDirection(slash, normal, _bloodOutwardBias);
         Vector3 bloodUp = Mathf.Abs(Vector3.Dot(bloodDirection, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
-        transform.SetPositionAndRotation(point, Quaternion.LookRotation(bloodDirection, bloodUp));
+        Vector3 bloodPoint = ResolveBloodSpawnPoint(point, slash, normal, _bloodSpawnOffset);
+        transform.SetPositionAndRotation(bloodPoint, Quaternion.LookRotation(bloodDirection, bloodUp));
         // Blood follows the physical blade direction. The fine light faces the viewing camera.
         var camera = viewingCamera != null ? viewingCamera : Camera.main;
         Vector3 facing = camera != null ? (camera.transform.position - point).normalized : -normal.normalized;
@@ -56,16 +74,41 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         _cutRenderer.transform.localScale = new Vector3(_cutSize.x * Mathf.Max(_minimumProjectedLength, projection), _cutSize.y, 1f);
         _started = FeedbackVisualTime.Now;
         _playing = true;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        _debugSample = 0;
+        _cutRenderer.forceRenderingOff = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
+#endif
         gameObject.SetActive(true);
+        LogBloodSnapshot("RootEnabled");
+        // Both dedicated prefabs store the three Blood GameObjects inactive.
+        // They are direct children of this root; enabling the root alone cannot activate them.
+        // Keep the prepared world-space pose and playOnAwake=false, then explicitly play below.
+        ActivateBloodObjects();
+        LogBloodSnapshot("BloodEnabled");
         _cutRenderer.enabled = !_useLocalContactFlash;
         foreach (var ps in _blood) ps.Play(false);
+        LogBloodSnapshot("Play");
         Tick();
+    }
+
+    private void ActivateBloodObjects()
+    {
+        foreach (var ps in _blood) ps.gameObject.SetActive(true);
     }
 
     public void Tick()
     {
         if (!_playing) return;
         float age = FeedbackVisualTime.Now - _started;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        bool bloodOnly = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
+        _cutRenderer.forceRenderingOff = bloodOnly;
+        while (bloodOnly && _debugSample < 3 && age >= (_debugSample == 0 ? .05f : _debugSample == 1 ? .1f : .2f))
+        {
+            _debugSample++;
+            LogBloodSnapshot(_debugSample == 1 ? "After50ms" : _debugSample == 2 ? "After100ms" : "After200ms");
+        }
+#endif
         if (age >= _duration) { Stop(); return; }
         _block.SetFloat(AgeId, age);
         _cutRenderer.SetPropertyBlock(_block);
@@ -76,11 +119,43 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         }
     }
 
-    public void Stop()
+    public void Stop([System.Runtime.CompilerServices.CallerMemberName] string caller = "")
     {
         _playing = false;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (_cutRenderer != null) _cutRenderer.forceRenderingOff = false;
+        _debugSample = 3;
+#endif
         if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         gameObject.SetActive(false);
+        LogBloodSnapshot("StopClearAndDeactivate", caller);
+    }
+
+    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    private void LogBloodSnapshot(string phase, [System.Runtime.CompilerServices.CallerMemberName] string caller = "")
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (_debugConfig == null || !_debugConfig.IsBloodOnlyDebug) return;
+        // Allocations and renderer lookups occur only at bounded diagnostic lifecycle checkpoints.
+        var text = new System.Text.StringBuilder(1024);
+        var camera = Camera.main;
+        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} instanceId={GetInstanceID()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
+        if (camera != null)
+            text.Append($" camera={camera.name} viewport={camera.WorldToViewportPoint(transform.position):F3} cameraDistance={Vector3.Distance(camera.transform.position, transform.position):F2}");
+        else text.Append(" camera=NULL");
+        if (_blood == null) text.Append("\nBlood array=NULL");
+        else foreach (var ps in _blood)
+        {
+            if (ps == null) { text.Append("\nParticleSystem=NULL"); continue; }
+            var renderer = ps.GetComponent<ParticleSystemRenderer>();
+            var material = renderer != null ? renderer.sharedMaterial : null;
+            var shader = material != null ? material.shader : null;
+            text.Append($"\n{ps.name}: blood.activeSelf={ps.gameObject.activeSelf} blood.activeInHierarchy={ps.gameObject.activeInHierarchy} isPlaying={ps.isPlaying} isEmitting={ps.isEmitting} isPaused={ps.isPaused} particleCount={ps.particleCount} emission.enabled={ps.emission.enabled}");
+            text.Append($" renderer={(renderer != null ? renderer.enabled.ToString() : "NULL")} forceOff={(renderer != null && renderer.forceRenderingOff)} material={(material != null ? material.name : "NULL")} shader={(shader != null ? shader.name : "NULL")} supported={(shader != null && shader.isSupported)}");
+            if (camera != null) text.Append($" cameraLayerVisible={((camera.cullingMask & (1 << ps.gameObject.layer)) != 0)}");
+        }
+        Debug.Log(text.ToString(), this);
+#endif
     }
 
     // The accepted player counter HitNormal points from the attacker to contact.
@@ -91,5 +166,17 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         slash.Normalize();
         Vector3 outward = Vector3.ProjectOnPlane(awayFromAttacker.normalized, slash);
         return (slash + outward * Mathf.Clamp(bias, 0f, .5f)).normalized;
+    }
+
+    public static Vector3 ResolveBloodSpawnPoint(Vector3 point, Vector3 slash, Vector3 awayFromAttacker, Vector3 offset)
+    {
+        Vector3 forward = Vector3.ProjectOnPlane(awayFromAttacker, Vector3.up);
+        if (forward.sqrMagnitude < .0001f) forward = Vector3.ProjectOnPlane(slash, Vector3.up);
+        if (forward.sqrMagnitude < .0001f) return point; // No measured horizontal basis: do not invent an offset axis.
+        forward.Normalize();
+        Vector3 tangent = Vector3.Cross(Vector3.up, forward);
+        if (Vector3.Dot(tangent, slash) < 0f) tangent = -tangent;
+        offset = Vector3.ClampMagnitude(offset, .1f);
+        return point + tangent * offset.x + Vector3.up * offset.y + forward * offset.z;
     }
 }

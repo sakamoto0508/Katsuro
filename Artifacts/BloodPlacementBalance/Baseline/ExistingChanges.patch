@@ -1,0 +1,654 @@
+diff --git a/Assets/Mock/Effects/JustAvoidCounterBlood.mat b/Assets/Mock/Effects/JustAvoidCounterBlood.mat
+index b8e73e3..90ade5f 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterBlood.mat
++++ b/Assets/Mock/Effects/JustAvoidCounterBlood.mat
+@@ -26,8 +26,10 @@ Material:
+     m_Ints: []
+     m_Floats:
+     - _BloodGain: 0.4
++    - _ContourVariation: 0.65
+     - _EdgeStrength: 0.55
+     - _Mist: 0
++    - _Opacity: 1
+     - _RimWidth: 0.22
+     - _VeinStrength: 0.3
+     - _ZTest: 8
+diff --git a/Assets/Mock/Effects/JustAvoidCounterBlood.shader b/Assets/Mock/Effects/JustAvoidCounterBlood.shader
+index e7d5164..0218e45 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterBlood.shader
++++ b/Assets/Mock/Effects/JustAvoidCounterBlood.shader
+@@ -8,6 +8,8 @@ Shader "Katsuro/JustAvoidCounterBlood"
+         _VeinColor("Crimson leading vein", Color) = (.95,.065,.095,1)
+         _VeinStrength("Vein reflection (non additive)", Range(0,.6)) = .3
+         _BloodGain("Crimson luminance", Range(.1,1)) = .4
++        _Opacity("Blood opacity", Range(0,1)) = 1
++        _ContourVariation("Wet contour variation", Range(0,1)) = .65
+         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("Contact depth test", Float) = 4
+     }
+     SubShader
+@@ -29,7 +31,7 @@ Shader "Katsuro/JustAvoidCounterBlood"
+             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
+             CBUFFER_START(UnityPerMaterial)
+             float4 _Tint, _RimColor, _VeinColor;
+-            float _RimWidth, _VeinStrength, _BloodGain;
++            float _RimWidth, _VeinStrength, _BloodGain, _Opacity, _ContourVariation;
+             CBUFFER_END
+             struct A { float3 vertex:POSITION; float2 uv:TEXCOORD0; float4 color:COLOR; };
+             struct V { float4 pos:SV_POSITION; float2 uv:TEXCOORD0; float4 color:COLOR; };
+@@ -37,17 +39,23 @@ Shader "Katsuro/JustAvoidCounterBlood"
+             float4 Frag(V i):SV_Target
+             {
+                 float2 p=i.uv*2-1;
+-                // A pointed tail and asymmetric wet head, shared by threads and droplets.
+-                float width=lerp(.23,.86,smoothstep(-1,.65,p.y));
+-                float wobble=.045*sin(p.y*15)+.025*sin(p.y*28);
+-                float edge=pow((p.x+wobble)/max(.05,width),2)+p.y*p.y;
+-                float aa=max(.025,fwidth(edge));
+-                float coverage=1-smoothstep(1-aa,1+aa,edge);
++                float t=saturate(i.uv.y);
++                // Both ends close to zero; the broad wet body has bounded necks, not a uniform bar.
++                float taper=pow(max(0,sin(t*PI)),.65)*lerp(.68,1,smoothstep(0,.48,t));
++                float variation=saturate(_ContourVariation);
++                float width=taper*(.82+variation*(.09*sin(t*19)+.055*sin(t*41+.7)));
++                float wobble=variation*.065*sin(t*17)*taper;
++                float edge=abs(p.x+wobble)/max(.001,width);
++                float aa=clamp(fwidth(edge),.015,.18);
++                float ends=smoothstep(0,.055,t)*(1-smoothstep(.94,1,t));
++                float coverage=(1-smoothstep(1-aa,1+aa,edge))*ends*(1-smoothstep(.94,1,abs(p.x)));
+                 float rim=smoothstep(1-_RimWidth-aa,1-_RimWidth*.25,edge);
+-                float vein=exp(-pow((p.x+.1)/max(.08,width*.25),2))*smoothstep(-.6,.65,p.y);
+-                float3 body=lerp(i.color.rgb,_VeinColor.rgb,vein*_VeinStrength);
++                float vein=exp(-pow((p.x+wobble+.07)/max(.045,width*.23),2))*smoothstep(.08,.6,t);
++                float wetShade=lerp(.72,1,smoothstep(.05,.48,t))*(1-variation*.13*pow(sin(t*23),2));
++                float3 body=lerp(i.color.rgb*wetShade,_VeinColor.rgb,vein*_VeinStrength);
+                 float3 rgb=lerp(body,_RimColor.rgb,rim*.92);
+-                return float4(saturate(rgb*_BloodGain),i.color.a*coverage);
++                // Straight-alpha RGB: multiply coverage only into alpha, never into RGB a second time.
++                return float4(saturate(rgb*_BloodGain),saturate(i.color.a*_Opacity)*coverage);
+             }
+             ENDHLSL
+         }
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab b/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
+index f4fa286..cf2d667 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
++++ b/Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
+@@ -287,8 +287,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.135
+-      minScalar: 0.1
++      scalar: 0.195
++      minScalar: 0.145
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -665,7 +665,7 @@ ParticleSystem:
+     serializedVersion: 6
+     enabled: 1
+     type: 4
+-    angle: 14
++    angle: 18
+     length: 0.02
+     boxThickness: {x: 0, y: 0, z: 0}
+     radiusThickness: 1
+@@ -1047,20 +1047,47 @@ ParticleSystem:
+           time: 0
+           value: 1
+           inSlope: 0
+-          outSlope: -0.65
+-          tangentMode: 0
++          outSlope: 0
++          tangentMode: 137
+           weightedMode: 0
+-          inWeight: 0
+-          outWeight: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.15
++          value: 1.12
++          inSlope: 0
++          outSlope: 0
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.48
++          value: 1
++          inSlope: -0.7384616
++          outSlope: -0.7384616
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.8
++          value: 0.48
++          inSlope: -1.8076923
++          outSlope: -1.8076923
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
+         - serializedVersion: 3
+           time: 1
+-          value: 0.35
+-          inSlope: -0.65
++          value: 0.06
++          inSlope: 0
+           outSlope: 0
+-          tangentMode: 0
++          tangentMode: 137
+           weightedMode: 0
+-          inWeight: 0
+-          outWeight: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
+         m_PreInfinity: 2
+         m_PostInfinity: 2
+         m_RotationOrder: 4
+@@ -4869,7 +4896,7 @@ ParticleSystemRenderer:
+   m_MaxParticleSize: 0.5
+   m_CameraVelocityScale: 0
+   m_VelocityScale: 0.055
+-  m_LengthScale: 9
++  m_LengthScale: 8
+   m_SortingFudge: 0
+   m_NormalDirection: 1
+   m_ShadowBias: 0
+@@ -4950,8 +4977,8 @@ ParticleSystem:
+   startDelay:
+     serializedVersion: 2
+     minMaxState: 3
+-    scalar: 0.09
+-    minScalar: 0.065
++    scalar: 0.135
++    minScalar: 0.095
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -5181,8 +5208,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.045
+-      minScalar: 0.024
++      scalar: 0.055
++      minScalar: 0.032
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -9991,9 +10018,9 @@ ParticleSystem:
+   autoRandomSeed: 0
+   startDelay:
+     serializedVersion: 2
+-    minMaxState: 0
+-    scalar: 0.012
+-    minScalar: 0
++    minMaxState: 3
++    scalar: 0.055
++    minScalar: 0.035
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -10223,8 +10250,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.12
+-      minScalar: 0.075
++      scalar: 0.14
++      minScalar: 0.09
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+diff --git a/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab b/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
+index ca8d1cf..e9d0f17 100644
+--- a/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
++++ b/Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
+@@ -376,8 +376,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.095
+-      minScalar: 0.07
++      scalar: 0.145
++      minScalar: 0.105
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -754,7 +754,7 @@ ParticleSystem:
+     serializedVersion: 6
+     enabled: 1
+     type: 4
+-    angle: 10
++    angle: 13
+     length: 0.02
+     boxThickness: {x: 0, y: 0, z: 0}
+     radiusThickness: 1
+@@ -1136,20 +1136,47 @@ ParticleSystem:
+           time: 0
+           value: 1
+           inSlope: 0
+-          outSlope: -0.65
+-          tangentMode: 0
++          outSlope: 0
++          tangentMode: 137
+           weightedMode: 0
+-          inWeight: 0
+-          outWeight: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.15
++          value: 1.12
++          inSlope: 0
++          outSlope: 0
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.48
++          value: 1
++          inSlope: -0.7384616
++          outSlope: -0.7384616
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
++        - serializedVersion: 3
++          time: 0.8
++          value: 0.48
++          inSlope: -1.8076923
++          outSlope: -1.8076923
++          tangentMode: 137
++          weightedMode: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
+         - serializedVersion: 3
+           time: 1
+-          value: 0.35
+-          inSlope: -0.65
++          value: 0.06
++          inSlope: 0
+           outSlope: 0
+-          tangentMode: 0
++          tangentMode: 137
+           weightedMode: 0
+-          inWeight: 0
+-          outWeight: 0
++          inWeight: 0.33333334
++          outWeight: 0.33333334
+         m_PreInfinity: 2
+         m_PostInfinity: 2
+         m_RotationOrder: 4
+@@ -4958,7 +4985,7 @@ ParticleSystemRenderer:
+   m_MaxParticleSize: 0.5
+   m_CameraVelocityScale: 0
+   m_VelocityScale: 0.045
+-  m_LengthScale: 7.5
++  m_LengthScale: 7
+   m_SortingFudge: 0
+   m_NormalDirection: 1
+   m_ShadowBias: 0
+@@ -5039,8 +5066,8 @@ ParticleSystem:
+   startDelay:
+     serializedVersion: 2
+     minMaxState: 3
+-    scalar: 0.05
+-    minScalar: 0.035
++    scalar: 0.08
++    minScalar: 0.055
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -5270,8 +5297,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.04
+-      minScalar: 0.022
++      scalar: 0.045
++      minScalar: 0.026
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+@@ -9991,9 +10018,9 @@ ParticleSystem:
+   autoRandomSeed: 0
+   startDelay:
+     serializedVersion: 2
+-    minMaxState: 0
+-    scalar: 0
+-    minScalar: 0
++    minMaxState: 3
++    scalar: 0.032
++    minScalar: 0.018
+     maxCurve:
+       serializedVersion: 2
+       m_Curve:
+@@ -10223,8 +10250,8 @@ ParticleSystem:
+     startSize:
+       serializedVersion: 2
+       minMaxState: 3
+-      scalar: 0.09
+-      minScalar: 0.06
++      scalar: 0.105
++      minScalar: 0.075
+       maxCurve:
+         serializedVersion: 2
+         m_Curve:
+diff --git a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+index ed1a845..9e04740 100644
+--- a/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
++++ b/Assets/Mock/Scripts/Config/JustAvoidCounterConfig.cs
+@@ -4,6 +4,22 @@ using UnityEngine;
+ [CreateAssetMenu(menuName = "Config/Just Avoid Counter", fileName = "JustAvoidCounterConfig")]
+ public sealed class JustAvoidCounterConfig : ScriptableObject
+ {
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++    [Header("Counter VFX diagnostics (Editor / Development Build only)")]
++    [Tooltip("BloodOnlyは追撃1・2の血以外の命中VFXだけを隠します。白黒演出・HitStop・HitReactionは維持。比較時はPlayを停止して切り替えてください。")]
++    public CounterVFXDebugMode VFXDebugMode;
++#endif
++    public bool IsBloodOnlyDebug
++    {
++        get
++        {
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++            return VFXDebugMode == CounterVFXDebugMode.BloodOnly;
++#else
++            return false;
++#endif
++        }
++    }
+     [System.Serializable]
+     public sealed class Strike
+     {
+@@ -81,3 +97,7 @@ public sealed class JustAvoidCounterConfig : ScriptableObject
+ 
+ /// <summary>命中窓を開いたStateが確定する演出段階。通常コンボ段数とは独立。</summary>
+ public enum JustAvoidCounterStrike { None, First, Second }
++
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++public enum CounterVFXDebugMode { Normal, BloodOnly }
++#endif
+diff --git a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+index aa10870..657a7cd 100644
+--- a/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
++++ b/Assets/Mock/Scripts/Feedback/CombatFeedback.cs
+@@ -433,10 +433,15 @@ public sealed class CombatFeedback : MonoBehaviour
+         GetComponent<JustAvoidCounterAnimation>()?.ResetSpeed();
+         float angle = info.IsHeavy ? _heavyReactionAngle : _lightReactionAngle;
+         bool strongFeedback = info.IsHeavy || info.IsJustAvoidCounter;
++        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
++        bool bloodOnly = info.IsJustAvoidCounter && counterPresentation != null && counterPresentation.IsBloodOnlyDebug;
++        Vector3 counterBloodDirection = info.SlashDirection;
+         if (info.IsJustAvoidCounter && info.Instigator != null)
+         {
+             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
+-            info.Instigator.GetComponentInChildren<SwordTrail>(true)?.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection);
++            var trail = info.Instigator.GetComponentInChildren<SwordTrail>(true);
++            Vector3 measured = trail != null ? trail.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection) : Vector3.zero;
++            if (measured.sqrMagnitude > .0001f) counterBloodDirection = measured;
+         }
+         if (_enemyOwner != null)
+         {
+@@ -463,7 +468,7 @@ public sealed class CombatFeedback : MonoBehaviour
+             {
+                 // 追撃専用の被弾Poseを全身の旧Flashで覆わず、閃光の中心を接触点へ限定する。
+                 _hitUntil = 0f;
+-                BeginNormalHitFlash(!info.IsCounterFirst);
++                if (!bloodOnly) BeginNormalHitFlash(!info.IsCounterFirst);
+             }
+         }
+         else
+@@ -475,23 +480,31 @@ public sealed class CombatFeedback : MonoBehaviour
+         }
+         Refresh();
+         Vector3 contact = _vfxConfig != null ? _vfxConfig.GetContactFlashStyle(info.IsHeavy, info.IsJustAvoidCounter) : new Vector3(.075f, .025f, .3f);
+-        var counterPresentation = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
+         if (info.IsCounterFirst && counterPresentation != null) contact = counterPresentation.FirstContact;
+         Color contactTint = new Color(.93f, .96f, 1f);
+         if (info.IsJustAvoidCounter && !info.IsCounterFirst && _vfxConfig != null) contactTint *= _vfxConfig.CounterContactIntensity;
+         contactTint.a = 1f;
+         var cuts = info.IsCounterFirst ? _counterFirstCuts : _counterCuts;
+         bool dedicatedCut = info.IsJustAvoidCounter && cuts != null;
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        if (bloodOnly)
++        {
++            var source = counterPresentation.GetCFX(info.CounterStrike);
++            Debug.Log($"[CounterBlood] Request stage={info.CounterStrike} dedicatedPool={dedicatedCut} prefab={(source != null ? source.name : "NULL")} point={info.HitPoint:F3} direction={counterBloodDirection:F3}", this);
++            if (!dedicatedCut) Debug.LogWarning("[CounterBlood] Dedicated Blood pool missing. Mixed fallback HitVFX is suppressed in BloodOnly; check Counter Config / CFX references.", this);
++        }
++#endif
+         if (dedicatedCut)
+         {
+             int slot = info.IsCounterFirst ? _nextCounterFirstCut : _nextCounterCut;
+-            cuts[slot].Play(info.HitPoint, info.SlashDirection, info.HitNormal);
+-            if (cuts[slot].UsesLocalContactFlash)
++            cuts[slot].ConfigureDebug(counterPresentation, info.CounterStrike);
++            cuts[slot].Play(info.HitPoint, counterBloodDirection, info.HitNormal);
++            if (!bloodOnly && cuts[slot].UsesLocalContactFlash)
+                 _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
+             if (info.IsCounterFirst) _nextCounterFirstCut = (slot + 1) % cuts.Length;
+             else _nextCounterCut = (slot + 1) % cuts.Length;
+         }
+-        else
++        else if (!bloodOnly)
+         {
+             _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
+             PlayHitVFX(info);
+diff --git a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+index 003da85..bae6fac 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
+@@ -110,5 +110,7 @@ internal sealed class CounterImpactStroke
+         block.SetFloat(AgeId,age); renderer.SetPropertyBlock(block);
+     }
+     public void Hide() { active=false; renderer.enabled=false; }
++    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
++    public void SetDebugVisibility(bool hidden) { renderer.forceRenderingOff = hidden; }
+     public void Dispose() { Object.Destroy(mesh); Object.Destroy(surface); }
+ }
+diff --git a/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs b/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
+index c5e7f1f..b4a6500 100644
+--- a/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
++++ b/Assets/Mock/Scripts/Feedback/CounterSlashPresentation.cs
+@@ -30,6 +30,7 @@ internal sealed class CounterSlashPresentation
+ 
+     public void Reset(float now)
+     {
++        SetDebugVisibility(false);
+         lastUpdate = now;
+         holdStart = holdUntil = 0f;
+         contacted = false;
+@@ -77,6 +78,12 @@ internal sealed class CounterSlashPresentation
+         renderer.SetPropertyBlock(block);
+     }
+     public void PrepareStroke(int layer) { if (stroke == null) stroke = new CounterImpactStroke(layer); }
++    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
++    public void SetDebugVisibility(bool hidden)
++    {
++        renderer.forceRenderingOff = hidden;
++        stroke?.SetDebugVisibility(hidden);
++    }
+     public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
+     { if (Enabled) stroke?.Show(Settings, point, direction, bladeAxis, view, now); }
+     public void Dispose() => stroke?.Dispose();
+diff --git a/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+index 29dc36d..b814ad5 100644
+--- a/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
++++ b/Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs
+@@ -24,6 +24,20 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+     private MaterialPropertyBlock _block;
+     private float _started;
+     private bool _playing;
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++    private JustAvoidCounterConfig _debugConfig;
++    private JustAvoidCounterStrike _debugStrike;
++    private int _debugSample;
++#endif
++
++    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
++    public void ConfigureDebug(JustAvoidCounterConfig config, JustAvoidCounterStrike strike)
++    {
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        _debugConfig = config;
++        _debugStrike = strike;
++#endif
++    }
+ 
+     // Allocate with the pool instance, rather than on its first accepted hit.
+     private void Awake()
+@@ -33,6 +47,7 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+ 
+     public void Play(Vector3 point, Vector3 slash, Vector3 normal, Camera viewingCamera = null)
+     {
++        LogBloodSnapshot("Acquired");
+         Stop();
+         if (_block == null) _block = new MaterialPropertyBlock();
+         if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
+@@ -56,16 +71,41 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         _cutRenderer.transform.localScale = new Vector3(_cutSize.x * Mathf.Max(_minimumProjectedLength, projection), _cutSize.y, 1f);
+         _started = FeedbackVisualTime.Now;
+         _playing = true;
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        _debugSample = 0;
++        _cutRenderer.forceRenderingOff = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
++#endif
+         gameObject.SetActive(true);
++        LogBloodSnapshot("RootEnabled");
++        // Both dedicated prefabs store the three Blood GameObjects inactive.
++        // They are direct children of this root; enabling the root alone cannot activate them.
++        // Keep the prepared world-space pose and playOnAwake=false, then explicitly play below.
++        ActivateBloodObjects();
++        LogBloodSnapshot("BloodEnabled");
+         _cutRenderer.enabled = !_useLocalContactFlash;
+         foreach (var ps in _blood) ps.Play(false);
++        LogBloodSnapshot("Play");
+         Tick();
+     }
+ 
++    private void ActivateBloodObjects()
++    {
++        foreach (var ps in _blood) ps.gameObject.SetActive(true);
++    }
++
+     public void Tick()
+     {
+         if (!_playing) return;
+         float age = FeedbackVisualTime.Now - _started;
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        bool bloodOnly = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
++        _cutRenderer.forceRenderingOff = bloodOnly;
++        while (bloodOnly && _debugSample < 3 && age >= (_debugSample == 0 ? .05f : _debugSample == 1 ? .1f : .2f))
++        {
++            _debugSample++;
++            LogBloodSnapshot(_debugSample == 1 ? "After50ms" : _debugSample == 2 ? "After100ms" : "After200ms");
++        }
++#endif
+         if (age >= _duration) { Stop(); return; }
+         _block.SetFloat(AgeId, age);
+         _cutRenderer.SetPropertyBlock(_block);
+@@ -76,11 +116,43 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
+         }
+     }
+ 
+-    public void Stop()
++    public void Stop([System.Runtime.CompilerServices.CallerMemberName] string caller = "")
+     {
+         _playing = false;
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        if (_cutRenderer != null) _cutRenderer.forceRenderingOff = false;
++        _debugSample = 3;
++#endif
+         if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+         gameObject.SetActive(false);
++        LogBloodSnapshot("StopClearAndDeactivate", caller);
++    }
++
++    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
++    private void LogBloodSnapshot(string phase, [System.Runtime.CompilerServices.CallerMemberName] string caller = "")
++    {
++#if UNITY_EDITOR || DEVELOPMENT_BUILD
++        if (_debugConfig == null || !_debugConfig.IsBloodOnlyDebug) return;
++        // Allocations and renderer lookups occur only at bounded diagnostic lifecycle checkpoints.
++        var text = new System.Text.StringBuilder(1024);
++        var camera = Camera.main;
++        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} instanceId={GetInstanceID()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
++        if (camera != null)
++            text.Append($" camera={camera.name} viewport={camera.WorldToViewportPoint(transform.position):F3} cameraDistance={Vector3.Distance(camera.transform.position, transform.position):F2}");
++        else text.Append(" camera=NULL");
++        if (_blood == null) text.Append("\nBlood array=NULL");
++        else foreach (var ps in _blood)
++        {
++            if (ps == null) { text.Append("\nParticleSystem=NULL"); continue; }
++            var renderer = ps.GetComponent<ParticleSystemRenderer>();
++            var material = renderer != null ? renderer.sharedMaterial : null;
++            var shader = material != null ? material.shader : null;
++            text.Append($"\n{ps.name}: blood.activeSelf={ps.gameObject.activeSelf} blood.activeInHierarchy={ps.gameObject.activeInHierarchy} isPlaying={ps.isPlaying} isEmitting={ps.isEmitting} isPaused={ps.isPaused} particleCount={ps.particleCount} emission.enabled={ps.emission.enabled}");
++            text.Append($" renderer={(renderer != null ? renderer.enabled.ToString() : "NULL")} forceOff={(renderer != null && renderer.forceRenderingOff)} material={(material != null ? material.name : "NULL")} shader={(shader != null ? shader.name : "NULL")} supported={(shader != null && shader.isSupported)}");
++            if (camera != null) text.Append($" cameraLayerVisible={((camera.cullingMask & (1 << ps.gameObject.layer)) != 0)}");
++        }
++        Debug.Log(text.ToString(), this);
++#endif
+     }
+ 
+     // The accepted player counter HitNormal points from the attacker to contact.
+diff --git a/Assets/Mock/Scripts/Feedback/SwordTrail.cs b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+index 5c25bf1..2447a3f 100644
+--- a/Assets/Mock/Scripts/Feedback/SwordTrail.cs
++++ b/Assets/Mock/Scripts/Feedback/SwordTrail.cs
+@@ -111,6 +111,7 @@ public sealed class SwordTrail : MonoBehaviour
+         style = value;
+         counterStrike = strike;
+         if (value != AttackStyle.JustAvoidCounter) counterWindow = false;
++        counterSlash?.SetDebugVisibility(value == AttackStyle.JustAvoidCounter && _counterPresentation != null && _counterPresentation.IsBloodOnlyDebug);
+     }
+     /// <summary>刀の振り区間のサンプリングを切り替える。新しい振りの開始時には前回履歴を消去する。</summary>
+     public void SetActive(bool active)
+@@ -123,10 +124,10 @@ public sealed class SwordTrail : MonoBehaviour
+         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
+     }
+     /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
+-    public void NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
++    public Vector3 NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
+     {
+-        if (_sharedTrail != null && _sharedTrail != this) { _sharedTrail.NotifyCounterHit(strike, point, sweepDirection); return; }
+-        if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return;
++        if (_sharedTrail != null && _sharedTrail != this) return _sharedTrail.NotifyCounterHit(strike, point, sweepDirection);
++        if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return Vector3.zero;
+         counterSlash.Hit(point, FeedbackVisualTime.Now);
+         float now=FeedbackVisualTime.Now;
+         Vector3 recent=Vector3.zero;
+@@ -142,6 +143,7 @@ public sealed class SwordTrail : MonoBehaviour
+         Vector3 instantaneous=_tip!=null && hasPrevious && delta>.0001f && delta<=.08f
+             ? ((_tip.position-previousTip)-ownerDelta)/delta : Vector3.zero;
+         Vector3 direction=CounterImpactStroke.SelectMotionDirection(instantaneous,recent,sweepDirection,_minimumSpeed);
++        Vector3 physicalDirection = direction;
+         Vector3 bladeAxis = _tip != null && _bladeBase != null ? _tip.position - _bladeBase.position : transform.up;
+         var camera = Camera.main;
+         Vector3 view = camera != null ? camera.transform.position - point : -transform.forward;
+@@ -151,6 +153,8 @@ public sealed class SwordTrail : MonoBehaviour
+             settings.StrokeMinProjection,settings.StrokeMaxProjectionAngle);
+         counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
+         captureCounterHit = true;
++        // Blood reuses the measured blade motion before the existing stroke-only camera correction.
++        return physicalDirection;
+     }
+     /// <summary>共有軌跡または専用Meshを準備し、旧TrailRendererによる二重描画を停止する。</summary>
+     /// <returns>軌跡の描画リソースを使用可能になった場合はtrue。</returns>
+@@ -245,7 +249,9 @@ public sealed class SwordTrail : MonoBehaviour
+     /// <summary>寿命内のサンプルだけを残して刀身の細いMeshを更新し、残像の位置をワールド上に保持する。</summary>
+     private void LateUpdate()
+     {
+-        if (!initialized || mesh == null || FeedbackVisualTime.IsPaused) return;
++        if (!initialized || mesh == null) return;
++        counterSlash.SetDebugVisibility(style == AttackStyle.JustAvoidCounter && _counterPresentation != null && _counterPresentation.IsBloodOnlyDebug);
++        if (FeedbackVisualTime.IsPaused) return;
+         UpdateCounterWindow();
+         float now = FeedbackVisualTime.Now;
+         counterSlash.Advance(now, times, count, ref previousTime);

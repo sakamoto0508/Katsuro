@@ -1,0 +1,22 @@
+{
+  "changed": [
+    "Assets/Mock/Scripts/Feedback/JustAvoidCounterCutVFX.cs"
+  ],
+  "variants": {
+    "Editor": {
+      "errors": 0,
+      "warnings": 9
+    },
+    "Development": {
+      "errors": 0,
+      "warnings": 9
+    },
+    "Release": {
+      "errors": 0,
+      "warnings": 9
+    }
+  },
+  "bloodAssetsAndParametersUnchanged": true,
+  "allOtherInitialAssetsUnchanged": true,
+  "priorUncommittedWorkPreserved": true
+}

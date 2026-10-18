@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 309f4f85a131d9745b70a024389485aa, type: 3}
   m_Name: JustAvoidCounterConfig
   m_EditorClassIdentifier: Assembly-CSharp::JustAvoidCounterConfig
+  VFXDebugMode: 0
   First:
     SlashMaterial: {fileID: 2100000, guid: 0f18038a8180f4140939f8e48a02d6f0, type: 2}
     BladeStart: 0.28

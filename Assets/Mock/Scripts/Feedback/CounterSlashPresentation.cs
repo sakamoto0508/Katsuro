@@ -30,6 +30,7 @@ internal sealed class CounterSlashPresentation
 
     public void Reset(float now)
     {
+        SetDebugVisibility(false);
         lastUpdate = now;
         holdStart = holdUntil = 0f;
         contacted = false;
@@ -77,6 +78,12 @@ internal sealed class CounterSlashPresentation
         renderer.SetPropertyBlock(block);
     }
     public void PrepareStroke(int layer) { if (stroke == null) stroke = new CounterImpactStroke(layer); }
+    [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    public void SetDebugVisibility(bool hidden)
+    {
+        renderer.forceRenderingOff = hidden;
+        stroke?.SetDebugVisibility(hidden);
+    }
     public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
     { if (Enabled) stroke?.Show(Settings, point, direction, bladeAxis, view, now); }
     public void Dispose() => stroke?.Dispose();

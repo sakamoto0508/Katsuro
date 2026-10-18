@@ -26,8 +26,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _BloodGain: 0.4
+    - _ContourVariation: 0.65
     - _EdgeStrength: 0.55
     - _Mist: 0
+    - _Opacity: 1
     - _RimWidth: 0.22
     - _VeinStrength: 0.3
     - _ZTest: 8

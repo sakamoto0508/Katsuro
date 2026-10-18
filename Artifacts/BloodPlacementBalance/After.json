@@ -1,0 +1,86 @@
+{
+  "playing": false,
+  "positionChecks": 8,
+  "settings": [
+    {
+      "attack": "Light",
+      "StreakCount": 3,
+      "DropletCount": 4,
+      "Width": 1.25,
+      "Speed": 1.0,
+      "Length": 1.0,
+      "Lifetime": 1.0,
+      "DirectionBias": 0.15,
+      "offset": "(0, 0, 0)"
+    },
+    {
+      "attack": "Heavy",
+      "StreakCount": 4,
+      "DropletCount": 6,
+      "Width": 1.5,
+      "Speed": 1.15,
+      "Length": 1.25,
+      "Lifetime": 1.1,
+      "DirectionBias": 0.2,
+      "offset": "(0, 0, 0)"
+    }
+  ],
+  "second": {
+    "size": [
+      0.10875,
+      0.14625
+    ],
+    "lengthScale": 10.666667
+  },
+  "mats": [
+    {
+      "path": "Assets/Mock/Effects/HitBlood.mat",
+      "shader": "Katsuro/HitBlood",
+      "renderQueue": 3000,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/HitBloodMist.mat",
+      "shader": "Katsuro/HitBlood",
+      "renderQueue": 3000,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/HitSlash.mat",
+      "shader": "Katsuro/HitSlash",
+      "renderQueue": 3000,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterBlood.mat",
+      "shader": "Katsuro/JustAvoidCounterBlood",
+      "renderQueue": 3005,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstSlash.mat",
+      "shader": "Katsuro/CounterSwordSlash",
+      "renderQueue": 3010,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherSlash.mat",
+      "shader": "Katsuro/CounterSwordSlash",
+      "renderQueue": 3010,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat",
+      "shader": "Katsuro/CounterImpactStroke",
+      "renderQueue": 3011,
+      "messages": []
+    },
+    {
+      "path": "Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat",
+      "shader": "Katsuro/CounterImpactStroke",
+      "renderQueue": 3011,
+      "messages": []
+    }
+  ],
+  "scope": "Asset APIs, shader compiler and pure position function only. No Scene, Play Mode, particle playback or visual validation."
+}
