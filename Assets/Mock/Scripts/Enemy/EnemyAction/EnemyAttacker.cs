@@ -130,6 +130,16 @@ public class EnemyAttacker : IDisposable
         }
     }
 
+    public void SetSweptHits(bool active)
+    {
+        if (_weapons == null) return;
+        foreach (var weapon in _weapons) weapon?.SetSweptHits(active);
+    }
+    public void FlushSweptHits()
+    {
+        if (_isHitboxActive) _currentWeapon?.FlushSweptHits();
+    }
+
     /// <summary>武器コライダーにヒットした相手へ一度だけダメージを適用する（Weaponごとのハンドラで呼ばれる）。</summary>
     private void HandleWeaponHit(Collider other, EnemyWeapon sourceWeapon)
     {

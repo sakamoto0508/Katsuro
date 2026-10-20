@@ -49,7 +49,7 @@ public sealed class EnemyAttackPatternRunner
                 if (_elapsed >= Pattern.ActiveWindupDuration + 1f) Finish(false);
                 break;
             case Phase.Playing:
-                if (_elapsed >= Pattern.Timeout / Pattern.PlaybackSpeed) Finish(false);
+                if (_elapsed >= Pattern.BodyTimeout) Finish(false);
                 break;
             case Phase.Recovery:
                 if (_elapsed >= Pattern.RecoveryDuration) Finish(true);

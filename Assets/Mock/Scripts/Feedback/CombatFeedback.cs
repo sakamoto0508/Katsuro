@@ -92,6 +92,8 @@ public sealed class CombatFeedback : MonoBehaviour
     private int _nextCounterCut;
     private JustAvoidCounterCutVFX[] _counterFirstCuts;
     private int _nextCounterFirstCut;
+    private KatsuroTimedVFX[] _counterIssens;
+    private int _nextCounterIssen;
     private ParticleSystem[][] _hitParticles;
     private ParticleSystem.Burst[][][] _hitBursts;
     private float[][] _hitAngles;
@@ -512,6 +514,8 @@ public sealed class CombatFeedback : MonoBehaviour
             _contactPulse?.Play(info.HitPoint, info.HitNormal, contact.x, contact.y, contact.z, contactTint);
             PlayHitVFX(info);
         }
+        // 一閃はEnemyが受けたJust Avoid追撃（1撃目・2撃目）のみ。通常攻撃やPlayer被弾では出さない。
+        if (_enemyOwner != null && info.IsJustAvoidCounter && !bloodOnly) PlayCounterIssen(info, counterBloodDirection);
         var config = _audio != null ? _audio.AudioConfig : null;
         AudioClip hitClip = config != null ? (info.IsCounterFirst ? config.GetCounterFirstClip() : config.GetHitClip(info.IsHeavy, info.IsJustAvoidCounter)) : null;
         // Final Blowが同じ衝撃Clipをこの命中処理の直後に鳴らす場合は、音を二重に重ねない。
@@ -593,6 +597,28 @@ public sealed class CombatFeedback : MonoBehaviour
             }
         }
     }
+    /// <summary>追撃の命中点へ、刀の振り方向に沿った一閃をカメラへ向けて出す。Poolは初回だけ作る。</summary>
+    private void PlayCounterIssen(DamageInfo info, Vector3 slashDirection)
+    {
+        var prefab = _vfxConfig != null ? _vfxConfig.CounterIssenSlash : null;
+        var view = Camera.main;
+        if (prefab == null || view == null) return;
+        if (_counterIssens == null)
+        {
+            _counterIssens = new KatsuroTimedVFX[2];
+            for (int i = 0; i < _counterIssens.Length; i++)
+            {
+                _counterIssens[i] = Instantiate(prefab);
+                foreach (var child in _counterIssens[i].GetComponentsInChildren<Transform>(true)) child.gameObject.layer = gameObject.layer;
+                _counterIssens[i].Stop();
+            }
+        }
+        var slash = _counterIssens[_nextCounterIssen];
+        _nextCounterIssen = (_nextCounterIssen + 1) % _counterIssens.Length;
+        Vector3 direction = slashDirection.sqrMagnitude > .0001f ? slashDirection : info.SlashDirection;
+        slash.Play(info.HitPoint, KatsuroVFXOrientation.FacingCamera(info.HitPoint, direction, view), _vfxConfig.GetCounterIssenScale(info.IsCounterFirst));
+    }
+
     /// <summary>段ごとの専用CFXを初期化時に固定数だけ作り、命中時の生成と破棄を避ける。</summary>
     private JustAvoidCounterCutVFX[] CreateCounterPool(JustAvoidCounterCutVFX prefab)
     {

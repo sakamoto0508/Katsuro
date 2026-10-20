@@ -25,7 +25,7 @@ public partial class EnemyController
         if (_patternRunner == null)
             _patternRunner = new EnemyAttackPatternRunner(StartPatternClip,
                 () => _attacker?.DisableWeaponHitbox(), FinishAttackPattern,
-                pattern => _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.PlaybackSpeed));
+                pattern => _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.UsesDashTuning ? pattern.DashPlaybackSpeed : pattern.PlaybackSpeed));
     }
 
     private bool BeginAttackPattern(EnemyAttackPattern pattern)
@@ -44,6 +44,8 @@ public partial class EnemyController
         if (pattern.IsWarp && !BeginWarpPreparation(pattern)) return false;
         if (!pattern.IsWarp && !_patternRunner.Begin(pattern)) return false;
         _mover?.SetAttackRootMotionScale(pattern.RootMotionScale);
+        _dashPreviousClipTime = 0f;
+        if (pattern.UsesDashTuning) _mover?.SetAttackRootMotionScale(0f);
         _mover?.SetAttackTravelLimit(pattern.MaximumTravelDistance);
         _patternCooldowns[pattern] = Time.time + pattern.Cooldown;
         _attacker.DisableWeaponHitbox();
@@ -60,7 +62,13 @@ public partial class EnemyController
         var current = _animator.GetCurrentAnimatorStateInfo(0);
         if (current.fullPathHash == pattern.StateHash) return false;
         // コンボ中は向きを瞬間変更せず、開始時に決めた方向へ振り切る。
-        return _attacker != null && _attacker.PerformAttack(pattern.Attack);
+        bool started = _attacker != null && _attacker.PerformAttack(pattern.Attack);
+        if (started)
+        {
+            ApplyPatternWeaponGrip(pattern);
+            _attacker.SetSweptHits(pattern.UsesDashTuning);
+        }
+        return started;
     }
 
     private void FinishAttackPattern(bool success)
@@ -95,13 +103,17 @@ public partial class EnemyController
 
     private void ClearPatternExecution()
     {
+        RestorePatternWeaponGrip();
         _pendingAction = null;
         _attackCompletionPending = false;
         _attackAnimationHash = 0;
         _attacker?.DisableWeaponHitbox();
+        _attacker?.SetSweptHits(false);
         _mover?.EndAttackRootMotion();
         _mover?.SetAttackRootMotionScale(null);
         _mover?.SetAttackTravelLimit(0f);
+        _dashPreviousClipTime = 0f;
+        if (_animator != null) _animator.SetFloat("EnemyComboPlaybackSpeed", 1f);
         ClearWarpPresentation();
     }
 
@@ -112,7 +124,12 @@ public partial class EnemyController
         var state = next ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
         if (!_patternRunner.OwnsAnimationState(state.fullPathHash)) return;
         var clips = next ? _animator.GetNextAnimatorClipInfo(0) : _animator.GetCurrentAnimatorClipInfo(0);
-        if (clips.Length > 0) _patternRunner.ObserveClipTime(state.normalizedTime * clips[0].clip.length, state.fullPathHash);
+        if (clips.Length > 0)
+        {
+            float time = state.normalizedTime * clips[0].clip.length;
+            _patternRunner.ObserveClipTime(time, state.fullPathHash);
+            UpdateDashPlayback(time);
+        }
     }
 
     private bool AcceptPatternEvent(AnimationEvent evt)
@@ -126,12 +143,23 @@ public partial class EnemyController
 
     public void AnimEvent_ComboEnableWeaponHitbox(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt) && _patternRunner.OpenWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash)) _attacker?.EnableWeaponHitbox();
+        if (AcceptPatternEvent(evt) && _patternRunner.OpenWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash))
+        {
+            MaintainPatternWeaponGrip();
+            _attacker?.EnableWeaponHitbox();
+            OnWarpHitboxOpened(_patternRunner.Pattern);
+        }
     }
 
     public void AnimEvent_ComboDisableWeaponHitbox(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt)) _patternRunner.CloseWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash);
+        if (!AcceptPatternEvent(evt)) return;
+        if (_patternRunner.Pattern.UsesDashTuning && _patternRunner.WindowActive && _patternRunner.WindowIndex == evt.intParameter)
+        {
+            MaintainPatternWeaponGrip();
+            _attacker?.FlushSweptHits();
+        }
+        _patternRunner.CloseWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash);
     }
 
     public void AnimEvent_ComboFinished(AnimationEvent evt)
@@ -150,6 +178,44 @@ public partial class EnemyController
     }
     public void AnimEvent_StopAttackRootMotion(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt)) { _attackAnimationHash = 0; _mover?.EndAttackRootMotion(); }
+        if (!AcceptPatternEvent(evt)) return;
+        if (_patternRunner.Pattern.UsesDashTuning) return; // Final evaluated delta must reach FixedUpdate; subsequent scale is zero.
+        _attackAnimationHash = 0; _mover?.EndAttackRootMotion();
+    }
+
+    private float _dashPreviousClipTime;
+
+    // Only the Rush state speed parameter changes; global Animator.speed remains owned by HitStop.
+    private void UpdateDashPlayback(float time)
+    {
+        var pattern = _patternRunner?.Pattern;
+        if (pattern == null || !pattern.UsesDashTuning) return;
+        float speed = time < pattern.WindupEndTime - .00001f ? pattern.WindupSpeed :
+            time < pattern.DashEndTime - .00001f ? pattern.DashPlaybackSpeed : pattern.PlaybackSpeed;
+        _animator.SetFloat("EnemyComboPlaybackSpeed", speed);
+    }
+
+    public void AnimEvent_DashRecovery(AnimationEvent evt)
+    {
+        if (AcceptPatternEvent(evt)) UpdateDashPlayback(evt.time);
+    }
+
+    // OnAnimatorMove consumes the last evaluated segment, including the final event-crossing frame.
+    // Weight boundary-spanning samples rather than dropping the final dash delta at low FPS.
+    private void PrepareDashRootMotion()
+    {
+        var pattern = _patternRunner?.Pattern;
+        if (pattern == null || !pattern.UsesDashTuning || _animator == null) return;
+        bool next = _animator.IsInTransition(0);
+        var state = next ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
+        if (state.fullPathHash != pattern.StateHash) return;
+        var clips = next ? _animator.GetNextAnimatorClipInfo(0) : _animator.GetCurrentAnimatorClipInfo(0);
+        if (clips.Length == 0) return;
+        float time = state.normalizedTime * clips[0].clip.length;
+        float dt = time - _dashPreviousClipTime;
+        float overlap = Mathf.Max(0f, Mathf.Min(time, pattern.DashEndTime) - Mathf.Max(_dashPreviousClipTime, pattern.WindupEndTime));
+        _mover?.SetAttackRootMotionScale(dt > .000001f ? pattern.DashRootMotionScale * overlap / dt : 0f);
+        _dashPreviousClipTime = time;
+        UpdateDashPlayback(time);
     }
 }

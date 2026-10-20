@@ -32,6 +32,15 @@ public class VFXConfig : ScriptableObject
     [Header("Just Avoid Counter / Two strikes")]
     [SerializeField] private JustAvoidCounterConfig _counterPresentation;
     public JustAvoidCounterConfig CounterPresentation => _counterPresentation;
+    [Header("Just Avoid Counter / Issen slash (Assets/Art)")]
+    [SerializeField, Tooltip("追撃2撃の命中点に出す一閃VFX。未設定なら出さない。")]
+    private KatsuroTimedVFX _counterIssenSlash;
+    [SerializeField, Range(.3f, 2f), Tooltip("追撃1撃目の一閃の大きさ（基準長2m）。")]
+    private float _counterFirstIssenScale = .75f;
+    [SerializeField, Range(.3f, 2f), Tooltip("追撃2撃目（締め）の一閃の大きさ（基準長2m）。")]
+    private float _counterSecondIssenScale = 1.05f;
+    public KatsuroTimedVFX CounterIssenSlash => _counterIssenSlash;
+    public float GetCounterIssenScale(bool first) => first ? _counterFirstIssenScale : _counterSecondIssenScale;
     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
     [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
     [Header("Just Avoid / Screen Distortion")]

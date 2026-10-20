@@ -21,6 +21,14 @@ MonoBehaviour:
   Timeout: 3
   PlaybackSpeed: 0.9
   RootMotionScale: 0.7
+  TuneDashRootMotion: 0
+  DashDistance: 3
+  DashSpeed: 12
+  DashEndTime: 0.55
+  MeasuredDashDistance: 3.145
+  OverrideWeaponGrip: 0
+  WeaponGripLocalPosition: {x: 0, y: 0, z: 0}
+  WeaponGripLocalEuler: {x: 0, y: 0, z: 0}
   MinAttackDistance: 3
   MaxAttackDistance: 18
   Cooldown: 8
@@ -32,3 +40,11 @@ MonoBehaviour:
   DisappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
   ReappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
   WarpEffectPrefab: {fileID: 991693034936716336, guid: 8e8d75741e69ca441bffcbae797e900d, type: 3}
+  WarpVanishVFX: {fileID: 7907734529080212083, guid: ab5cade32b0ffad4f95ba0daa1b4db58, type: 3}
+  WarpAppearVFX: {fileID: 7706840471134813055, guid: 6624b8e4a44f0a0499f53052ba28954b, type: 3}
+  WarpSlashVFX: {fileID: 6079003188372657689, guid: 16cd2ac1860eba349989be6a8567e048, type: 3}
+  WarpAppearLead: 0.06
+  WarpEffectHeight: 1.1
+  WarpSlashForward: 0.8
+  WarpSlashRoll: -35
+  WarpSlashScale: 0.9

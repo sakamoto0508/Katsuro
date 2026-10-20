@@ -247,6 +247,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                 _enemyAnimController?.InterruptAttackForHitReaction();
             }
             bool animated = counter && _enemyAnimController != null && _enemyAnimController.TryPlayHitReaction(info);
+            if (counter) MaintainPatternWeaponGrip(); // Reaction evaluation may sample outgoing Rush weapon curves.
             if (animated)
             {
                 _reactionInterruptedAttack = true;
@@ -272,6 +273,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         _mover?.EndAttackRootMotion();
         _attacker?.Dispose();
         _health?.Dispose();
+        DestroyWarpVFX();
     }
 
     /// <summary>戦闘中だけ被弾の復帰・AI判断・予約行動・移動を順に進める。死亡時は歩行表示を停止する。</summary>
@@ -395,6 +397,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     /// <summary>所有中の攻撃Stateの移動をMoverへ渡す。死亡・別Stateへの切り替えではRoot Motionを解除する。</summary>
     private void OnAnimatorMove()
     {
+        MaintainPatternWeaponGrip();
         if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
         if (_mover != null && _mover.IsUsingAttackRootMotion)
         {
@@ -407,6 +410,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                 return;
             }
         }
+        PrepareDashRootMotion();
         _mover?.OnAnimatorMove();
     }
 

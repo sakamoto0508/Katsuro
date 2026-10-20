@@ -15,12 +15,20 @@ MonoBehaviour:
   PatternName: RushAttack
   Attack: {fileID: 11400000, guid: b72d5743a06b4c0498daaad99588629e, type: 2}
   AnimatorState: Base Layer.Attacks.RushAttack
-  WindupDuration: 0.45
-  WindupEndTime: 0.22
-  RecoveryDuration: 0.65
+  WindupDuration: 0.5
+  WindupEndTime: 0.45
+  RecoveryDuration: 0.1
   Timeout: 3
-  PlaybackSpeed: 0.9
-  RootMotionScale: 1.3
+  PlaybackSpeed: 1
+  RootMotionScale: 1
+  TuneDashRootMotion: 1
+  DashDistance: 3
+  DashSpeed: 12
+  DashEndTime: 0.7
+  MeasuredDashDistance: 3.284039
+  OverrideWeaponGrip: 1
+  WeaponGripLocalPosition: {x: 0.03806717, y: 0.24124862, z: -0.0063277865}
+  WeaponGripLocalEuler: {x: 291.3323, y: 123.410126, z: 202.17143}
   MinAttackDistance: 3
   MaxAttackDistance: 4.25
   Cooldown: 5
@@ -32,3 +40,11 @@ MonoBehaviour:
   DisappearSound: {fileID: 0}
   ReappearSound: {fileID: 0}
   WarpEffectPrefab: {fileID: 0}
+  WarpVanishVFX: {fileID: 0}
+  WarpAppearVFX: {fileID: 0}
+  WarpSlashVFX: {fileID: 0}
+  WarpAppearLead: 0.06
+  WarpEffectHeight: 1.1
+  WarpSlashForward: 0.8
+  WarpSlashRoll: -35
+  WarpSlashScale: 0.9

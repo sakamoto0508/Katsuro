@@ -71,6 +71,15 @@ public sealed class EnemyWeapon
     /// <summary>ヒットボックスを無効化する。</summary>
     public void DisableHitbox() => SetHitboxActive(false);
 
+    public void SetSweptHits(bool active)
+    {
+        foreach (var relay in EnumerateRelays()) if (relay != null) relay.SetSweptHits(active);
+    }
+    public void FlushSweptHits()
+    {
+        foreach (var relay in EnumerateRelays()) if (relay != null) relay.FlushSweptHits();
+    }
+
     /// <summary>武器がヒットした際の通知先を登録する。</summary>
     public void RegisterHitObserver(Action<Collider> handler)
     {
@@ -160,6 +169,7 @@ public sealed class EnemyWeapon
             }
 
             weaponCollider.enabled = isActive;
+            if (_relayCache.TryGetValue(weaponCollider, out var relay)) relay.ResetSweepSample();
             if (_trails.TryGetValue(weaponCollider, out var trail)) trail.SetActive(isActive);
         }
 

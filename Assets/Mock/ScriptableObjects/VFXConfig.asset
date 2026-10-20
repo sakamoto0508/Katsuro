@@ -31,6 +31,9 @@ MonoBehaviour:
     DirectionBias: 0.2
     SpawnOffset: {x: 0, y: 0, z: 0}
   _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
+  _counterIssenSlash: {fileID: 6079003188372657689, guid: 16cd2ac1860eba349989be6a8567e048, type: 3}
+  _counterFirstIssenScale: 0.75
+  _counterSecondIssenScale: 1.05
   _screenDistortionEnable: 1
   _distortionDuration: 0.14
   _distortionMaxRadius: 1.15
