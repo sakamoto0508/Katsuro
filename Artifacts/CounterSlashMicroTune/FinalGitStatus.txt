@@ -1,4 +1,0 @@
- M Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
- M Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
-?? Artifacts/CounterSlashMicroTune/
-?? CounterSlashMicroTuneChanges.md
