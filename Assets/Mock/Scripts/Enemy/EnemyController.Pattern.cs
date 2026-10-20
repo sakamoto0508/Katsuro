@@ -49,7 +49,10 @@ public partial class EnemyController
         _mover?.SetAttackTravelLimit(pattern.MaximumTravelDistance);
         _patternCooldowns[pattern] = Time.time + pattern.Cooldown;
         _attacker.DisableWeaponHitbox();
-        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.IsWarp ? .1f / Mathf.Max(.1f, pattern.WindupDuration) : pattern.WindupSpeed);
+        // Warp：刀を挙げる動きは通常速度で再生し、挙げ切ったら止めて「間」を取る（TickAttackPattern 側で制御）。
+        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.IsWarp ? 1f
+            : pattern.UsesDashTuning ? pattern.StanceSpeedAt(0f) : pattern.WindupSpeed);
+        OnRushPatternBegun(pattern);
         return true;
     }
 
@@ -63,6 +66,13 @@ public partial class EnemyController
         if (current.fullPathHash == pattern.StateHash) return false;
         // コンボ中は向きを瞬間変更せず、開始時に決めた方向へ振り切る。
         bool started = _attacker != null && _attacker.PerformAttack(pattern.Attack);
+        if (started && pattern.IsWarp)
+        {
+            // 出現後は刀を挙げ切った姿勢から再開する（予備動作で挙げた動きを繰り返さない）。
+            if (_enemyAnimController != null && _enemyAnimController.HasTrigger(pattern.Attack.AnimatorTrigger))
+                _animator.ResetTrigger(pattern.Attack.AnimatorTrigger);
+            _animator.CrossFadeInFixedTime(pattern.StateHash, 0f, 0, pattern.WarpRaiseTime);
+        }
         if (started)
         {
             ApplyPatternWeaponGrip(pattern);
@@ -87,6 +97,7 @@ public partial class EnemyController
         var pattern = _preparingWarp != null ? _preparingWarp : _patternRunner.Pattern;
         _preparingWarp = null;
         _patternRunner.Cancel();
+        OnRushEnded(true);
         ClearPatternExecution();
         _mover?.ReleaseMovementAfterAttack();
         if (_animator != null && _animator.runtimeAnimatorController != null)
@@ -115,6 +126,7 @@ public partial class EnemyController
         _dashPreviousClipTime = 0f;
         if (_animator != null) _animator.SetFloat("EnemyComboPlaybackSpeed", 1f);
         ClearWarpPresentation();
+        OnRushEnded(false);
     }
 
     private void ObserveAttackPatternAnimation()
@@ -148,6 +160,7 @@ public partial class EnemyController
             MaintainPatternWeaponGrip();
             _attacker?.EnableWeaponHitbox();
             OnWarpHitboxOpened(_patternRunner.Pattern);
+            OnRushDashStarted(_patternRunner.Pattern);
         }
     }
 
@@ -190,7 +203,7 @@ public partial class EnemyController
     {
         var pattern = _patternRunner?.Pattern;
         if (pattern == null || !pattern.UsesDashTuning) return;
-        float speed = time < pattern.WindupEndTime - .00001f ? pattern.WindupSpeed :
+        float speed = time < pattern.WindupEndTime - .00001f ? pattern.StanceSpeedAt(time) :
             time < pattern.DashEndTime - .00001f ? pattern.DashPlaybackSpeed : pattern.PlaybackSpeed;
         _animator.SetFloat("EnemyComboPlaybackSpeed", speed);
     }

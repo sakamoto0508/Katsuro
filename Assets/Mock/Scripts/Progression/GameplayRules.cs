@@ -67,6 +67,7 @@ public sealed class GameplayRules : ScriptableObject
     [UnityEngine.Tooltip("前回勝者が「息吹」の場合に継承Enemyへ適用する最大HP倍率。")]
     [Min(0)] public float BreathBossHealth = 1.2f;
     private static GameplayRules _instance;
+    /// <summary>Resources内のKatsuroRulesを共有する。未配置の場合は既定値の一時インスタンスを作成して共有する。</summary>
     public static GameplayRules Current
     {
         get

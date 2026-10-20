@@ -48,6 +48,13 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     private float _started;
     private bool _playing;
     private float _intensityMultiplier = 1f, _timeScale = 1f;
+    private static readonly int ColorId = Shader.PropertyToID("_Color");
+    private Color[] _baseColors;
+    private Color _tint = Color.white;
+    private Transform _follow;
+    private Vector3 _followOffset;
+    private bool _faceCamera;
+    private float _holdUntil, _heldTime, _holdBoost = 1f;
 
     /// <summary>全パーツが消え終わるまでの秒数。</summary>
     public float Duration
@@ -85,16 +92,50 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     /// <summary>再生中のまま位置だけ移す（出現先の再検証など）。</summary>
     public void MoveTo(Vector3 position) => transform.position = position;
 
+    /// <summary>全パーツの色に掛ける倍率（各Materialの_Colorに乗算）。次の再生まで保持する。</summary>
+    public void SetTint(Color tint) => _tint = tint;
+
+    /// <summary>再生中、指定Transformへ追従させる（刀先など）。faceCameraで面を常にカメラへ向ける。nullで解除。</summary>
+    public void Follow(Transform target, Vector3 worldOffset = default, bool faceCamera = false)
+    {
+        _follow = target; _followOffset = worldOffset; _faceCamera = faceCamera;
+    }
+
+    /// <summary>今の見た目のまま指定秒数止める（命中時のHitStopと同期）。boostで保持中の明るさを上げる。</summary>
+    public void HoldFor(float seconds, float boost = 1f)
+    {
+        if (!_playing || seconds <= 0f) return;
+        float now = FeedbackVisualTime.Now;
+        if (now >= _holdUntil) _heldTime = (now - _started) / _timeScale;
+        _holdUntil = Mathf.Max(_holdUntil, now + seconds);
+        _holdBoost = Mathf.Max(0f, boost);
+    }
+
     public void Stop()
     {
         _playing = false;
+        _holdUntil = 0f;
+        _follow = null;
         HideAll();
     }
 
     private void LateUpdate()
     {
         if (!_playing) return;
-        float t = (FeedbackVisualTime.Now - _started) / _timeScale;
+        if (_follow != null)
+        {
+            transform.position = _follow.position + _followOffset;
+            var view = _faceCamera ? Camera.main : null;
+            if (view != null) transform.rotation = KatsuroVFXOrientation.FacingCamera(transform.position, view);
+        }
+        float now = FeedbackVisualTime.Now;
+        if (_holdUntil > 0f)
+        {
+            if (now < _holdUntil) { Apply(_heldTime, _holdBoost); return; }
+            _started = _holdUntil - _heldTime * _timeScale;   // resume exactly where the hold began
+            _holdUntil = 0f;
+        }
+        float t = (now - _started) / _timeScale;
         if (t >= Duration) { Stop(); return; }
         Apply(t);
     }
@@ -104,11 +145,17 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
         if (_block != null) return;
         _block = new MaterialPropertyBlock();
         _baseScales = new Vector3[_tracks.Length];
+        _baseColors = new Color[_tracks.Length];
         for (int i = 0; i < _tracks.Length; i++)
-            _baseScales[i] = _tracks[i] != null && _tracks[i].Renderer != null ? _tracks[i].Renderer.transform.localScale : Vector3.one;
+        {
+            var renderer = _tracks[i] != null ? _tracks[i].Renderer : null;
+            _baseScales[i] = renderer != null ? renderer.transform.localScale : Vector3.one;
+            var material = renderer != null ? renderer.sharedMaterial : null;
+            _baseColors[i] = material != null && material.HasProperty(ColorId) ? material.GetColor(ColorId) : Color.white;
+        }
     }
 
-    private void Apply(float time)
+    private void Apply(float time, float boost = 1f)
     {
         for (int i = 0; i < _tracks.Length; i++)
         {
@@ -132,9 +179,10 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
             else
             {
                 float envelope = (1f - (1f - rise) * (1f - rise)) * (1f - Mathf.SmoothStep(0f, 1f, fall));
-                _block.SetFloat(IntensityId, track.Peak * envelope * _intensityMultiplier);
+                _block.SetFloat(IntensityId, track.Peak * envelope * _intensityMultiplier * boost);
                 _block.SetFloat(ProgressId, track.Wipe ? Mathf.Lerp(0f, 1.2f, rise) : 1.2f);
             }
+            _block.SetColor(ColorId, _baseColors[i] * _tint);
             track.Renderer.SetPropertyBlock(_block);
             track.Renderer.enabled = true;
         }

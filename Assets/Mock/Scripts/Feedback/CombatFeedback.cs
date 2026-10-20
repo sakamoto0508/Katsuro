@@ -533,6 +533,9 @@ public sealed class CombatFeedback : MonoBehaviour
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
             if (info.IsJustAvoidCounter && counterPresentation != null) duration = counterPresentation.GetStrike(info.CounterStrike).HitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
+            // 敵の攻撃（RushAttack の刺突線など）を同じ HitStop 時間だけ保持する。
+            if (info.Instigator != null && !info.IsJustAvoidCounter)
+                info.Instigator.GetComponentInParent<EnemyController>()?.NotifyAttackHitFeedback(duration);
         }
         _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
         _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter, info.IsCounterFirst);

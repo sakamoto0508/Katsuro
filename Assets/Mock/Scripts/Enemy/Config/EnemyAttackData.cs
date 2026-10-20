@@ -4,11 +4,15 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Enemy/AttackData", fileName = "EnemyAttackData")]
 public class EnemyAttackData : ScriptableObject
 {
+    /// <summary>敵攻撃の強弱を明示する分類。Lightは軽攻撃、Heavyは強攻撃。</summary>
     public enum AttackStrength { Light = 0, Heavy = 1 }
 
+    /// <summary>攻撃の強弱。Animator名やActionTypeから推測しない。</summary>
     [SerializeField, Tooltip("攻撃の強弱。Animator名やActionTypeから推測しない。")]
     private AttackStrength _strength;
+    /// <summary>設定された敵攻撃の強弱を取得する。</summary>
     public AttackStrength Strength => _strength;
+    /// <summary>この攻撃が明示的にHeavyとして設定されているか。</summary>
     public bool IsHeavy => _strength == AttackStrength.Heavy;
     /// <summary>この攻撃設定を使うEnemy行動の種類。</summary>
     public EnemyActionType ActionType => _actionType;

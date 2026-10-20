@@ -172,6 +172,8 @@ public sealed class SwordTrail : MonoBehaviour
         mesh = new Mesh { name = "Blade Trail Surface" }; mesh.MarkDynamic();
         owner = GetComponentInParent<Animator>(true)?.transform;
         surface = new GameObject("Blade Trail Surface", typeof(MeshFilter), typeof(MeshRenderer));
+        // Runtime-only helper: never written into the scene, even if Init runs in Edit Mode (tests, tools).
+        surface.hideFlags = HideFlags.DontSave;
         surface.layer = gameObject.layer;
         // Keep sampled vertices in world space; do not transform the history with the blade.
         surface.GetComponent<MeshFilter>().sharedMesh = mesh;
@@ -345,5 +347,11 @@ public sealed class SwordTrail : MonoBehaviour
     /// <summary>サンプリングを停止して履歴とMesh表示を消去する。</summary>
     private void OnDisable() { emitting = false; counterWindow = captureCounterHit = false; count = 0; if (mesh != null) mesh.Clear(); counterSlash?.Reset(FeedbackVisualTime.Now); }
     /// <summary>所有する軌跡Mesh・表示オブジェクトと、生成した場合だけMaterialを解放する。</summary>
-    private void OnDestroy() { GameManager.OnGameStateChanged -= OnGameStateChanged; counterSlash?.Dispose(); if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+    private void OnDestroy()
+    {
+        GameManager.OnGameStateChanged -= OnGameStateChanged; counterSlash?.Dispose();
+        // Destroy is not allowed in Edit Mode; DontSave objects must be removed explicitly there.
+        if (Application.isPlaying) { if (mesh != null) Destroy(mesh); if (surface != null) Destroy(surface); if (ownsMaterial) Destroy(material); }
+        else { if (mesh != null) DestroyImmediate(mesh); if (surface != null) DestroyImmediate(surface); if (ownsMaterial && material != null) DestroyImmediate(material); }
+    }
 }
