@@ -1,8 +1,0 @@
-{
-  "playing": true,
-  "errors": [],
-  "compileMethods": [
-    "Boolean IsPassCompiled(UnityEngine.Material, Int32)",
-    "Void CompilePass(UnityEngine.Material, Int32, Boolean)"
-  ]
-}

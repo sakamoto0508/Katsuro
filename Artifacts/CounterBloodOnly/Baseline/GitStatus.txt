@@ -1,9 +1,0 @@
- M Assets/Mock/Effects/JustAvoidCounterBlood.mat
- M Assets/Mock/Effects/JustAvoidCounterBlood.shader
- M Assets/Mock/Effects/JustAvoidCounterFinisherCFX.prefab
- M Assets/Mock/Effects/JustAvoidCounterFirstCutCFX.prefab
- M Assets/Mock/Scripts/Feedback/CombatFeedback.cs
- M Assets/Mock/Scripts/Feedback/SwordTrail.cs
-?? AKI112BloodChanges.md
-?? Artifacts/AKI112Blood/
-?? Artifacts/CounterBloodOnly/

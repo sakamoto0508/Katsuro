@@ -10,7 +10,7 @@ using UnityEngine.Playables;
 
 /// <summary>
 /// Gatotsu V08 の Humanoid クリップを実際の Enemy.prefab に適用し、全フレームの関節位置・刀の向き・足裏高さを
-/// Artifacts/GatotsuV08/Stage3/UnitySample.json へ書き出す。開いているシーンや Animator Controller は変更しない
+/// Assets/Art/Source~/GatotsuV08/Stage3/UnitySample.json へ書き出す。開いているシーンや Animator Controller は変更しない
 /// （非表示の Preview Scene で評価する）。初回はコンパイル後に自動実行、以降は Katsuro/Gatotsu メニューから。
 /// </summary>
 internal static class GatotsuV08HumanoidCheck
@@ -18,7 +18,7 @@ internal static class GatotsuV08HumanoidCheck
     private const string Fbx = "Assets/Art/Animation/Katsuro_Gatotsu_RM_v08.fbx";
     private const string ClipName = "Katsuro_Gatotsu_RM_v08";
     private const string EnemyPrefab = "Assets/Mock/Prefabs/Enemy.prefab";
-    private const string OutDir = "Artifacts/GatotsuV08/Stage3";
+    private const string OutDir = "Assets/Art/Source~/GatotsuV08/Stage3";
     private const string OutFile = OutDir + "/UnitySample.json";
     // V07 で計測した RightHand 基準の刀 Grip（V08 も同じ Grip を使う）
     private static readonly Vector3 GripPosition = new Vector3(0.03806717f, 0.241248623f, -0.00632778648f);

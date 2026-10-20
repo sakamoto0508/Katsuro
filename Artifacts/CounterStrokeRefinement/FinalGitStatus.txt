@@ -1,7 +1,0 @@
- M Assets/Mock/Effects/JustAvoidCounterFinisherStroke.mat
- M Assets/Mock/Effects/JustAvoidCounterFirstStroke.mat
- M Assets/Mock/Resources/CounterImpactStroke.shader
- M Assets/Mock/ScriptableObjects/JustAvoidCounterConfig.asset
- M Assets/Mock/Scripts/Feedback/CounterImpactStroke.cs
-?? Artifacts/CounterStrokeRefinement/
-?? CounterStrokeRefinementChanges.md

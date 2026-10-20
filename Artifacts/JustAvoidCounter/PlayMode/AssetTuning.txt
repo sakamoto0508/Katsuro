@@ -1,6 +1,0 @@
-JustAvoidCounterFirstCutCFX/Crimson Threads before size=0.045..0.065 life=0.2..0.27 space=World renderer=Stretch
-JustAvoidCounterFirstCutCFX/Dark Blood Drops before size=0.045..0.075 life=0.22..0.31 space=World renderer=Stretch
-JustAvoidCounterFirstCutCFX/Late Fine Drops before size=0.022..0.04 life=0.24..0.31 space=World renderer=Stretch
-JustAvoidCounterFinisherCFX/Crimson Threads before size=0.055..0.08 life=0.24..0.35 space=World renderer=Stretch
-JustAvoidCounterFinisherCFX/Dark Blood Drops before size=0.06..0.095 life=0.22..0.4 space=World renderer=Stretch
-JustAvoidCounterFinisherCFX/Late Fine Drops before size=0.024..0.045 life=0.24..0.43 space=World renderer=Stretch

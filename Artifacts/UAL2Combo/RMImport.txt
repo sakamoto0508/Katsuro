@@ -1,3 +1,0 @@
-Avatar valid=True human=True
-Armature|Sword_Heavy_Combo human=True length=4.333333 root=True speed=(-0.10, 0.00, 0.23)
-Armature|Sword_Regular_Combo human=True length=3 root=True speed=(-0.18, 0.00, 0.17)
