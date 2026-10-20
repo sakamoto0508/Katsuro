@@ -53,9 +53,6 @@ public class PlayerDeadManager : MonoBehaviour
     /// <summary>敗北時にVignetteを制御するHDRP Volume参照。</summary>
     [UnityEngine.Tooltip("敗北時にVignetteを制御するHDRP Volume参照。")]
     [SerializeField] private Volume _volume;
-    /// <summary>旧補間時間設定（秒）。現行の敗北演出では直接参照しない。</summary>
-    [UnityEngine.Tooltip("旧補間時間設定（秒）。現行の敗北演出では直接参照しない。")]
-    [SerializeField] private float _smoothTime = 0.1f;
     /// <summary>敗北時のHDRP Vignetteの目標強度。</summary>
     [UnityEngine.Tooltip("敗北時のHDRP Vignetteの目標強度。")]
     [SerializeField] private float _intensity = 0.45f;
@@ -230,7 +227,8 @@ public class PlayerDeadManager : MonoBehaviour
         var blackGO = new GameObject("vignette_black");
         blackGO.transform.SetParent(_overlay.transform, false);
         _blackImage = blackGO.AddComponent<Image>();
-        // 使用するシェーダーは Assets/Mock/Shaders/UIUnlitVignette.shader
+        // 使用するシェーダーは Assets/Mock/Resources/UIUnlitVignette.shader。
+        // Shader.Findはマテリアル参照のないシェーダーをビルドに含めないため、Resourcesに配置している。
         var shader = Shader.Find("UI/UnlitVignette");
         if (shader != null)
         {

@@ -1,22 +1,22 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-// ƒƒbƒNƒIƒ“ó‘Ô‚ğŠÇ—‚·‚éƒ†[ƒeƒBƒŠƒeƒBƒNƒ‰ƒX
-// - ƒvƒŒƒCƒ„[‚Æƒ^[ƒQƒbƒgi“Gj‚Ì Transform ‚ğó‚¯æ‚èAƒƒbƒNƒIƒ“ó‘Ô‚ÌŠÇ—‚ğs‚¤
-// - Cinemachine ‚Ì VirtualCamera —Dæ“x§Œä‚âA•K—v‚É‰‚¶‚Ä CinemachineBrain ‚ğ–³Œø‰»‚µ‚Ä
-//   è“®‚ÅƒJƒƒ‰‚Ì Transform ‚ğ§Œä‚·‚é‚½‚ß‚Ìƒ‰ƒbƒp‚Å‚·
-/// <summary>’ÊíELock-OnƒJƒƒ‰‚Ì—Dæ“x‚ÆAnimatorƒtƒ‰ƒO‚ğØ‚è‘Ö‚¦Aè“®’Ç]’†‚ÌBrain’â~‚Æ•œ‹A‚ğŠÇ—‚·‚éB</summary>
+// ãƒ­ãƒƒã‚¯ã‚ªãƒ³çŠ¶æ…‹ã‚’ç®¡ç†ã™ã‚‹ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£ã‚¯ãƒ©ã‚¹
+// - ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã‚¿ãƒ¼ã‚²ãƒƒãƒˆï¼ˆæ•µï¼‰ã® Transform ã‚’å—ã‘å–ã‚Šã€ãƒ­ãƒƒã‚¯ã‚ªãƒ³çŠ¶æ…‹ã®ç®¡ç†ã‚’è¡Œã†
+// - Cinemachine ã® VirtualCamera å„ªå…ˆåº¦åˆ¶å¾¡ã‚„ã€å¿…è¦ã«å¿œã˜ã¦ CinemachineBrain ã‚’ç„¡åŠ¹åŒ–ã—ã¦
+//   æ‰‹å‹•ã§ã‚«ãƒ¡ãƒ©ã® Transform ã‚’åˆ¶å¾¡ã™ã‚‹ãŸã‚ã®ãƒ©ãƒƒãƒ‘ã§ã™
+/// <summary>é€šå¸¸ãƒ»Lock-Onã‚«ãƒ¡ãƒ©ã®å„ªå…ˆåº¦ã¨Animatorãƒ•ãƒ©ã‚°ã‚’åˆ‡ã‚Šæ›¿ãˆã€æ‰‹å‹•è¿½å¾“ä¸­ã®Brainåœæ­¢ã¨å¾©å¸°ã‚’ç®¡ç†ã™ã‚‹ã€‚</summary>
 public class LockOnCamera
 {
     /// <summary>
-    /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    /// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     /// </summary>
-    /// <param name="playerPosition">ƒvƒŒƒCƒ„[‚Ì TransformiQÆj</param>
-    /// <param name="enemyPosition">‰Šúƒ^[ƒQƒbƒg‚Ì TransformiQÆj</param>
-    /// <param name="camera">’Êí‚Ég‚¤ CinemachineCameraiQÆj</param>
-    /// <param name="lockOnCamera">ƒƒbƒNƒIƒ“—p‚Ì CinemachineCameraiQÆj</param>
-    /// <param name="animController">ƒvƒŒƒCƒ„[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“§Œäƒ‰ƒbƒp</param>
-    /// <param name="animationName">ƒAƒjƒ[ƒVƒ‡ƒ“–¼’è‹`</param>
+    /// <param name="playerPosition">ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã® Transformï¼ˆå‚ç…§ï¼‰</param>
+    /// <param name="enemyPosition">åˆæœŸã‚¿ãƒ¼ã‚²ãƒƒãƒˆã® Transformï¼ˆå‚ç…§ï¼‰</param>
+    /// <param name="camera">é€šå¸¸æ™‚ã«ä½¿ã† CinemachineCameraï¼ˆå‚ç…§ï¼‰</param>
+    /// <param name="lockOnCamera">ãƒ­ãƒƒã‚¯ã‚ªãƒ³ç”¨ã® CinemachineCameraï¼ˆå‚ç…§ï¼‰</param>
+    /// <param name="animController">ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åˆ¶å¾¡ãƒ©ãƒƒãƒ‘</param>
+    /// <param name="animationName">ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åå®šç¾©</param>
     public LockOnCamera(Transform playerPosition, Transform enemyPosition, CinemachineCamera camera
         , CinemachineCamera lockOnCamera, PlayerAnimationController animController, AnimationName animationName)
     {
@@ -35,33 +35,33 @@ public class LockOnCamera
         }
     }
 
-    /// <summary>Œ»İƒƒbƒNƒIƒ“’†‚©‚Ç‚¤‚©</summary>
+    /// <summary>ç¾åœ¨ãƒ­ãƒƒã‚¯ã‚ªãƒ³ä¸­ã‹ã©ã†ã‹</summary>
     public bool IsLockOn { get; private set; }
-    /// <summary>Œ»İ‚ÌÀÛ‚ÌLock-On‘ÎÛ‚ğ“Ç‚İæ‚èê—p‚ÅŒöŠJ‚·‚éB</summary>
+    /// <summary>ç¾åœ¨ã®å®Ÿéš›ã®Lock-Onå¯¾è±¡ã‚’èª­ã¿å–ã‚Šå°‚ç”¨ã§å…¬é–‹ã™ã‚‹ã€‚</summary>
     public Transform Target => _enemyPosition;
 
-    // --- QÆ€–Ú ---
-    /// <summary>ƒvƒŒƒCƒ„[‚Ì TransformiQÆ•Ûj</summary>
+    // --- å‚ç…§é …ç›® ---
+    /// <summary>ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã® Transformï¼ˆå‚ç…§ä¿æŒï¼‰</summary>
     private Transform _playerPosition;
-    /// <summary>Œ»İ‚ÌƒƒbƒN‘ÎÛi“Gj‚Ì TransformiQÆ•Ûj</summary>
+    /// <summary>ç¾åœ¨ã®ãƒ­ãƒƒã‚¯å¯¾è±¡ï¼ˆæ•µï¼‰ã® Transformï¼ˆå‚ç…§ä¿æŒï¼‰</summary>
     private Transform _enemyPosition;
-    /// <summary>’Êí—p‚Ì CinemachineCameraiQÆj</summary>
+    /// <summary>é€šå¸¸ç”¨ã® CinemachineCameraï¼ˆå‚ç…§ï¼‰</summary>
     private CinemachineCamera _camera;
-    /// <summary>ƒƒbƒNƒIƒ“‚ÉØ‚è‘Ö‚¦‚é CinemachineCameraiQÆj</summary>
+    /// <summary>ãƒ­ãƒƒã‚¯ã‚ªãƒ³æ™‚ã«åˆ‡ã‚Šæ›¿ãˆã‚‹ CinemachineCameraï¼ˆå‚ç…§ï¼‰</summary>
     private CinemachineCamera _lockOnCamera;
-    /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“§Œäƒ‰ƒbƒp</summary>
+    /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åˆ¶å¾¡ãƒ©ãƒƒãƒ‘</summary>
     private PlayerAnimationController _animController;
-    /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“–¼’è‹`</summary>
+    /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åå®šç¾©</summary>
     private AnimationName _animationName;
 
-    // --- Cinemachine §Œä—p ---
-    /// <summary>Main Camera ‚Ì CinemachineBraini‚ ‚ê‚Îæ“¾j</summary>
+    // --- Cinemachine åˆ¶å¾¡ç”¨ ---
+    /// <summary>Main Camera ã® CinemachineBrainï¼ˆã‚ã‚Œã°å–å¾—ï¼‰</summary>
     private Unity.Cinemachine.CinemachineBrain _cinemachineBrain;
-    /// <summary>LockOn ‚É‚æ‚èˆê“I‚É Brain ‚ğ–³Œø‰»‚µ‚½‚©‚Ìƒtƒ‰ƒO</summary>
+    /// <summary>LockOn ã«ã‚ˆã‚Šä¸€æ™‚çš„ã« Brain ã‚’ç„¡åŠ¹åŒ–ã—ãŸã‹ã®ãƒ•ãƒ©ã‚°</summary>
     private bool _brainDisabledByLockOn = false;
 
     /// <summary>
-    /// ƒƒbƒN‘ÎÛ‚ğ–¾¦“I‚Éİ’è‚µ‚Ü‚·B
+    /// ãƒ­ãƒƒã‚¯å¯¾è±¡ã‚’æ˜ç¤ºçš„ã«è¨­å®šã—ã¾ã™ã€‚
     /// </summary>
     public void SetTarget(Transform t)
     {
@@ -69,21 +69,21 @@ public class LockOnCamera
     }
 
     /// <summary>
-    /// Œ»İ—LŒø‚ÈƒƒbƒN‘ÎÛ‚ªİ’è‚³‚ê‚Ä‚¢‚é‚©‚ğ•Ô‚µ‚Ü‚·B
+    /// ç¾åœ¨æœ‰åŠ¹ãªãƒ­ãƒƒã‚¯å¯¾è±¡ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ã‹ã‚’è¿”ã—ã¾ã™ã€‚
     /// </summary>
-    /// <returns>‘ÎÛ‚ª‘¶İ‚µAHierarchyã‚Å—LŒø‚È‚çtrueB</returns>
+    /// <returns>å¯¾è±¡ãŒå­˜åœ¨ã—ã€Hierarchyä¸Šã§æœ‰åŠ¹ãªã‚‰trueã€‚</returns>
     public bool HasValidTarget()
     {
         return _enemyPosition != null && _enemyPosition.gameObject.activeInHierarchy;
     }
 
-    /// <summary>—LŒø‚È‘ÎÛ‚ÖLock-On‚µAƒJƒƒ‰—Dæ“x‚ÆAnimatorƒtƒ‰ƒO‚ğ•ÏX‚·‚éBè“®’Ç]’†‚ÍBrain‚ğ’â~‚·‚éB</summary>
+    /// <summary>æœ‰åŠ¹ãªå¯¾è±¡ã¸Lock-Onã—ã€ã‚«ãƒ¡ãƒ©å„ªå…ˆåº¦ã¨Animatorãƒ•ãƒ©ã‚°ã‚’å¤‰æ›´ã™ã‚‹ã€‚æ‰‹å‹•è¿½å¾“ä¸­ã¯Brainã‚’åœæ­¢ã™ã‚‹ã€‚</summary>
     public void LockOn()
     {
         if (!HasValidTarget() || _playerPosition == null) return;
         IsLockOn = true;
-        // ƒƒbƒNƒIƒ“ŠJnFVirtualCamera ‚Ì—Dæ“x‚ğØ‚è‘Ö‚¦A•K—v‚È‚ç CinemachineBrain ‚ğ–³Œø‰»‚µ‚Ä
-        // è“®‚ÅƒJƒƒ‰§Œä‚ğs‚¦‚é‚æ‚¤‚É‚µ‚Ü‚·B
+        // ãƒ­ãƒƒã‚¯ã‚ªãƒ³é–‹å§‹ï¼šVirtualCamera ã®å„ªå…ˆåº¦ã‚’åˆ‡ã‚Šæ›¿ãˆã€å¿…è¦ãªã‚‰ CinemachineBrain ã‚’ç„¡åŠ¹åŒ–ã—ã¦
+        // æ‰‹å‹•ã§ã‚«ãƒ¡ãƒ©åˆ¶å¾¡ã‚’è¡Œãˆã‚‹ã‚ˆã†ã«ã—ã¾ã™ã€‚
 
         if (_camera != null && _lockOnCamera != null)
         {
@@ -101,11 +101,11 @@ public class LockOnCamera
         }
     }
 
-    /// <summary>Lock-On‚ğ‰ğœ‚µ‚Ä‰¼‘zƒJƒƒ‰—Dæ“x‚ÆAnimatorƒtƒ‰ƒO‚ğ–ß‚µA©g‚ª’â~‚µ‚½Brain‚¾‚¯‚ğÄŠJ‚·‚éB</summary>
+    /// <summary>Lock-Onã‚’è§£é™¤ã—ã¦ä»®æƒ³ã‚«ãƒ¡ãƒ©å„ªå…ˆåº¦ã¨Animatorãƒ•ãƒ©ã‚°ã‚’æˆ»ã—ã€è‡ªèº«ãŒåœæ­¢ã—ãŸBrainã ã‘ã‚’å†é–‹ã™ã‚‹ã€‚</summary>
     public void UnLockOn()
     {
         if (!IsLockOn) return;
-        // ƒƒbƒN‰ğœF—Dæ“x‚ğŒ³‚É–ß‚µABrain ‚ğÄ—LŒø‰»‚µ‚Ü‚·i–³Œø‰»‚µ‚½ê‡jB
+        // ãƒ­ãƒƒã‚¯è§£é™¤ï¼šå„ªå…ˆåº¦ã‚’å…ƒã«æˆ»ã—ã€Brain ã‚’å†æœ‰åŠ¹åŒ–ã—ã¾ã™ï¼ˆç„¡åŠ¹åŒ–ã—ãŸå ´åˆï¼‰ã€‚
 
         IsLockOn = false;
         if (_camera != null && _lockOnCamera != null)
@@ -113,7 +113,7 @@ public class LockOnCamera
             _camera.Priority = 10;
             _lockOnCamera.Priority = 0;
         }
-        // –³Œø‰»‚µ‚Ä‚¢‚½ƒJƒƒ‰§Œä‚ğÄ‚Ñ—LŒø‚É‚·‚éB
+        // ç„¡åŠ¹åŒ–ã—ã¦ã„ãŸã‚«ãƒ¡ãƒ©åˆ¶å¾¡ã‚’å†ã³æœ‰åŠ¹ã«ã™ã‚‹ã€‚
         if (_cinemachineBrain != null && _brainDisabledByLockOn)
         {
             _cinemachineBrain.enabled = true;
@@ -126,7 +126,7 @@ public class LockOnCamera
     }
 
     /// <summary>
-    /// ƒvƒŒƒCƒ„[—pF“G‚ğŒ©‚é•ûŒüiˆÚ“®E‰ñ“]—pj
+    /// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”¨ï¼šæ•µã‚’è¦‹ã‚‹æ–¹å‘ï¼ˆç§»å‹•ãƒ»å›è»¢ç”¨ï¼‰
     /// </summary>
     /// <returns></returns>
     public Vector3 ReturnLockOnDirection()
@@ -138,7 +138,7 @@ public class LockOnCamera
             return Vector3.zero;
         }
 
-        // ƒvƒŒƒCƒ„[‚©‚çƒ^[ƒQƒbƒg‚Ö‚Ì…•½iY¬•ª–³‚µj•ûŒüƒxƒNƒgƒ‹‚ğ•Ô‚µ‚Ü‚·B
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‹ã‚‰ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æ°´å¹³ï¼ˆYæˆåˆ†ç„¡ã—ï¼‰æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¿”ã—ã¾ã™ã€‚
         Vector3 direction = _enemyPosition.position - _playerPosition.position;
         direction.y = 0;
         var dir = direction.normalized;

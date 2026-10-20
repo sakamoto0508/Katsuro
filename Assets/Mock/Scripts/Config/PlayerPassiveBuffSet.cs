@@ -62,6 +62,9 @@ public sealed class PassiveBuffEntry
     /// <summary>ヒット時に再生するエフェクトのプレハブ（任意）。</summary>
     public GameObject OnHitEffectPrefab => _onHitEffectPrefab;
 
+    /// <summary>生成した命中Effectを破棄するまでの時間（秒）。0以下ならPrefab側の自己破棄に任せる。</summary>
+    public float OnHitEffectLifetime => _onHitEffectLifetime;
+
     /// <summary>Inspector上で装備ボーナスを識別する表示用ラベル。</summary>
     [UnityEngine.Tooltip("Inspector上で装備ボーナスを識別する表示用ラベル。")]
     [SerializeField] private string _label = "PassiveBuff";
@@ -74,4 +77,7 @@ public sealed class PassiveBuffEntry
     /// <summary>この装備の命中時に使うEffect Prefab参照。未設定も許容する。</summary>
     [UnityEngine.Tooltip("この装備の命中時に使うEffect Prefab参照。未設定も許容する。")]
     [SerializeField] private GameObject _onHitEffectPrefab;
+    /// <summary>生成した命中Effectを破棄するまでの時間（秒）。0以下ならPrefab側の自己破棄に任せる。</summary>
+    [UnityEngine.Tooltip("生成した命中Effectを破棄するまでの時間（秒）。0以下ならPrefab側の自己破棄に任せる。")]
+    [SerializeField] private float _onHitEffectLifetime = 3f;
 }

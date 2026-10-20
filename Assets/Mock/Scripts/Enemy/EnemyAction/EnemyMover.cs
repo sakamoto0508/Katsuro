@@ -118,6 +118,9 @@ public class EnemyMover
         _attackTravel += delta.magnitude;
     }
     private bool _isStepBack;
+    private bool _stepBackKinematic;
+    /// <summary>後退のRoot Motion移動中か。終了Eventが欠落した場合の復帰判定に使用する。</summary>
+    public bool IsStepBack => _isStepBack;
     private bool _isPatrolWalking;
     private bool _manualRotationDisabledByAgent = false;
     private const float MovementDeadZone = .05f;
@@ -485,25 +488,7 @@ public class EnemyMover
     {
         if (_playerPosition == null) return playerPos;
 
-        // プレイヤーの半径を取得する。カプセル状の当たり判定、キャラクター制御用の当たり判定の順に探す。
-        var playerRoot = _playerPosition.gameObject;
-        CapsuleCollider cap = playerRoot.GetComponentInChildren<CapsuleCollider>();
-        float radius = 0f;
-        if (cap != null)
-        {
-            radius = Mathf.Max(cap.radius, 0f);
-        }
-        else
-        {
-            var cc = playerRoot.GetComponentInChildren<UnityEngine.CharacterController>();
-            if (cc != null)
-            {
-                radius = Mathf.Max(cc.radius, 0f);
-            }
-        }
-
-        // 当たり判定が見つからない場合は、小さな既定の半径を使用する。
-        if (radius <= 0f) radius = 0.5f;
+        float radius = GetPlayerRadius();
 
         // 目標位置をプレイヤー方向から radius 分だけ手前に引く
         Vector3 dir = (playerPos - _enemyTransform.position);
@@ -514,9 +499,26 @@ public class EnemyMover
         return adjusted;
     }
 
-    /// <summary>
-    /// 即時にプレイヤー方向へ目的地を更新して追跡を開始します。
-    /// </summary>
+    private float _playerRadius = -1f;
+    /// <summary>PlayerのCollider半径を初回だけ検索して保持する。カプセル状の当たり判定、キャラクター制御用の当たり判定の順に探す。</summary>
+    /// <returns>Playerの占有半径。当たり判定が見つからなければ0.5。</returns>
+    private float GetPlayerRadius()
+    {
+        if (_playerRadius > 0f) return _playerRadius;
+        var playerRoot = _playerPosition.gameObject;
+        float radius = 0f;
+        var cap = playerRoot.GetComponentInChildren<CapsuleCollider>();
+        if (cap != null) radius = Mathf.Max(cap.radius, 0f);
+        else
+        {
+            var cc = playerRoot.GetComponentInChildren<UnityEngine.CharacterController>();
+            if (cc != null) radius = Mathf.Max(cc.radius, 0f);
+        }
+        // 当たり判定が見つからない場合は、小さな既定の半径を使用する。
+        _playerRadius = radius > 0f ? radius : 0.5f;
+        return _playerRadius;
+    }
+
     /// <summary>
     /// 即座にプレイヤー方向へ目的地を更新して追跡を開始します。
     /// </summary>
@@ -574,9 +576,12 @@ public class EnemyMover
     /// 後退アニメ（root motion）によるステップバックを開始します。
     /// NavMeshAgent の位置更新・回転更新を無効化し、アニメ側の root motion を適用します。
     /// </summary>
-    public void StartStepBack()
+    /// <returns>後退を開始できればtrue。攻撃・被弾で移動停止中、またはAgentがNavMesh外ならfalse。</returns>
+    public bool StartStepBack()
     {
-        if (_animator == null || _agent == null) return;
+        if (_animator == null || _agent == null || _animName == null) return false;
+        if (_isStepBack || _isMovementHeldForAttack || _reactionHeld) return false;
+        if (!_agent.isActiveAndEnabled || !_agent.isOnNavMesh) return false;
         _agent.updatePosition = false;
         _agent.updateRotation = false;
         _agent.isStopped = true;
@@ -585,13 +590,15 @@ public class EnemyMover
 
         if (_rb != null)
         {
+            // 終了時に元の物理設定へ戻すため、Kinematicへ切り替える前の値を保存する。
+            _stepBackKinematic = _rb.isKinematic;
+            if (!_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
             _rb.isKinematic = true;
-            _rb.linearVelocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
         }
 
         _animator.SetTrigger(_animName.BackStep);
         _isStepBack = true;
+        return true;
     }
 
     /// <summary>
@@ -599,26 +606,29 @@ public class EnemyMover
     /// </summary>
     public void EndStepBack()
     {
+        if (!_isStepBack) return;
         if (_reactionHeld) { _endStepBackAfterReaction = true; return; }
         _usingRootMotionStepBack = false;
         if (_animator != null) _animator.applyRootMotion = false;
 
         if (_rb != null)
         {
-            _rb.isKinematic = false;
-            _rb.linearVelocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = _stepBackKinematic;
+            if (!_rb.isKinematic) { _rb.linearVelocity = Vector3.zero; _rb.angularVelocity = Vector3.zero; }
         }
 
         if (_agent != null)
         {
-            _agent.Warp(_enemyTransform.position);
-            _agent.velocity = Vector3.zero;
-            _agent.isStopped = false;
             _agent.updatePosition = true;
             // ステータスの RotationMode に応じて updateRotation を復帰させる
             ApplyRotationMode();
-            _agent.ResetPath();
+            // 無効化中・NavMesh外のAgentへは操作できないため、配置済みの場合だけ現在位置へ同期する。
+            if (_agent.isActiveAndEnabled && _agent.Warp(_enemyTransform.position) && _agent.isOnNavMesh)
+            {
+                _agent.velocity = Vector3.zero;
+                _agent.isStopped = false;
+                _agent.ResetPath();
+            }
         }
         _isStepBack = false;
     }

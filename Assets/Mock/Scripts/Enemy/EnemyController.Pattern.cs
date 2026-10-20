@@ -34,10 +34,7 @@ public partial class EnemyController
             (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
         if (!_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
         if (!CanUseAttackPattern(pattern)) return false;
-        bool speedConfigured = false;
-        foreach (var parameter in _animator.parameters)
-            speedConfigured |= parameter.name == "EnemyComboPlaybackSpeed" && parameter.type == AnimatorControllerParameterType.Float;
-        if (!speedConfigured) return false;
+        if (!HasComboSpeedParameter()) return false;
         EnsurePatternRunner();
         _attackCompletionPending = false;
         if (IsAttackPatternActive) return false;
@@ -54,6 +51,22 @@ public partial class EnemyController
             : pattern.UsesDashTuning ? pattern.StanceSpeedAt(0f) : pattern.WindupSpeed);
         OnRushPatternBegun(pattern);
         return true;
+    }
+
+    private RuntimeAnimatorController _comboSpeedCheckedController;
+    private bool _hasComboSpeedParameter;
+    /// <summary>Pattern再生速度のFloatパラメータがあるかを確認する。parametersは毎回配列を生成するため、Controller単位で結果を保持する。</summary>
+    private bool HasComboSpeedParameter()
+    {
+        var controller = _animator.runtimeAnimatorController;
+        if (controller != _comboSpeedCheckedController)
+        {
+            _comboSpeedCheckedController = controller;
+            _hasComboSpeedParameter = false;
+            foreach (var parameter in _animator.parameters)
+                _hasComboSpeedParameter |= parameter.name == "EnemyComboPlaybackSpeed" && parameter.type == AnimatorControllerParameterType.Float;
+        }
+        return _hasComboSpeedParameter;
     }
 
     private bool StartPatternClip(EnemyAttackPattern pattern)

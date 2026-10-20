@@ -1,15 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Animator ƒpƒ‰ƒ[ƒ^[‘€ì‚ğˆêŒ³‰»‚µAˆÚ“®’l‚âUŒ‚ƒgƒŠƒK[‚ğˆÀ‘S‚ÉXV‚·‚éƒRƒ“ƒ|[ƒlƒ“ƒgB
+/// Animator ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼æ“ä½œã‚’ä¸€å…ƒåŒ–ã—ã€ç§»å‹•å€¤ã‚„æ”»æ’ƒãƒˆãƒªã‚¬ãƒ¼ã‚’å®‰å…¨ã«æ›´æ–°ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã€‚
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationController : MonoBehaviour
 {
-    /// <summary>Player Animator‚ÌˆÚ“®EUŒ‚E‰ñ”ğE”²“/”[“ƒpƒ‰ƒ[ƒ^–¼‚Ìİ’èB</summary>
+    /// <summary>Player Animatorã®ç§»å‹•ãƒ»æ”»æ’ƒãƒ»å›é¿ãƒ»æŠœåˆ€/ç´åˆ€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿åã®è¨­å®šã€‚</summary>
     public AnimationName AnimName => _animName;
-    /// <summary>Player Animator‚ÌˆÚ“®EUŒ‚E‰ñ”ğE”²“/”[“ƒpƒ‰ƒ[ƒ^–¼‚Ìİ’èB</summary>
-    [UnityEngine.Tooltip("Player Animator‚ÌˆÚ“®EUŒ‚E‰ñ”ğE”²“/”[“ƒpƒ‰ƒ[ƒ^–¼‚Ìİ’èB")]
+    /// <summary>Player Animatorã®ç§»å‹•ãƒ»æ”»æ’ƒãƒ»å›é¿ãƒ»æŠœåˆ€/ç´åˆ€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿åã®è¨­å®šã€‚</summary>
+    [UnityEngine.Tooltip("Player Animatorã®ç§»å‹•ãƒ»æ”»æ’ƒãƒ»å›é¿ãƒ»æŠœåˆ€/ç´åˆ€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿åã®è¨­å®šã€‚")]
     [SerializeField] private AnimationName _animName;
     private Animator _animator;
     private int _moveVelocityHash;
@@ -17,7 +17,7 @@ public class PlayerAnimationController : MonoBehaviour
     private int _moveVectorYHash;
 
     /// <summary>
-    /// ‘¬“x‚ğƒXƒ€[ƒWƒ“ƒO•t‚«‚Å Animator ‚É”½‰f‚·‚éB
+    /// é€Ÿåº¦ã‚’ã‚¹ãƒ ãƒ¼ã‚¸ãƒ³ã‚°ä»˜ãã§ Animator ã«åæ˜ ã™ã‚‹ã€‚
     /// </summary>
     public void MoveVelocity(float speed)
     {
@@ -25,7 +25,7 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// ˆÚ“®ƒxƒNƒgƒ‹iX/Zj‚ğƒXƒ€[ƒWƒ“ƒO•t‚«‚Åİ’è‚·‚éB
+    /// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ï¼ˆX/Zï¼‰ã‚’ã‚¹ãƒ ãƒ¼ã‚¸ãƒ³ã‚°ä»˜ãã§è¨­å®šã™ã‚‹ã€‚
     /// </summary>
     public void MoveVector(Vector2 input)
     {
@@ -34,7 +34,7 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// w’èƒgƒŠƒK[‚ğ”­‰Î‚·‚éB–¢İ’è–¼‚Í–³‹‚·‚éB
+    /// æŒ‡å®šãƒˆãƒªã‚¬ãƒ¼ã‚’ç™ºç«ã™ã‚‹ã€‚æœªè¨­å®šåã¯ç„¡è¦–ã™ã‚‹ã€‚
     /// </summary>
     public void PlayTrigger(string animationName)
     {
@@ -42,7 +42,7 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// w’è Bool ƒpƒ‰ƒ[ƒ^[‚ğXV‚·‚éB
+    /// æŒ‡å®š Bool ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’æ›´æ–°ã™ã‚‹ã€‚
     /// </summary>
     public void PlayBool(string animationName, bool value)
     {
@@ -50,7 +50,7 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     /// <summary>
-    /// ®”ƒpƒ‰ƒ[ƒ^[i—á: ComboStepj‚ğİ’è‚·‚éB‹ó•¶š‚Í–³‹B
+    /// æ•´æ•°ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ï¼ˆä¾‹: ComboStepï¼‰ã‚’è¨­å®šã™ã‚‹ã€‚ç©ºæ–‡å­—ã¯ç„¡è¦–ã€‚
     /// </summary>
     public void SetInteger(string parameterName, int value)
     {
@@ -63,20 +63,20 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     private bool _initialized;
-    /// <summary>Animator‚ğæ“¾‚µAˆÚ“®ƒpƒ‰ƒ[ƒ^‚ÌƒnƒbƒVƒ…‚ğˆê“x‚¾‚¯‰Šú‰»‚·‚éB</summary>
+    /// <summary>Animatorã‚’å–å¾—ã—ã€ç§»å‹•ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ãƒãƒƒã‚·ãƒ¥ã‚’ä¸€åº¦ã ã‘åˆæœŸåŒ–ã™ã‚‹ã€‚</summary>
     public void Init()
     {
         if (_initialized) return;
         _initialized = true;
         _animator = GetComponent<Animator>();
-        // ŒŸØˆ—‚ªŒÄ‚Î‚ê‚Ä‚¢‚È‚­‚Ä‚àAÀs‚Éƒpƒ‰ƒ[ƒ^[‚ÌƒnƒbƒVƒ…’l‚ğ‰Šú‰»‚·‚éB
+        // æ¤œè¨¼å‡¦ç†ãŒå‘¼ã°ã‚Œã¦ã„ãªãã¦ã‚‚ã€å®Ÿè¡Œæ™‚ã«ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®ãƒãƒƒã‚·ãƒ¥å€¤ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
         _moveVelocityHash = Animator.StringToHash(_animName.MoveVelocity);
         _moveVectorXHash = Animator.StringToHash(_animName.MoveVectorX);
         _moveVectorYHash = Animator.StringToHash(_animName.MoveVectorY);
     }
 
     /// <summary>
-    /// ƒCƒ“ƒXƒyƒNƒ^[XV‚ÉƒnƒbƒVƒ…’l‚ğÄŒvZ‚µ‚Ä‚¨‚­B
+    /// ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼æ›´æ–°æ™‚ã«ãƒãƒƒã‚·ãƒ¥å€¤ã‚’å†è¨ˆç®—ã—ã¦ãŠãã€‚
     /// </summary>
     private void OnValidate()
     {

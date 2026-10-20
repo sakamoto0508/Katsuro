@@ -86,9 +86,15 @@ public class FinalBlowManager : MonoBehaviour
     }
 
     /// <summary>重複開始を防いで回避の色と音を解除し、勝利用モノクロ・UI・決着シーケンスを開始する。</summary>
-    public void StartFinalBlow()
+    /// <returns>決着シーケンスが進行中ならtrue。参照不足・無効で開始できなければfalse。</returns>
+    public bool StartFinalBlow()
     {
-        if (_isPlaying || _sequenceCancellation != null || !isActiveAndEnabled || _enemyController == null || _player == null) return;
+        if (_isPlaying || _sequenceCancellation != null) return true;
+        if (!isActiveAndEnabled || _enemyController == null || _player == null)
+        {
+            Debug.LogError("FinalBlowManagerにPlayerとEnemyを割り当ててください。Final Blowを省略して遷移します。", this);
+            return false;
+        }
         _isPlaying = true;
         _cameraFeedback?.GetComponent<JustAvoidContrast>()?.Cancel();
         _audio?.CancelJustAvoidDuck();
@@ -97,6 +103,7 @@ public class FinalBlowManager : MonoBehaviour
         if (_presentation != null) _presentation.Begin(_finalBlowText, _whiteFlashDuration, _textDelay, _finalBlowTextFadeIn);
         _game?.WinGame();
         DoFinalBlow().Forget();
+        return true;
     }
 
     /// <summary>HitStopとBGM停止から専用カメラ、納刀、討伐、既存Scene Fadeへ実時間で進め、中断時も一時状態を片付ける。</summary>

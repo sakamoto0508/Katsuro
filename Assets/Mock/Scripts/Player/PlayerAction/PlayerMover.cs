@@ -2,10 +2,10 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 
-/// <summary>ˆÚ“®“ü—ÍEù‰ñERigidbodyˆÚ“®‚ÆUŒ‚Root Motion‚Ì•¨—”½‰f‚ğ’S“–‚·‚éBUŒ‚‚â”\—Í‚Ì‘I‘ğ‚Ís‚í‚È‚¢B</summary>
+/// <summary>ç§»å‹•å…¥åŠ›ãƒ»æ—‹å›ãƒ»Rigidbodyç§»å‹•ã¨æ”»æ’ƒRoot Motionã®ç‰©ç†åæ˜ ã‚’æ‹…å½“ã™ã‚‹ã€‚æ”»æ’ƒã‚„èƒ½åŠ›ã®é¸æŠã¯è¡Œã‚ãªã„ã€‚</summary>
 public class PlayerMover
 {
-    /// <summary>ˆÚ“®İ’èERigidbodyEPlayer‚ÆEnemy‚ÌTransformEAnimator‚ğ•Û‚·‚éB</summary>
+    /// <summary>ç§»å‹•è¨­å®šãƒ»Rigidbodyãƒ»Playerã¨Enemyã®Transformãƒ»Animatorã‚’ä¿æŒã™ã‚‹ã€‚</summary>
     public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
         , Transform cameraPosition, PlayerAnimationController animationController, float attackRootMotionScale = 1f)
     {
@@ -17,7 +17,7 @@ public class PlayerMover
         _animationController = animationController;
         _attackRootMotionScale = Mathf.Max(0f, attackRootMotionScale);
     }
-    /// <summary>”²“‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©B</summary>
+    /// <summary>æŠœåˆ€ã—ã¦ã„ã‚‹ã‹ã©ã†ã‹ã€‚</summary>
     public bool IsDrawnSword { get; private set; }
     private PlayerStatus _playerStatus;
     private PlayerAnimationController _animationController;
@@ -36,7 +36,7 @@ public class PlayerMover
     private Vector3 _pendingAttackRootMotion;
     public bool IsUsingAttackRootMotion { get; private set; }
 
-    /// <summary>UŒ‚Root Motion‚Ìó•t‚ğŠJn‚µA‘O‚ÌUŒ‚‚ÌˆÚ“®—Ê‚ğÁ‹‚·‚éB</summary>
+    /// <summary>æ”»æ’ƒRoot Motionã®å—ä»˜ã‚’é–‹å§‹ã—ã€å‰ã®æ”»æ’ƒã®ç§»å‹•é‡ã‚’æ¶ˆå»ã™ã‚‹ã€‚</summary>
     public void BeginAttackRootMotion()
     {
         if (IsUsingAttackRootMotion) return;
@@ -44,14 +44,14 @@ public class PlayerMover
         _pendingAttackRootMotion = Vector3.zero;
         StopAttackVelocity();
     }
-    /// <summary>UŒ‚Root Motion‚Ìó•t‚Æ’~Ï—Ê‚ğ‰ğœ‚µA“K—p‚µ‚Ä‚¢‚½UŒ‚‘¬“x‚ğ’â~‚·‚éB</summary>
+    /// <summary>æ”»æ’ƒRoot Motionã®å—ä»˜ã¨è“„ç©é‡ã‚’è§£é™¤ã—ã€é©ç”¨ã—ã¦ã„ãŸæ”»æ’ƒé€Ÿåº¦ã‚’åœæ­¢ã™ã‚‹ã€‚</summary>
     public void EndAttackRootMotion()
     {
         _pendingAttackRootMotion = Vector3.zero;
         if (IsUsingAttackRootMotion) StopAttackVelocity();
         IsUsingAttackRootMotion = false;
     }
-    /// <summary>Ä¶’†‚ÌUŒ‚‚©‚ç…•½ˆÚ“®—Ê‚ğ’~Ï‚·‚éBHitStop’†‚ÌˆÚ“®‚Í’~Ï‚µ‚È‚¢B</summary>
+    /// <summary>å†ç”Ÿä¸­ã®æ”»æ’ƒã‹ã‚‰æ°´å¹³ç§»å‹•é‡ã‚’è“„ç©ã™ã‚‹ã€‚HitStopä¸­ã®ç§»å‹•ã¯è“„ç©ã—ãªã„ã€‚</summary>
     public void QueueAttackRootMotion(Vector3 delta, bool animationRunning)
     {
         if (!IsUsingAttackRootMotion) return;
@@ -59,7 +59,7 @@ public class PlayerMover
         delta.y = 0f;
         _pendingAttackRootMotion += delta * _attackRootMotionScale;
     }
-    /// <summary>’~Ï‚µ‚½UŒ‚ˆÚ“®—Ê‚ğÕ“Ë‚Å§ŒÀ‚µA•¨—ƒtƒŒ[ƒ€‚ÌRigidbody‘¬“x‚Ö•ÏŠ·‚·‚éB</summary>
+    /// <summary>è“„ç©ã—ãŸæ”»æ’ƒç§»å‹•é‡ã‚’è¡çªã§åˆ¶é™ã—ã€ç‰©ç†ãƒ•ãƒ¬ãƒ¼ãƒ ã®Rigidbodyé€Ÿåº¦ã¸å¤‰æ›ã™ã‚‹ã€‚</summary>
     public void FixedUpdateAttackRootMotion(bool animationRunning)
     {
         if (!IsUsingAttackRootMotion) return;
@@ -69,25 +69,25 @@ public class PlayerMover
         Vector3 velocity = delta / Time.fixedDeltaTime;
         _rb.linearVelocity = new Vector3(velocity.x, _rb.linearVelocity.y, velocity.z);
     }
-    /// <summary>©g‚ª“K—p‚µ‚½UŒ‚‘¬“x‚ğ’â~‚µA‚’¼•ûŒü‚Ì‘¬“x‚ğ•Û‚·‚éB</summary>
+    /// <summary>è‡ªèº«ãŒé©ç”¨ã—ãŸæ”»æ’ƒé€Ÿåº¦ã‚’åœæ­¢ã—ã€å‚ç›´æ–¹å‘ã®é€Ÿåº¦ã‚’ä¿æŒã™ã‚‹ã€‚</summary>
     private void StopAttackVelocity()
     {
         if (_rb != null && !_rb.isKinematic) _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
     }
 
-    /// <summary>“ü—Í‚É‰‚¶‚½ˆÚ“®‘¬“xE•ûŒü‚Æ•\¦—pAnimator’l‚ğXV‚·‚éB</summary>
+    /// <summary>å…¥åŠ›ã«å¿œã˜ãŸç§»å‹•é€Ÿåº¦ãƒ»æ–¹å‘ã¨è¡¨ç¤ºç”¨Animatorå€¤ã‚’æ›´æ–°ã™ã‚‹ã€‚</summary>
     public void Update()
     {
         UpdateDirection();
         _animationController?.PlayBool(_animationController.AnimName.IsDrawingSword, IsDrawnSword);
         _animationController?.MoveVelocity(ReturnVelocity());
         _animationController?.MoveVector(ReturnVector());
-        // ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì•s‹ï‡’²¸—p‚ÉA‘¬“x‚ÆƒAƒjƒ[ƒ^[‚Ì—L–³‚ğ‹L˜^‚·‚éB
-        // ˆê“I‚È’²¸ˆ—BŠm”FŒã‚Ííœ‚·‚é‚©ƒRƒƒ“ƒgƒAƒEƒg‚·‚éB
+        // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®ä¸å…·åˆèª¿æŸ»ç”¨ã«ã€é€Ÿåº¦ã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼ã®æœ‰ç„¡ã‚’è¨˜éŒ²ã™ã‚‹ã€‚
+        // ä¸€æ™‚çš„ãªèª¿æŸ»å‡¦ç†ã€‚ç¢ºèªå¾Œã¯å‰Šé™¤ã™ã‚‹ã‹ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã™ã‚‹ã€‚
         
     }
 
-    /// <summary>UŒ‚Root Motion‚ª—Dæ‚³‚ê‚Ä‚¢‚È‚¯‚ê‚ÎA’ÊíˆÚ“®‚Æù‰ñ‚ğ•¨—ƒtƒŒ[ƒ€‚Å”½‰f‚·‚éB</summary>
+    /// <summary>æ”»æ’ƒRoot MotionãŒå„ªå…ˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ã€é€šå¸¸ç§»å‹•ã¨æ—‹å›ã‚’ç‰©ç†ãƒ•ãƒ¬ãƒ¼ãƒ ã§åæ˜ ã™ã‚‹ã€‚</summary>
     public void FixedUpdate()
     {
         if (IsUsingAttackRootMotion) return;
@@ -96,19 +96,19 @@ public class PlayerMover
         SpeedControll();
     }
 
-    /// <summary>Ÿ‚ÌˆÚ“®XV‚Ég—p‚·‚é•½–Ê“ü—Í‚ğ•Û‚·‚éB</summary>
+    /// <summary>æ¬¡ã®ç§»å‹•æ›´æ–°ã«ä½¿ç”¨ã™ã‚‹å¹³é¢å…¥åŠ›ã‚’ä¿æŒã™ã‚‹ã€‚</summary>
     public void OnMove(Vector2 input)
     {
         _currentInput = input;
     }
 
-    /// <summary>’ÊíˆÚ“®‘¬“x‚ÆDash‘¬“x‚Ì‘I‘ğ‚Ég—p‚·‚éƒtƒ‰ƒO‚ğØ‚è‘Ö‚¦‚éB</summary>
+    /// <summary>é€šå¸¸ç§»å‹•é€Ÿåº¦ã¨Dashé€Ÿåº¦ã®é¸æŠã«ä½¿ç”¨ã™ã‚‹ãƒ•ãƒ©ã‚°ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚</summary>
     public void SetSprint(bool isSprinting)
     {
         _isSprinting = isSprinting;
     }
 
-    /// <summary>Lock-Onó‘Ô‚Æ‘ÎÛ•ûŒü‚ğ•Û‚µAˆÚ“®Eù‰ñ‚ÌŠî€‚Ö”½‰f‚·‚éB</summary>
+    /// <summary>Lock-OnçŠ¶æ…‹ã¨å¯¾è±¡æ–¹å‘ã‚’ä¿æŒã—ã€ç§»å‹•ãƒ»æ—‹å›ã®åŸºæº–ã¸åæ˜ ã™ã‚‹ã€‚</summary>
     public void LockOnDirection(bool isLockOn, Vector3 lockOnDirection)
     {
         _isLockOn = isLockOn;
@@ -119,7 +119,7 @@ public class PlayerMover
             : Vector3.zero;
     }
 
-    /// <summary>ˆÚ“®“ü—Í‚Æ…•½ˆÚ“®‘¬“x‚ğ~‚ßAÃ~ó‘Ô‚ÌAnimator’l‚Ö–ß‚·B</summary>
+    /// <summary>ç§»å‹•å…¥åŠ›ã¨æ°´å¹³ç§»å‹•é€Ÿåº¦ã‚’æ­¢ã‚ã€é™æ­¢çŠ¶æ…‹ã®Animatorå€¤ã¸æˆ»ã™ã€‚</summary>
     public void MoveStop()
     {
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
@@ -130,12 +130,12 @@ public class PlayerMover
         }
     }
 
-    /// <summary>”²“ó‘Ô‚ğ‹L˜^‚µAˆÚ“®‚Ég—p‚·‚ép¨‚Æ‘¬“x‚Ì‘I‘ğ‚Ö”½‰f‚·‚éB</summary>
+    /// <summary>æŠœåˆ€çŠ¶æ…‹ã‚’è¨˜éŒ²ã—ã€ç§»å‹•æ™‚ã«ä½¿ç”¨ã™ã‚‹å§¿å‹¢ã¨é€Ÿåº¦ã®é¸æŠã¸åæ˜ ã™ã‚‹ã€‚</summary>
     public void SetDrawingSword(bool value)=> IsDrawnSword = value;
 
-    /// <summary>w’èƒ^[ƒQƒbƒg‚Ì•ûŒü‚ğŒ©‚éB</summary>
+    /// <summary>æŒ‡å®šã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ–¹å‘ã‚’è¦‹ã‚‹ã€‚</summary>
 
-    /// <returns>‘ÎÛ•ûŒü‚Ö‚Ì•âŠÔù‰ñ‚ªI—¹‚·‚é‚Ü‚Å‘Ò‹@‚·‚éƒ^ƒXƒNB</returns>
+    /// <returns>å¯¾è±¡æ–¹å‘ã¸ã®è£œé–“æ—‹å›ãŒçµ‚äº†ã™ã‚‹ã¾ã§å¾…æ©Ÿã™ã‚‹ã‚¿ã‚¹ã‚¯ã€‚</returns>
     public async UniTask LookTargetSmooth(float duration, CancellationToken ct = default)
     {
         if (_enemyPosition == null || _playerPosition == null) return;
@@ -162,18 +162,18 @@ public class PlayerMover
         _playerPosition.rotation = target;
     }
 
-    /// <summary>ˆÚ“®‘¬“x‚ğAnimator‚Ö“n‚·‚½‚ß‚Ì’l‚ÉŠ·Z‚·‚éB</summary>
-    /// <returns>Œ»İ‚ÌˆÚ“®‘¬“x‚É‘Î‰‚·‚éAnimator’lB</returns>
+    /// <summary>ç§»å‹•é€Ÿåº¦ã‚’Animatorã¸æ¸¡ã™ãŸã‚ã®å€¤ã«æ›ç®—ã™ã‚‹ã€‚</summary>
+    /// <returns>ç¾åœ¨ã®ç§»å‹•é€Ÿåº¦ã«å¯¾å¿œã™ã‚‹Animatorå€¤ã€‚</returns>
     private float ReturnVelocity()
     {
         Vector3 velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         return velXZ.magnitude;
     }
 
-    /// <summary>ƒJƒƒ‰‚ÆLock-On•ûŒü‚ğŠî€‚ÉA“ü—Í‚©‚çƒ[ƒ‹ƒh‚ÌˆÚ“®•ûŒü‚ğ‹‚ß‚éB</summary>
+    /// <summary>ã‚«ãƒ¡ãƒ©ã¨Lock-Onæ–¹å‘ã‚’åŸºæº–ã«ã€å…¥åŠ›ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ã®ç§»å‹•æ–¹å‘ã‚’æ±‚ã‚ã‚‹ã€‚</summary>
     private void UpdateDirection()
     {
-        // ƒJƒƒ‰Šî€‚Ì‘OŒãE¶‰E‚ğ…•½–Ê‚É“Š‰e‚µA“ü—Í‚©‚çƒ[ƒ‹ƒh•ûŒü‚ğ‹‚ß‚éB
+        // ã‚«ãƒ¡ãƒ©åŸºæº–ã®å‰å¾Œãƒ»å·¦å³ã‚’æ°´å¹³é¢ã«æŠ•å½±ã—ã€å…¥åŠ›ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰æ–¹å‘ã‚’æ±‚ã‚ã‚‹ã€‚
         Vector3 cameraForward = _cameraPosition.forward;
         cameraForward.y = 0f;
         cameraForward.Normalize();
@@ -187,7 +187,7 @@ public class PlayerMover
 
         if (_isLockOn && _lockOnDirection.sqrMagnitude > 0.001f)
         {
-            // “G•ûŒü(forward)‚ÆƒJƒƒ‰‰E•ûŒü(lateral)‚ğ’¼Œğ‰»‚µAƒˆ‚ÈƒXƒgƒŒ[ƒt²‚ğì‚éB
+            // æ•µæ–¹å‘(forward)ã¨ã‚«ãƒ¡ãƒ©å³æ–¹å‘(lateral)ã‚’ç›´äº¤åŒ–ã—ã€ç´”ç²‹ãªã‚¹ãƒˆãƒ¬ãƒ¼ãƒ•è»¸ã‚’ä½œã‚‹ã€‚
             Vector3 forward = _lockOnDirection;
             Vector3 lateral = cameraRight;
             Vector3 up = Vector3.up;
@@ -196,35 +196,35 @@ public class PlayerMover
             Vector3 lockMove = forward * _currentInput.y + lateral * _currentInput.x;
             _moveDirection = lockMove.sqrMagnitude > 0.001f ? lockMove.normalized : Vector3.zero;
 
-            // ƒƒbƒNƒIƒ“‚Íí‚É“G•ûŒü‚ğŒü‚­B
+            // ãƒ­ãƒƒã‚¯ã‚ªãƒ³æ™‚ã¯å¸¸ã«æ•µæ–¹å‘ã‚’å‘ãã€‚
             _lookDirection = forward;
             return;
         }
 
-        // ”ñƒƒbƒNƒIƒ“‚ÍˆÚ“®‘¬“x‚ª\•ª‚ ‚ê‚Î‘¬“x•ûŒü‚ğA‚È‚¯‚ê‚Î“ü—Í•ûŒü‚ğŒü‚­B
+        // éãƒ­ãƒƒã‚¯ã‚ªãƒ³æ™‚ã¯ç§»å‹•é€Ÿåº¦ãŒååˆ†ã‚ã‚Œã°é€Ÿåº¦æ–¹å‘ã‚’ã€ãªã‘ã‚Œã°å…¥åŠ›æ–¹å‘ã‚’å‘ãã€‚
         Vector3 vel = _rb.linearVelocity;
         vel.y = 0;
         _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
     }
 
-    /// <summary>…•½ˆÚ“®•ûŒü‚Æ‘¬“x‚ğRigidbody‚Ö”½‰f‚µA‚’¼‘¬“x‚ğˆÛ‚·‚éB</summary>
+    /// <summary>æ°´å¹³ç§»å‹•æ–¹å‘ã¨é€Ÿåº¦ã‚’Rigidbodyã¸åæ˜ ã—ã€å‚ç›´é€Ÿåº¦ã‚’ç¶­æŒã™ã‚‹ã€‚</summary>
     private void Movement()
     {
         if (_moveDirection.sqrMagnitude < 0.001f)
         {
-            // “ü—Í‚ª‹É¬‚È‚ç—Í‚ğ‰Á‚¦‚È‚¢B
+            // å…¥åŠ›ãŒæ¥µå°ãªã‚‰åŠ›ã‚’åŠ ãˆãªã„ã€‚
             return;
         }
 
         float inputMagnitude = Mathf.Clamp01(_currentInput.magnitude);
         float targetSpeed = ResolveTargetSpeed();
-        // ƒƒbƒNƒIƒ“^ƒXƒvƒŠƒ“ƒgó‘Ô‚É‰‚¶‚½–Ú•W‘¬“x‚Å‰Á‘¬—Í‚ğŒˆ’èB
+        // ãƒ­ãƒƒã‚¯ã‚ªãƒ³ï¼ã‚¹ãƒ—ãƒªãƒ³ãƒˆçŠ¶æ…‹ã«å¿œã˜ãŸç›®æ¨™é€Ÿåº¦ã§åŠ é€ŸåŠ›ã‚’æ±ºå®šã€‚
         Vector3 acceleration = _moveDirection * targetSpeed * _playerStatus.Acceleration * inputMagnitude;
         _rb.AddForce(acceleration, ForceMode.Acceleration);
     }
 
-    /// <summary>Ã~E•àsEDash‚È‚ÇŒ»İ‚Ì“ü—Í‚Æó‘Ô‚©‚ç–Ú•W‘¬“x‚ğ‘I‚ÔB</summary>
-    /// <returns>ˆÚ“®ó‘Ô‚É‘Î‰‚·‚é–Ú•W‘¬“xB</returns>
+    /// <summary>é™æ­¢ãƒ»æ­©è¡Œãƒ»Dashãªã©ç¾åœ¨ã®å…¥åŠ›ã¨çŠ¶æ…‹ã‹ã‚‰ç›®æ¨™é€Ÿåº¦ã‚’é¸ã¶ã€‚</summary>
+    /// <returns>ç§»å‹•çŠ¶æ…‹ã«å¯¾å¿œã™ã‚‹ç›®æ¨™é€Ÿåº¦ã€‚</returns>
     private float ResolveTargetSpeed()
     {
         if (_isLockOn)
@@ -235,7 +235,7 @@ public class PlayerMover
         return _isSprinting ? _playerStatus.UnLockSprintSpeed : _playerStatus.UnLockWalkSpeed;
     }
 
-    /// <summary>ˆÚ“®‚Ü‚½‚ÍLock-On‚ÌŒü‚«‚ÖPlayer‚ğ•âŠÔù‰ñ‚³‚¹‚éB</summary>
+    /// <summary>ç§»å‹•ã¾ãŸã¯Lock-Onã®å‘ãã¸Playerã‚’è£œé–“æ—‹å›ã•ã›ã‚‹ã€‚</summary>
     private void UpdateRotation()
     {
         if (_lookDirection.sqrMagnitude > 0.1f)
@@ -247,27 +247,27 @@ public class PlayerMover
     }
 
 
-    /// <summary>–Ú•W‘¬“x‚ÉŒü‚¯‚Ä‰ÁŒ¸‘¬‚µA‹}Œƒ‚È‘¬“xØ‚è‘Ö‚¦‚ğ—}‚¦‚éB</summary>
+    /// <summary>ç›®æ¨™é€Ÿåº¦ã«å‘ã‘ã¦åŠ æ¸›é€Ÿã—ã€æ€¥æ¿€ãªé€Ÿåº¦åˆ‡ã‚Šæ›¿ãˆã‚’æŠ‘ãˆã‚‹ã€‚</summary>
     private void SpeedControll()
     {
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
         float maxSpeed = ResolveTargetSpeed();
 
-        // ‘¬“xãŒÀ‚ğ’´‚¦‚Ä‚¢‚½‚ç…•½•ûŒü‚Ì‚İ§ŒÀB
+        // é€Ÿåº¦ä¸Šé™ã‚’è¶…ãˆã¦ã„ãŸã‚‰æ°´å¹³æ–¹å‘ã®ã¿åˆ¶é™ã€‚
         if (_velXZ.magnitude >= maxSpeed)
         {
             Vector3 limited = _velXZ.normalized * maxSpeed;
             _rb.linearVelocity = new Vector3(limited.x, _rb.linearVelocity.y, limited.z);
         }
-        // “ü—Í‚ª–³‚¢‚Æ‚«‚ÍŒ¸‘¬—Í‚ğ—^‚¦‚é‚©Š®‘S’â~‚³‚¹‚éB
+        // å…¥åŠ›ãŒç„¡ã„ã¨ãã¯æ¸›é€ŸåŠ›ã‚’ä¸ãˆã‚‹ã‹å®Œå…¨åœæ­¢ã•ã›ã‚‹ã€‚
         if (_currentInput.sqrMagnitude < 0.01f)
         {
             MoveStop();
         }
     }
 
-    /// <summary>ƒ[ƒ‹ƒhˆÚ“®•ûŒü‚ğPlayerƒ[ƒJƒ‹‚Ì“ñ²’l‚Ö•ÏŠ·‚µ‚ÄAnimator‚Ö“n‚·B</summary>
-    /// <returns>ˆÚ“®•ûŒü‚ğ•\‚·“ñ²’lB</returns>
+    /// <summary>ãƒ¯ãƒ¼ãƒ«ãƒ‰ç§»å‹•æ–¹å‘ã‚’Playerãƒ­ãƒ¼ã‚«ãƒ«ã®äºŒè»¸å€¤ã¸å¤‰æ›ã—ã¦Animatorã¸æ¸¡ã™ã€‚</summary>
+    /// <returns>ç§»å‹•æ–¹å‘ã‚’è¡¨ã™äºŒè»¸å€¤ã€‚</returns>
     private Vector2 ReturnVector()
     {
         Vector2 animInput = Vector2.zero;
