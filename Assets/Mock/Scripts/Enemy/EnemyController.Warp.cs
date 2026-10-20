@@ -10,7 +10,7 @@ public partial class EnemyController
     private readonly Dictionary<Renderer, bool> _warpRenderers = new();
     private readonly List<GameObject> _warpEffects = new();
     private KatsuroTimedVFX _warpVanish, _warpAppear, _warpSlash;
-    private bool _warpAppearStarted, _warpSlashPending;
+    private bool _warpAppearStarted, _warpSlashPending, _warpVanishStarted;
 
     private bool TryFindWarpDestination(EnemyAttackPattern pattern, out Vector3 target)
     {
@@ -26,7 +26,7 @@ public partial class EnemyController
         _preparingWarp = pattern;
         _warpElapsed = 0f;
         _warpHidden = false;
-        _warpAppearStarted = _warpSlashPending = false;
+        _warpAppearStarted = _warpSlashPending = _warpVanishStarted = false;
         _animator.CrossFadeInFixedTime(departure, .08f, 0, 0);
         return true;
     }
@@ -45,10 +45,18 @@ public partial class EnemyController
         _warpElapsed += deltaTime;
         if (!_warpHidden)
         {
-            if (_warpElapsed < pattern.WindupDuration) return;
+            if (!_warpVanishStarted)
+            {
+                if (_warpElapsed < pattern.WindupDuration) return;
+                if (!TryFindWarpDestination(pattern, out _)) { CancelAttackPattern(true); return; }
+                PlayWarpCue(pattern, true);
+                _warpVanishStarted = true;
+                _warpElapsed = 0f;
+                return;
+            }
+            if (_warpElapsed < (pattern.UsesArtWarpVFX ? pattern.WarpVanishLead : 0f)) return;
             // 先に検証。候補が無効なら見えるまま中止する。
             if (!TryFindWarpDestination(pattern, out _)) { CancelAttackPattern(true); return; }
-            PlayWarpCue(pattern, true);
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))
             {
                 _warpRenderers[renderer] = renderer.enabled;
@@ -58,15 +66,18 @@ public partial class EnemyController
             _warpElapsed = 0f;
             return;
         }
-        if (_warpElapsed < pattern.DisappearDuration)
+        // A long frame can skip the entire lead window. Start convergence before
+        // testing reappearance, and preserve its lead time even in that case.
+        float lead = Mathf.Min(pattern.WarpAppearLead, pattern.DisappearDuration);
+        if (!_warpAppearStarted && pattern.WarpAppearVFX != null &&
+            _warpElapsed >= pattern.DisappearDuration - lead &&
+            TryFindWarpDestination(pattern, out var upcoming))
         {
-            // 実体が現れる少し前から、出現予定地点で青白い光を収束させる。
-            float lead = Mathf.Min(pattern.WarpAppearLead, pattern.DisappearDuration);
-            if (!_warpAppearStarted && pattern.WarpAppearVFX != null && _warpElapsed >= pattern.DisappearDuration - lead &&
-                TryFindWarpDestination(pattern, out var upcoming))
-                PlayWarpAppear(pattern, upcoming);
-            return;
+            PlayWarpAppear(pattern, upcoming);
+            _warpElapsed = Mathf.Min(_warpElapsed, pattern.DisappearDuration - lead);
+            if (lead > 0f) return;
         }
+        if (_warpElapsed < pattern.DisappearDuration) return;
         // 消失中にPlayerが動いても、現在の背後を再検証してからWarpする。
         if (!TryFindWarpDestination(pattern, out var destination) || !_mover.TryTeleportDuringAttack(destination))
         { CancelAttackPattern(true); return; }
@@ -166,7 +177,7 @@ public partial class EnemyController
         _warpElapsed = 0f;
         // 中断・被弾・死亡で出現光が浮いたまま残らないようにする。消失の黒霧は自然に消えるまで残す。
         if (_warpAppear != null) _warpAppear.Stop();
-        _warpAppearStarted = _warpSlashPending = false;
+        _warpAppearStarted = _warpSlashPending = _warpVanishStarted = false;
     }
 
     /// <summary>Enemyと一緒に、使い回していたワープVFXのインスタンスも破棄する。</summary>

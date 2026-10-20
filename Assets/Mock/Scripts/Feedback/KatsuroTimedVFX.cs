@@ -47,6 +47,7 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     private Vector3[] _baseScales;
     private float _started;
     private bool _playing;
+    private float _intensityMultiplier = 1f, _timeScale = 1f;
 
     /// <summary>全パーツが消え終わるまでの秒数。</summary>
     public float Duration
@@ -68,11 +69,13 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     }
 
     /// <summary>位置・向き・一様スケールを決めて最初から再生する。向きはローカルX=斬撃方向、Z=正面法線。</summary>
-    public void Play(Vector3 position, Quaternion rotation, float scale = 1f)
+    public void Play(Vector3 position, Quaternion rotation, float scale = 1f, float emission = 1f, float duration = 0f)
     {
         Prepare();
         transform.SetPositionAndRotation(position, rotation);
         transform.localScale = Vector3.one * Mathf.Max(.01f, scale);
+        _intensityMultiplier = Mathf.Max(0f, emission);
+        _timeScale = duration > 0f ? Mathf.Max(.01f, duration) / Mathf.Max(.001f, Duration) : 1f;
         _started = FeedbackVisualTime.Now;
         _playing = true;
         gameObject.SetActive(true);
@@ -91,7 +94,7 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     private void LateUpdate()
     {
         if (!_playing) return;
-        float t = FeedbackVisualTime.Now - _started;
+        float t = (FeedbackVisualTime.Now - _started) / _timeScale;
         if (t >= Duration) { Stop(); return; }
         Apply(t);
     }
@@ -129,7 +132,7 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
             else
             {
                 float envelope = (1f - (1f - rise) * (1f - rise)) * (1f - Mathf.SmoothStep(0f, 1f, fall));
-                _block.SetFloat(IntensityId, track.Peak * envelope);
+                _block.SetFloat(IntensityId, track.Peak * envelope * _intensityMultiplier);
                 _block.SetFloat(ProgressId, track.Wipe ? Mathf.Lerp(0f, 1.2f, rise) : 1.2f);
             }
             track.Renderer.SetPropertyBlock(_block);

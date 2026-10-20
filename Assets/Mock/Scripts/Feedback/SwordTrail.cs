@@ -124,9 +124,9 @@ public sealed class SwordTrail : MonoBehaviour
         if (active) { count = 0; mesh.Clear(); hasPrevious = false; speedStrength = 0f; counterSlash?.Reset(FeedbackVisualTime.Now); Sample(); }
     }
     /// <summary>受理済み命中の表示通知のみ。判定、ダメージ、Animator、HitStop設定は操作しない。</summary>
-    public Vector3 NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default)
+    public Vector3 NotifyCounterHit(JustAvoidCounterStrike strike, Vector3 point, Vector3 sweepDirection = default, bool showImpactStroke = true)
     {
-        if (_sharedTrail != null && _sharedTrail != this) return _sharedTrail.NotifyCounterHit(strike, point, sweepDirection);
+        if (_sharedTrail != null && _sharedTrail != this) return _sharedTrail.NotifyCounterHit(strike, point, sweepDirection, showImpactStroke);
         if (!initialized || style != AttackStyle.JustAvoidCounter || counterStrike != strike || !counterSlash.Enabled) return Vector3.zero;
         counterSlash.Hit(point, FeedbackVisualTime.Now);
         float now=FeedbackVisualTime.Now;
@@ -151,7 +151,7 @@ public sealed class SwordTrail : MonoBehaviour
         float reliableSpeed=Mathf.Max(.1f,_minimumSpeed);
         direction=CounterImpactStroke.ProjectDirection(direction,recent.sqrMagnitude>=reliableSpeed*reliableSpeed?recent:sweepDirection,view,
             settings.StrokeMinProjection,settings.StrokeMaxProjectionAngle);
-        counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
+        if (showImpactStroke) counterSlash.ShowStroke(point, direction, bladeAxis, view, FeedbackVisualTime.Now);
         captureCounterHit = true;
         // Blood reuses the measured blade motion before the existing stroke-only camera correction.
         return physicalDirection;

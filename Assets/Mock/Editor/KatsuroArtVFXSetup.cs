@@ -28,7 +28,7 @@ internal static class KatsuroArtVFXSetup
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             if (File.Exists(IssenPrefab) && File.Exists(VanishPrefab) && File.Exists(AppearPrefab)) return;
             if (!File.Exists(IssenFbx) || !File.Exists(WarpFbx)) return;
-            Build();
+            Debug.LogWarning("[ArtVFX] A generated prefab is missing. Use Katsuro/VFX/Rebuild Art VFX explicitly; existing manual materials and prefabs were preserved.");
         };
     }
 

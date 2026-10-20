@@ -25,7 +25,7 @@ MonoBehaviour:
   DashDistance: 3
   DashSpeed: 12
   DashEndTime: 0.7
-  MeasuredDashDistance: 3.284039
+  MeasuredDashDistance: 3.2893562
   OverrideWeaponGrip: 1
   WeaponGripLocalPosition: {x: 0.03806717, y: 0.24124862, z: -0.0063277865}
   WeaponGripLocalEuler: {x: 291.3323, y: 123.410126, z: 202.17143}
@@ -43,6 +43,7 @@ MonoBehaviour:
   WarpVanishVFX: {fileID: 0}
   WarpAppearVFX: {fileID: 0}
   WarpSlashVFX: {fileID: 0}
+  WarpVanishLead: 0.07
   WarpAppearLead: 0.06
   WarpEffectHeight: 1.1
   WarpSlashForward: 0.8

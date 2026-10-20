@@ -39,6 +39,18 @@ public class VFXConfig : ScriptableObject
     private float _counterFirstIssenScale = .75f;
     [SerializeField, Range(.3f, 2f), Tooltip("追撃2撃目（締め）の一閃の大きさ（基準長2m）。")]
     private float _counterSecondIssenScale = 1.05f;
+    [System.Serializable]
+    public sealed class CounterIssenStyle
+    {
+        [Tooltip("命中位置からのオフセット。X=斬撃方向、Y=面内上方向、Z=カメラ方向。")]
+        public Vector3 PositionOffset;
+        public Vector3 RotationOffset;
+        [Min(0f)] public float EmissionIntensity = 1f;
+        [Min(.01f)] public float Duration = .22f;
+    }
+    [SerializeField] private CounterIssenStyle _counterFirstIssenStyle = new CounterIssenStyle { EmissionIntensity = .75f, Duration = .19f };
+    [SerializeField] private CounterIssenStyle _counterSecondIssenStyle = new CounterIssenStyle { EmissionIntensity = 1f, Duration = .24f };
+    public CounterIssenStyle GetCounterIssenStyle(bool first) => first ? _counterFirstIssenStyle : _counterSecondIssenStyle;
     public KatsuroTimedVFX CounterIssenSlash => _counterIssenSlash;
     public float GetCounterIssenScale(bool first) => first ? _counterFirstIssenScale : _counterSecondIssenScale;
     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>

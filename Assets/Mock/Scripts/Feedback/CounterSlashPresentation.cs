@@ -34,7 +34,7 @@ internal sealed class CounterSlashPresentation
         lastUpdate = now;
         holdStart = holdUntil = 0f;
         contacted = false;
-        renderer.SetPropertyBlock(null);
+        if (renderer != null) renderer.SetPropertyBlock(null);
         stroke?.Hide();
     }
 
@@ -81,7 +81,7 @@ internal sealed class CounterSlashPresentation
     [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
     public void SetDebugVisibility(bool hidden)
     {
-        renderer.forceRenderingOff = hidden;
+        if (renderer != null) renderer.forceRenderingOff = hidden;
         stroke?.SetDebugVisibility(hidden);
     }
     public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)

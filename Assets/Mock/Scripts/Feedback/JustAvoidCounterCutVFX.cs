@@ -9,6 +9,7 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     [SerializeField, Tooltip("刀軌跡Slashを主役にし、このPrefabの旧Cut Quadを非表示にする。Bloodは維持し、既存ContactPulseで局所光を再生します。")]
     private bool _useLocalContactFlash;
     public bool UsesLocalContactFlash => _useLocalContactFlash;
+    public void UseExternalSlash() { _useLocalContactFlash = true; if (_cutRenderer != null) _cutRenderer.enabled = false; }
     [SerializeField] private ParticleSystem[] _blood;
     [SerializeField, Min(.01f), Tooltip("プールを返却するまでの秒数。Bloodの寿命も含むため、Cutだけの減衰は専用Materialで調整します。")]
     private float _duration = .38f;

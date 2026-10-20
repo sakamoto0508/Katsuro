@@ -445,7 +445,8 @@ public sealed class CombatFeedback : MonoBehaviour
         {
             info.Instigator.GetComponent<JustAvoidCounterAnimation>()?.OnCounterHit();
             var trail = info.Instigator.GetComponentInChildren<SwordTrail>(true);
-            Vector3 measured = trail != null ? trail.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection) : Vector3.zero;
+            Vector3 measured = trail != null ? trail.NotifyCounterHit(info.CounterStrike, info.HitPoint, info.SlashDirection,
+                showImpactStroke: _vfxConfig == null || _vfxConfig.CounterIssenSlash == null) : Vector3.zero;
             if (measured.sqrMagnitude > .0001f) counterBloodDirection = measured;
         }
         if (_enemyOwner != null)
@@ -544,6 +545,7 @@ public sealed class CombatFeedback : MonoBehaviour
         var counter = _vfxConfig != null ? _vfxConfig.CounterPresentation : null;
         _counterCuts = CreateCounterPool(counter != null ? counter.FinisherCFX : null);
         _counterFirstCuts = CreateCounterPool(counter != null ? counter.FirstCFX : null);
+        PrepareCounterIssen();
         if (_vfxConfig == null || _vfxConfig.HitVFX == null) return;
         _hitRoots = new GameObject[4]; _hitParticles = new ParticleSystem[4][]; _hitStarted = new float[4];
         _hitBursts = new ParticleSystem.Burst[4][][];
@@ -603,7 +605,22 @@ public sealed class CombatFeedback : MonoBehaviour
         var prefab = _vfxConfig != null ? _vfxConfig.CounterIssenSlash : null;
         var view = Camera.main;
         if (prefab == null || view == null) return;
-        if (_counterIssens == null)
+        PrepareCounterIssen();
+        if (_counterIssens == null) return;
+        var slash = _counterIssens[_nextCounterIssen];
+        _nextCounterIssen = (_nextCounterIssen + 1) % _counterIssens.Length;
+        Vector3 direction = slashDirection.sqrMagnitude > .0001f ? slashDirection : info.SlashDirection;
+        Quaternion basis = KatsuroVFXOrientation.FacingCamera(info.HitPoint, direction, view);
+        var style = _vfxConfig.GetCounterIssenStyle(info.IsCounterFirst);
+        Vector3 point = info.HitPoint + (style != null ? basis * style.PositionOffset : Vector3.zero);
+        slash.Play(point, basis * Quaternion.Euler(style != null ? style.RotationOffset : Vector3.zero),
+            _vfxConfig.GetCounterIssenScale(info.IsCounterFirst), style != null ? style.EmissionIntensity : 1f, style != null ? style.Duration : 0f);
+    }
+
+    private void PrepareCounterIssen()
+    {
+        var prefab = _vfxConfig != null ? _vfxConfig.CounterIssenSlash : null;
+        if (prefab != null && _counterIssens == null)
         {
             _counterIssens = new KatsuroTimedVFX[2];
             for (int i = 0; i < _counterIssens.Length; i++)
@@ -613,10 +630,6 @@ public sealed class CombatFeedback : MonoBehaviour
                 _counterIssens[i].Stop();
             }
         }
-        var slash = _counterIssens[_nextCounterIssen];
-        _nextCounterIssen = (_nextCounterIssen + 1) % _counterIssens.Length;
-        Vector3 direction = slashDirection.sqrMagnitude > .0001f ? slashDirection : info.SlashDirection;
-        slash.Play(info.HitPoint, KatsuroVFXOrientation.FacingCamera(info.HitPoint, direction, view), _vfxConfig.GetCounterIssenScale(info.IsCounterFirst));
     }
 
     /// <summary>段ごとの専用CFXを初期化時に固定数だけ作り、命中時の生成と破棄を避ける。</summary>
@@ -629,6 +642,7 @@ public sealed class CombatFeedback : MonoBehaviour
             pool[i] = Instantiate(prefab);
             foreach (var child in pool[i].GetComponentsInChildren<Transform>(true)) child.gameObject.layer = gameObject.layer;
             pool[i].Stop();
+            if (_vfxConfig != null && _vfxConfig.CounterIssenSlash != null) pool[i].UseExternalSlash();
         }
         return pool;
     }
@@ -857,6 +871,7 @@ public sealed class CombatFeedback : MonoBehaviour
         _contactPulse?.Dispose();
         if (_counterCuts != null) foreach (var cut in _counterCuts) if (cut != null) Destroy(cut.gameObject);
         if (_counterFirstCuts != null) foreach (var cut in _counterFirstCuts) if (cut != null) Destroy(cut.gameObject);
+        if (_counterIssens != null) foreach (var slash in _counterIssens) if (slash != null) Destroy(slash.gameObject);
         if (_hitRoots != null) foreach (var root in _hitRoots) if (root != null) Destroy(root);
         if (_afterImageMeshes != null)
             foreach (var mesh in _afterImageMeshes) if (mesh != null) Destroy(mesh);

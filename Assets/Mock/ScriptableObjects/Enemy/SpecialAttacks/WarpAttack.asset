@@ -43,7 +43,8 @@ MonoBehaviour:
   WarpVanishVFX: {fileID: 7907734529080212083, guid: ab5cade32b0ffad4f95ba0daa1b4db58, type: 3}
   WarpAppearVFX: {fileID: 7706840471134813055, guid: 6624b8e4a44f0a0499f53052ba28954b, type: 3}
   WarpSlashVFX: {fileID: 6079003188372657689, guid: 16cd2ac1860eba349989be6a8567e048, type: 3}
-  WarpAppearLead: 0.06
+  WarpVanishLead: 0.07
+  WarpAppearLead: 0.12
   WarpEffectHeight: 1.1
   WarpSlashForward: 0.8
   WarpSlashRoll: -35

@@ -62,7 +62,10 @@ public sealed class EnemyAttackPattern : ScriptableObject
     public KatsuroTimedVFX WarpAppearVFX;
     [Tooltip("出現後の斬撃で、最初の攻撃判定が開いた瞬間に出す一閃。")]
     public KatsuroTimedVFX WarpSlashVFX;
-    [Min(0f), Tooltip("出現の収束光を、実体が現れる何秒前から始めるか。DisappearDuration以下に収まる。")]
+
+    [Min(0f), Tooltip("黒霧を出してから本体を隠すまでの秒数。移動・判定には使用しない。")]
+    public float WarpVanishLead = .07f;
+    [Min(0f), Tooltip("実体出現前に収束光を始める秒数。") ]
     public float WarpAppearLead = .06f;
     [Min(0f), Tooltip("収束点・一閃の高さ（足元からm）。")]
     public float WarpEffectHeight = 1.1f;
