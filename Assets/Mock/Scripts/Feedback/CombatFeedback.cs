@@ -618,7 +618,16 @@ public sealed class CombatFeedback : MonoBehaviour
         Vector3 point = info.HitPoint + (style != null ? basis * style.PositionOffset : Vector3.zero);
         slash.Play(point, basis * Quaternion.Euler(style != null ? style.RotationOffset : Vector3.zero),
             _vfxConfig.GetCounterIssenScale(info.IsCounterFirst), style != null ? style.EmissionIntensity : 1f, style != null ? style.Duration : 0f);
+        // 鬼武者の一閃のような追加演出（画面の白飛び・巨大な弧・放射状の光の筋・しぶき・青い火花）。
+        if (_issenFinisher == null)
+        {
+            _issenFinisher = gameObject.AddComponent<OnimushaIssenVFX>();
+            _issenFinisher.Initialize(_vfxConfig);
+        }
+        Vector3 attacker = info.Instigator != null ? info.Instigator.transform.position : info.HitPoint - direction.normalized;
+        _issenFinisher.Play(info.HitPoint, direction, attacker, info.IsCounterFirst);
     }
+    private OnimushaIssenVFX _issenFinisher;
 
     private void PrepareCounterIssen()
     {

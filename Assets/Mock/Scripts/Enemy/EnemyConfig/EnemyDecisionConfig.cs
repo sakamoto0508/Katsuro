@@ -4,6 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyDecisionConfig", menuName = "ScriptableObjects/Enemy/DecisionConfig")]
 public class EnemyDecisionConfig : ScriptableObject
 {
+    /// <summary>既存AIの中距離帯か。Nearの境界は含まず、Farの境界は含む。</summary>
+    public bool IsMidDistance(float distance) => float.IsFinite(distance) && distance >= 0f &&
+        distance > NearDistance && distance <= FarDistance;
+
     /// <summary>遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。</summary>
     [UnityEngine.Tooltip("遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。")]
     [Header("Distance thresholds")]

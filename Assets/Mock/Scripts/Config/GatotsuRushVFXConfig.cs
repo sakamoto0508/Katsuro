@@ -86,9 +86,9 @@ public sealed class GatotsuRushVFXConfig : ScriptableObject
     {
         /// <summary>この演出要素を有効にする。</summary>
         public bool Enabled = true;
-        /// <summary>残像の色と初期の濃さ（CombatGlow の _Tint）。</summary>
-        [Tooltip("残像の色と初期の濃さ（CombatGlow の _Tint）。")]
-        public Color Color = new Color(.70f, .82f, .95f, .22f);
+        /// <summary>残像の色と初期の濃さ（CombatGlow の _Tint）。黒い影のような残像。</summary>
+        [Tooltip("残像の色と初期の濃さ（CombatGlow の _Tint）。黒い影のような残像。")]
+        public Color Color = new Color(.015f, .015f, .025f, .55f);
         /// <summary>突進中に残す残像の数。</summary>
         [Range(0, 6), Tooltip("突進中に残す残像の数。")]
         public int Count = 3;

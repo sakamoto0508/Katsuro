@@ -80,6 +80,45 @@ public class VFXConfig : ScriptableObject
     public KatsuroTimedVFX CounterIssenSlash => _counterIssenSlash;
     /// <summary>追撃1撃目または2撃目のArt一閃のサイズ倍率を取得する。</summary>
     public float GetCounterIssenScale(bool first) => first ? _counterFirstIssenScale : _counterSecondIssenScale;
+
+    /// <summary>鬼武者の一閃のような追撃演出（画面の白飛び・巨大な弧・放射状の光の筋・白いしぶき・青い火花）。</summary>
+    [System.Serializable]
+    public sealed class IssenFinisher
+    {
+        [Tooltip("一閃演出を出す。")] public bool Enabled = true;
+        [Header("画面の白飛び")]
+        [ColorUsage(false, true), Tooltip("白飛びの色。")] public Color FlashColor = new Color(.86f, .93f, 1f, 1f);
+        [Range(0f, 3f), Tooltip("1撃目の白飛びの強さ。")] public float FirstFlash = .45f;
+        [Range(0f, 3f), Tooltip("2撃目（締め）の白飛びの強さ。")] public float SecondFlash = 1.1f;
+        [Range(.02f, .5f), Tooltip("白飛びが引くまでの秒数。")] public float FlashDuration = .14f;
+        [Header("巨大な弧（体の周りを走る光の面）")]
+        [Tooltip("1撃目に弧を出す。")] public bool FirstArc = true;
+        [Tooltip("2撃目に弧を出す。")] public bool SecondArc;
+        [ColorUsage(false, true), Tooltip("弧の色。")] public Color ArcColor = new Color(.9f, .95f, 1f, 1f);
+        [Range(0f, 10f), Tooltip("弧の明るさ。")] public float ArcIntensity = 2.2f;
+        [Range(30f, 300f), Tooltip("弧の角度（度）。")] public float ArcAngle = 150f;
+        [Range(0f, 3f), Tooltip("命中点より外へ広げる半径の余白（m）。")] public float ArcRadiusPadding = .8f;
+        [Range(.01f, .3f), Tooltip("弧が尾から先端まで走る秒数。")] public float ArcSweep = .06f;
+        [Range(.05f, .8f), Tooltip("走り切ってから消えるまでの秒数。")] public float ArcFade = .22f;
+        [Header("放射状の光の筋")]
+        [Range(0, 80)] public int StreakCount = 28;
+        [Range(1f, 60f), Tooltip("筋が飛ぶ速さ（m/s）。")] public float StreakSpeed = 22f;
+        [ColorUsage(false, true)] public Color StreakColor = new Color(.9f, .96f, 1f, 1f);
+        [Header("白いしぶき")]
+        [Range(0, 60)] public int MistCount = 16;
+        public Color MistColor = new Color(1f, 1f, 1f, .35f);
+        [Header("青い火花（余韻）")]
+        [Range(0, 120)] public int SparkCount = 40;
+        [ColorUsage(false, true)] public Color SparkColor = new Color(.45f, .75f, 1f, 1f);
+        [Range(0f, 10f)] public float SparkIntensity = 3f;
+    }
+    [Header("Just Avoid Counter / Onimusha-style finisher")]
+    [SerializeField] private IssenFinisher _issenFinisher = new IssenFinisher();
+    [SerializeField, Tooltip("巨大な弧に使う Material（一閃の光の面：M_Issen_LightSheet）。")] private Material _issenArcMaterial;
+    [SerializeField, Tooltip("しぶき・光の筋・火花の元にする Material（Katsuro/VFXParticle の手続き的な粒：M_Rush_Dust）。")] private Material _issenParticleMaterial;
+    public IssenFinisher IssenFinisherStyle => _issenFinisher;
+    public Material IssenArcMaterial => _issenArcMaterial;
+    public Material IssenParticleMaterial => _issenParticleMaterial;
     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
     [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
     [Header("Just Avoid / Screen Distortion")]

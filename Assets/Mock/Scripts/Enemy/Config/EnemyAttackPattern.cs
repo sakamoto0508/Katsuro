@@ -81,21 +81,25 @@ public sealed class EnemyAttackPattern : ScriptableObject
     }
     /// <summary>本体再生に適用する、再生速度・突進時間を考慮した異常復帰期限（秒）。</summary>
     public float BodyTimeout => UsesDashTuning ? Timeout + DashDuration : Timeout / PlaybackSpeed;
-    /// <summary>AIが選択可能な対象までの最小距離（m）。</summary>
+    /// <summary>対象までの最小選択距離（m）。Mid距離帯のWarpではAIの距離帯判定を優先する。</summary>
     [Header("Selection / travel")]
-    [Min(0f)] public float MinAttackDistance;
-    /// <summary>AIが選択可能な対象までの最大距離（m）。</summary>
-    [Min(0f)] public float MaxAttackDistance = 1000f;
+    [Min(0f), Tooltip("対象までの最小選択距離（m）。WarpのMid候補ではNearDistance/FarDistanceを優先し、この制限を適用しない。Near/Farや他の攻撃では使用する。")]
+    public float MinAttackDistance;
+    /// <summary>対象までの最大選択距離（m）。Mid距離帯のWarpではAIの距離帯判定を優先する。</summary>
+    [Min(0f), Tooltip("対象までの最大選択距離（m）。WarpのMid候補ではNearDistance/FarDistanceを優先し、この制限を適用しない。Near/Farや他の攻撃では使用する。")]
+    public float MaxAttackDistance = 1000f;
     /// <summary>同じパターンを再選択できるまでの時間（秒）。</summary>
     [Min(0f)] public float Cooldown;
-    /// <summary>水平Root Motionの累計移動距離の上限。0は制限なし。</summary>
-    [Min(0f), Tooltip("水平Root Motionの累計移動距離の上限。0は制限なし。")]
+    /// <summary>攻撃中の水平Root Motionの累計移動上限（m）。ワープ自体の移動距離は含まない。0は制限なし。</summary>
+    [Min(0f), Tooltip("攻撃中の水平Root Motionの累計移動上限（m）。Warpでは出現後の攻撃移動だけを制限し、テレポート距離は含まない。0は制限なし。")]
     public float MaximumTravelDistance;
-    /// <summary>ワープ先を探索するときの、対象からの基準距離（m）。</summary>
+    /// <summary>Player背後の出現目標地点までの距離（m）。攻撃射程・発動距離とは独立。</summary>
     [Header("WarpAttack only")]
-    [Min(.1f)] public float TeleportDistance = 2.5f;
+    [Min(.1f), Tooltip("Playerの背後に出現する目標地点までの距離（m）。攻撃射程や発動条件ではない。NavMesh・衝突検証で安全な地点が見つからなければ中止する。")]
+    public float TeleportDistance = 2.5f;
     /// <summary>ワープ先の方向を対象の背後からずらす角度（度）。</summary>
-    [Range(-90f, 90f)] public float TeleportAngleOffset;
+    [Range(-90f, 90f), Tooltip("Playerの水平な背後方向を0度として、ワープ先を上下軸まわりにずらす角度（度）。TeleportDistanceと組み合わせて目標地点を決める。")]
+    public float TeleportAngleOffset;
     /// <summary>本体が非表示になってからワープ先へ再出現するまでの基準時間（秒）。</summary>
     [Min(0f)] public float DisappearDuration = .18f;
     /// <summary>再出現後の攻撃予兆。WarpではWindupDurationは消失前、こちらは出現後の構え時間。</summary>
@@ -190,6 +194,14 @@ public sealed class EnemyAttackPattern : ScriptableObject
     public WarpGhostSettings WarpGhost = new WarpGhostSettings();
     /// <summary>参照する攻撃データがWarpAttackか。</summary>
     public bool IsWarp => Attack != null && Attack.ActionType == EnemyActionType.WarpAttack;
+
+    /// <summary>抽選時と開始時で共有する距離条件。MidのWarpだけはAIの距離帯を優先し、他は既存Min/Maxを使う。</summary>
+    public bool IsInSelectionRange(float distance, EnemyDecisionConfig decisionConfig)
+    {
+        if (!float.IsFinite(distance) || distance < 0f) return false;
+        if (IsWarp && decisionConfig != null && decisionConfig.IsMidDistance(distance)) return true;
+        return distance >= MinAttackDistance && distance <= MaxAttackDistance;
+    }
     /// <summary>現在の構え時間（秒）。Warpでは再出現後、それ以外ではWindupDurationの時間。</summary>
     public float ActiveWindupDuration => IsWarp ? ReappearWindupDuration : WindupDuration;
     // Warp の出現後の構えは、刀を挙げ切った姿勢で完全に止めて待つ（EnemyController.Warp が速度0→通常速度を切り替える）。

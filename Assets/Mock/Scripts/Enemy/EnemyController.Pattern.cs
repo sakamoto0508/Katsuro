@@ -14,7 +14,7 @@ public partial class EnemyController
         if (_attackTarget != null)
         {
             float distance = Vector3.Distance(transform.position, _attackTarget.position);
-            if (distance < pattern.MinAttackDistance || distance > pattern.MaxAttackDistance) return false;
+            if (!pattern.IsInSelectionRange(distance, _decisionConfig)) return false;
         }
         return !pattern.IsWarp || TryFindWarpDestination(pattern, out _);
     }
