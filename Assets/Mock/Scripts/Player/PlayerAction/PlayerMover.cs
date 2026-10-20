@@ -34,6 +34,8 @@ public class PlayerMover
     private bool _isSprinting;
     private readonly float _attackRootMotionScale;
     private Vector3 _pendingAttackRootMotion;
+    /// <summary>RotationSmoothnessを調整したときの物理ステップ間隔。この間隔では従来と同じ補間量になる。</summary>
+    private const float RotationReferenceStep = 0.02f;
     public bool IsUsingAttackRootMotion { get; private set; }
 
     /// <summary>攻撃Root Motionの受付を開始し、前の攻撃の移動量を消去する。</summary>
@@ -91,6 +93,8 @@ public class PlayerMover
     public void FixedUpdate()
     {
         if (IsUsingAttackRootMotion) return;
+        // 移動設定が無いと速度も旋回量も決められないため、通常移動は行わない。
+        if (_playerStatus == null || _rb == null) return;
         Movement();
         UpdateRotation();
         SpeedControll();
@@ -122,12 +126,17 @@ public class PlayerMover
     /// <summary>移動入力と水平移動速度を止め、静止状態のAnimator値へ戻す。</summary>
     public void MoveStop()
     {
+        // KinematicではAddForceも速度設定も効かないため、従来どおり何もしない。
+        if (_rb == null || _rb.isKinematic || _playerStatus == null) return;
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
-        if (_velXZ.sqrMagnitude > 0.01f)
-        {
-            Vector3 brakeForce = -_velXZ.normalized * _playerStatus.BreakForce;
-            _rb.AddForce(brakeForce, ForceMode.Acceleration);
-        }
+        if (_velXZ.sqrMagnitude <= 0.01f) return;
+
+        // 1ステップの減速量が残り速度を超えると逆向きに振動するため、その場合は水平速度をゼロにして止める。
+        float brakeStep = _playerStatus.BreakForce * Time.fixedDeltaTime;
+        if (brakeStep >= _velXZ.magnitude) { _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f); return; }
+
+        Vector3 brakeForce = -_velXZ.normalized * _playerStatus.BreakForce;
+        _rb.AddForce(brakeForce, ForceMode.Acceleration);
     }
 
     /// <summary>抜刀状態を記録し、移動時に使用する姿勢と速度の選択へ反映する。</summary>
@@ -144,22 +153,34 @@ public class PlayerMover
         dir.y = 0f;
         if (dir.sqrMagnitude < 0.0001f) return;
 
-        Quaternion start = _playerPosition.rotation;
+        Quaternion start = CurrentRotation();
         Quaternion target = Quaternion.LookRotation(dir.normalized);
         float elapsed = 0f;
 
+        // 通常旋回と同じくRigidbody経由で回すため、物理フレームで進める。
         while (elapsed < duration)
         {
             ct.ThrowIfCancellationRequested();
 
-            elapsed += Time.deltaTime;
+            elapsed += Time.fixedDeltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            _playerPosition.rotation = Quaternion.Slerp(start, target, t);
+            ApplyRotation(Quaternion.Slerp(start, target, t));
 
-            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            await UniTask.Yield(PlayerLoopTiming.FixedUpdate, ct);
         }
 
-        _playerPosition.rotation = target;
+        ApplyRotation(target);
+    }
+
+    /// <summary>Rigidbodyがあればその姿勢を、なければTransformの姿勢を返す。</summary>
+    /// <returns>現在のPlayerの回転。</returns>
+    private Quaternion CurrentRotation() => _rb != null ? _rb.rotation : _playerPosition.rotation;
+
+    /// <summary>Rigidbodyの補間と衝突しないよう、Rigidbodyがあれば MoveRotation で回転させる。</summary>
+    private void ApplyRotation(Quaternion rotation)
+    {
+        if (_rb != null) { _rb.MoveRotation(rotation); return; }
+        _playerPosition.rotation = rotation;
     }
 
     /// <summary>移動速度をAnimatorへ渡すための値に換算する。</summary>
@@ -238,12 +259,13 @@ public class PlayerMover
     /// <summary>移動またはLock-Onの向きへPlayerを補間旋回させる。</summary>
     private void UpdateRotation()
     {
-        if (_lookDirection.sqrMagnitude > 0.1f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(_lookDirection);
-            _playerPosition.rotation = Quaternion.Slerp(_playerPosition.rotation
-                , targetRotation, _playerStatus.RotationSmoothness);
-        }
+        if (_lookDirection.sqrMagnitude <= 0.1f) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(_lookDirection);
+        // 係数は0.02秒ステップ基準の値として扱い、ステップ間隔が変わっても同じ速さで向くように換算する。
+        float smoothness = Mathf.Clamp01(_playerStatus.RotationSmoothness);
+        float t = 1f - Mathf.Pow(1f - smoothness, Time.fixedDeltaTime / RotationReferenceStep);
+        ApplyRotation(Quaternion.Slerp(CurrentRotation(), targetRotation, t));
     }
 
 
