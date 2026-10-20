@@ -21,3 +21,37 @@ MonoBehaviour:
   Timeout: 7
   PlaybackSpeed: 0.8
   RootMotionScale: 0.1
+  StageSounds:
+  - Label: "1段目: 初段"
+    Swing:
+    - Clip: {fileID: 8300000, guid: e8d6653c8d3f50c4bbb3d73ce5988e9a, type: 3}
+      Volume: 0.85
+      StartOffset: 0
+    Hit: []
+  - Label: "2段目: 連撃"
+    Swing:
+    - Clip: {fileID: 8300000, guid: a34ec4b74367c2d4d86175068a83415f, type: 3}
+      Volume: 0.9
+      StartOffset: 0
+    Hit: []
+  - Label: "3段目: 連撃（溜め前）"
+    Swing:
+    - Clip: {fileID: 8300000, guid: f440fd0ebb7918049a5ce39d863a7114, type: 3}
+      Volume: 0.95
+      StartOffset: 0
+    Hit: []
+  - Label: "4段目: 重いフィニッシュ"
+    Swing:
+    - Clip: {fileID: 8300000, guid: 09c2d303e1e093248ab830e7db1153dd, type: 3}
+      Volume: 1
+      StartOffset: 0
+    - Clip: {fileID: 8300000, guid: 6895fde4b737c86478834953b544b93c, type: 3}
+      Volume: 0.6
+      StartOffset: 0
+    Hit:
+    - Clip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
+      Volume: 1
+      StartOffset: 0
+    - Clip: {fileID: 8300000, guid: 00de4c24f2eed784b84357e4412c6434, type: 3}
+      Volume: 0.7
+      StartOffset: 0

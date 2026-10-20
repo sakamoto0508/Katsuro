@@ -21,3 +21,25 @@ MonoBehaviour:
   Timeout: 5
   PlaybackSpeed: 0.8
   RootMotionScale: 0.18
+  StageSounds:
+  - Label: "1段目: 初段（軽く鋭い）"
+    Swing:
+    - Clip: {fileID: 8300000, guid: 7e008eeec3fe75c448ab569f2e6d53ae, type: 3}
+      Volume: 0.8
+      StartOffset: 0
+    Hit: []
+  - Label: "2段目: 振り抜き"
+    Swing:
+    - Clip: {fileID: 8300000, guid: 34b0e6c3e31350b4abf77717082f83b5, type: 3}
+      Volume: 0.9
+      StartOffset: 0
+    Hit: []
+  - Label: "3段目: フィニッシュ"
+    Swing:
+    - Clip: {fileID: 8300000, guid: 6895fde4b737c86478834953b544b93c, type: 3}
+      Volume: 1
+      StartOffset: 0
+    Hit:
+    - Clip: {fileID: 8300000, guid: bdcc5db5ce36ff3409d90d57452d3f6c, type: 3}
+      Volume: 0.85
+      StartOffset: 0

@@ -133,6 +133,7 @@ public partial class EnemyController
         _attackAnimationHash = 0;
         _attacker?.DisableWeaponHitbox();
         _attacker?.SetSweptHits(false);
+        _attacker?.SetHitSounds(null);
         _mover?.EndAttackRootMotion();
         _mover?.SetAttackRootMotionScale(null);
         _mover?.SetAttackTravelLimit(0f);
@@ -171,6 +172,8 @@ public partial class EnemyController
         if (AcceptPatternEvent(evt) && _patternRunner.OpenWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash))
         {
             MaintainPatternWeaponGrip();
+            // この段の命中音を武器へ渡す。実際にPlayerへ当たった時だけ被弾側で鳴る。
+            _attacker?.SetHitSounds(_patternRunner.Pattern.GetStageSound(evt.intParameter)?.Hit);
             _attacker?.EnableWeaponHitbox();
             OnWarpHitboxOpened(_patternRunner.Pattern);
             OnRushDashStarted(_patternRunner.Pattern);
@@ -198,9 +201,12 @@ public partial class EnemyController
         }
     }
 
+    /// <summary>開いている段の振り抜き音を鳴らす。段別SEが未設定ならClipのEventに書かれた登録名を使う。</summary>
     public void AnimEvent_ComboSound(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt) && _patternRunner.WindowActive && _patternRunner.WindowIndex == evt.intParameter) _audio?.PlaySE(evt.stringParameter);
+        if (!AcceptPatternEvent(evt) || !_patternRunner.WindowActive || _patternRunner.WindowIndex != evt.intParameter) return;
+        var stage = _patternRunner.Pattern.GetStageSound(evt.intParameter);
+        if (!EnemyComboStageSound.Play(_audio, stage?.Swing)) _audio?.PlaySE(evt.stringParameter);
     }
     public void AnimEvent_StopAttackRootMotion(AnimationEvent evt)
     {

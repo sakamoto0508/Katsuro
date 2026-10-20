@@ -523,7 +523,8 @@ public sealed class CombatFeedback : MonoBehaviour
         bool finalBlowOwnsSound = _enemyOwner != null && _enemyOwner.HpRatio <= 0f &&
             FinalBlowManager.Instance != null && FinalBlowManager.Instance.isActiveAndEnabled &&
             hitClip != null && config != null && hitClip == _audio.GetSEClip(config.EnemyDeadSound);
-        if (!finalBlowOwnsSound)
+        // 敵コンボの段別命中音が指定されていれば、通常の命中音の代わりに鳴らす（フィニッシュの重さを素材の重ねで出す）。
+        if (!finalBlowOwnsSound && !EnemyComboStageSound.Play(_audio, info.HitSounds))
         {
             if (hitClip != null) _audio.PlaySE(hitClip, info.IsCounterFirst ? config.CounterFirstHitVolume : config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), info.IsCounterFirst ? config.CounterFirstHitOffset : config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
             else _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");

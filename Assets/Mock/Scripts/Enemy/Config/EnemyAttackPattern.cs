@@ -105,6 +105,14 @@ public sealed class EnemyAttackPattern : ScriptableObject
     /// <summary>再出現後の攻撃予兆。WarpではWindupDurationは消失前、こちらは出現後の構え時間。</summary>
     [Min(.1f), Tooltip("再出現後の攻撃予兆。WarpではWindupDurationは消失前、こちらは出現後の構え時間。")]
     public float ReappearWindupDuration = .5f;
+    /// <summary>コンボ各段の振り抜き音・命中音。要素0が1段目で、最後の要素をフィニッシュとして重く設定する。未設定の段は既存のComboSound Eventと通常命中音を使う。</summary>
+    [Header("Combo stage sounds")]
+    [Tooltip("コンボ各段の振り抜き音・命中音。要素0が1段目で、最後の要素をフィニッシュとして重く設定する。未設定の段は既存のComboSound Eventと通常命中音を使う。")]
+    public EnemyComboStageSound[] StageSounds = System.Array.Empty<EnemyComboStageSound>();
+    /// <summary>Animation Eventの段番号（1始まり）に対応する段別SEを取得する。</summary>
+    /// <returns>対応する段別SE。範囲外・未設定ならnull。</returns>
+    public EnemyComboStageSound GetStageSound(int stage) =>
+        StageSounds != null && stage >= 1 && stage <= StageSounds.Length ? StageSounds[stage - 1] : null;
     /// <summary>ワープ消失演出の開始時に再生するSE。</summary>
     public AudioClip DisappearSound;
     /// <summary>ワープ再出現時に再生するSE。</summary>

@@ -38,6 +38,7 @@ public class EnemyAttacker : IDisposable
     private bool _currentIsHeavy;
     private EnemyWeapon _currentWeapon;
     private float _currentDamage;
+    private ComboSoundLayer[] _currentHitSounds;
     private HitStopManager _hitStop;
     private bool _initialized;
     private readonly Transform _ownerTransform;
@@ -73,6 +74,7 @@ public class EnemyAttacker : IDisposable
     {
         DisableWeaponHitbox();
         _currentWeapon = null;
+        _currentHitSounds = null;
         if (!CanPerformAttack(data))
         {
             Debug.LogWarning($"EnemyAttacker: invalid attack data, Animator trigger or weapon: {data?.name}");
@@ -130,6 +132,9 @@ public class EnemyAttacker : IDisposable
         }
     }
 
+    /// <summary>以降の命中で被弾側へ渡す段別の命中音を設定する。nullなら被弾側の通常命中音を使う。</summary>
+    public void SetHitSounds(ComboSoundLayer[] sounds) => _currentHitSounds = EnemyComboStageSound.HasAny(sounds) ? sounds : null;
+
     public void SetSweptHits(bool active)
     {
         if (_weapons == null) return;
@@ -163,7 +168,7 @@ public class EnemyAttacker : IDisposable
         var owner = _ownerTransform != null ? _ownerTransform.GetComponent<EnemyController>() : null;
         damage *= owner != null && owner.IsTraining ? 1f : RunSession.EnemyDamage(owner != null ? owner.HpRatio : 1f);
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy,
-            sourceWeapon != null ? sourceWeapon.GetSlashDirection(other) : Vector3.zero);
+            sourceWeapon != null ? sourceWeapon.GetSlashDirection(other) : Vector3.zero, hitSounds: _currentHitSounds);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
         CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
         damageable.ApplyDamage(damageInfo);
