@@ -79,11 +79,6 @@ public class GameManager : MonoBehaviour
     [UnityEngine.Tooltip("命中時ダメージ数字を表示するコンポーネント参照。")]
     [SerializeField] private DamageNumbers _damageNumbers;
 
-    /// <summary>GameManagerがBGM再生を要求する際の基準音量。0で無音、1で最大。</summary>
-    [UnityEngine.Tooltip("GameManagerがBGM再生を要求する際の基準音量。0で無音、1で最大。")]
-    [SerializeField] private float _soundVolume = 0.3f;
-
-
     /// <summary>現在のゲーム進行状態。タイトル・戦闘・勝利・敗北の入力受付と演出を分ける。</summary>
     [UnityEngine.Tooltip("現在のゲーム進行状態。タイトル・戦闘・勝利・敗北の入力受付と演出を分ける。")]
     [SerializeField] private GameState _state = GameState.Title;
@@ -164,6 +159,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void SetGameState(GameState newState)
     {
+        // Pauseからの再開ではBGMを再生し直さず、停止前の曲とバフ用チャンネルを継続する。
+        bool resumed = _state == GameState.Pause && newState == GameState.InGame;
         _state = newState;
         // 入力
         if (_inputBuffer != null)
@@ -173,7 +170,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Audio: タイトル画面ならタイトル BGM を再生
-        if (_audioConfig != null && _audio != null)
+        if (_audioConfig != null && _audio != null && !resumed)
         {
             if (newState == GameState.Title)
             {
@@ -184,7 +181,6 @@ public class GameManager : MonoBehaviour
             {
                 _audio.StopAllBGMs();
                 _audio.PlayBGM(_audioConfig.InGameBGM, 0.5f);
-                _audio.PlayBGM(_audioConfig.TitleBGM, 1, _soundVolume);
             }
         }
         // イベント発行
@@ -224,9 +220,13 @@ public class GameManager : MonoBehaviour
         {
             _loadSceneManager.LoadScene(sceneName);
         }
-        else
+        else if (_fader != null)
         {
             _fader.FadeToScene(sceneName).Forget();
+        }
+        else
+        {
+            Debug.LogError("Scene遷移にはLoadSceneManagerまたはGlobalFaderが必要です。", this);
         }
     }
 }

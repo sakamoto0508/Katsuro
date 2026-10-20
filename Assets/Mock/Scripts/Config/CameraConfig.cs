@@ -4,8 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CameraConfig", menuName = "ScriptableObjects/Camera/CameraConfig", order = 1)]
 public class CameraConfig : ScriptableObject
 {
+    /// <summary>追撃1撃目の命中時にカメラへ与えるインパルスの強さ。</summary>
     [Header("Just Avoid Counter / First contact")]
     [SerializeField, Range(0f, .15f)] private float _counterFirstCameraStrength = .018f;
+    /// <summary>追撃1撃目の命中時のカメラ演出の持続時間（秒）。</summary>
     [SerializeField, Min(.01f)] private float _counterFirstCameraDuration = .055f;
     /// <summary>追従カメラとPlayerの基準水平距離（Unity単位）。</summary>
     public float CameraDistance => _cameraDistance;

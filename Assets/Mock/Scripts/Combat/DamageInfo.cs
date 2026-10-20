@@ -6,8 +6,9 @@ using UnityEngine;
 public readonly struct DamageInfo
 {
     /// <summary>命中時の値と攻撃者を保持し、通常攻撃とジャスト回避追撃の識別を伝える。</summary>
-    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false, JustAvoidCounterStrike counterStrike = JustAvoidCounterStrike.None)
+    public DamageInfo(float damageAmount, Vector3 hitPoint, Vector3 hitNormal, GameObject instigator, Collider targetCollider, bool isHeavy = false, Vector3 slashDirection = default, bool isJustAvoidCounter = false, JustAvoidCounterStrike counterStrike = JustAvoidCounterStrike.None, ComboSoundLayer[] hitSounds = null)
     {
+        HitSounds = hitSounds;
         DamageAmount = damageAmount;
         HitPoint = hitPoint;
         HitNormal = hitNormal;
@@ -26,6 +27,9 @@ public readonly struct DamageInfo
     public bool IsJustAvoidCounter { get; }
     public JustAvoidCounterStrike CounterStrike { get; }
     public bool IsCounterFirst => IsJustAvoidCounter && CounterStrike == JustAvoidCounterStrike.First;
+
+    /// <summary>攻撃側が指定した命中音。敵コンボの段別SEで使用し、未指定なら被弾側の通常命中音を鳴らす。</summary>
+    public ComboSoundLayer[] HitSounds { get; }
 
     /// <summary>最終的に与えるダメージ量。</summary>
     public float DamageAmount { get; }

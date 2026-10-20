@@ -39,6 +39,7 @@ MonoBehaviour:
   ReappearWindupDuration: 0.5
   DisappearSound: {fileID: 0}
   ReappearSound: {fileID: 0}
+  RushVFX: {fileID: 11400000, guid: 7a78c1bc7522d684f97617e2fb26e733, type: 2}
   WarpEffectPrefab: {fileID: 0}
   WarpVanishVFX: {fileID: 0}
   WarpAppearVFX: {fileID: 0}

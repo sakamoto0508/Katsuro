@@ -6,24 +6,24 @@ using System;
 using INab.VFXAssets;
 
 /// <summary>
-/// ƒvƒŒƒCƒ„[“ü—Í‚Ìó‚¯Œû‚Æ‚È‚èAŠeíƒRƒ“ƒ|[ƒlƒ“ƒgEƒXƒe[ƒgƒ}ƒVƒ“‚ğ‰Šú‰»‚¨‚æ‚ÑXV‚·‚é’†•ƒNƒ‰ƒXB
+/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å…¥åŠ›ã®å—ã‘å£ã¨ãªã‚Šã€å„ç¨®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆãƒ»ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³ã‚’åˆæœŸåŒ–ãŠã‚ˆã³æ›´æ–°ã™ã‚‹ä¸­æ¢ã‚¯ãƒ©ã‚¹ã€‚
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour, IDamageable
 {
-    /// <summary>Œ»İ‚ÌUŒ‚‚ªŠù‘¶ƒRƒ“ƒ{‚Ì‰½’i–Ú‚©‚ğC—û‚ÖŒöŠJ‚·‚éB</summary>
+    /// <summary>ç¾åœ¨ã®æ”»æ’ƒãŒæ—¢å­˜ã‚³ãƒ³ãƒœã®ä½•æ®µç›®ã‹ã‚’ä¿®ç·´ã¸å…¬é–‹ã™ã‚‹ã€‚</summary>
     public int AttackComboStepForTutorial => _stateContext?.Attacker?.CurrentComboStep ?? 0;
-    /// <summary>ÀÛ‚ÌLock-Onó‘Ô‚Æ—LŒø‚È‘ÎÛ‚ªC—û‚Ì‘Šè‚Éˆê’v‚·‚é‚©’²‚×‚éB</summary>
+    /// <summary>å®Ÿéš›ã®Lock-OnçŠ¶æ…‹ã¨æœ‰åŠ¹ãªå¯¾è±¡ãŒä¿®ç·´ã®ç›¸æ‰‹ã«ä¸€è‡´ã™ã‚‹ã‹èª¿ã¹ã‚‹ã€‚</summary>
     public bool IsLockedOnForTutorial(Transform target) => _lookOnCamera != null && _lookOnCamera.IsLockOn && _lookOnCamera.HasValidTarget() && _lookOnCamera.Target == target;
-    /// <summary>Šù‘¶‚ÌUŒ‚óMˆ—‚Å¬—§‚µ‚½’Êí‰ñ”ğ‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>æ—¢å­˜ã®æ”»æ’ƒå—ä¿¡å‡¦ç†ã§æˆç«‹ã—ãŸé€šå¸¸å›é¿ã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public event Action<DamageInfo> AvoidSucceeded;
-    /// <summary>Šù‘¶‚ÌƒWƒƒƒXƒg‰ñ”ğ”»’è‚Å¬—§‚µ‚½¬Œ÷‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>æ—¢å­˜ã®ã‚¸ãƒ£ã‚¹ãƒˆå›é¿åˆ¤å®šã§æˆç«‹ã—ãŸæˆåŠŸã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public event Action<DamageInfo> JustAvoidSucceeded;
-    /// <summary>ÀÛ‚ÉHP‚ğÁ”ï‚µ‚½ƒoƒt‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>å®Ÿéš›ã«HPã‚’æ¶ˆè²»ã—ãŸãƒãƒ•ã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public event Action BuffSucceeded;
-    /// <summary>ÀÛ‚ÌHP‰ñ•œ—Ê‚ğ’Ê’m‚·‚éB–ƒ^ƒ“‚Å‚Ì‹óU‚è‚Í’Ê’m‚µ‚È‚¢B</summary>
+    /// <summary>å®Ÿéš›ã®HPå›å¾©é‡ã‚’é€šçŸ¥ã™ã‚‹ã€‚æº€ã‚¿ãƒ³ã§ã®ç©ºæŒ¯ã‚Šã¯é€šçŸ¥ã—ãªã„ã€‚</summary>
     public event Action<float> HealSucceeded;
-    /// <summary>C—û‚Å’v€ƒ_ƒ[ƒW‚©‚ç•œ‹A‚µ‚½‚±‚Æ‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>ä¿®ç·´ã§è‡´æ­»ãƒ€ãƒ¡ãƒ¼ã‚¸ã‹ã‚‰å¾©å¸°ã—ãŸã“ã¨ã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public event Action TrainingRecovered;
 
     public int JustStacks => _stateContext != null ? _stateContext.JustAvoidStacks : 0;
@@ -32,73 +32,73 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float Gauge => _stateContext != null ? _stateContext.SkillGauge.Value : 0f;
     public float JustBonus => JustStacks * (_playerStatus != null && _playerStatus.JustAvoidBuffConfig != null ? _playerStatus.JustAvoidBuffConfig.DamageMultiplierPerStack : 0f);
     public bool IsInvulnerable => (_stateContext?.IsGhostMode ?? false) || (_playerResource != null && Time.time < _playerResource.InvulnerableUntil);
-    /// <summary>HUDŒü‚¯‚ÉA•œŠˆŒã‚Ì–³“G‚ªI—¹‚·‚é‚Ü‚Å‚ÌÀÛ‚Ìc‚èƒQ[ƒ€•b‚ğ•Ô‚·B</summary>
+    /// <summary>HUDå‘ã‘ã«ã€å¾©æ´»å¾Œã®ç„¡æ•µãŒçµ‚äº†ã™ã‚‹ã¾ã§ã®å®Ÿéš›ã®æ®‹ã‚Šã‚²ãƒ¼ãƒ ç§’ã‚’è¿”ã™ã€‚</summary>
     public float ReviveProtectionSeconds => _playerResource != null ? Mathf.Max(0f, _playerResource.InvulnerableUntil - Time.time) : 0f;
-    /// <summary>HUDŒü‚¯‚ÉA‰ñ•œƒ`ƒƒƒlƒŠƒ“ƒO‚Ì—LŒøó‘Ô‚¾‚¯‚ğ“Ç‚İæ‚éB</summary>
+    /// <summary>HUDå‘ã‘ã«ã€å›å¾©ãƒãƒ£ãƒãƒªãƒ³ã‚°ã®æœ‰åŠ¹çŠ¶æ…‹ã ã‘ã‚’èª­ã¿å–ã‚‹ã€‚</summary>
     public bool IsHealingForHUD => _stateContext?.Healer?.IsHealing ?? false;
-    /// <summary>HUDŒü‚¯‚ÉAƒoƒt‘€ì‚É‚æ‚é©”\—Í‚Ì—LŒøó‘Ô‚¾‚¯‚ğ“Ç‚İæ‚éB</summary>
+    /// <summary>HUDå‘ã‘ã«ã€ãƒãƒ•æ“ä½œã«ã‚ˆã‚‹è‡ªå‚·èƒ½åŠ›ã®æœ‰åŠ¹çŠ¶æ…‹ã ã‘ã‚’èª­ã¿å–ã‚‹ã€‚</summary>
     public bool IsBuffActiveForHUD => _stateContext?.SelfSacrifice?.IsSacrificing ?? false;
     private bool CanFight => _playerResource != null && !_playerResource.IsDead
         && (_game == null || _game.IsCombatActive);
 
     /// <summary>
-    /// ƒQ[ƒ€ƒ}ƒl[ƒWƒƒ[‚©‚çŒÄ‚Ño‚³‚ê‚é‰Šú‰»ƒƒ\ƒbƒhB•K—v‚ÈŠeíƒ‚ƒWƒ…[ƒ‹‚ğ¶¬‚µˆË‘¶‚ğŒ‹ü‚·‚éB
+    /// ã‚²ãƒ¼ãƒ ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã‚‹åˆæœŸåŒ–ãƒ¡ã‚½ãƒƒãƒ‰ã€‚å¿…è¦ãªå„ç¨®ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’ç”Ÿæˆã—ä¾å­˜ã‚’çµç·šã™ã‚‹ã€‚
     /// </summary>
     public VFXConfig FeedbackConfig => _vfxConfig;
 
     public PlayerAnimationController AnimController => _animationController;
-    /// <summary>PlayerUŒ‚Clip‚©‚çæ“¾‚·‚é…•½Root Motion‚ÌˆÚ“®”{—¦B0‚ÅUŒ‚‚ÌˆÚ“®‚ğ—}‚¦‚éB</summary>
-    [Tooltip("PlayerUŒ‚Clip‚©‚çæ“¾‚·‚é…•½Root Motion‚ÌˆÚ“®”{—¦B0‚ÅUŒ‚‚ÌˆÚ“®‚ğ—}‚¦‚éB")]
+    /// <summary>Playeræ”»æ’ƒClipã‹ã‚‰å–å¾—ã™ã‚‹æ°´å¹³Root Motionã®ç§»å‹•å€ç‡ã€‚0ã§æ”»æ’ƒæ™‚ã®ç§»å‹•ã‚’æŠ‘ãˆã‚‹ã€‚</summary>
+    [Tooltip("Playeræ”»æ’ƒClipã‹ã‚‰å–å¾—ã™ã‚‹æ°´å¹³Root Motionã®ç§»å‹•å€ç‡ã€‚0ã§æ”»æ’ƒæ™‚ã®ç§»å‹•ã‚’æŠ‘ãˆã‚‹ã€‚")]
     [Header("Attack Root Motion")]
     [SerializeField, Min(0f)] private float _attackRootMotionScale = .25f;
-    /// <summary>”²“E”[“‚É‡‚í‚¹‚Ä•\¦‚ğØ‚è‘Ö‚¦‚é“‚ÌMeshRendererB</summary>
-    [Tooltip("”²“E”[“‚É‡‚í‚¹‚Ä•\¦‚ğØ‚è‘Ö‚¦‚é“‚ÌMeshRendererB")]
+    /// <summary>æŠœåˆ€ãƒ»ç´åˆ€ã«åˆã‚ã›ã¦è¡¨ç¤ºã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹åˆ€ã®MeshRendererã€‚</summary>
+    [Tooltip("æŠœåˆ€ãƒ»ç´åˆ€ã«åˆã‚ã›ã¦è¡¨ç¤ºã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹åˆ€ã®MeshRendererã€‚")]
     [Header("PlayerStatus")]
     [SerializeField] private GameObject _playerWeapon;
-    /// <summary>”[“’†‚Ì“‚ÌŒ©‚½–Ú‚ğØ‚è‘Ö‚¦‚éGameObjectQÆB</summary>
-    [Tooltip("”[“’†‚Ì“‚ÌŒ©‚½–Ú‚ğØ‚è‘Ö‚¦‚éGameObjectQÆB")]
+    /// <summary>ç´åˆ€ä¸­ã®åˆ€ã®è¦‹ãŸç›®ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹GameObjectå‚ç…§ã€‚</summary>
+    [Tooltip("ç´åˆ€ä¸­ã®åˆ€ã®è¦‹ãŸç›®ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹GameObjectå‚ç…§ã€‚")]
     [SerializeField] private GameObject _playerStartWeapon;
-    /// <summary>Player•Ší‚ÌUŒ‚”»’èColliderˆê——BAnimation Event‚Å—LŒøE–³Œø‚ğØ‚è‘Ö‚¦‚éB</summary>
-    [Tooltip("Player•Ší‚ÌUŒ‚”»’èColliderˆê——BAnimation Event‚Å—LŒøE–³Œø‚ğØ‚è‘Ö‚¦‚éB")]
+    /// <summary>Playeræ­¦å™¨ã®æ”»æ’ƒåˆ¤å®šColliderä¸€è¦§ã€‚Animation Eventã§æœ‰åŠ¹ãƒ»ç„¡åŠ¹ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚</summary>
+    [Tooltip("Playeræ­¦å™¨ã®æ”»æ’ƒåˆ¤å®šColliderä¸€è¦§ã€‚Animation Eventã§æœ‰åŠ¹ãƒ»ç„¡åŠ¹ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚")]
     [SerializeField] private Collider[] _weaponColliders;
-    /// <summary>ƒvƒŒƒCƒ„[‚Ì“”»’è‚É‰ÁZ‚·‚é‘S‘ÌƒTƒCƒYB“‚Ìƒ[ƒJƒ‹²BY‚Í’·‚³AX/Z‚ÍŒú‚İB</summary>
-    [Tooltip("ƒvƒŒƒCƒ„[‚Ì“”»’è‚É‰ÁZ‚·‚é‘S‘ÌƒTƒCƒYB“‚Ìƒ[ƒJƒ‹²BY‚Í’·‚³AX/Z‚ÍŒú‚İB")]
+    /// <summary>ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆ€åˆ¤å®šã«åŠ ç®—ã™ã‚‹å…¨ä½“ã‚µã‚¤ã‚ºã€‚åˆ€ã®ãƒ­ãƒ¼ã‚«ãƒ«è»¸ã€‚Yã¯é•·ã•ã€X/Zã¯åšã¿ã€‚</summary>
+    [Tooltip("ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆ€åˆ¤å®šã«åŠ ç®—ã™ã‚‹å…¨ä½“ã‚µã‚¤ã‚ºã€‚åˆ€ã®ãƒ­ãƒ¼ã‚«ãƒ«è»¸ã€‚Yã¯é•·ã•ã€X/Zã¯åšã¿ã€‚")]
     [SerializeField] private Vector3 _weaponHitboxPadding = new Vector3(.08f, .02f, .08f);
     private PlayerWeapon _weaponHitboxes;
     private Vector3 _appliedHitboxPadding;
-    /// <summary>ÚG’²®‚ÅQÆ‚·‚éEnemy•Ší‚ÌColliderˆê——B</summary>
-    [Tooltip("ÚG’²®‚ÅQÆ‚·‚éEnemy•Ší‚ÌColliderˆê——B")]
+    /// <summary>æ¥è§¦èª¿æ•´ã§å‚ç…§ã™ã‚‹Enemyæ­¦å™¨ã®Colliderä¸€è¦§ã€‚</summary>
+    [Tooltip("æ¥è§¦èª¿æ•´ã§å‚ç…§ã™ã‚‹Enemyæ­¦å™¨ã®Colliderä¸€è¦§ã€‚")]
     [SerializeField] private Collider[] _enemyWeaponColliders;
 
-    /// <summary>Player‚ÌHPEˆÚ“®‘¬“xEƒQ[ƒWE”\—ÍƒRƒXƒg‚ÌŠî‘bİ’èB</summary>
-    [Tooltip("Player‚ÌHPEˆÚ“®‘¬“xEƒQ[ƒWE”\—ÍƒRƒXƒg‚ÌŠî‘bİ’èB")]
+    /// <summary>Playerã®HPãƒ»ç§»å‹•é€Ÿåº¦ãƒ»ã‚²ãƒ¼ã‚¸ãƒ»èƒ½åŠ›ã‚³ã‚¹ãƒˆã®åŸºç¤è¨­å®šã€‚</summary>
+    [Tooltip("Playerã®HPãƒ»ç§»å‹•é€Ÿåº¦ãƒ»ã‚²ãƒ¼ã‚¸ãƒ»èƒ½åŠ›ã‚³ã‚¹ãƒˆã®åŸºç¤è¨­å®šã€‚")]
     [Header("ScriptableObject")]
     [SerializeField] private PlayerStatus _playerStatus;
-    /// <summary>Player Animator‚Ìƒpƒ‰ƒ[ƒ^–¼‚ğ‹¤—L‚·‚éİ’èB</summary>
-    [Tooltip("Player Animator‚Ìƒpƒ‰ƒ[ƒ^–¼‚ğ‹¤—L‚·‚éİ’èB")]
+    /// <summary>Player Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿åã‚’å…±æœ‰ã™ã‚‹è¨­å®šã€‚</summary>
+    [Tooltip("Player Animatorã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿åã‚’å…±æœ‰ã™ã‚‹è¨­å®šã€‚")]
     [SerializeField] private AnimationName _animationName;
-    /// <summary>Player‚Ì‰ñ”ğó•tŠÔE—H‘Ì‰»EƒRƒ“ƒ{Clip‚Ìİ’èB</summary>
-    [Tooltip("Player‚Ì‰ñ”ğó•tŠÔE—H‘Ì‰»EƒRƒ“ƒ{Clip‚Ìİ’èB")]
+    /// <summary>Playerã®å›é¿å—ä»˜æ™‚é–“ãƒ»å¹½ä½“åŒ–ãƒ»ã‚³ãƒ³ãƒœClipã®è¨­å®šã€‚</summary>
+    [Tooltip("Playerã®å›é¿å—ä»˜æ™‚é–“ãƒ»å¹½ä½“åŒ–ãƒ»ã‚³ãƒ³ãƒœClipã®è¨­å®šã€‚")]
     [SerializeField] private PlayerStateConfig _playerStateConfig;
-    /// <summary>‘•”õ‚É‚æ‚éUŒ‚”{—¦E‰ÁZˆĞ—ÍE–½’†Effect‚Ìİ’èB</summary>
-    [Tooltip("‘•”õ‚É‚æ‚éUŒ‚”{—¦E‰ÁZˆĞ—ÍE–½’†Effect‚Ìİ’èB")]
+    /// <summary>è£…å‚™ã«ã‚ˆã‚‹æ”»æ’ƒå€ç‡ãƒ»åŠ ç®—å¨åŠ›ãƒ»å‘½ä¸­Effectã®è¨­å®šã€‚</summary>
+    [Tooltip("è£…å‚™ã«ã‚ˆã‚‹æ”»æ’ƒå€ç‡ãƒ»åŠ ç®—å¨åŠ›ãƒ»å‘½ä¸­Effectã®è¨­å®šã€‚")]
     [SerializeField] private PlayerPassiveBuffSet _passiveBuffSet;
-    /// <summary>–½’†EJust AvoidE‰ñ•œEƒoƒt‚È‚Ç‚ÌŒ©‚½–Ú‰‰oİ’èB</summary>
-    [Tooltip("–½’†EJust AvoidE‰ñ•œEƒoƒt‚È‚Ç‚ÌŒ©‚½–Ú‰‰oİ’èB")]
+    /// <summary>å‘½ä¸­ãƒ»Just Avoidãƒ»å›å¾©ãƒ»ãƒãƒ•ãªã©ã®è¦‹ãŸç›®æ¼”å‡ºè¨­å®šã€‚</summary>
+    [Tooltip("å‘½ä¸­ãƒ»Just Avoidãƒ»å›å¾©ãƒ»ãƒãƒ•ãªã©ã®è¦‹ãŸç›®æ¼”å‡ºè¨­å®šã€‚")]
     [SerializeField] private VFXConfig _vfxConfig;
 
-    /// <summary>Just Avoid¬Œ÷‚É“K—p‚·‚éƒXƒ[ó‘ÔŒø‰Ê‚Ì’è‹`B</summary>
-    [Tooltip("Just Avoid¬Œ÷‚É“K—p‚·‚éƒXƒ[ó‘ÔŒø‰Ê‚Ì’è‹`B")]
+    /// <summary>Just AvoidæˆåŠŸæ™‚ã«é©ç”¨ã™ã‚‹ã‚¹ãƒ­ãƒ¼çŠ¶æ…‹åŠ¹æœã®å®šç¾©ã€‚</summary>
+    [Tooltip("Just AvoidæˆåŠŸæ™‚ã«é©ç”¨ã™ã‚‹ã‚¹ãƒ­ãƒ¼çŠ¶æ…‹åŠ¹æœã®å®šç¾©ã€‚")]
     [Header("Status Effects")]
     [SerializeField] private StatusEffectDef _justAvoidSlowDef;
 
-    // ƒfƒoƒbƒO—pF“ü—Í‚ğ’Ê‚µ‚ÄUŒ‚‚ª‰Â”\‚©‚ğ§ŒäB
-    /// <summary>UŒ‚“ü—Í‚ğó‚¯•t‚¯‚é‚½‚ß‚Ì‹–‰Âƒtƒ‰ƒOBfalse‚È‚çLight/Heavy“ü—Í‚ğ–³‹‚·‚éB</summary>
-    [Tooltip("UŒ‚“ü—Í‚ğó‚¯•t‚¯‚é‚½‚ß‚Ì‹–‰Âƒtƒ‰ƒOBfalse‚È‚çLight/Heavy“ü—Í‚ğ–³‹‚·‚éB")]
-    [SerializeField] private bool _canAttack;
-    // •\¦Eó‘ÔE’‡‰î‚ğ•ª—£‚µ‚½ƒQ[ƒ€“à•\¦B
-    /// <summary>Player‚ÌHPEƒ_ƒ[ƒW’Ç]EƒQ[ƒW‚ğ•\¦‚·‚éHUDQÆB</summary>
-    [Tooltip("Player‚ÌHPEƒ_ƒ[ƒW’Ç]EƒQ[ƒW‚ğ•\¦‚·‚éHUDQÆB")]
+    // ãƒ‡ãƒãƒƒã‚°ç”¨ï¼šå…¥åŠ›ã‚’é€šã—ã¦æ”»æ’ƒãŒå¯èƒ½ã‹ã‚’åˆ¶å¾¡ã€‚
+    /// <summary>æ”»æ’ƒå…¥åŠ›ã‚’å—ã‘ä»˜ã‘ã‚‹ãŸã‚ã®è¨±å¯ãƒ•ãƒ©ã‚°ã€‚falseãªã‚‰Light/Heavyå…¥åŠ›ã‚’ç„¡è¦–ã™ã‚‹ã€‚</summary>
+    [Tooltip("æ”»æ’ƒå…¥åŠ›ã‚’å—ã‘ä»˜ã‘ã‚‹ãŸã‚ã®è¨±å¯ãƒ•ãƒ©ã‚°ã€‚falseãªã‚‰Light/Heavyå…¥åŠ›ã‚’ç„¡è¦–ã™ã‚‹ã€‚")]
+    [SerializeField] private bool _canAttack = true;
+    // è¡¨ç¤ºãƒ»çŠ¶æ…‹ãƒ»ä»²ä»‹ã‚’åˆ†é›¢ã—ãŸã‚²ãƒ¼ãƒ å†…è¡¨ç¤ºã€‚
+    /// <summary>Playerã®HPãƒ»ãƒ€ãƒ¡ãƒ¼ã‚¸è¿½å¾“ãƒ»ã‚²ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹HUDå‚ç…§ã€‚</summary>
+    [Tooltip("Playerã®HPãƒ»ãƒ€ãƒ¡ãƒ¼ã‚¸è¿½å¾“ãƒ»ã‚²ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹HUDå‚ç…§ã€‚")]
     [Header("UI")]
     [SerializeField] private PlayerHUDView _playerHudView;
     private PlayerHUDPresenter _playerHudPresenter;
@@ -111,13 +111,16 @@ public class PlayerController : MonoBehaviour, IDamageable
     private PlayerResource _playerResource;
     private float _justBuffRemaining;
     private Animator _rootMotionAnimator;
+    /// <summary>Root Motionã¨Animation Eventã®åˆ¤å®šã«ä½¿ã†Animatorã€‚Eventæ¯ã®æ¤œç´¢ã‚’é¿ã‘ã‚‹ãŸã‚åˆå›å–å¾—å¾Œã«ä¿æŒã™ã‚‹ã€‚</summary>
+    private Animator OwnerAnimator => _rootMotionAnimator != null ? _rootMotionAnimator : _rootMotionAnimator = GetComponent<Animator>();
+    private MeshRenderer _playerWeaponRenderer;
     private int _attackAnimationHash;
     private GameManager _game;
     private AudioManager _audio;
     private CombatFeedback _combatFeedback;
     private bool _initialized;
 
-    /// <summary>“ü—ÍEó‘ÔEˆÚ“®E”\—ÍE•ŠíE•\¦‚ÌˆË‘¶æ‚ğ‘g‚İ—§‚ÄA•K—v‚È’Ê’m‚ğw“Ç‚·‚éB</summary>
+    /// <summary>å…¥åŠ›ãƒ»çŠ¶æ…‹ãƒ»ç§»å‹•ãƒ»èƒ½åŠ›ãƒ»æ­¦å™¨ãƒ»è¡¨ç¤ºã®ä¾å­˜å…ˆã‚’çµ„ã¿ç«‹ã¦ã€å¿…è¦ãªé€šçŸ¥ã‚’è³¼èª­ã™ã‚‹ã€‚</summary>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
         , CameraManager cameraManager, LockOnCamera lockOnCamera, GameManager game, AudioManager audio, HitStopManager hitStop, PlayerDeadManager playerDead, LoadSceneManager loader)
     {
@@ -140,13 +143,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         _lookOnCamera = lockOnCamera;
         CharacterEffect characterEffect = GetComponent<CharacterEffect>();
 
-        // --- İ’è’liSkillGauge ‚È‚Ç‚Ì¶¬‚Ég‚¤j
+        // --- è¨­å®šå€¤ï¼ˆSkillGauge ãªã©ã®ç”Ÿæˆã«ä½¿ã†ï¼‰
         float maxGauge = _playerStatus != null ? _playerStatus.MaxSkillGauge
             : _playerStateConfig?.MaxSkillGauge ?? 100f;
         float passiveRecovery = _playerStatus != null ? _playerStatus.SkillGaugePassiveRecoveryPerSecond
             : _playerStateConfig?.SkillGaugeRecoveryPerSecond ?? 0f;
 
-        // --- ŠeíƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ¶¬
+        // --- å„ç¨®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’ç”Ÿæˆ
         _playerResource = new PlayerResource(_playerStatus, _animationController);
         _playerResource.Init(game, audio, playerDead, loader);
         var ownerColliders = GetComponentsInChildren<Collider>();
@@ -173,7 +176,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         GetComponent<PlayerBuffPresentation>()?.Init(playerBuff, audio, _vfxConfig);
         _playerResource.Revived += OnRevived;
 
-        // HUD ƒvƒŒƒ[ƒ“ƒ^[‚ğ¶¬iInspector ‚É View ‚ğŠ„‚è“–‚Ä‚Ä‚¢‚éê‡j
+        // HUD ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ãƒ¼ã‚’ç”Ÿæˆï¼ˆInspector ã« View ã‚’å‰²ã‚Šå½“ã¦ã¦ã„ã‚‹å ´åˆï¼‰
         if (_playerHudView != null)
         {
             _playerHudPresenter = new PlayerHUDPresenter(
@@ -183,7 +186,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                 skillGauge.NormalizedReactive);
         }
 
-        // ’èŠúˆ—‚Ìw“Ç“o˜^iAbility ‚Ì’Ê’m‚ğó‚¯‚Ä PlayerResource ‚ğ‘€ì‚·‚éj
+        // å®šæœŸå‡¦ç†ã®è³¼èª­ç™»éŒ²ï¼ˆAbility ã®é€šçŸ¥ã‚’å—ã‘ã¦ PlayerResource ã‚’æ“ä½œã™ã‚‹ï¼‰
         _stateContext.SelfSacrifice.OnConsumed
             .Subscribe(deltaSeconds => HandleSelfSacrificeTick(deltaSeconds))
             .AddTo(this);
@@ -191,12 +194,11 @@ public class PlayerController : MonoBehaviour, IDamageable
             .Subscribe(percent => HandleHealTick(percent))
             .AddTo(this);
 
-        //•Ší‚ÌŒ©‚½–Ú‚ğÅ‰‚Í”ñ•\¦‚É‚·‚éB
-        _playerWeapon.GetComponent<MeshRenderer>().enabled = false;
-        _playerStartWeapon.SetActive(true);
+        //æ­¦å™¨ã®è¦‹ãŸç›®ã‚’æœ€åˆã¯éè¡¨ç¤ºã«ã™ã‚‹ã€‚
+        SetDrawnWeaponVisible(false);
     }
 
-    /// <summary>C—û‚Å‚Ì‚İ”\—Í‚ğI—¹‚µA‰ñ•œ‰Û‘è—pHP‚Æ‹C—Í‚ğ€”õ‚·‚éB</summary>
+    /// <summary>ä¿®ç·´ã§ã®ã¿èƒ½åŠ›ã‚’çµ‚äº†ã—ã€å›å¾©èª²é¡Œç”¨HPã¨æ°—åŠ›ã‚’æº–å‚™ã™ã‚‹ã€‚</summary>
     public void PrepareTrainingVitals(float hpRatio)
     {
         if (_game == null || !_game.IsTutorial || _stateContext == null) return;
@@ -204,48 +206,48 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateContext.Healer.End(); _stateContext.SelfSacrifice.End(); StopBuffAudio();
         _playerResource.SetTrainingHpRatio(hpRatio); RefillTrainingGauge();
     }
-    /// <summary>‹C—Í•s‘«‚ÅC—û‚ª~‚Ü‚ç‚È‚¢‚æ‚¤AC—û‚Å‚Ì‚İ‹C—Í‚ğ•â[‚·‚éB</summary>
+    /// <summary>æ°—åŠ›ä¸è¶³ã§ä¿®ç·´ãŒæ­¢ã¾ã‚‰ãªã„ã‚ˆã†ã€ä¿®ç·´ã§ã®ã¿æ°—åŠ›ã‚’è£œå……ã™ã‚‹ã€‚</summary>
     public void RefillTrainingGauge()
     {
         if (_game != null && _game.IsTutorial) _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
     }
     
-    /// <summary>í“¬‰Â”\‚È‚Æ‚«‚¾‚¯UŒ‚State‚ÌƒnƒbƒVƒ…‚ğ‹L˜^‚µAMover‚ÌRoot Motionó•t‚ğŠJn‚·‚éB</summary>
-    /// <param name="stateHash">Root Motion‚ğŠ—L‚·‚éUŒ‚State‚ÌfullPathHashB</param>
+    /// <summary>æˆ¦é—˜å¯èƒ½ãªã¨ãã ã‘æ”»æ’ƒStateã®ãƒãƒƒã‚·ãƒ¥ã‚’è¨˜éŒ²ã—ã€Moverã®Root Motionå—ä»˜ã‚’é–‹å§‹ã™ã‚‹ã€‚</summary>
+    /// <param name="stateHash">Root Motionã‚’æ‰€æœ‰ã™ã‚‹æ”»æ’ƒStateã®fullPathHashã€‚</param>
     public void BeginAnimationAttackRootMotion(int stateHash)
     {
         if (!CanFight) { StopAttackRootMotion(); return; }
         _attackAnimationHash = stateHash;
         _stateContext?.Mover?.BeginAttackRootMotion();
     }
-    /// <summary>I—¹State‚ªŒ»İ‚ÌŠ—LÒ‚Éˆê’v‚·‚éê‡‚¾‚¯UŒ‚Root Motion‚ğ’â~‚·‚éB</summary>
-    /// <param name="stateHash">I—¹‚µ‚½State‚ÌfullPathHashB•ÊState‚ÌI—¹‚Å‚ÍŠ—LŒ ‚ğ‰ğœ‚µ‚È‚¢B</param>
+    /// <summary>çµ‚äº†StateãŒç¾åœ¨ã®æ‰€æœ‰è€…ã«ä¸€è‡´ã™ã‚‹å ´åˆã ã‘æ”»æ’ƒRoot Motionã‚’åœæ­¢ã™ã‚‹ã€‚</summary>
+    /// <param name="stateHash">çµ‚äº†ã—ãŸStateã®fullPathHashã€‚åˆ¥Stateã®çµ‚äº†ã§ã¯æ‰€æœ‰æ¨©ã‚’è§£é™¤ã—ãªã„ã€‚</param>
     public void EndAnimationAttackRootMotion(int stateHash)
     {
         if (_attackAnimationHash == stateHash) StopAttackRootMotion();
     }
-    /// <summary>UŒ‚State‚ÌŠ—LŒ ‚ÆMover‚Ì•Û—¯ˆÚ“®EUŒ‚‘¬“x‚ğ‰ğœ‚·‚éB</summary>
+    /// <summary>æ”»æ’ƒStateã®æ‰€æœ‰æ¨©ã¨Moverã®ä¿ç•™ç§»å‹•ãƒ»æ”»æ’ƒé€Ÿåº¦ã‚’è§£é™¤ã™ã‚‹ã€‚</summary>
     public void StopAttackRootMotion()
     {
         _attackAnimationHash = 0;
         _stateContext?.Mover?.EndAttackRootMotion();
     }
-    /// <summary>Š—L’†‚ÌUŒ‚State‚Ì…•½ˆÚ“®‚ğMover‚Ö“n‚·Bí“¬I—¹‚â•ÊState‚Ö‚Ì‘JˆÚ‚Å‚Íó•t‚ğ‰ğœ‚·‚éB</summary>
+    /// <summary>æ‰€æœ‰ä¸­ã®æ”»æ’ƒStateã®æ°´å¹³ç§»å‹•ã‚’Moverã¸æ¸¡ã™ã€‚æˆ¦é—˜çµ‚äº†ã‚„åˆ¥Stateã¸ã®é·ç§»ã§ã¯å—ä»˜ã‚’è§£é™¤ã™ã‚‹ã€‚</summary>
     private void OnAnimatorMove()
     {
         if (!CanFight) { StopAttackRootMotion(); return; }
-        if (_rootMotionAnimator == null) _rootMotionAnimator = GetComponent<Animator>();
+        if (OwnerAnimator == null) return;
         var state = _rootMotionAnimator.IsInTransition(0) ? _rootMotionAnimator.GetNextAnimatorStateInfo(0) : _rootMotionAnimator.GetCurrentAnimatorStateInfo(0);
         if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
         _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
     }
-    /// <summary>–³Œø‰»‚É•Û—¯’†‚ÌUŒ‚Root Motion‚ğÁ‹‚·‚éB</summary>
+    /// <summary>ç„¡åŠ¹åŒ–æ™‚ã«ä¿ç•™ä¸­ã®æ”»æ’ƒRoot Motionã‚’æ¶ˆå»ã™ã‚‹ã€‚</summary>
     private void OnDisable() => StopAttackRootMotion();
 
-    /// <summary>—H‘Ì‰»‚Ì•\¦ó‘Ô‚ğCombatFeedback‚Ö“n‚·B</summary>
+    /// <summary>å¹½ä½“åŒ–ã®è¡¨ç¤ºçŠ¶æ…‹ã‚’CombatFeedbackã¸æ¸¡ã™ã€‚</summary>
     public void SetGhostVisual(bool active) => _combatFeedback?.SetGhost(active);
 
-    /// <summary>”\—ÍEUŒ‚E‰‰o‚ğI—¹‚³‚¹A•œŠˆŒã‚Ì’ÊíˆÚ“®ó‘Ô‚Ö–ß‚·B</summary>
+    /// <summary>èƒ½åŠ›ãƒ»æ”»æ’ƒãƒ»æ¼”å‡ºã‚’çµ‚äº†ã•ã›ã€å¾©æ´»å¾Œã®é€šå¸¸ç§»å‹•çŠ¶æ…‹ã¸æˆ»ã™ã€‚</summary>
     private void OnRevived()
     {
         _stateMachine.ChangeState(PlayerStateId.Locomotion);
@@ -264,32 +266,32 @@ public class PlayerController : MonoBehaviour, IDamageable
     }
 
    
-    /// <summary>ƒoƒt—pBGM‚ğê—p‚Ì‘æ2ƒ`ƒƒƒ“ƒlƒ‹‚Ö—v‹‚·‚éB</summary>
+    /// <summary>ãƒãƒ•ç”¨BGMã‚’å°‚ç”¨ã®ç¬¬2ãƒãƒ£ãƒ³ãƒãƒ«ã¸è¦æ±‚ã™ã‚‹ã€‚</summary>
     public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
-    /// <summary>ƒoƒt—p‚Ì‘æ2BGMƒ`ƒƒƒ“ƒlƒ‹‚ğ’â~‚·‚éB</summary>
+    /// <summary>ãƒãƒ•ç”¨ã®ç¬¬2BGMãƒãƒ£ãƒ³ãƒãƒ«ã‚’åœæ­¢ã™ã‚‹ã€‚</summary>
     public void StopBuffAudio() => _audio?.StopBGM(2);
     
-    /// <summary>ƒ_ƒ[ƒW‚ğ“K—p‚·‚éB</summary>
+    /// <summary>ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’é©ç”¨ã™ã‚‹ã€‚</summary>
     public void ApplyDamage(DamageInfo info)
     {
         if (!CanFight || info.DamageAmount <= 0f || Time.time < _playerResource.InvulnerableUntil) return;
-        // ƒWƒƒƒXƒg‰ñ”ğƒEƒBƒ“ƒhƒE“à‚Å‚ ‚ê‚Îƒ_ƒ[ƒW‚ğ–³Œø‰»‚µAƒWƒƒƒXƒg‰ñ”ğƒXƒ^ƒbƒN‚ğ‰ÁZ‚·‚éB
+        // ã‚¸ãƒ£ã‚¹ãƒˆå›é¿ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å†…ã§ã‚ã‚Œã°ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ç„¡åŠ¹åŒ–ã—ã€ã‚¸ãƒ£ã‚¹ãƒˆå›é¿ã‚¹ã‚¿ãƒƒã‚¯ã‚’åŠ ç®—ã™ã‚‹ã€‚
         if (_stateContext?.IsInJustAvoidWindow ?? false)
         {
-            // ƒWƒƒƒXƒg‰ñ”ğ¬Œ÷‚É‚æ‚éƒoƒt‰ÁZB
+            // ã‚¸ãƒ£ã‚¹ãƒˆå›é¿æˆåŠŸã«ã‚ˆã‚‹ãƒãƒ•åŠ ç®—ã€‚
             _stateContext.AddJustAvoidStack(1);
             _stateContext.SetJustAvoidWindow(false);
             _justBuffRemaining = Mathf.Max(0.01f, GameplayRules.Current.JustBuffDuration);
-            // PlayerStatus ‚Éİ’è‚³‚ê‚Ä‚¢‚éƒQ[ƒWƒ{[ƒiƒX‚ğ‘¦•t—^i‘¶İ‚·‚ê‚Îj
+            // PlayerStatus ã«è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚²ãƒ¼ã‚¸ãƒœãƒ¼ãƒŠã‚¹ã‚’å³æ™‚ä»˜ä¸ï¼ˆå­˜åœ¨ã™ã‚Œã°ï¼‰
             float bonus = _playerStatus?.SkillGaugeOnJustAvoidBonus ?? 0f;
             if (bonus > 0f)
             {
                 _stateContext?.SkillGauge?.Add(bonus);
             }
-            // ƒfƒoƒbƒOƒƒO: ƒWƒƒƒXƒg‰ñ”ğ¬Œ÷‚ğo—Í
+            // ãƒ‡ãƒãƒƒã‚°ãƒ­ã‚°: ã‚¸ãƒ£ã‚¹ãƒˆå›é¿æˆåŠŸã‚’å‡ºåŠ›
             CombatLog.Trace($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
             _animationController?.PlayTrigger(_animationName?.JustAvoidWindow);
-            // ƒWƒƒƒXƒg‰ñ”ğƒXƒƒEŒø‰Ê‚ğ•t—^‚·‚éB
+            // ã‚¸ãƒ£ã‚¹ãƒˆå›é¿ã‚¹ãƒ­ã‚¦åŠ¹æœã‚’ä»˜ä¸ã™ã‚‹ã€‚
             var instigator = info.Instigator;
             if (instigator != null && _justAvoidSlowDef != null)
             {
@@ -303,7 +305,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             JustAvoidSucceeded?.Invoke(info);
             return;
         }
-        // ƒS[ƒXƒgƒ‚[ƒh’†‚Íƒ_ƒ[ƒW‚ğ–³Œø‰»‚·‚éB
+        // ã‚´ãƒ¼ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰ä¸­ã¯ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ã€‚
         if (_stateContext?.IsGhostMode ?? false)
         {
             _stateContext.SkillGauge.Add(_playerStatus != null ? _playerStatus.SkillGaugeOnAvoidGain : 5f);
@@ -315,7 +317,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (!CanFight) StopAttackRootMotion();
     }
 
-    /// <summary>Root Motion‚Æ“ü—Íw“Ç‚ğ’â~‚µAPlayer‚ªŠ—L‚·‚éó‘ÔE”\—ÍE•Ší‚ÌƒŠƒ\[ƒX‚ğ‰ğ•ú‚·‚éB</summary>
+    /// <summary>Root Motionã¨å…¥åŠ›è³¼èª­ã‚’åœæ­¢ã—ã€PlayerãŒæ‰€æœ‰ã™ã‚‹çŠ¶æ…‹ãƒ»èƒ½åŠ›ãƒ»æ­¦å™¨ã®ãƒªã‚½ãƒ¼ã‚¹ã‚’è§£æ”¾ã™ã‚‹ã€‚</summary>
     private void OnDestroy()
     {
         StopAttackRootMotion();
@@ -324,7 +326,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             InputEventUnRegistry(_inputBuffer);
         }
 
-        // Ability ‚Æ SkillGauge / PlayerResource ‚Ì Dispose
+        // Ability ã¨ SkillGauge / PlayerResource ã® Dispose
         _playerHudPresenter?.Dispose();
         _stateMachine?.Dispose();
         _stateMachine = null;
@@ -343,7 +345,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _animationEventStream = null;
     }
 
-    /// <summary>Inspector•ÏX‚Ì“”»’è‚ğ”½‰f‚µAí“¬‰Â”\‚ÈŠÔ‚¾‚¯ó‘Ô‚Æ”\—Í‚ÌƒtƒŒ[ƒ€XV‚ği‚ß‚éB</summary>
+    /// <summary>Inspectorå¤‰æ›´ã®åˆ€åˆ¤å®šã‚’åæ˜ ã—ã€æˆ¦é—˜å¯èƒ½ãªé–“ã ã‘çŠ¶æ…‹ã¨èƒ½åŠ›ã®ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°ã‚’é€²ã‚ã‚‹ã€‚</summary>
     private void Update()
     {
         if (_weaponHitboxes != null && _appliedHitboxPadding != _weaponHitboxPadding)
@@ -359,15 +361,15 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         if (_stateContext?.Mover != null && _lookOnCamera != null)
         {
-            // ƒƒbƒNƒIƒ“•ûŒü‚ğ“s“xXV‚µAˆÚ“®ŒvZ‚Ö”½‰fB
+            // ãƒ­ãƒƒã‚¯ã‚ªãƒ³æ–¹å‘ã‚’éƒ½åº¦æ›´æ–°ã—ã€ç§»å‹•è¨ˆç®—ã¸åæ˜ ã€‚
             _stateContext.Mover.LockOnDirection(_lookOnCamera.IsLockOn, _lookOnCamera.ReturnLockOnDirection());
         }
-        // Ability ƒŒƒCƒ„‚ğæ‚É TickiGhost / SelfSacrifice ‚ÌŒp‘±ˆ—j
+        // Ability ãƒ¬ã‚¤ãƒ¤ã‚’å…ˆã« Tickï¼ˆGhost / SelfSacrifice ã®ç¶™ç¶šå‡¦ç†ï¼‰
         _stateContext?.AbilityManager?.Tick(Time.deltaTime);
         _stateMachine?.Update(Time.deltaTime);
     }
 
-    /// <summary>í“¬‰Â”\‚ÈŠÔ‚¾‚¯UŒ‚Root Motion‚ÆŒ»İó‘Ô‚Ì•¨—XV‚ği‚ß‚éB</summary>
+    /// <summary>æˆ¦é—˜å¯èƒ½ãªé–“ã ã‘æ”»æ’ƒRoot Motionã¨ç¾åœ¨çŠ¶æ…‹ã®ç‰©ç†æ›´æ–°ã‚’é€²ã‚ã‚‹ã€‚</summary>
     private void FixedUpdate()
     {
         if (!CanFight) { StopAttackRootMotion(); return; }
@@ -375,53 +377,53 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
 
-    /// <summary>©”\—Í‚©‚çó‚¯‚½Œo‰ß•b‚ğÅ‘åHP‚ÌŠ„‡‚ÖŠ·Z‚µA‰¹‚ğd‚Ë‚¸HPÁ”ï‚Ö”½‰f‚·‚éB</summary>
+    /// <summary>è‡ªå‚·èƒ½åŠ›ã‹ã‚‰å—ã‘ãŸçµŒéç§’ã‚’æœ€å¤§HPã®å‰²åˆã¸æ›ç®—ã—ã€éŸ³ã‚’é‡ã­ãšHPæ¶ˆè²»ã¸åæ˜ ã™ã‚‹ã€‚</summary>
     private void HandleSelfSacrificeTick(float deltaSeconds)
     {
-        // deltaSecondsF‚±‚ÌƒtƒŒ[ƒ€‚ÌŒo‰ß•biAbility ‚ª’Ê’mj
-        // SelfSacrifice ‚Ì•b‚ ‚½‚è%’l‚Í SkillGaugeCost ‘¤‚ÅŠÇ—i–¢İ’è‚Í 1%/s ‚ğƒtƒH[ƒ‹ƒoƒbƒNj
+        // deltaSecondsï¼šã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµŒéç§’ï¼ˆAbility ãŒé€šçŸ¥ï¼‰
+        // SelfSacrifice ã®ç§’ã‚ãŸã‚Š%å€¤ã¯ SkillGaugeCost å´ã§ç®¡ç†ï¼ˆæœªè¨­å®šæ™‚ã¯ 1%/s ã‚’ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯ï¼‰
         float percentPerSecond = _playerStatus?.SkillGaugeCost?.SelfSacrificeDamagePercentPerSecond ?? 1f;
-        float percent = percentPerSecond * deltaSeconds; // Å‘å‘Ì—Í‚É‘Î‚·‚éŠ„‡B
+        float percent = percentPerSecond * deltaSeconds; // æœ€å¤§ä½“åŠ›ã«å¯¾ã™ã‚‹å‰²åˆã€‚
         float damage = _playerResource.MaxHp * (percent / 100f);
 
-        // Å¬HP•ÛŒì: SelfSacrificeMinHpRatio ‚ğ’´‚¦‚È‚¢‚æ‚¤‚É•ªŠ„“K—p‚Ü‚½‚Í©“®’â~
+        // æœ€å°HPä¿è­·: SelfSacrificeMinHpRatio ã‚’è¶…ãˆãªã„ã‚ˆã†ã«åˆ†å‰²é©ç”¨ã¾ãŸã¯è‡ªå‹•åœæ­¢
         float currentHp = _playerResource?.CurrentHp ?? 0f;
         float minHpRatio = _playerStatus?.SkillGaugeCost?.SelfSacrificeMinHpRatio ?? 0.1f;
         float minHp = _playerResource != null ? _playerResource.MaxHp * minHpRatio : 0f;
 
-        // “K—p‰Â”\‚ÈÅ‘åƒ_ƒ[ƒWiŒ»HP ‚ğ minHp ‚Ü‚Å‚µ‚©Œ¸‚ç‚³‚È‚¢j
+        // é©ç”¨å¯èƒ½ãªæœ€å¤§ãƒ€ãƒ¡ãƒ¼ã‚¸ï¼ˆç¾HP ã‚’ minHp ã¾ã§ã—ã‹æ¸›ã‚‰ã•ãªã„ï¼‰
         float maxAllowedDamage = Mathf.Max(0f, currentHp - minHp);
 
         if (maxAllowedDamage <= Mathf.Epsilon)
         {
-            // Å’áHP‚É“’B‚µ‚Ä‚¢‚é‚Ì‚Åƒ`ƒƒƒlƒŠƒ“ƒO‚ğ’â~‚·‚é
+            // æœ€ä½HPã«åˆ°é”ã—ã¦ã„ã‚‹ã®ã§ãƒãƒ£ãƒãƒªãƒ³ã‚°ã‚’åœæ­¢ã™ã‚‹
             _stateContext?.SelfSacrifice?.End();
             return;
         }
 
         float applied = Mathf.Min(damage, maxAllowedDamage);
-        // SelfSacrifice ‚É‚æ‚é–ˆƒtƒŒ[ƒ€‚Ìƒ_ƒ[ƒW‚ÍŒø‰Ê‰¹‚ğ–Â‚ç‚³‚È‚¢
+        // SelfSacrifice ã«ã‚ˆã‚‹æ¯ãƒ•ãƒ¬ãƒ¼ãƒ ã®ãƒ€ãƒ¡ãƒ¼ã‚¸ã¯åŠ¹æœéŸ³ã‚’é³´ã‚‰ã•ãªã„
         _playerResource?.ApplyDamage(applied, false);
         if (applied > 0f) BuffSucceeded?.Invoke();
 
-        // ‚à‚µ—v‹ƒ_ƒ[ƒW‚ª‘å‚«‚­Ac—Ê‚ª•s‘«‚µ‚Ä‚¢‚éê‡‚Í©“®’â~
+        // ã‚‚ã—è¦æ±‚ãƒ€ãƒ¡ãƒ¼ã‚¸ãŒå¤§ããã€æ®‹é‡ãŒä¸è¶³ã—ã¦ã„ã‚‹å ´åˆã¯è‡ªå‹•åœæ­¢
         if (applied < damage)
         {
             _stateContext?.SelfSacrifice?.End();
         }
     }
 
-    /// <summary>‰ñ•œ”\—Í‚©‚ç’Ê’m‚³‚ê‚½Š„‡‚ğPlayerResource‚ÌHP‰ñ•œ‚Ö”½‰f‚·‚éB</summary>
+    /// <summary>å›å¾©èƒ½åŠ›ã‹ã‚‰é€šçŸ¥ã•ã‚ŒãŸå‰²åˆã‚’PlayerResourceã®HPå›å¾©ã¸åæ˜ ã™ã‚‹ã€‚</summary>
     private void HandleHealTick(float healedPercent)
     {
-        // healedPercent ‚Í "‚±‚ÌƒtƒŒ[ƒ€‚Å‰ñ•œ‚µ‚½Š„‡ (%)"iAbility ‚ª’Ê’mj
+        // healedPercent ã¯ "ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§å›å¾©ã—ãŸå‰²åˆ (%)"ï¼ˆAbility ãŒé€šçŸ¥ï¼‰
         float before = _playerResource.CurrentHp;
         _playerResource.HealByPercent(healedPercent);
         float actual = _playerResource.CurrentHp - before;
         if (actual > 0f) HealSucceeded?.Invoke(actual);
     }
 
-    /// <summary>•K—v‚È “ü—ÍAction ‚ğw“Ç‚·‚éB</summary>
+    /// <summary>å¿…è¦ãª å…¥åŠ›Action ã‚’è³¼èª­ã™ã‚‹ã€‚</summary>
     private void InputEventRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed += OnMove;
@@ -437,7 +439,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         inputBuffer.SprintAction.canceled += OnSprint;
     }
 
-    /// <summary>w“Ç‚µ‚Ä‚¢‚½ “ü—ÍAction ‚ğ‰ğœ‚·‚éB</summary>
+    /// <summary>è³¼èª­ã—ã¦ã„ãŸ å…¥åŠ›Action ã‚’è§£é™¤ã™ã‚‹ã€‚</summary>
     private void InputEventUnRegistry(InputBuffer inputBuffer)
     {
         inputBuffer.MoveAction.performed -= OnMove;
@@ -453,7 +455,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         inputBuffer.SprintAction.canceled -= OnSprint;
     }
 
-    /// <summary>ˆÚ“®“ü—Í‚ÌŠJnE•ÏXE‰ğœ‚ğ“Ç‚İæ‚èA‰ğœ‚Íƒ[ƒ“ü—Í‚ğó‘ÔŠÇ—‚Ö“n‚·B</summary>
+    /// <summary>ç§»å‹•å…¥åŠ›ã®é–‹å§‹ãƒ»å¤‰æ›´ãƒ»è§£é™¤ã‚’èª­ã¿å–ã‚Šã€è§£é™¤æ™‚ã¯ã‚¼ãƒ­å…¥åŠ›ã‚’çŠ¶æ…‹ç®¡ç†ã¸æ¸¡ã™ã€‚</summary>
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector2 currentInput = context.ReadValue<Vector2>();
@@ -465,7 +467,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateMachine?.HandleMove(currentInput);
     }
 
-    /// <summary>—LŒø‚ÈãUŒ‚ŠJn“ü—Í‚Å”²“ó‘Ô‚ğŠm”F‚µAŒ»İó‘Ô‚ÌUŒ‚EƒRƒ“ƒ{ó•t‚Ö“n‚·B</summary>
+    /// <summary>æœ‰åŠ¹ãªå¼±æ”»æ’ƒé–‹å§‹å…¥åŠ›ã§æŠœåˆ€çŠ¶æ…‹ã‚’ç¢ºèªã—ã€ç¾åœ¨çŠ¶æ…‹ã®æ”»æ’ƒãƒ»ã‚³ãƒ³ãƒœå—ä»˜ã¸æ¸¡ã™ã€‚</summary>
     private void OnLightAttackAction(InputAction.CallbackContext context)
     {
         if (!context.started || !_canAttack)
@@ -475,22 +477,22 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (_stateContext != null && _stateContext.IsGhostMode) _stateMachine.ChangeState(PlayerStateId.Locomotion);
         TryDrawSword();
-        // SelfSacrifice ’†‚ÍUŒ‚‚ğ‘¦‘JˆÚ‚³‚¹‚éi”²“‚ª–¢Š®‚Å‚àƒXƒe[ƒg‚ğØ‚è‘Ö‚¦AUŒ‚’†‚É”²“Š®—¹‚ğ‘Ò‚Âj
+        // SelfSacrifice ä¸­ã¯æ”»æ’ƒã‚’å³æ™‚é·ç§»ã•ã›ã‚‹ï¼ˆæŠœåˆ€ãŒæœªå®Œã§ã‚‚ã‚¹ãƒ†ãƒ¼ãƒˆã‚’åˆ‡ã‚Šæ›¿ãˆã€æ”»æ’ƒä¸­ã«æŠœåˆ€å®Œäº†ã‚’å¾…ã¤ï¼‰
         if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
         {
             _stateMachine?.HandleLightAttack();
             return;
         }
 
-        if (!_stateContext?.Attacker?.IsSwordReady ?? true) return;
-        if (!_stateContext.Attacker.IsSwordReady)
+        if (!_stateContext?.Attacker?.IsSwordReady ?? true)
         {
             CombatLog.Trace("PlayerController: Attack input ignored, sword not ready.");
+            return;
         }
         _stateMachine?.HandleLightAttack();
     }
 
-    /// <summary>—LŒø‚È‹­UŒ‚ŠJn“ü—Í‚Å”²“ó‘Ô‚ğŠm”F‚µAŒ»İó‘Ô‚Ì‹­UŒ‚EƒRƒ“ƒ{ó•t‚Ö“n‚·B</summary>
+    /// <summary>æœ‰åŠ¹ãªå¼·æ”»æ’ƒé–‹å§‹å…¥åŠ›ã§æŠœåˆ€çŠ¶æ…‹ã‚’ç¢ºèªã—ã€ç¾åœ¨çŠ¶æ…‹ã®å¼·æ”»æ’ƒãƒ»ã‚³ãƒ³ãƒœå—ä»˜ã¸æ¸¡ã™ã€‚</summary>
     private void OnStrongAttackAction(InputAction.CallbackContext context)
     {
         if (!context.started || !_canAttack)
@@ -510,7 +512,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateMachine?.HandleStrongAttack();
     }
 
-    /// <summary>—H‘Ì‰»”\—Í‚ÌŠJnE‰ğœ‚ğ“ü—Í‚É‰‚¶‚Äˆ—‚µAó‘Ô‚Æ•\¦‚ğÚ‘±‚·‚éB</summary>
+    /// <summary>å¹½ä½“åŒ–èƒ½åŠ›ã®é–‹å§‹ãƒ»è§£é™¤ã‚’å…¥åŠ›ã«å¿œã˜ã¦å‡¦ç†ã—ã€çŠ¶æ…‹ã¨è¡¨ç¤ºã‚’æ¥ç¶šã™ã‚‹ã€‚</summary>
     private void OnGhostAction(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -533,7 +535,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>©”\—Í‚ÌŠJnE‰ğœŒ‹‰Ê‚ğó‘ÔŠÇ—‚Æƒoƒt•\¦‚Ö”½‰f‚·‚éB</summary>
+    /// <summary>è‡ªå‚·èƒ½åŠ›ã®é–‹å§‹ãƒ»è§£é™¤çµæœã‚’çŠ¶æ…‹ç®¡ç†ã¨ãƒãƒ•è¡¨ç¤ºã¸åæ˜ ã™ã‚‹ã€‚</summary>
     private void OnSelfSacrificeAction(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -546,14 +548,14 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
             else
             {
-                // Ø‚è‘Ö‚¦Œ‹‰Ê‚ª–³Œø‚È‚çAI—¹‚µ‚½‚©ŠJn‚É¸”s‚µ‚Ä‚¢‚éB
+                // åˆ‡ã‚Šæ›¿ãˆçµæœãŒç„¡åŠ¹ãªã‚‰ã€çµ‚äº†ã—ãŸã‹é–‹å§‹ã«å¤±æ•—ã—ã¦ã„ã‚‹ã€‚
                 _stateMachine?.HandleSelfSacrificeCanceled();
                 CombatLog.Trace("SelfSacrifice Canceled/Failed (via AbilityManager)");
             }
         }
     }
 
-    /// <summary>‰ñ•œ”\—Í‚ÌŠJnE‰ğœ‚ğ“ü—Í‚É‰‚¶‚Ä—v‹‚µA‘Î‰‚·‚éPlayeró‘Ô‚Ö’Ê’m‚·‚éB</summary>
+    /// <summary>å›å¾©èƒ½åŠ›ã®é–‹å§‹ãƒ»è§£é™¤ã‚’å…¥åŠ›ã«å¿œã˜ã¦è¦æ±‚ã—ã€å¯¾å¿œã™ã‚‹PlayerçŠ¶æ…‹ã¸é€šçŸ¥ã™ã‚‹ã€‚</summary>
     private void OnHeal(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -571,13 +573,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         else if (context.canceled)
         {
-            // ‰ğœ“ü—Í‚Íí‚ÉƒXƒe[ƒg‚Ö“`‚¦‚é
+            // è§£é™¤å…¥åŠ›ã¯å¸¸ã«ã‚¹ãƒ†ãƒ¼ãƒˆã¸ä¼ãˆã‚‹
             _stateMachine?.HandleHealCanceled();
             CombatLog.Trace("Heal Canceled");
         }
     }
 
-    /// <summary>Dash“ü—Í‚ÌŠJn‚Æ‰ğœ‚ğŒ»İó‘Ô‚Ö“]‘—‚·‚éB</summary>
+    /// <summary>Dashå…¥åŠ›ã®é–‹å§‹ã¨è§£é™¤ã‚’ç¾åœ¨çŠ¶æ…‹ã¸è»¢é€ã™ã‚‹ã€‚</summary>
     private void OnSprint(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -590,7 +592,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>”²“ó‘Ô‚Å‚È‚¯‚ê‚Î”²“ƒAƒjƒ‚ğŠJn‚·‚éB</summary>
+    /// <summary>æŠœåˆ€çŠ¶æ…‹ã§ãªã‘ã‚Œã°æŠœåˆ€ã‚¢ãƒ‹ãƒ¡ã‚’é–‹å§‹ã™ã‚‹ã€‚</summary>
     private void TryDrawSword()
     {
         var attacker = _stateContext?.Attacker;
@@ -602,72 +604,70 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg
+    //ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼
 
     /// <summary>
-    /// ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgiƒqƒbƒgƒ{ƒbƒNƒX—LŒø‰»j‚©‚çŒÄ‚Î‚êAƒS[ƒXƒg’†‚È‚ç–³Œø‰»‚ğˆÛA‚»‚êˆÈŠO‚Í•Šíƒqƒbƒgƒ{ƒbƒNƒX‚ğ—LŒø‰»‚·‚éB
+    /// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆï¼ˆãƒ’ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹æœ‰åŠ¹åŒ–ï¼‰ã‹ã‚‰å‘¼ã°ã‚Œã€ã‚´ãƒ¼ã‚¹ãƒˆä¸­ãªã‚‰ç„¡åŠ¹åŒ–ã‚’ç¶­æŒã€ãã‚Œä»¥å¤–ã¯æ­¦å™¨ãƒ’ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã‚’æœ‰åŠ¹åŒ–ã™ã‚‹ã€‚
     /// </summary>
     public void AnimEvent_EnableWeaponHitbox(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
         _stateContext?.Attacker?.EnableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxEnabled);
     }
 
-    /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgiƒqƒbƒgƒ{ƒbƒNƒX–³Œø‰»j‚ÅŒÄ‚Î‚êA•Šíƒqƒbƒgƒ{ƒbƒNƒX‚ğ‹­§“I‚ÉƒIƒt‚É‚·‚éB</summary>
+    /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆï¼ˆãƒ’ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ç„¡åŠ¹åŒ–ï¼‰ã§å‘¼ã°ã‚Œã€æ­¦å™¨ãƒ’ãƒƒãƒˆãƒœãƒƒã‚¯ã‚¹ã‚’å¼·åˆ¶çš„ã«ã‚ªãƒ•ã«ã™ã‚‹ã€‚</summary>
     public void AnimEvent_DisableWeaponHitbox(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
         _stateContext?.Attacker?.DisableWeaponHitbox();
         _animationEventStream?.Publish(AnimationEventType.WeaponHitboxDisabled);
     }
 
-    /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚ÅƒRƒ“ƒ{ó•t‚ªŠJ‚¢‚½ƒ^ƒCƒ~ƒ“ƒO‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã§ã‚³ãƒ³ãƒœå—ä»˜ãŒé–‹ã„ãŸã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnComboWindowOpened(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowOpened);
     }
 
-    /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚ÅƒRƒ“ƒ{ó•t‚ª•Â‚¶‚½ƒ^ƒCƒ~ƒ“ƒO‚ğ’Ê’m‚·‚éB</summary>
+    /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã§ã‚³ãƒ³ãƒœå—ä»˜ãŒé–‰ã˜ãŸã‚¿ã‚¤ãƒŸãƒ³ã‚°ã‚’é€šçŸ¥ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnComboWindowClosed(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowClosed);
     }
 
-    /// <summary>UŒ‚ƒAƒjƒ[ƒVƒ‡ƒ“Š®—¹‚ğŒ»İƒXƒe[ƒg‚Ö“`‚¦‚éB</summary>
+    /// <summary>æ”»æ’ƒã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å®Œäº†ã‚’ç¾åœ¨ã‚¹ãƒ†ãƒ¼ãƒˆã¸ä¼ãˆã‚‹ã€‚</summary>
     public void AnimEvent_OnAttackFinished(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(GetComponent<Animator>(), animationEvent)) return;
+        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.AttackFinished);
     }
 
-    /// <summary>”²“ƒAƒjƒŠ®—¹‚ğUŒ‚ƒ‚ƒWƒ…[ƒ‹‚Ö“`‚¦A”²“ƒtƒ‰ƒO‚ğXV‚·‚éB</summary>
+    /// <summary>æŠœåˆ€ã‚¢ãƒ‹ãƒ¡å®Œäº†ã‚’æ”»æ’ƒãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã¸ä¼ãˆã€æŠœåˆ€ãƒ•ãƒ©ã‚°ã‚’æ›´æ–°ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnSwordDrawCompleted()
     {
         _stateContext?.Attacker?.CompleteDrawSword();
         _animationEventStream?.Publish(AnimationEventType.SwordDrawCompleted);
     }
 
-    /// <summary>”²“Clip‚ÌEvent‚É‡‚í‚¹Ag—p’†‚Ì“ƒ‚ƒfƒ‹‚ğ•\¦‚µ‚Ä”[“‘¤ƒ‚ƒfƒ‹‚ğ‰B‚·B</summary>
-    public void AnimaEvent_OnSordDrawWeapon()
+    /// <summary>æŠœåˆ€Clipã®Eventã«åˆã‚ã›ã€ä½¿ç”¨ä¸­ã®åˆ€ãƒ¢ãƒ‡ãƒ«ã‚’è¡¨ç¤ºã—ã¦ç´åˆ€å´ãƒ¢ãƒ‡ãƒ«ã‚’éš ã™ã€‚</summary>
+    public void AnimaEvent_OnSordDrawWeapon() => SetDrawnWeaponVisible(true);
+
+    /// <summary>ç´åˆ€Clipã®Eventã«åˆã‚ã›ã€ä½¿ç”¨ä¸­ã®åˆ€ãƒ¢ãƒ‡ãƒ«ã‚’éš ã—ã¦é˜å´ãƒ¢ãƒ‡ãƒ«ã¸åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚</summary>
+    public void AnimEvent_OnSwordSheathing() => SetDrawnWeaponVisible(false);
+
+    /// <summary>æŠœåˆ€ãƒ»ç´åˆ€ã§åˆ€ã¨é˜å´ãƒ¢ãƒ‡ãƒ«ã®è¡¨ç¤ºã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã€‚åˆ€ã¯Rendererã ã‘ã‚’åˆ‡ã‚Šæ›¿ãˆã€åˆ¤å®šColliderã®éšå±¤ã‚’ç„¡åŠ¹åŒ–ã—ãªã„ã€‚</summary>
+    private void SetDrawnWeaponVisible(bool drawn)
     {
-        //•Ší‚ÌŒ©‚½–Ú‚ğ•\¦‚·‚éB
-        _playerWeapon.GetComponent<MeshRenderer>().enabled = true;
-        _playerStartWeapon.SetActive(false);
+        if (_playerWeaponRenderer == null && _playerWeapon != null) _playerWeaponRenderer = _playerWeapon.GetComponent<MeshRenderer>();
+        if (_playerWeaponRenderer != null) _playerWeaponRenderer.enabled = drawn;
+        if (_playerStartWeapon != null) _playerStartWeapon.SetActive(!drawn);
     }
 
-    /// <summary>”[“Clip‚ÌEvent‚É‡‚í‚¹Ag—p’†‚Ì“ƒ‚ƒfƒ‹‚ğ‰B‚µ‚Äâ‘¤ƒ‚ƒfƒ‹‚ÖØ‚è‘Ö‚¦‚éB</summary>
-    public void AnimEvent_OnSwordSheathing()
-    {
-        //•Ší‚ÌŒ©‚½–Ú‚ğ”ñ•\¦‚É‚·‚éB
-        _playerWeapon.SetActive(false);
-        _playerStartWeapon.SetActive(true);
-    }
-
-    //ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgFƒWƒƒƒXƒg‰ñ”ğƒAƒjƒ[ƒVƒ‡ƒ“ŠJnB
-    /// <summary>ƒWƒƒƒXƒg‰ñ”ğClipŠJnEvent‚Åê—pAnimator Bool‚ğ—LŒø‚É‚·‚éB</summary>
+    //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆï¼šã‚¸ãƒ£ã‚¹ãƒˆå›é¿ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é–‹å§‹æ™‚ã€‚
+    /// <summary>ã‚¸ãƒ£ã‚¹ãƒˆå›é¿Clipé–‹å§‹Eventã§å°‚ç”¨Animator Boolã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnJustAvoidStarted()
     {
         if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
@@ -678,8 +678,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    //ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgFƒWƒƒƒXƒg‰ñ”ğƒAƒjƒ[ƒVƒ‡ƒ“I—¹
-    /// <summary>ƒWƒƒƒXƒg‰ñ”ğClipI—¹Event‚Åê—pAnimator Bool‚ğ‰ğœ‚·‚éB</summary>
+    //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆï¼šã‚¸ãƒ£ã‚¹ãƒˆå›é¿ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚
+    /// <summary>ã‚¸ãƒ£ã‚¹ãƒˆå›é¿Clipçµ‚äº†Eventã§å°‚ç”¨Animator Boolã‚’è§£é™¤ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnJustAvoidFinished()
     {
         if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
@@ -690,7 +690,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>Clip‚ªw’è‚µ‚½“o˜^–¼‚ÌSE‚ğAudioManager‚Ö—v‹‚·‚éB</summary>
+    /// <summary>ClipãŒæŒ‡å®šã—ãŸç™»éŒ²åã®SEã‚’AudioManagerã¸è¦æ±‚ã™ã‚‹ã€‚</summary>
     public void AnimEvent_OnSoundEffect(string soundName)
     {
         _audio?.PlaySE(soundName);

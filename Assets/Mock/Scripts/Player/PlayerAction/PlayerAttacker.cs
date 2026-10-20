@@ -350,7 +350,9 @@ public sealed class PlayerAttacker : IDisposable
                 ? Quaternion.LookRotation(damageInfo.HitNormal)
                 : Quaternion.identity;
 
-            UnityEngine.Object.Instantiate(entry.OnHitEffectPrefab, damageInfo.HitPoint, rotation);
+            var effect = UnityEngine.Object.Instantiate(entry.OnHitEffectPrefab, damageInfo.HitPoint, rotation);
+            // 命中ごとに生成するため、寿命を設定してScene内に残し続けない。
+            if (entry.OnHitEffectLifetime > 0f) UnityEngine.Object.Destroy(effect, entry.OnHitEffectLifetime);
         }
     }
 }

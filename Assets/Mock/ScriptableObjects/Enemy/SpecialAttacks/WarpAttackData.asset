@@ -16,7 +16,7 @@ MonoBehaviour:
   _actionType: 8
   _animatorTrigger: WarpAttack
   _damage: 10
-  _range: 0
+  _range: 1.2
   _hitboxIndex: 0
   _hitboxEnableDelay: 0
   _hitboxDisableDelay: 0

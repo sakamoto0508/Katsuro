@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using INab.VFXAssets;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -54,13 +53,13 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     /// <summary>後退行動でPlayerから離れる目標距離（Unity単位）。</summary>
     [UnityEngine.Tooltip("後退行動でPlayerから離れる目標距離（Unity単位）。")]
     [SerializeField] private float _stepBackDistance = 2f;
+    /// <summary>後退の終了Eventが届かない場合にAIを復帰させるまでの時間（Animator速度を反映した秒）。</summary>
+    [UnityEngine.Tooltip("後退の終了Eventが届かない場合にAIを復帰させるまでの時間（Animator速度を反映した秒）。")]
+    [SerializeField, Min(.5f)] private float _stepBackTimeout = 3f;
 
     /// <summary>Enemyの登録済み見た目Effectを再生するコンポーネント参照。</summary>
     [UnityEngine.Tooltip("Enemyの登録済み見た目Effectを再生するコンポーネント参照。")]
     [SerializeField] private CharacterEffect _characterEffect;
-    /// <summary>旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。</summary>
-    [UnityEngine.Tooltip("旧死亡待機の設定（ミリ秒）。現行の死亡・Final Blow処理では直接参照しない。")]
-    [SerializeField] private int _enemyDeadDelay = 2000;
 
     private EnemyAnimationController _enemyAnimController;
     private EnemyHealth _health;
@@ -74,7 +73,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     private EnemyDecision? _pendingAction;
     private bool _attackCompletionPending;
     private float _attackElapsed;
-    private CancellationToken _token;
+    private float _stepBackElapsed;
     private bool _dead = false;
     private GameManager _game;
     private AudioManager _audio;
@@ -311,6 +310,18 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                 else _ai?.OnActionFailed();
             }
         }
+        // 後退の終了Eventが欠落した場合も、AIが行動中のまま停止しないよう復帰する。
+        if (_mover != null && _mover.IsStepBack && _animator != null)
+        {
+            _stepBackElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
+            if (_stepBackElapsed > _stepBackTimeout)
+            {
+                Debug.LogWarning("Enemy step back finished without completion event; recovering AI.", this);
+                _stepBackElapsed = 0f;
+                _mover.EndStepBack();
+                _ai?.OnAttackFinished();
+            }
+        }
         // AI の Tick を先に呼び、意思決定を行わせる
         if (!IsTraining) _ai?.Tick(Time.deltaTime);
 
@@ -359,7 +370,8 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                     }
                     break;
                 case EnemyActionType.StepBack:
-                    _mover?.StartStepBack();
+                    _stepBackElapsed = 0f;
+                    if (_mover == null || !_mover.StartStepBack()) _ai?.OnActionFailed();
                     break;
                 case EnemyActionType.Wait:
                     _mover?.StopMove();
@@ -390,8 +402,9 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         _mover?.HoldMovementForAttack();
 
         _game?.WinGame();
-        if (_finalBlow != null) _finalBlow.StartFinalBlow();
-        else _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 2000).Forget();
+        // Final Blowを開始できない場合も、勝利状態のまま止まらないようTitleへ遷移する。
+        if (_finalBlow == null || !_finalBlow.StartFinalBlow())
+            _loader?.LoadSceneAsync(_loader.SceneNameConfig.TitleScene, 2000).Forget();
     }
 
     /// <summary>所有中の攻撃Stateの移動をMoverへ渡す。死亡・別Stateへの切り替えではRoot Motionを解除する。</summary>

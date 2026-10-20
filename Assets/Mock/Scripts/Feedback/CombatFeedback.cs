@@ -523,7 +523,8 @@ public sealed class CombatFeedback : MonoBehaviour
         bool finalBlowOwnsSound = _enemyOwner != null && _enemyOwner.HpRatio <= 0f &&
             FinalBlowManager.Instance != null && FinalBlowManager.Instance.isActiveAndEnabled &&
             hitClip != null && config != null && hitClip == _audio.GetSEClip(config.EnemyDeadSound);
-        if (!finalBlowOwnsSound)
+        // 敵コンボの段別命中音が指定されていれば、通常の命中音の代わりに鳴らす（フィニッシュの重さを素材の重ねで出す）。
+        if (!finalBlowOwnsSound && !EnemyComboStageSound.Play(_audio, info.HitSounds))
         {
             if (hitClip != null) _audio.PlaySE(hitClip, info.IsCounterFirst ? config.CounterFirstHitVolume : config.GetHitVolume(info.IsHeavy, info.IsJustAvoidCounter), info.IsCounterFirst ? config.CounterFirstHitOffset : config.GetHitStartOffset(info.IsHeavy, info.IsJustAvoidCounter));
             else _audio?.PlaySE(config != null ? (strongFeedback ? config.HeavyHitSound : config.LightHitSound) : "Damage");
@@ -533,6 +534,9 @@ public sealed class CombatFeedback : MonoBehaviour
             float duration = info.IsJustAvoidCounter ? Mathf.Max(_justAvoidCounterHitStop, _hitStop.HeavyHitStop) : info.IsHeavy ? _hitStop.HeavyHitStop : _hitStop.LightHitStop;
             if (info.IsJustAvoidCounter && counterPresentation != null) duration = counterPresentation.GetStrike(info.CounterStrike).HitStop;
             _hitStop.PlayHitStop(duration, gameObject, info.Instigator);
+            // 敵の攻撃（RushAttack の刺突線など）を同じ HitStop 時間だけ保持する。
+            if (info.Instigator != null && !info.IsJustAvoidCounter)
+                info.Instigator.GetComponentInParent<EnemyController>()?.NotifyAttackHitFeedback(duration);
         }
         _enemyAnimation?.DiagnoseNormalHitAfterHitStop(info);
         _cameraFeedback?.PlayHitFeedback(info.IsHeavy, info.HitPoint, info.IsJustAvoidCounter, info.IsCounterFirst);
@@ -615,7 +619,16 @@ public sealed class CombatFeedback : MonoBehaviour
         Vector3 point = info.HitPoint + (style != null ? basis * style.PositionOffset : Vector3.zero);
         slash.Play(point, basis * Quaternion.Euler(style != null ? style.RotationOffset : Vector3.zero),
             _vfxConfig.GetCounterIssenScale(info.IsCounterFirst), style != null ? style.EmissionIntensity : 1f, style != null ? style.Duration : 0f);
+        // 鬼武者の一閃のような追加演出（画面の白飛び・巨大な弧・放射状の光の筋・しぶき・青い火花）。
+        if (_issenFinisher == null)
+        {
+            _issenFinisher = gameObject.AddComponent<OnimushaIssenVFX>();
+            _issenFinisher.Initialize(_vfxConfig);
+        }
+        Vector3 attacker = info.Instigator != null ? info.Instigator.transform.position : info.HitPoint - direction.normalized;
+        _issenFinisher.Play(info.HitPoint, direction, attacker, info.IsCounterFirst);
     }
+    private OnimushaIssenVFX _issenFinisher;
 
     private void PrepareCounterIssen()
     {

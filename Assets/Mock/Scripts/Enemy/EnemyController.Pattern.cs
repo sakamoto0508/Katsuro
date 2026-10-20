@@ -14,7 +14,7 @@ public partial class EnemyController
         if (_attackTarget != null)
         {
             float distance = Vector3.Distance(transform.position, _attackTarget.position);
-            if (distance < pattern.MinAttackDistance || distance > pattern.MaxAttackDistance) return false;
+            if (!pattern.IsInSelectionRange(distance, _decisionConfig)) return false;
         }
         return !pattern.IsWarp || TryFindWarpDestination(pattern, out _);
     }
@@ -34,10 +34,7 @@ public partial class EnemyController
             (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
         if (!_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
         if (!CanUseAttackPattern(pattern)) return false;
-        bool speedConfigured = false;
-        foreach (var parameter in _animator.parameters)
-            speedConfigured |= parameter.name == "EnemyComboPlaybackSpeed" && parameter.type == AnimatorControllerParameterType.Float;
-        if (!speedConfigured) return false;
+        if (!HasComboSpeedParameter()) return false;
         EnsurePatternRunner();
         _attackCompletionPending = false;
         if (IsAttackPatternActive) return false;
@@ -49,8 +46,27 @@ public partial class EnemyController
         _mover?.SetAttackTravelLimit(pattern.MaximumTravelDistance);
         _patternCooldowns[pattern] = Time.time + pattern.Cooldown;
         _attacker.DisableWeaponHitbox();
-        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.IsWarp ? .1f / Mathf.Max(.1f, pattern.WindupDuration) : pattern.WindupSpeed);
+        // Warp：刀を挙げる動きは通常速度で再生し、挙げ切ったら止めて「間」を取る（TickAttackPattern 側で制御）。
+        _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.IsWarp ? 1f
+            : pattern.UsesDashTuning ? pattern.StanceSpeedAt(0f) : pattern.WindupSpeed);
+        OnRushPatternBegun(pattern);
         return true;
+    }
+
+    private RuntimeAnimatorController _comboSpeedCheckedController;
+    private bool _hasComboSpeedParameter;
+    /// <summary>Pattern再生速度のFloatパラメータがあるかを確認する。parametersは毎回配列を生成するため、Controller単位で結果を保持する。</summary>
+    private bool HasComboSpeedParameter()
+    {
+        var controller = _animator.runtimeAnimatorController;
+        if (controller != _comboSpeedCheckedController)
+        {
+            _comboSpeedCheckedController = controller;
+            _hasComboSpeedParameter = false;
+            foreach (var parameter in _animator.parameters)
+                _hasComboSpeedParameter |= parameter.name == "EnemyComboPlaybackSpeed" && parameter.type == AnimatorControllerParameterType.Float;
+        }
+        return _hasComboSpeedParameter;
     }
 
     private bool StartPatternClip(EnemyAttackPattern pattern)
@@ -63,6 +79,13 @@ public partial class EnemyController
         if (current.fullPathHash == pattern.StateHash) return false;
         // コンボ中は向きを瞬間変更せず、開始時に決めた方向へ振り切る。
         bool started = _attacker != null && _attacker.PerformAttack(pattern.Attack);
+        if (started && pattern.IsWarp)
+        {
+            // 出現後は刀を挙げ切った姿勢から再開する（予備動作で挙げた動きを繰り返さない）。
+            if (_enemyAnimController != null && _enemyAnimController.HasTrigger(pattern.Attack.AnimatorTrigger))
+                _animator.ResetTrigger(pattern.Attack.AnimatorTrigger);
+            _animator.CrossFadeInFixedTime(pattern.StateHash, 0f, 0, pattern.WarpRaiseTime);
+        }
         if (started)
         {
             ApplyPatternWeaponGrip(pattern);
@@ -87,6 +110,7 @@ public partial class EnemyController
         var pattern = _preparingWarp != null ? _preparingWarp : _patternRunner.Pattern;
         _preparingWarp = null;
         _patternRunner.Cancel();
+        OnRushEnded(true);
         ClearPatternExecution();
         _mover?.ReleaseMovementAfterAttack();
         if (_animator != null && _animator.runtimeAnimatorController != null)
@@ -109,12 +133,14 @@ public partial class EnemyController
         _attackAnimationHash = 0;
         _attacker?.DisableWeaponHitbox();
         _attacker?.SetSweptHits(false);
+        _attacker?.SetHitSounds(null);
         _mover?.EndAttackRootMotion();
         _mover?.SetAttackRootMotionScale(null);
         _mover?.SetAttackTravelLimit(0f);
         _dashPreviousClipTime = 0f;
         if (_animator != null) _animator.SetFloat("EnemyComboPlaybackSpeed", 1f);
         ClearWarpPresentation();
+        OnRushEnded(false);
     }
 
     private void ObserveAttackPatternAnimation()
@@ -146,8 +172,11 @@ public partial class EnemyController
         if (AcceptPatternEvent(evt) && _patternRunner.OpenWindow(evt.intParameter, evt.animatorStateInfo.fullPathHash))
         {
             MaintainPatternWeaponGrip();
+            // この段の命中音を武器へ渡す。実際にPlayerへ当たった時だけ被弾側で鳴る。
+            _attacker?.SetHitSounds(_patternRunner.Pattern.GetStageSound(evt.intParameter)?.Hit);
             _attacker?.EnableWeaponHitbox();
             OnWarpHitboxOpened(_patternRunner.Pattern);
+            OnRushDashStarted(_patternRunner.Pattern);
         }
     }
 
@@ -172,9 +201,12 @@ public partial class EnemyController
         }
     }
 
+    /// <summary>開いている段の振り抜き音を鳴らす。段別SEが未設定ならClipのEventに書かれた登録名を使う。</summary>
     public void AnimEvent_ComboSound(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt) && _patternRunner.WindowActive && _patternRunner.WindowIndex == evt.intParameter) _audio?.PlaySE(evt.stringParameter);
+        if (!AcceptPatternEvent(evt) || !_patternRunner.WindowActive || _patternRunner.WindowIndex != evt.intParameter) return;
+        var stage = _patternRunner.Pattern.GetStageSound(evt.intParameter);
+        if (!EnemyComboStageSound.Play(_audio, stage?.Swing)) _audio?.PlaySE(evt.stringParameter);
     }
     public void AnimEvent_StopAttackRootMotion(AnimationEvent evt)
     {
@@ -190,7 +222,7 @@ public partial class EnemyController
     {
         var pattern = _patternRunner?.Pattern;
         if (pattern == null || !pattern.UsesDashTuning) return;
-        float speed = time < pattern.WindupEndTime - .00001f ? pattern.WindupSpeed :
+        float speed = time < pattern.WindupEndTime - .00001f ? pattern.StanceSpeedAt(time) :
             time < pattern.DashEndTime - .00001f ? pattern.DashPlaybackSpeed : pattern.PlaybackSpeed;
         _animator.SetFloat("EnemyComboPlaybackSpeed", speed);
     }

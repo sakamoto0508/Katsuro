@@ -39,13 +39,13 @@ public sealed class EnemyDecisionMaker
         if (candidates == null) return wait;
         float penalty = float.IsNaN(config.RepeatPenalty) ? 1f : Mathf.Clamp01(config.RepeatPenalty);
         double total = 0;
-        foreach (var candidate in candidates) total += Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, canUse);
+        foreach (var candidate in candidates) total += Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, config, canUse);
         if (total <= 0) return wait;
         double remaining = _rand.NextDouble() * total;
         var fallback = wait;
         foreach (var candidate in candidates)
         {
-            float weight = Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, canUse);
+            float weight = Weight(candidate, last, penalty, config.RepeatPenaltyPerAttack, distance, config, canUse);
             if (weight <= 0) continue;
             fallback = new EnemyDecision(candidate.Action, candidate.Attack, candidate.Pattern);
             remaining -= weight;
@@ -55,13 +55,13 @@ public sealed class EnemyDecisionMaker
     }
 
     private static float Weight(EnemyDecisionConfig.ActionWeight candidate, EnemyDecision last, float penalty, bool perAttack,
-        float distance, System.Func<EnemyDecisionConfig.ActionWeight, bool> canUse)
+        float distance, EnemyDecisionConfig config, System.Func<EnemyDecisionConfig.ActionWeight, bool> canUse)
     {
         float weight = candidate.Weight;
         if (float.IsNaN(weight) || float.IsInfinity(weight) || weight <= 0f) return 0f;
         if ((int)candidate.Action < 0 || (int)candidate.Action > (int)EnemyActionType.RushAttack) return 0f;
         if (candidate.Pattern != null && (!EnemyDecision.IsAttackAction(candidate.Action) || !candidate.Pattern.IsValid)) return 0f;
-        if (candidate.Pattern != null && (distance < candidate.Pattern.MinAttackDistance || distance > candidate.Pattern.MaxAttackDistance)) return 0f;
+        if (candidate.Pattern != null && !candidate.Pattern.IsInSelectionRange(distance, config)) return 0f;
         if ((candidate.Action == EnemyActionType.RushAttack || candidate.Action == EnemyActionType.WarpAttack) &&
             (candidate.Pattern == null || candidate.Pattern.Attack.ActionType != candidate.Action)) return 0f;
         if (canUse != null && !canUse(candidate)) return 0f;

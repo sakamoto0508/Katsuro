@@ -2044,7 +2044,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: b2e4b1f0331fb2f4ba3a3eb582b3ed60, type: 2}
+  m_Motion: {fileID: 7400000, guid: f2c9b3790c26cba4eaf6b7c69e62ad9d, type: 2}
   m_Tag: WarpDeparture
   m_SpeedParameter: EnemyComboPlaybackSpeed
   m_MirrorParameter: 

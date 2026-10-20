@@ -32,8 +32,8 @@ MonoBehaviour:
     SpawnOffset: {x: 0, y: 0, z: 0}
   _counterPresentation: {fileID: 11400000, guid: bcade4df1e61f7d438a3c3ecef1a7767, type: 2}
   _counterIssenSlash: {fileID: 6079003188372657689, guid: 16cd2ac1860eba349989be6a8567e048, type: 3}
-  _counterFirstIssenScale: 0.75
-  _counterSecondIssenScale: 1.05
+  _counterFirstIssenScale: 1.3
+  _counterSecondIssenScale: 2
   _counterFirstIssenStyle:
     PositionOffset: {x: 0, y: 0, z: 0}
     RotationOffset: {x: 0, y: 0, z: 0}
@@ -44,6 +44,30 @@ MonoBehaviour:
     RotationOffset: {x: 0, y: 0, z: 0}
     EmissionIntensity: 1
     Duration: 0.24
+  _issenFinisher:
+    Enabled: 1
+    FlashColor: {r: 0.86, g: 0.93, b: 1, a: 1}
+    FirstFlash: 0
+    SecondFlash: 0
+    FlashDuration: 0.14
+    FirstArc: 1
+    SecondArc: 0
+    ArcColor: {r: 0.9, g: 0.95, b: 1, a: 1}
+    ArcIntensity: 2.2
+    ArcAngle: 150
+    ArcRadiusPadding: 0.8
+    ArcSweep: 0.06
+    ArcFade: 0.22
+    StreakCount: 28
+    StreakSpeed: 22
+    StreakColor: {r: 0.9, g: 0.96, b: 1, a: 1}
+    MistCount: 6
+    MistColor: {r: 1, g: 1, b: 1, a: 0.06666667}
+    SparkCount: 40
+    SparkColor: {r: 0.45, g: 0.75, b: 1, a: 1}
+    SparkIntensity: 3
+  _issenArcMaterial: {fileID: 2100000, guid: 07c221e3056776241abc2079866b6464, type: 2}
+  _issenParticleMaterial: {fileID: 2100000, guid: e1040deb2cc7ca046baa895177d210fa, type: 2}
   _screenDistortionEnable: 1
   _distortionDuration: 0.14
   _distortionMaxRadius: 1.15

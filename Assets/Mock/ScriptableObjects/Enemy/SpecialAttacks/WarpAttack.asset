@@ -26,6 +26,7 @@ MonoBehaviour:
   DashSpeed: 12
   DashEndTime: 0.55
   MeasuredDashDistance: 3.145
+  StanceHoldStartTime: 0.42
   OverrideWeaponGrip: 0
   WeaponGripLocalPosition: {x: 0, y: 0, z: 0}
   WeaponGripLocalEuler: {x: 0, y: 0, z: 0}
@@ -33,12 +34,13 @@ MonoBehaviour:
   MaxAttackDistance: 18
   Cooldown: 8
   MaximumTravelDistance: 2
-  TeleportDistance: 2.5
+  TeleportDistance: 1.5
   TeleportAngleOffset: 0
   DisappearDuration: 0.18
   ReappearWindupDuration: 0.5
   DisappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
   ReappearSound: {fileID: 8300000, guid: 2f89b99ce7fc729468feb891fd98f74c, type: 3}
+  RushVFX: {fileID: 0}
   WarpEffectPrefab: {fileID: 991693034936716336, guid: 8e8d75741e69ca441bffcbae797e900d, type: 3}
   WarpVanishVFX: {fileID: 7907734529080212083, guid: ab5cade32b0ffad4f95ba0daa1b4db58, type: 3}
   WarpAppearVFX: {fileID: 7706840471134813055, guid: 6624b8e4a44f0a0499f53052ba28954b, type: 3}
@@ -49,3 +51,15 @@ MonoBehaviour:
   WarpSlashForward: 0.8
   WarpSlashRoll: -35
   WarpSlashScale: 0.9
+  WarpRaiseClipTime: 0.2
+  WarpHoldDuration: 0.45
+  WarpGhost:
+    Enabled: 1
+    Color: {r: 0.02, g: 0.02, b: 0.035, a: 0.85}
+    EdgeColor: {r: 0.18, g: 0.22, b: 0.32, a: 1}
+    WarningStrength: 0.9
+    WarningSway: 0.012
+    VanishDuration: 0.24
+    FormLead: 0.16
+    AppearFade: 0.28
+    Drift: 0.25

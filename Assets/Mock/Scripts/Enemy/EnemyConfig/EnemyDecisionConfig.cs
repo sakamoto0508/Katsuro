@@ -4,6 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyDecisionConfig", menuName = "ScriptableObjects/Enemy/DecisionConfig")]
 public class EnemyDecisionConfig : ScriptableObject
 {
+    /// <summary>既存AIの中距離帯か。Nearの境界は含まず、Farの境界は含む。</summary>
+    public bool IsMidDistance(float distance) => float.IsFinite(distance) && distance >= 0f &&
+        distance > NearDistance && distance <= FarDistance;
+
     /// <summary>遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。</summary>
     [UnityEngine.Tooltip("遠距離行動候補へ切り替えるPlayerとの距離（Unity単位）。")]
     [Header("Distance thresholds")]
@@ -44,6 +48,7 @@ public class EnemyDecisionConfig : ScriptableObject
     [Range(0f, 1f), Tooltip("直前に実行した行動の重みを何倍にするか（0 = 完全に除外、1 = 変化なし）")]
     public float RepeatPenalty = 0.25f;
 
+    /// <summary>オフ: 同じAction全体に補正（既存の攻撃頻度を維持）。オン: 同じAttackDataまたはPatternだけに補正。</summary>
     [Tooltip("オフ: 同じAction全体に補正（既存の攻撃頻度を維持）。オン: 同じAttackDataまたはPatternだけに補正。")]
     public bool RepeatPenaltyPerAttack;
 
@@ -54,8 +59,10 @@ public class EnemyDecisionConfig : ScriptableObject
         /// <summary>この抽選候補が実行するEnemy行動の種類。</summary>
         [UnityEngine.Tooltip("この抽選候補が実行するEnemy行動の種類。")]
         public EnemyActionType Action;
+        /// <summary>攻撃候補では使用するEnemyAttackDataを指定。移動・待機ではNone。未指定の旧攻撃候補は従来方式で実行。</summary>
         [Tooltip("攻撃候補では使用するEnemyAttackDataを指定。移動・待機ではNone。未指定の旧攻撃候補は従来方式で実行。")]
         public EnemyAttackData Attack;
+        /// <summary>設定時はAttackよりPatternを優先。無効なPatternは候補から除外。移動・待機ではNone。</summary>
         [Tooltip("設定時はAttackよりPatternを優先。無効なPatternは候補から除外。移動・待機ではNone。")]
         public EnemyAttackPattern Pattern;
         /// <summary>この候補の抽選重み。大きいほど選ばれやすく、直前行動にはRepeatPenaltyを掛ける。</summary>

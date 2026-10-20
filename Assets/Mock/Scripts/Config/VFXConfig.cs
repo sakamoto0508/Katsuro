@@ -4,55 +4,121 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "VFXConfig", menuName = "Config/VFXConfig")]
 public class VFXConfig : ScriptableObject
 {
+    /// <summary>敵への通常攻撃の血しぶき表示を定義する。追撃専用演出には適用しない。</summary>
     [System.Serializable]
     public sealed class NormalBloodStyle
     {
+        /// <summary>SwordHitVFX/BloodStreaksの最初のBurst数。敵への通常攻撃だけ。</summary>
         [Min(0), Tooltip("SwordHitVFX/BloodStreaksの最初のBurst数。敵への通常攻撃だけ。")]
         public int StreakCount = 3;
+        /// <summary>SwordHitVFX/BloodDropletsの最初のBurst数。</summary>
         [Min(0), Tooltip("SwordHitVFX/BloodDropletsの最初のBurst数。")]
         public int DropletCount = 4;
+        /// <summary>通常BloodのPrefabサイズ倍率。Heavyでは既存VFXルートScaleも掛かります。Slashには適用しません。</summary>
         [Range(.25f, 2f), Tooltip("通常BloodのPrefabサイズ倍率。Heavyでは既存VFXルートScaleも掛かります。Slashには適用しません。")]
         public float Width = 1.25f;
+        /// <summary>通常BloodのPrefab初速倍率。</summary>
         [Range(.25f, 2f), Tooltip("通常BloodのPrefab初速倍率。")]
         public float Speed = 1f;
+        /// <summary>通常BloodのPrefab Stretch長倍率。</summary>
         [Range(.25f, 2f), Tooltip("通常BloodのPrefab Stretch長倍率。")]
         public float Length = 1f;
+        /// <summary>通常BloodのPrefab寿命倍率。Pool返却時間内に収めてください。</summary>
         [Range(.5f, 1.5f), Tooltip("通常BloodのPrefab寿命倍率。Pool返却時間内に収めてください。")]
         public float Lifetime = 1f;
+        /// <summary>斬撃軸に直交する、攻撃者から離れる成分を追加する割合。</summary>
         [Range(0f, .5f), Tooltip("斬撃軸に直交する、攻撃者から離れる成分を追加する割合。")]
         public float DirectionBias = .15f;
+        /// <summary>Bloodだけの表示位置(m)。X=斬撃横成分の接線、Y=上、Z=攻撃者から離れる水平軸。合計最大0.10m。0でHitPointを維持。</summary>
         [Tooltip("Bloodだけの表示位置(m)。X=斬撃横成分の接線、Y=上、Z=攻撃者から離れる水平軸。合計最大0.10m。0でHitPointを維持。")]
         public Vector3 SpawnOffset;
     }
+    /// <summary>敵への通常軽攻撃の血しぶき設定。追撃の専用血しぶきや一閃には適用しない。</summary>
     [Header("Enemy normal hit / Blood only (Counter uses its dedicated prefabs)")]
     [SerializeField] private NormalBloodStyle _lightBlood = new NormalBloodStyle();
+    /// <summary>敵への通常強攻撃の血しぶき設定。追撃の専用血しぶきや一閃には適用しない。</summary>
     [SerializeField] private NormalBloodStyle _heavyBlood = new NormalBloodStyle
         { StreakCount = 4, DropletCount = 6, Width = 1.5f, Speed = 1.15f, Length = 1.25f, Lifetime = 1.1f, DirectionBias = .2f };
+    /// <summary>通常攻撃の強弱に対応する血しぶき設定を取得する。追撃の専用演出には使用しない。</summary>
     public NormalBloodStyle GetNormalBloodStyle(bool heavy) => heavy ? _heavyBlood : _lightBlood;
+    /// <summary>追撃の段別演出を定義する既存の設定アセット。</summary>
     [Header("Just Avoid Counter / Two strikes")]
     [SerializeField] private JustAvoidCounterConfig _counterPresentation;
+    /// <summary>追撃1撃目・2撃目の既存の演出設定。</summary>
     public JustAvoidCounterConfig CounterPresentation => _counterPresentation;
+    /// <summary>追撃2撃の命中点に出す一閃VFX。未設定なら出さない。</summary>
     [Header("Just Avoid Counter / Issen slash (Assets/Art)")]
     [SerializeField, Tooltip("追撃2撃の命中点に出す一閃VFX。未設定なら出さない。")]
     private KatsuroTimedVFX _counterIssenSlash;
+    /// <summary>追撃1撃目の一閃の大きさ（基準長2m）。</summary>
     [SerializeField, Range(.3f, 2f), Tooltip("追撃1撃目の一閃の大きさ（基準長2m）。")]
     private float _counterFirstIssenScale = .75f;
+    /// <summary>追撃2撃目（締め）の一閃の大きさ（基準長2m）。</summary>
     [SerializeField, Range(.3f, 2f), Tooltip("追撃2撃目（締め）の一閃の大きさ（基準長2m）。")]
     private float _counterSecondIssenScale = 1.05f;
+    /// <summary>追撃の各段に独立して適用するArt一閃の表示設定。</summary>
     [System.Serializable]
     public sealed class CounterIssenStyle
     {
+        /// <summary>命中位置からのオフセット。X=斬撃方向、Y=面内上方向、Z=カメラ方向。</summary>
         [Tooltip("命中位置からのオフセット。X=斬撃方向、Y=面内上方向、Z=カメラ方向。")]
         public Vector3 PositionOffset;
+        /// <summary>命中方向とカメラから算出した基準回転に追加するローカルEuler角（度）。</summary>
         public Vector3 RotationOffset;
+        /// <summary>各Trackの発光ピークに乗算する一閃の発光倍率。</summary>
         [Min(0f)] public float EmissionIntensity = 1f;
+        /// <summary>各Trackの時間配分を維持して伸縮する、一閃全体の再生時間（秒）。</summary>
         [Min(.01f)] public float Duration = .22f;
     }
+    /// <summary>追撃1撃目専用の位置・回転・発光・持続時間の設定。</summary>
     [SerializeField] private CounterIssenStyle _counterFirstIssenStyle = new CounterIssenStyle { EmissionIntensity = .75f, Duration = .19f };
+    /// <summary>追撃2撃目専用の位置・回転・発光・持続時間の設定。</summary>
     [SerializeField] private CounterIssenStyle _counterSecondIssenStyle = new CounterIssenStyle { EmissionIntensity = 1f, Duration = .24f };
+    /// <summary>追撃1撃目または2撃目のArt一閃の位置・回転・発光・持続時間の設定を取得する。</summary>
     public CounterIssenStyle GetCounterIssenStyle(bool first) => first ? _counterFirstIssenStyle : _counterSecondIssenStyle;
+    /// <summary>命中演出側から参照するArt一閃Prefab。</summary>
     public KatsuroTimedVFX CounterIssenSlash => _counterIssenSlash;
+    /// <summary>追撃1撃目または2撃目のArt一閃のサイズ倍率を取得する。</summary>
     public float GetCounterIssenScale(bool first) => first ? _counterFirstIssenScale : _counterSecondIssenScale;
+
+    /// <summary>鬼武者の一閃のような追撃演出（画面の白飛び・巨大な弧・放射状の光の筋・白いしぶき・青い火花）。</summary>
+    [System.Serializable]
+    public sealed class IssenFinisher
+    {
+        [Tooltip("一閃演出を出す。")] public bool Enabled = true;
+        [Header("画面の白飛び")]
+        [ColorUsage(false, true), Tooltip("白飛びの色。")] public Color FlashColor = new Color(.86f, .93f, 1f, 1f);
+        [Range(0f, 3f), Tooltip("1撃目の白飛びの強さ。")] public float FirstFlash = .45f;
+        [Range(0f, 3f), Tooltip("2撃目（締め）の白飛びの強さ。")] public float SecondFlash = 1.1f;
+        [Range(.02f, .5f), Tooltip("白飛びが引くまでの秒数。")] public float FlashDuration = .14f;
+        [Header("巨大な弧（体の周りを走る光の面）")]
+        [Tooltip("1撃目に弧を出す。")] public bool FirstArc = true;
+        [Tooltip("2撃目に弧を出す。")] public bool SecondArc;
+        [ColorUsage(false, true), Tooltip("弧の色。")] public Color ArcColor = new Color(.9f, .95f, 1f, 1f);
+        [Range(0f, 10f), Tooltip("弧の明るさ。")] public float ArcIntensity = 2.2f;
+        [Range(30f, 300f), Tooltip("弧の角度（度）。")] public float ArcAngle = 150f;
+        [Range(0f, 3f), Tooltip("命中点より外へ広げる半径の余白（m）。")] public float ArcRadiusPadding = .8f;
+        [Range(.01f, .3f), Tooltip("弧が尾から先端まで走る秒数。")] public float ArcSweep = .06f;
+        [Range(.05f, .8f), Tooltip("走り切ってから消えるまでの秒数。")] public float ArcFade = .22f;
+        [Header("放射状の光の筋")]
+        [Range(0, 80)] public int StreakCount = 28;
+        [Range(1f, 60f), Tooltip("筋が飛ぶ速さ（m/s）。")] public float StreakSpeed = 22f;
+        [ColorUsage(false, true)] public Color StreakColor = new Color(.9f, .96f, 1f, 1f);
+        [Header("白いしぶき")]
+        [Range(0, 60)] public int MistCount = 16;
+        public Color MistColor = new Color(1f, 1f, 1f, .35f);
+        [Header("青い火花（余韻）")]
+        [Range(0, 120)] public int SparkCount = 40;
+        [ColorUsage(false, true)] public Color SparkColor = new Color(.45f, .75f, 1f, 1f);
+        [Range(0f, 10f)] public float SparkIntensity = 3f;
+    }
+    [Header("Just Avoid Counter / Onimusha-style finisher")]
+    [SerializeField] private IssenFinisher _issenFinisher = new IssenFinisher();
+    [SerializeField, Tooltip("巨大な弧に使う Material（一閃の光の面：M_Issen_LightSheet）。")] private Material _issenArcMaterial;
+    [SerializeField, Tooltip("しぶき・光の筋・火花の元にする Material（Katsuro/VFXParticle の手続き的な粒：M_Rush_Dust）。")] private Material _issenParticleMaterial;
+    public IssenFinisher IssenFinisherStyle => _issenFinisher;
+    public Material IssenArcMaterial => _issenArcMaterial;
+    public Material IssenParticleMaterial => _issenParticleMaterial;
     /// <summary>Just Avoid成功時の画面歪みを有効にする。</summary>
     [UnityEngine.Tooltip("Just Avoid成功時の画面歪みを有効にする。")]
     [Header("Just Avoid / Screen Distortion")]

@@ -37,53 +37,45 @@ MonoBehaviour:
   - Action: 0
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
-    Weight: 20
+    Weight: 25
   - Action: 2
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
-    Weight: 2
+    Weight: 10
   - Action: 10
     Attack: {fileID: 0}
     Pattern: {fileID: 11400000, guid: c8401f7cbf64d09488842dc10309d5ee, type: 2}
-    Weight: 5
+    Weight: 45
   - Action: 8
     Attack: {fileID: 0}
     Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
-    Weight: 5
+    Weight: 20
   NearCandidates:
   - Action: 3
     Attack: {fileID: 11400000, guid: 4ca001fdc8b671941b6dda62d3dddcbf, type: 2}
     Pattern: {fileID: 0}
-    Weight: 5
+    Weight: 15
   - Action: 3
     Attack: {fileID: 11400000, guid: c958f190ac9187f4c8e5be61256b8980, type: 2}
     Pattern: {fileID: 0}
-    Weight: 5
+    Weight: 15
   - Action: 3
     Attack: {fileID: 11400000, guid: e46e2a1b9049f844f91a86e40bc32f09, type: 2}
     Pattern: {fileID: 0}
-    Weight: 5
+    Weight: 15
   - Action: 3
     Attack: {fileID: 11400000, guid: e2802607a4a07bd4f96a53e5bca36b48, type: 2}
     Pattern: {fileID: 0}
-    Weight: 5
+    Weight: 15
   - Action: 3
     Attack: {fileID: 0}
     Pattern: {fileID: 11400000, guid: e98dc187eccb7014dba348fe90204dcd, type: 2}
-    Weight: 5
+    Weight: 10
   - Action: 3
     Attack: {fileID: 0}
     Pattern: {fileID: 11400000, guid: 89f9ee2a7bb81ea4fb0ac3805c3685c5, type: 2}
-    Weight: 5
+    Weight: 10
   - Action: 1
     Attack: {fileID: 0}
     Pattern: {fileID: 0}
-    Weight: 1.5
-  - Action: 3
-    Attack: {fileID: 0}
-    Pattern: {fileID: 11400000, guid: 89f9ee2a7bb81ea4fb0ac3805c3685c5, type: 2}
-    Weight: 5
-  - Action: 3
-    Attack: {fileID: 0}
-    Pattern: {fileID: 11400000, guid: e98dc187eccb7014dba348fe90204dcd, type: 2}
-    Weight: 5
+    Weight: 15

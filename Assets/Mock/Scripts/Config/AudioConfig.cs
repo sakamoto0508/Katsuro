@@ -5,12 +5,18 @@ using UnityEngine;
 /// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
 public class AudioConfig : ScriptableObject
 {
+    /// <summary>追撃1撃目の命中SE。未設定時は通常Light命中Clipを使用する。</summary>
     [Header("Just Avoid Counter / First contact")]
     [SerializeField] private AudioClip _counterFirstHitClip;
+    /// <summary>追撃1撃目の命中SEの音量倍率（0〜1）。</summary>
     [SerializeField, Range(0f, 1f)] private float _counterFirstHitVolume = .52f;
+    /// <summary>追撃1撃目の命中SEを再生し始めるClip内の位置（秒）。再生を遅らせる時間ではない。</summary>
     [SerializeField, Min(0f)] private float _counterFirstHitOffset = .04f;
+    /// <summary>追撃1撃目の命中SEを取得する。専用Clipが未設定なら通常Light命中Clipを返す。</summary>
     public AudioClip GetCounterFirstClip() => _counterFirstHitClip != null ? _counterFirstHitClip : _lightHitClip;
+    /// <summary>追撃1撃目の命中SEに適用する音量倍率（0〜1）。</summary>
     public float CounterFirstHitVolume => _counterFirstHitVolume;
+    /// <summary>追撃1撃目の命中SEのClip内再生開始位置（秒）。</summary>
     public float CounterFirstHitOffset => _counterFirstHitOffset;
     /// <summary>ゲーム開始操作で再生するSEの登録名。</summary>
     public string StartSE => _startSE;

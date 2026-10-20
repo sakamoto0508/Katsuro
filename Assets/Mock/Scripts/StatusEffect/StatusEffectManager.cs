@@ -29,6 +29,7 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         // 乗算の基準となる速度を保存
         if (_agent != null) _baseAgentSpeed = _agent.speed;
         if (_animator != null) { _speed = _animator.GetComponent<AnimationSpeedController>(); _speed?.Init(); }
+        if (_speed == null) Debug.LogWarning("AnimationSpeedControllerがないため、状態効果のAnimator速度倍率は反映されません。", this);
     }
 
     /// <summary>効果の残り時間を進め、期限切れのVFXを除去して倍率の変更を再計算する。</summary>
@@ -150,7 +151,8 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
             _agent.speed = _baseAgentSpeed * speedMul;
         }
 
-        if (_animator != null)
+        // Animator速度はHitStopと合成するため、AnimationSpeedControllerがある場合だけ反映する。
+        if (_speed != null)
         {
             _speed.SetStatus(animMul);
         }

@@ -90,9 +90,13 @@ public class PlayerStateConfig : ScriptableObject
     /// <summary>ゴースト化時の透明度（アルファ値）。</summary>
     public float GhostAlpha => _alpha;
 
+    /// <summary>非Lock-On時の弱攻撃に使用する、コンボ順のAnimationClip一覧。</summary>
     public IReadOnlyList<AnimationClip> LightAttackClips => _lightAttackClips.Clips;
+    /// <summary>Lock-On時の弱攻撃に使用する、コンボ順のAnimationClip一覧。</summary>
     public IReadOnlyList<AnimationClip> LockOnLightAttackClips => _lockOnLightAttackClips.Clips;
+    /// <summary>強攻撃に使用する、コンボ順のAnimationClip一覧。</summary>
     public IReadOnlyList<AnimationClip> StrongAttackClips => _strongAttackClips.Clips;
+    /// <summary>ジャスト回避追撃に使用する、段階順のAnimationClip一覧。</summary>
     public IReadOnlyList<AnimationClip> JustAvoidAttackClips => _justAvoidAttackClips.Clips;
 
     /// <summary>Lock-Onに応じた弱攻撃Clipの長さを取得し、未設定時は弱攻撃用の代替時間を返す。</summary>
