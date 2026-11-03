@@ -123,25 +123,5 @@ public sealed class AbilityManager
         }
         return false;
     }
-
-    /// <summary>
-    /// Heal のトグル（開始 / 終了）。開始時はデフォルトの回復速度を使用します。
-    /// </summary>
-    /// <returns>要求に応じて回復能力を切り替えられた場合はtrue。</returns>
-    public bool ToggleHeal()
-    {
-        var h = _healer;
-        if (h == null) return false;
-
-        if (h.IsHealing)
-        {
-            h.End();
-            return false;
-        }
-
-        // デフォルト回復速度（%/s）を PlayerHealState と合わせる
-        float defaultPercentPerSecond = 5f;
-        return h.TryBegin(defaultPercentPerSecond);
-    }
 }
 
