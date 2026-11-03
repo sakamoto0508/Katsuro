@@ -15,7 +15,7 @@ public class PlayerHealState : PlayerState
 
     public override PlayerStateId Id => PlayerStateId.Heal;
 
-    /// <summary>回復能力を確認して回復中の表示・移動状態を開始する。</summary>
+    /// <summary>回復能力を開始する唯一の入口。開始できた場合だけ回復中の表示・移動状態を開始する。</summary>
     public override void Enter()
     {
         if (Context?.Healer == null)
@@ -53,9 +53,11 @@ public class PlayerHealState : PlayerState
         }
     }
 
-    /// <summary>入力解除で回復能力を終了させる。</summary>
+    /// <summary>入力解除で回復能力を終了し、State更新を待たずに通常移動へ戻って回復演出を止める。</summary>
     public override void OnHealCanceled()
     {
         Context.Healer?.End();
+        // 敗北直後など戦闘不能でUpdateが呼ばれない場合も、この時点でExitを通す。
+        StateMachine.ChangeState(PlayerStateId.Locomotion);
     }
 }

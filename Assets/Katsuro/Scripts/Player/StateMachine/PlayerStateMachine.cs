@@ -36,6 +36,9 @@ public sealed class PlayerStateMachine : IDisposable
     /// <summary>ステート間で共有される依存情報。</summary>
     public PlayerStateContext Context { get; }
 
+    /// <summary>現在の状態の識別子。破棄後など状態がない場合はnull。</summary>
+    public PlayerStateId? CurrentStateId => _currentState?.Id;
+
     /// <summary>Combo受付と攻撃終了の通知を現在状態へ転送する購読を登録する。</summary>
     private void SubscribeAnimationEvents()
     {

@@ -119,6 +119,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     private AudioManager _audio;
     private CombatFeedback _combatFeedback;
     private bool _initialized;
+    private bool _couldFight;
 
     /// <summary>入力・状態・移動・能力・武器・表示の依存先を組み立て、必要な通知を購読する。</summary>
     public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
@@ -266,6 +267,15 @@ public class PlayerController : MonoBehaviour, IDamageable
     }
 
    
+    /// <summary>戦闘不能になった時点で回復能力を終了し、回復状態に残っていれば抜けて回復演出を止める。他の能力・状態は変更しない。</summary>
+    private void StopHealOnCombatStop()
+    {
+        _stateContext?.Healer?.End();
+        // 戦闘不能中はState更新が止まるため、回復状態のままだとExitが呼ばれず演出が残る。
+        if (_stateMachine != null && _stateMachine.CurrentStateId == PlayerStateId.Heal)
+            _stateMachine.ChangeState(PlayerStateId.Locomotion);
+    }
+
     /// <summary>バフ用BGMを専用の第2チャンネルへ要求する。</summary>
     public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
     /// <summary>バフ用の第2BGMチャンネルを停止する。</summary>
@@ -353,7 +363,11 @@ public class PlayerController : MonoBehaviour, IDamageable
             _weaponHitboxes.SetHitboxPadding(_weaponHitboxPadding);
             _appliedHitboxPadding = _weaponHitboxPadding;
         }
-        if (!CanFight) { StopAttackRootMotion(); return; }
+        bool canFight = CanFight;
+        // 敗北・戦闘終了・Pauseで戦闘不能になった瞬間に、入力のcanceled通知を待たず回復と回復演出を止める。
+        if (!canFight && _couldFight) StopHealOnCombatStop();
+        _couldFight = canFight;
+        if (!canFight) { StopAttackRootMotion(); return; }
         if (_justBuffRemaining > 0f)
         {
             _justBuffRemaining -= Time.deltaTime;
@@ -555,25 +569,19 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>回復能力の開始・解除を入力に応じて要求し、対応するPlayer状態へ通知する。</summary>
+    /// <summary>回復の開始要求を現在状態へ渡し、解除入力では状態に関係なく回復を終了する。</summary>
     private void OnHeal(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            var started = _stateContext?.AbilityManager?.ToggleHeal() ?? false;
-            if (started)
-            {
-                _stateMachine?.HandleHealStarted();
-                CombatLog.Trace("Heal Started (via AbilityManager)");
-            }
-            else
-            {
-                CombatLog.Trace("Heal Failed to start (via AbilityManager)");
-            }
+            // 開始の可否と開始処理はPlayerHealStateが持つ。Locomotion以外の状態はこの要求を無視する。
+            _stateMachine?.HandleHealStarted();
+            CombatLog.Trace("Heal Requested");
         }
         else if (context.canceled)
         {
-            // 解除入力は常にステートへ伝える
+            // 回復状態以外で能力だけが残らないよう、能力の終了は状態を介さず確実に行う。
+            _stateContext?.Healer?.End();
             _stateMachine?.HandleHealCanceled();
             CombatLog.Trace("Heal Canceled");
         }

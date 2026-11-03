@@ -15,16 +15,17 @@ public class LoadSceneManager : MonoBehaviour
     private GlobalFader _fader;
     private bool _initialized;
 
-    /// <summary>共有インスタンスとFaderを一度だけ接続する。</summary>
+    /// <summary>Scene内の共有インスタンスとFaderを一度だけ接続する。</summary>
     public void Init(GlobalFader fader)
     {
         if (_initialized) return;
         _initialized = true;
         _fader = fader;
+        // 各SceneのManager配下に置かれ、遷移自体は永続するGlobalFaderが担うため、Sceneごとのインスタンスで足りる。
+        // 子のままDontDestroyOnLoadを呼んでも永続化されず警告だけが出ていたので、永続化はしない。
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {
