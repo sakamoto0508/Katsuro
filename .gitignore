@@ -97,21 +97,49 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
-Assets/InportAssets/
+Assets/ThirdParty/
 # Keep imported animation copies ignored, except the authored enemy UAL2 combos.
-Assets/Mock/Animation/*
-!Assets/Mock/Animation/Enemy/
-Assets/Mock/Animation/Enemy/*
-!Assets/Mock/Animation/Enemy/UAL2Combos/
-!Assets/Mock/Animation/Enemy/UAL2Combos.meta
-!Assets/Mock/Animation/Enemy/SpecialAttacks/
-!Assets/Mock/Animation/Enemy/SpecialAttacks.meta
+Assets/Katsuro/Animations/Clips/*
+!Assets/Katsuro/Animations/Clips/Enemy/
+Assets/Katsuro/Animations/Clips/Enemy/*
+!Assets/Katsuro/Animations/Clips/Enemy/UAL2Combos/
+!Assets/Katsuro/Animations/Clips/Enemy/UAL2Combos.meta
+!Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/
+!Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks.meta
 Assets/Plugins/
 Assets/INab Studio/
 AgentScripts/
-Assets/Mock/TutorialEnvironment/
+Assets/Katsuro/Art/Environment/Tutorial/
 ProfilingResults/
-Assets/Art/
+Assets/Katsuro/Art/CombatVFX/
 Artifacts/
-Assets/Mock/Animation/Enemy/SpecialAttacks/
-Assets/Mock/Tests/
+Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/
+Assets/Katsuro/Editor/Verification/
+
+# Preserve local-only art/source policies after the folder organization.
+/Source/Art/
+/Assets/Katsuro/Data/Feedback/GatotsuRushVFX.asset
+/Assets/Katsuro/Data/Feedback/GatotsuRushVFX.asset.meta
+!Assets/Katsuro/Animations/Clips/Enemy/Reactions/
+!Assets/Katsuro/Animations/Clips/Enemy/Reactions.meta
+
+# Keep the few previously versioned files inside otherwise ignored asset packs.
+!/Assets/ThirdParty/
+/Assets/ThirdParty/*
+!/Assets/ThirdParty/Katana/
+/Assets/ThirdParty/Katana/*
+!/Assets/ThirdParty/Katana/Provisional/
+/Assets/ThirdParty/Katana/Provisional/*
+!/Assets/ThirdParty/Katana/Provisional/Katana_Mokko.prefab
+!/Assets/ThirdParty/Katana/Provisional/Katana_Mokko.prefab.meta
+!/Assets/ThirdParty/Katana/Provisional/Katana_Rust.prefab
+!/Assets/ThirdParty/Katana/Provisional/Katana_Rust.prefab.meta
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/
+/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/*
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyRushAttack.anim
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyRushAttack.anim.meta
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyWarpAttack.anim
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyWarpAttack.anim.meta
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyWarpDeparture.anim
+!/Assets/Katsuro/Animations/Clips/Enemy/SpecialAttacks/EnemyWarpDeparture.anim.meta
+!/Assets/Katsuro/Animations/Clips/Player.meta

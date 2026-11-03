@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06f256e550c8cdf4293581e661ce2957, type: 3}
+  m_Name: RushAttack
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackPattern
+  PatternName: RushAttack
+  Attack: {fileID: 11400000, guid: b72d5743a06b4c0498daaad99588629e, type: 2}
+  AnimatorState: Base Layer.Attacks.RushAttack
+  WindupDuration: 1.5
+  WindupEndTime: 0.45
+  RecoveryDuration: 0.1
+  Timeout: 3
+  PlaybackSpeed: 1
+  RootMotionScale: 1
+  TuneDashRootMotion: 1
+  DashDistance: 3
+  DashSpeed: 12
+  DashEndTime: 0.7
+  MeasuredDashDistance: 3.2893562
+  StanceHoldStartTime: 0.42
+  OverrideWeaponGrip: 1
+  WeaponGripLocalPosition: {x: 0.03806717, y: 0.24124862, z: -0.0063277865}
+  WeaponGripLocalEuler: {x: 291.3323, y: 123.410126, z: 202.17143}
+  MinAttackDistance: 3
+  MaxAttackDistance: 4.25
+  Cooldown: 5
+  MaximumTravelDistance: 4
+  TeleportDistance: 2.5
+  TeleportAngleOffset: 0
+  DisappearDuration: 0.18
+  ReappearWindupDuration: 0.5
+  StageSounds: []
+  DisappearSound: {fileID: 0}
+  ReappearSound: {fileID: 0}
+  RushVFX: {fileID: 11400000, guid: 7a78c1bc7522d684f97617e2fb26e733, type: 2}
+  WarpEffectPrefab: {fileID: 0}
+  WarpVanishVFX: {fileID: 0}
+  WarpAppearVFX: {fileID: 0}
+  WarpSlashVFX: {fileID: 0}
+  WarpVanishLead: 0.07
+  WarpAppearLead: 0.06
+  WarpEffectHeight: 1.1
+  WarpSlashForward: 0.8
+  WarpSlashRoll: -35
+  WarpSlashScale: 0.9
+  WarpRaiseClipTime: 0.21
+  WarpHoldDuration: 0.45
+  WarpGhost:
+    Enabled: 1
+    Color: {r: 0.02, g: 0.02, b: 0.035, a: 0.85}
+    EdgeColor: {r: 0.18, g: 0.22, b: 0.32, a: 1}
+    WarningStrength: 0.9
+    WarningSway: 0.012
+    VanishDuration: 0.24
+    FormLead: 0.16
+    AppearFade: 0.28
+    Drift: 0.25
