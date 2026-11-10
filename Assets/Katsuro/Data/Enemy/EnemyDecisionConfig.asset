@@ -24,6 +24,7 @@ MonoBehaviour:
   WeightBackstep: 0.1
   RepeatPenalty: 0.25
   RepeatPenaltyPerAttack: 0
+  _initialSpecialAttackLockSeconds: 5
   FarCandidates:
   - Action: 0
     Attack: {fileID: 0}
@@ -32,6 +33,10 @@ MonoBehaviour:
   - Action: 8
     Attack: {fileID: 0}
     Pattern: {fileID: 11400000, guid: 36bfb66670657d947909fc1ce6228d2f, type: 2}
+    Weight: 2
+  - Action: 10
+    Attack: {fileID: 0}
+    Pattern: {fileID: 11400000, guid: c8401f7cbf64d09488842dc10309d5ee, type: 2}
     Weight: 2
   MidCandidates:
   - Action: 0

@@ -23,7 +23,10 @@ public class CameraManager : MonoBehaviour
     private LockOnCameraMover _lockOnCameraMover;
     private Camera _outputCamera;
     private CameraConfig _config;
-    private float _fovStarted = float.NegativeInfinity;
+    private JustAvoidEnvelope _justAvoidEnvelope;
+    private Transform _playerPosition;
+    private System.Func<bool> _justAvoidSustain;
+    private float _justAvoidSustainStarted = float.NegativeInfinity;
     private bool _finalBlowPlaying;
     private float _finalBlowStarted;
     private Vector3 _savedPosition;
@@ -33,6 +36,9 @@ public class CameraManager : MonoBehaviour
     private bool _wasLocked;
     private float _releaseStarted = float.NegativeInfinity;
     private float _savedFov;
+    private Vector3 _appliedPosition;
+    private Quaternion _appliedRotation;
+    private float _appliedFov;
     private bool _renderOffsetApplied;
     private bool _subscribed;
     private bool _initialized;
@@ -47,6 +53,7 @@ public class CameraManager : MonoBehaviour
         _victoryRig = GetComponent<VictoryCameraRig>();
         _victoryRig?.Init(playerPosition, outputCamera);
         _config = config;
+        _playerPosition = playerPosition;
         if (_combatImpulse == null) _combatImpulse = GetComponent<CinemachineImpulseSource>();
         if (_combatImpulse != null)
         {
@@ -82,16 +89,20 @@ public class CameraManager : MonoBehaviour
         _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter, counterFirst);
         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
     }
-    /// <summary>Final Blowが優先中でなければ、ジャスト回避のFOV補正時計を開始する。</summary>
+    /// <summary>Final Blowが優先中でなければ、ジャスト回避の寄り・ローアングル・FOV補正の時計を開始する。</summary>
     public void PlayJustAvoidFeedback()
     {
-        if (_initialized && isActiveAndEnabled && !_finalBlowPlaying) _fovStarted = Time.unscaledTime;
+        if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying) return;
+        _justAvoidEnvelope.Begin(Time.unscaledTime);
+        _justAvoidSustainStarted = float.NegativeInfinity;
     }
+    /// <summary>ジャスト回避のカメラ演出を最大のまま維持する条件を登録する。trueの間は復帰を始めない。</summary>
+    public void SetJustAvoidSustain(System.Func<bool> sustain) => _justAvoidSustain = sustain;
     /// <summary>回避FOVを解除して勝利FOVと専用構図を開始する。寄り始めは指定秒数だけ遅らせる。</summary>
     public void PlayFinalBlowFeedback(float delay = 0f)
     {
         if (!_initialized || !isActiveAndEnabled) return;
-        _fovStarted = float.NegativeInfinity;
+        _justAvoidEnvelope.Reset();
         _finalBlowStarted = Time.unscaledTime + Mathf.Max(0f, delay);
         _finalBlowPlaying = true;
         _victoryRig?.Begin(delay);
@@ -101,13 +112,13 @@ public class CameraManager : MonoBehaviour
     /// <summary>初期化済みなら描画前後の補正イベントを再登録する。</summary>
     private void OnEnable() { if (_initialized) SubscribeRendering(); }
     /// <summary>描画購読を解除し、回避・勝利の一時カメラ補正を消去する。</summary>
-    private void OnDisable() { UnsubscribeRendering(); _fovStarted = _releaseStarted = float.NegativeInfinity; _wasLocked = false; StopFinalBlowFeedback(); }
+    private void OnDisable() { UnsubscribeRendering(); _justAvoidEnvelope.Reset(); _releaseStarted = float.NegativeInfinity; _wasLocked = false; StopFinalBlowFeedback(); }
     /// <summary>出力カメラの描画前後で一時補正を適用・解除するイベントを重複なく登録する。</summary>
     private void SubscribeRendering()
     {
         if (_subscribed) return;
         _subscribed = true;
-        RenderPipelineManager.beginCameraRendering += BeginRendering;
+        Application.onBeforeRender += BeforeRender;
         RenderPipelineManager.endCameraRendering += EndRendering;
     }
     /// <summary>描画イベントを解除し、適用中の一時補正が残らないよう復元する。</summary>
@@ -115,15 +126,17 @@ public class CameraManager : MonoBehaviour
     {
         if (!_subscribed) return;
         _subscribed = false;
-        RenderPipelineManager.beginCameraRendering -= BeginRendering;
+        Application.onBeforeRender -= BeforeRender;
         RenderPipelineManager.endCameraRendering -= EndRendering;
         RestoreCamera();
     }
-    // Cinemachineと手動ロックオンの更新後、描画する瞬間だけ小さな補正を重ねる。
+    // HDRPはbeginCameraRenderingより前にView/Projection行列を確定するため、
+    // CinemachineのLateUpdate後かつ描画前のonBeforeRenderで補正を重ねる。
     /// <summary>Cinemachine更新後の構図を保存し、その描画だけ解除時の補間・Impulse・FOV補正を重ねる。</summary>
-    private void BeginRendering(ScriptableRenderContext context, Camera camera)
+    private void BeforeRender()
     {
-        if (camera != _outputCamera || _config == null) return;
+        var camera = _outputCamera;
+        if (camera == null || _config == null) return;
         RestoreCamera();
         _savedPosition = camera.transform.position;
         _savedRotation = camera.transform.rotation;
@@ -143,28 +156,64 @@ public class CameraManager : MonoBehaviour
         if (!_finalBlowPlaying && _combatImpulse != null && CinemachineImpulseManager.Instance.GetImpulseAt(
             _savedPosition, false, 2, out var offset, out var rotation))
             camera.transform.position += Vector3.ClampMagnitude(offset, .15f);
-        float progress = (Time.unscaledTime - _fovStarted) / Mathf.Max(.01f, _config.JustAvoidFOVDuration);
         if (_finalBlowPlaying)
         {
             float push = Mathf.SmoothStep(0, 1, Mathf.Clamp01((Time.unscaledTime - _finalBlowStarted) / Mathf.Max(.01f, _finalBlowPushDuration)));
             camera.fieldOfView = Mathf.Clamp(_savedFov + _finalBlowFOVOffset * push, 1f, 179f);
         }
-        else if (progress >= 0f && progress < 1f)
-            camera.fieldOfView = Mathf.Clamp(_savedFov + _config.JustAvoidFOVOffset * Mathf.Sin(progress * Mathf.PI), 1f, 179f);
+        else ApplyJustAvoid(camera);
+        _appliedPosition = camera.transform.position;
+        _appliedRotation = camera.transform.rotation;
+        _appliedFov = camera.fieldOfView;
+    }
+    /// <summary>ジャスト回避の包絡線に応じ、Playerの注視点を軸に下へ回り込みながら寄せ、FOVを補正する。</summary>
+    private void ApplyJustAvoid(Camera camera)
+    {
+        float now = Time.unscaledTime;
+        if (_justAvoidEnvelope.Playing && IsJustAvoidSustained(now)) _justAvoidEnvelope.Sustain(now, _config.JustAvoidCameraEnter);
+        float weight = _justAvoidEnvelope.Evaluate(now, _config.JustAvoidCameraEnter
+            , _config.JustAvoidCameraHold, _config.JustAvoidCameraRestore);
+        if (weight <= 0f) return;
+        camera.fieldOfView = Mathf.Clamp(camera.fieldOfView + _config.JustAvoidFOVOffset * weight, 1f, 179f);
+        if (_playerPosition == null) return;
+        Vector3 pivot = _playerPosition.position + Vector3.up * _config.LookAtHeight;
+        // 注視点を軸に剛体回転させるため、Playerの画面上の位置を保ったまま見上げる構図になる。
+        Quaternion orbit = Quaternion.AngleAxis(-_config.JustAvoidLowAngle * weight, camera.transform.right);
+        Vector3 offset = orbit * (camera.transform.position - pivot);
+        float distance = offset.magnitude;
+        if (distance > .01f) offset *= Mathf.Max(.3f, distance - _config.JustAvoidPushIn * weight) / distance;
+        Vector3 position = pivot + offset;
+        position.y = Mathf.Max(position.y, Mathf.Min(camera.transform.position.y, _playerPosition.position.y + _config.JustAvoidMinHeight));
+        camera.transform.SetPositionAndRotation(position, orbit * camera.transform.rotation);
+    }
+    /// <summary>ジャスト回避フラグまたは追撃中で、維持の上限時間内ならtrue。</summary>
+    /// <returns>カメラ演出を最大のまま維持する場合はtrue。</returns>
+    private bool IsJustAvoidSustained(float now)
+    {
+        if (_justAvoidSustain == null || !_justAvoidSustain())
+        {
+            _justAvoidSustainStarted = float.NegativeInfinity;
+            return false;
+        }
+        if (float.IsNegativeInfinity(_justAvoidSustainStarted)) _justAvoidSustainStarted = now;
+        return now - _justAvoidSustainStarted < _config.JustAvoidCameraMaxSustain;
     }
     /// <summary>描画終了後に位置・回転・FOVを戻し、次のCinemachine更新に補正を持ち越さない。</summary>
     private void EndRendering(ScriptableRenderContext context, Camera camera)
     {
         if (camera == _outputCamera) RestoreCamera();
     }
-    /// <summary>描画用に保存した位置・回転・FOVを一度だけ復元する。</summary>
+    /// <summary>描画用に保存した位置・回転・FOVを一度だけ復元する。補正後に他から上書きされていれば新しい値を優先する。</summary>
     private void RestoreCamera()
     {
         if (!_renderOffsetApplied || _outputCamera == null) return;
-        _outputCamera.transform.position = _savedPosition;
-        _outputCamera.transform.rotation = _savedRotation;
-        _outputCamera.fieldOfView = _savedFov;
         _renderOffsetApplied = false;
+        var cameraTransform = _outputCamera.transform;
+        // 描画されないフレームでCinemachineが新しい構図を書き込んだ場合、古い保存値で戻さない。
+        if (cameraTransform.position != _appliedPosition || cameraTransform.rotation != _appliedRotation
+            || !Mathf.Approximately(_outputCamera.fieldOfView, _appliedFov)) return;
+        cameraTransform.SetPositionAndRotation(_savedPosition, _savedRotation);
+        _outputCamera.fieldOfView = _savedFov;
     }
 
     /// <summary>勝利中は専用仮想カメラを進行し、それ以外はLock-Onの手動追従を更新する。</summary>

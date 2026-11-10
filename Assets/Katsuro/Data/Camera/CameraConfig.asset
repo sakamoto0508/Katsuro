@@ -25,8 +25,14 @@ MonoBehaviour:
   _counterHitCameraStrength: 0.085
   _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.105}
   _cameraDuration: 0.12
-  _justAvoidFOVOffset: 1.5
-  _justAvoidFOVDuration: 0.18
+  _justAvoidFOVOffset: -15.1
+  _justAvoidPushIn: 0.4
+  _justAvoidLowAngle: -30
+  _justAvoidMinHeight: 0.25
+  _justAvoidCameraEnter: 0.12
+  _justAvoidCameraHold: 0.35
+  _justAvoidCameraRestore: 0.3
+  _justAvoidCameraMaxSustain: 3
   _cameraDistance: 2.52
   _cameraHeight: 2.98
   _positionSmooth: 6
