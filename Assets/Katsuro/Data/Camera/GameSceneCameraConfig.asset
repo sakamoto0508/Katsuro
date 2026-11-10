@@ -19,14 +19,20 @@ MonoBehaviour:
   _lockOnReleaseBlendDuration: 0.3
   _lockOnObstacleMask:
     serializedVersion: 2
-    m_Bits: 4294967291
+    m_Bits: 123
   _lightHitCameraStrength: 0.012
   _heavyHitCameraStrength: 0.055
   _counterHitCameraStrength: 0.085
   _hitCameraDurations: {x: 0.065, y: 0.095, z: 0.105}
   _cameraDuration: 0.12
-  _justAvoidFOVOffset: 1.5
-  _justAvoidFOVDuration: 0.18
+  _justAvoidFOVOffset: -15
+  _justAvoidPushIn: 0.4
+  _justAvoidLowAngle: 17.1
+  _justAvoidMinHeight: 0.25
+  _justAvoidCameraEnter: 0.12
+  _justAvoidCameraHold: 0.35
+  _justAvoidCameraRestore: 0.3
+  _justAvoidCameraMaxSustain: 2
   _cameraDistance: 4.2
   _cameraHeight: 2.1
   _positionSmooth: 6

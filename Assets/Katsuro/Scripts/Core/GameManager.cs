@@ -152,6 +152,7 @@ public class GameManager : MonoBehaviour
         _enemyController?.Init(_playerPosition, _damageNumbers, this, _audio, _scene.HitStop, _scene.FinalBlow, _scene.Loader, _cameraManager, _playerController != null ? _playerController.FeedbackConfig : null);
         _cameraManager?.Init(_inputBuffer, _playerPosition
             , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera, _camera);
+        if (_playerController != null) _cameraManager?.SetJustAvoidSustain(() => _playerController != null && _playerController.IsJustAvoidActionPlaying);
     }
 
     /// <summary>

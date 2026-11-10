@@ -30,6 +30,15 @@ public struct JustAvoidEnvelope
         else Reset();
         return Value;
     }
+    /// <summary>再生中なら最大効果の保持区間に留める。移行中はそのまま進め、復帰中なら現在値から再び最大へ移行する。</summary>
+    /// <param name="now">開始時と同じ時計の実時刻。</param>
+    /// <param name="enter">最大効果へ移行する実時間秒数。</param>
+    public void Sustain(float now, float enter)
+    {
+        if (!Playing || now - _started < Mathf.Max(0, enter)) return;
+        if (Value < 1) Begin(now);
+        else _started = now - Mathf.Max(0, enter);
+    }
     /// <summary>包絡線の再生状態を解除し、適用量をゼロへ戻す。</summary>
     public void Reset() { Playing = false; Value = 0; }
 }

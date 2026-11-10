@@ -22,7 +22,7 @@ MonoBehaviour:
   _counterHitClip: {fileID: 8300000, guid: 00de4c24f2eed784b84357e4412c6434, type: 3}
   _hitVolumes: {x: 0.7, y: 0.9, z: 0.88}
   _hitStartOffsets: {x: 0.04, y: 0, z: 0.195}
-  _justAvoidSound: 
+  _justAvoidSound: JustAvoid
   _titleBGM: TitleBGM
   _startSE: StartSE
   _inGameBGM: InGameBGM

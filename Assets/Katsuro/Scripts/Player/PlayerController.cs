@@ -674,6 +674,20 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (_playerStartWeapon != null) _playerStartWeapon.SetActive(!drawn);
     }
 
+    /// <summary>ジャスト回避のAnimator Boolがtrue、またはJust Avoid追撃Stateの再生中ならtrue。演出の継続判定に使う。</summary>
+    public bool IsJustAvoidActionPlaying
+    {
+        get
+        {
+            var animator = OwnerAnimator;
+            if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null) return false;
+            string justAvoidBool = _animationName?.JustAvoid;
+            if (!string.IsNullOrEmpty(justAvoidBool) && animator.GetBool(justAvoidBool)) return true;
+            var state = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
+            return state.IsTag(PlayerAttacker.JustAvoidCounterTag) && state.normalizedTime < 1f;
+        }
+    }
+
     //アニメーションイベント：ジャスト回避アニメーション開始時。
     /// <summary>ジャスト回避Clip開始Eventで専用Animator Boolを有効にする。</summary>
     public void AnimEvent_OnJustAvoidStarted()
