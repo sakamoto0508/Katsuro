@@ -140,7 +140,7 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         // Allocations and renderer lookups occur only at bounded diagnostic lifecycle checkpoints.
         var text = new System.Text.StringBuilder(1024);
         var camera = Camera.main;
-        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} instanceId={GetInstanceID()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
+        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} entityId={GetEntityId()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
         if (camera != null)
             text.Append($" camera={camera.name} viewport={camera.WorldToViewportPoint(transform.position):F3} cameraDistance={Vector3.Distance(camera.transform.position, transform.position):F2}");
         else text.Append(" camera=NULL");
