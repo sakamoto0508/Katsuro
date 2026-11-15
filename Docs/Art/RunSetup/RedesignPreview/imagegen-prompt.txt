@@ -1,0 +1,24 @@
+Create one high-fidelity 1920x1080 landscape UI DESIGN PREVIEW for Katsuro, a Japanese samurai sword-action console game. Use image 1 only as visual direction, image 2 as the current UI content inventory. This is a redesign concept, not an implemented screenshot. Render a finished screen, no mockup device, no external annotations.
+Reference image 1: dark sumi charcoal, subtle handmade washi fibers, peripheral dry ink scuffs, restrained muted antique gold, dry vermilion horizontal brush highlight, generous negative space, calm expensive console-game typography. Transform it into a genuinely TWO COLUMN UI: LEFT 43% width = six blessing choices in two groups of three compact horizontal rows; RIGHT 49% width = equipped blessings with their full existing descriptions and challenge rules. No central giant kanji hero panel or enso; do not copy the three-part visual composition. No characters or 3D scenery. No gilded card boxes. At 1920 width margins 100, gutter 90, top header ends y175, footer begins y925. Body type readable around 25px, row names 36px, screen title 68px. Thin faded gold section dividers only, almost borderless panels, dark textured surfaces close to #171719 and #202022, ink #29292B, muted gold #B59A66, dark red #9E3535, ivory #E8E3DA. Texture extremely quiet underneath body copy; peripheral ink marks are sparse, intentional, no meaningless patterns.
+Header: small existing eyebrow "出陣の前に" above "挑戦の準備". Upper right single challenger input labeled "挑戦者名" with value "挑戦者", thin gold underline and minimal dark field. NO KATSURO brand wordmark (not an existing field).
+Left:
+heading "攻撃の加護" and existing helper "決定ボタンで装備".
+Each row uses an existing small square kanji icon, blessing name, effect.
+1 icon 力 / name 剛力 / effect "与ダメージ ×1.2"
+2 icon 魂 / name 吸魂 / effect "命中時のゲージ回復 ×2"
+3 icon 刃 / name 窮地 / effect "低HPほど追加威力（最大 +35%）"
+Then heading "防御の加護", helper "決定ボタンで装備".
+1 icon 守 / name 堅守 / effect "被ダメージ ×0.8"
+2 icon 霊 / name 霊衣 / effect "幽霊化の開始・継続消費 ×0.7"
+3 icon 息 / name 息吹 / effect "ゲージ自然回復 ×1.3"
+State example: 剛力 and 堅守 ARE EQUIPPED. Mark each with the existing small "装備中" label and a small thin antique-gold edge/underline. 窮地 has KEYBOARD FOCUS ONLY, not equipped: a narrow faded dry dark vermilion brush behind this compact row and four delicate ivory corner marks. Do NOT mark 窮地 装備中. Distinguish equipment state and focus state through shape and text, not only color.
+Right: title "装備中の加護". Spacious stacked two entries, no new fields:
+small existing 攻 tag then name "剛力", effect "与ダメージ ×1.2" and readable body "すべての攻撃の威力が上がる。素直に火力で押し切りたい時に。"
+small existing 防 tag then name "堅守", effect "被ダメージ ×0.8" and readable body "受けるダメージを常に減らす。被弾を抑えて粘り強く戦える。"
+Below a restrained faded line: title "挑戦の掟", text "最初の相手：名もなき守人", then "命は1つ。倒されれば挑戦終了。勝利すると痕跡を更新。"
+Keep quiet breathing space below this for the existing conditional result/error message; show no invented message or empty framed placeholder.
+Footer: thin horizontal divider; left EXACT current guide, two lines:
+"移動：方向キー／スティック　決定：Enter／Aボタン"
+"金枠＝装備中　四隅の印＝操作中"
+Right two subtle large actions. "修練場へ" with existing caption "基本操作と攻撃を練習"; "ボス戦へ" with existing caption "修練場を省略して挑戦する". Flat charcoal buttons with subtly worn minimal underlines, gold for tutorial, dark vermilion for boss. No gaudy gold boxes. No controller glyphs implying controls absent from current game. NO 戻る, NO cancel action.
+Critical: all six choices exactly once, no invented stats or features, preserve Japanese copy, no additional screens. Visually restrained polished authored Japanese dark fantasy UI; modern readable body font, expressive but legible brush heading. Text belongs to this concept preview only, subsequent Unity assets will be text free.

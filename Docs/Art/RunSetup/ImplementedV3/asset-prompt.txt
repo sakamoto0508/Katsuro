@@ -1,0 +1,4 @@
+Tool: built-in imagegen. transparent_background=true.
+Saved asset: Assets/Katsuro/Art/UI/Textures/Setup/Redesign/PreviewEnso.png
+
+One single restrained Japanese enso circle brushstroke as a GAME UI decoration texture. True transparent background. A broad incomplete circular ring with fine dry brush bristles and ink gaps, muted antique brown-gold #796B51 at low opacity, aged charcoal-gold sumi ink. Empty fully transparent center, no kanji, no writing, no text, no symbols, no extra splashes beyond a few minute natural dry-ink breaks at the circumference. Square composition, ring centered, generous safe margin, circle diameter 80 percent canvas. Quiet and weighty refined samurai console UI decoration intended BEHIND a separate live rendered ivory kanji; not a bright badge or logo. Flat matte no lighting, no shadows, no emboss, no metallic shine. No parchment, no background.

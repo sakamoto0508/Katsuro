@@ -26,6 +26,8 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     /// <summary>Hover・フォーカス・決定で拡縮させる表示部分。未設定ならこのオブジェクト自身。</summary>
     [UnityEngine.Tooltip("Hover・フォーカス・決定で拡縮させる表示部分。未設定ならこのオブジェクト自身。")]
     [SerializeField] private RectTransform _scaleTarget;
+    /// <summary>加護のフォーカス・Hoverを中央表示へ通知する任意のView。装備は変更しない。</summary>
+    [SerializeField] private RunSetupBlessingPreview _blessingPreview;
     /// <summary>操作フォーカス中の拡大率。</summary>
     [UnityEngine.Tooltip("操作フォーカス中の拡大率。")]
     [SerializeField] private float _focusScale = 1.03f;
@@ -100,6 +102,7 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnSelect(BaseEventData eventData)
     {
         _focused = true;
+        if (_blessingPreview != null) _blessingPreview.Show(_selectable);
         if (_focusFrame != null) _focusFrame.transform.localScale = Vector3.one * _focusFrameStartScale;
         Apply();
     }
@@ -115,6 +118,7 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         _hovered = true;
+        if (_blessingPreview != null && _selectable != null && _selectable.IsInteractable()) _blessingPreview.Show(_selectable);
         Apply();
     }
 
@@ -122,6 +126,7 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnPointerExit(PointerEventData eventData)
     {
         _hovered = false;
+        if (_blessingPreview != null) _blessingPreview.RestoreFocus();
         Apply();
     }
 
