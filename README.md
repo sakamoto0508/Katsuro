@@ -1,75 +1,90 @@
 # Katsuro（活路）
 
-**Unity / C#で制作した、1対1のボス戦を中心とする3D剣戟アクションゲーム**です。敵の攻撃を見極めて「幽体化」でかわし、ジャスト回避から追撃につなげる戦闘と、攻撃が命中したときの手応えを重視しています。
+**敵の攻撃を「幽体化」でかわし、ジャスト回避から追撃へつなげる、1対1のボス戦を中心とした3D剣戟アクションゲームです。**
 
-- [プレイ動画（YouTube）](https://youtu.be/gMJ5AtFKUY0)
-- [ポートフォリオ（設計の意図・制作背景）](https://global-diagnostic-240.notion.site/6ebbcae3a9fb476ba20aa0e5ad399064)
+- [プレイ動画](https://youtu.be/gMJ5AtFKUY0)
+- [ポートフォリオ](https://global-diagnostic-240.notion.site/6ebbcae3a9fb476ba20aa0e5ad399064)
 
 ## 作品概要
 
-- **制作形態**：個人制作
-- **開発環境**：Unity `6000.2.7f2`、C#、HDRP `17.2.0`
-- **主要パッケージ**：Input System `1.14.2`、Cinemachine `3.1.5`、UniTask、UniRx
-- **特徴**：通常攻撃・強攻撃、幽体化、ジャスト回避と追撃、敵AI、加護選択、修練モード
+| 項目 | 内容 |
+| --- | --- |
+| 制作形態 | 個人制作 |
+| ジャンル | 3D剣戟アクション |
+| 言語 | C# |
+| Unity | 6000.6.3f1（現行mainのProjectVersion.txt） |
+| レンダリング | HDRP 17.6.0 |
+| 主なパッケージ | Input System 1.20.0 / Cinemachine 6.6.0 / UniTask |
 
-戦闘の開始前には攻撃・防御の加護を選択します。勝利した挑戦者の情報と加護は保存され、次の挑戦で戦う相手に引き継がれる仕組みも実装しています。
+通常攻撃・強攻撃・幽体化・ジャスト回避・追撃・敵AI・加護選択・修練モードを実装しています。勝利した挑戦者の情報と加護を次回の挑戦へ引き継ぐ仕組みもあります。
+
+> **注意**：この開発環境は現行リポジトリの設定に基づきます。提出するプロジェクトや実行ファイルと一致するか確認してください。
 
 ## 主要な設計・実装
 
-### 1. State Patternによるプレイヤー行動の管理
+### 1. State Patternによるプレイヤー行動管理
 
-[PlayerController](Assets/Mock/Scripts/Player/PlayerController.cs)が入力を受け取り、[PlayerStateMachine](Assets/Mock/Scripts/Player/StateMachine/PlayerStateMachine.cs)が現在のStateへ処理を委譲します。移動・攻撃・幽体化などを個別Stateに分け、`Enter` / `Update` / `Exit`を通じて遷移前後の処理を管理しています。
+入力受付を担う`PlayerController`、現在の状態を管理する`PlayerStateMachine`、個別のStateを分離しています。`Enter` / `Update` / `Exit`で、移動・攻撃・幽体化・回復などの処理を管理しています。
 
 ```text
 Input System → PlayerController → PlayerStateMachine
-                                         ├─ Locomotion
-                                         ├─ Light / Strong Attack
-                                         ├─ Ghost
-                                         └─ Heal / その他
+                                        ├─ Locomotion
+                                        ├─ Light / Strong Attack
+                                        ├─ Ghost
+                                        └─ Heal / その他
 ```
 
-代表コード：[PlayerGhostState](Assets/Mock/Scripts/Player/StateMachine/States/PlayerGhostState.cs)、[PlayerStateContext](Assets/Mock/Scripts/Player/StateMachine/PlayerStateContext.cs)。
+- [PlayerController.cs](Assets/Katsuro/Scripts/Player/PlayerController.cs)
+- [PlayerStateMachine.cs](Assets/Katsuro/Scripts/Player/StateMachine/PlayerStateMachine.cs)
+- [PlayerGhostState.cs](Assets/Katsuro/Scripts/Player/StateMachine/States/PlayerGhostState.cs)
+- [PlayerStateContext.cs](Assets/Katsuro/Scripts/Player/StateMachine/PlayerStateContext.cs)
 
 ### 2. 幽体化・ジャスト回避・追撃
 
-幽体化を開始した直後にジャスト回避受付時間を設け、HPの割合に応じて受付時間を変更します。成功時は画面の色味・音量などで成功を伝え、追撃ではアニメーションの振りかぶりと斬撃の速度に差をつけています。
+幽体化開始直後に短いジャスト回避受付時間を設け、HP割合に応じて受付時間を補正します。成功時の画面演出や追撃の緩急によって、成功したことが感覚的に伝わるよう調整しています。
 
-代表コード：[PlayerGhostState](Assets/Mock/Scripts/Player/StateMachine/States/PlayerGhostState.cs)、[GameplayRules](Assets/Mock/Scripts/Progression/GameplayRules.cs)、[JustAvoidContrast](Assets/Mock/Scripts/Feedback/JustAvoidContrast.cs)、[JustAvoidCounterAnimation](Assets/Mock/Scripts/Player/JustAvoidCounterAnimation.cs)。
+- [PlayerGhostState.cs](Assets/Katsuro/Scripts/Player/StateMachine/States/PlayerGhostState.cs)：受付時間と状態復帰
+- [GameplayRules.cs](Assets/Katsuro/Scripts/Progression/GameplayRules.cs)：受付時間のルール
+- [JustAvoidContrast.cs](Assets/Katsuro/Scripts/Feedback/JustAvoid/JustAvoidContrast.cs)：画面演出
+- [JustAvoidCounterAnimation.cs](Assets/Katsuro/Scripts/Player/Animation/JustAvoidCounterAnimation.cs)：追撃演出
 
 ### 3. 攻撃の手応えとフィードバック
 
-Animation Eventで攻撃中だけ武器の当たり判定を有効にし、同じ攻撃による重複命中を防止しています。命中時にはヒットストップ、被弾方向を踏まえた骨のリアクション、刀の速度に応じた軌跡などを組み合わせています。
+Animation Eventによる武器判定の制御と、同一攻撃による重複命中の防止を実装しています。命中時のヒットストップ、骨の被弾リアクション、刀の軌跡などを組み合わせています。
 
-代表コード：[PlayerAttacker](Assets/Mock/Scripts/Player/PlayerAction/PlayerAttacker.cs)、[CombatFeedback](Assets/Mock/Scripts/Feedback/CombatFeedback.cs)、[EnemyBoneHitReaction](Assets/Mock/Scripts/Feedback/EnemyBoneHitReaction.cs)、[SwordTrail](Assets/Mock/Scripts/Feedback/SwordTrail.cs)。
+- [PlayerAttacker.cs](Assets/Katsuro/Scripts/Player/Actions/PlayerAttacker.cs)
+- [CombatFeedback.cs](Assets/Katsuro/Scripts/Feedback/CombatFeedback.cs)
+- [EnemyBoneHitReaction.cs](Assets/Katsuro/Scripts/Feedback/HitReactions/EnemyBoneHitReaction.cs)
+- [SwordTrail.cs](Assets/Katsuro/Scripts/Feedback/Weapons/SwordTrail.cs)
 
 ### 4. 距離別の重み付き敵AI
 
-プレイヤーとの距離を近・中・遠に分類し、距離帯ごとに設定された行動候補から重み付き抽選で次の行動を選びます。直前の行動を繰り返しにくくする補正を加え、調整値はデータ側で変更できる構成です。
+プレイヤーとの距離を近・中・遠に分類し、距離帯別の行動候補から重み付き抽選で行動を選択します。直前の行動の繰り返しを抑える補正と、データ側で調整可能な構成を採用しました。
 
-代表コード：[EnemyDecisionMaker](Assets/Mock/Scripts/Enemy/EnemyAI/EnemyDecisionMaker.cs)。
+- [EnemyDecisionMaker.cs](Assets/Katsuro/Scripts/Enemy/AI/EnemyDecisionMaker.cs)
 
 ### 5. 初見プレイヤー向けの修練モード
 
-移動、ロックオン、攻撃、幽体化、ジャスト回避、追撃などを段階的に練習できるモードを用意しています。
+移動、ロックオン、攻撃、幽体化、ジャスト回避、追撃を段階的に練習できるモードを用意しました。
 
-代表コード：[TutorialDirector](Assets/Mock/Scripts/Tutorial/TutorialDirector.cs)。
-
-## プロジェクトの開き方
-
-1. リポジトリをクローンし、Unity Hubからフォルダを開きます。Unity Editorは`6000.2.7f2`を使用してください。
-2. Package Managerによる依存解決を確認します。外部アセットやローカル環境に依存する項目がある場合、追加の設定が必要になることがあります。
-3. `Assets/Mock/Scenes/TitleScene.unity`を開いてPlayします。戦闘シーンは`GameScene.unity`、修練モードは`TutorialScene.unity`です。いずれもBuild Settingsに登録されています。
-4. 操作方法はゲーム内の操作ガイド・修練モードを参照してください。入力表示はキーボード／ゲームパッドに応じて変わります。
-
-> このREADMEはソースとプロジェクト設定の案内です。全環境でのビルド・プレイ成功を保証するものではありません。
-
-## 動作確認で注目する点
-
-- 幽体化開始直後のジャスト回避判定と解除後の状態復帰
-- 通常／強攻撃時のヒットボックス有効期間と一振りでの重複ダメージ防止
-- 回復に必要なゲージが不足したときの状態復帰とエフェクト停止
-- チュートリアルの課題進行、ボス撃破後の結果表示
+- [TutorialDirector.cs](Assets/Katsuro/Scripts/Tutorial/TutorialDirector.cs)
 
 ## 開発で重視したこと
 
-「仕様どおり動く」だけでなく、「プレイヤーが意図どおりに操作でき、結果が気持ちよく伝わる」ことを目標に、プレイテストで得た意見を実装・演出の改善につなげています。
+プレイテストで得た意見をもとに、回避タイミング、追撃の緩急、命中時のフィードバックを調整しました。「機能が動く」だけでなく「プレイヤーの操作意図と結果が気持ちよく伝わる」ことを目指しています。
+
+## プロジェクトの開き方
+
+1. リポジトリをクローンし、`ProjectSettings/ProjectVersion.txt`に記載されたUnity Editorで開きます。
+2. Package Managerの依存解決を確認してください。Git URL指定のパッケージや外部アセットなど、環境によって追加の準備が必要になる場合があります。
+3. [TitleScene.unity](Assets/Katsuro/Scenes/TitleScene.unity)を開いてPlayします。戦闘用[GameScene.unity](Assets/Katsuro/Scenes/GameScene.unity)、修練用[TutorialScene.unity](Assets/Katsuro/Scenes/TutorialScene.unity)もあります。
+4. 操作方法はゲーム内の操作ガイド・修練モードを参照してください。
+
+## 動作確認の注目点
+
+- 幽体化開始直後のジャスト回避受付と解除後の状態復帰
+- 攻撃中の当たり判定期間と重複ダメージ防止
+- 回復条件を満たさない場合の状態復帰
+- 修練モードの進行とボス撃破後の結果表示
+
+※本READMEは実装構成と確認ポイントの案内であり、第三者環境でのビルド成功や全機能の動作を保証するものではありません。
