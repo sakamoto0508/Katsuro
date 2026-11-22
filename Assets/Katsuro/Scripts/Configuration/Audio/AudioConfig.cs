@@ -5,6 +5,12 @@ using UnityEngine;
 /// <summary>BGMと戦闘SEをAudioManagerの登録名で指定する設定。AudioClip自体の再生は管理しない。</summary>
 public class AudioConfig : ScriptableObject
 {
+    /// <summary>タイトルと戦闘の BGM に共通で適用する基準音量。</summary>
+    public float SceneBgmVolume => _sceneBgmVolume;
+
+    [SerializeField, Range(0f, 1f), Tooltip("タイトルと戦闘の BGM の基準音量。ユーザー音量は別途掛け合わせます。")]
+    private float _sceneBgmVolume = 0.5f;
+
     /// <summary>追撃1撃目の命中SE。未設定時は通常Light命中Clipを使用する。</summary>
     [Header("Just Avoid Counter / First contact")]
     [SerializeField] private AudioClip _counterFirstHitClip;
@@ -58,11 +64,15 @@ public class AudioConfig : ScriptableObject
     [SerializeField, Tooltip("再生開始位置（秒）。X=Light、Y=Heavy、Z=追撃。")]
     private Vector3 _hitStartOffsets = new Vector3(.04f, 0f, .195f);
     /// <summary>命中種別のClipを取得する。追撃音が未設定ならHeavyへ戻す。</summary>
-    public AudioClip GetHitClip(bool heavy, bool counter) => counter ? (_counterHitClip != null ? _counterHitClip : _heavyHitClip) : heavy ? _heavyHitClip : _lightHitClip;
+    public AudioClip GetHitClip(bool heavy, bool counter) =>
+        counter
+            ? (_counterHitClip != null ? _counterHitClip : _heavyHitClip)
+            : heavy ? _heavyHitClip : _lightHitClip;
     /// <summary>ユーザー音量へ掛ける命中種別の基準音量を取得する。</summary>
     public float GetHitVolume(bool heavy, bool counter) => Mathf.Clamp01(_hitVolumes[counter ? 2 : heavy ? 1 : 0]);
     /// <summary>選択Clipの先頭の間を除く開始位置を取得する。</summary>
-    public float GetHitStartOffset(bool heavy, bool counter) => Mathf.Max(0f, _hitStartOffsets[counter && _counterHitClip != null ? 2 : heavy || counter ? 1 : 0]);
+    public float GetHitStartOffset(bool heavy, bool counter) =>
+        Mathf.Max(0f, _hitStartOffsets[counter && _counterHitClip != null ? 2 : heavy || counter ? 1 : 0]);
     /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>
     public string JustAvoidSound => _justAvoidSound;
     /// <summary>AudioManagerのSEリストに登録した名前。空欄なら再生しない。</summary>

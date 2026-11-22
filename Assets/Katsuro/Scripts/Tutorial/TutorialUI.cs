@@ -58,80 +58,159 @@ public sealed class TutorialUI : MonoBehaviour
     /// <summary>ボタン通知を一度接続し、通常の課題表示へ切り替える。</summary>
     public void Init(TutorialDirector director)
     {
-        if (_initialized) return;
-        _initialized = true; _director = director;
+        if (_initialized)
+            return;
+        _initialized = true;
+        _director = director;
         UsesGamepad = PlayerInput.all.Count > 0 && PlayerInput.all[0].currentControlScheme == "Gamepad";
         InputSystem.onEvent += ObserveDevice;
-        _pause.onClick.AddListener(() => OpenMenu(false)); _resume.onClick.AddListener(CloseMenu);
-        _boss.onClick.AddListener(() => { if (_complete) _director.GoToBoss(); else ShowConfirmation(); });
-        _retry.onClick.AddListener(_director.Retry); _title.onClick.AddListener(_director.ReturnToTitle);
-        _confirm.onClick.AddListener(_director.GoToBoss); _cancel.onClick.AddListener(HideConfirmation);
-        Group(_menu, false); Group(_confirmation, false);
+        _pause.onClick.AddListener(() => OpenMenu(false));
+        _resume.onClick.AddListener(CloseMenu);
+        _boss.onClick.AddListener(() =>
+        {
+            if (_complete)
+                _director.GoToBoss();
+            else
+                ShowConfirmation();
+        });
+        _retry.onClick.AddListener(_director.Retry);
+        _title.onClick.AddListener(_director.ReturnToTitle);
+        _confirm.onClick.AddListener(_director.GoToBoss);
+        _cancel.onClick.AddListener(HideConfirmation);
+        Group(_menu, false);
+        Group(_confirmation, false);
     }
     /// <summary>課題・進捗・操作説明を変更時に更新する。</summary>
     public void SetInstruction(string progress, string instruction, Func<string> hint)
-    { _progress.text = progress; _instruction.text = instruction; _hintFactory = hint; _hint.text = hint(); }
+    {
+        _progress.text = progress;
+        _instruction.text = instruction;
+        _hintFactory = hint;
+        _hint.text = hint();
+    }
     /// <summary>既存の段階変更を表示へ反映する。成功条件や進行時間は変更しない。</summary>
     public void PresentStep(TutorialDirector.TutorialStep step)
     {
-        if (_hasStep && step != _step && _step != TutorialDirector.TutorialStep.JustAvoid) _achievementAt = Time.unscaledTime;
-        _hasStep = true; _step = step;
-        if (_enemyGauge != null) _enemyGauge.alpha = step == TutorialDirector.TutorialStep.Light || step == TutorialDirector.TutorialStep.Combo || step == TutorialDirector.TutorialStep.Heavy || step == TutorialDirector.TutorialStep.Counter ? 1 : 0;
+        if (_hasStep && step != _step && _step != TutorialDirector.TutorialStep.JustAvoid)
+            _achievementAt = Time.unscaledTime;
+        _hasStep = true;
+        _step = step;
+        if (_enemyGauge != null)
+            _enemyGauge.alpha = step == TutorialDirector.TutorialStep.Light
+                || step == TutorialDirector.TutorialStep.Combo
+                || step == TutorialDirector.TutorialStep.Heavy
+                || step == TutorialDirector.TutorialStep.Counter
+                    ? 1
+                    : 0;
     }
     /// <summary>有意な入力イベントだけで機器を切り替え、実Bindingの表示を再取得する。</summary>
     private void ObserveDevice(InputEventPtr pointer, InputDevice device)
     {
         if (!pointer.IsA<StateEvent>() && !pointer.IsA<DeltaStateEvent>()) return;
         bool changed = false;
-        foreach (var control in pointer.EnumerateChangedControls(device, .2f)) { changed = true; break; }
-        if (!changed || (!(device is Gamepad) && !(device is Keyboard) && !(device is Mouse))) return;
+        foreach (var control in pointer.EnumerateChangedControls(device, .2f))
+        {
+            changed = true;
+            break;
+        }
+        if (!changed || (!(device is Gamepad) && !(device is Keyboard) && !(device is Mouse)))
+            return;
         bool pad = device is Gamepad;
         if (pad == UsesGamepad) return;
         UsesGamepad = pad;
-        if (_hintFactory != null) _hint.text = _hintFactory();
+        if (_hintFactory != null)
+            _hint.text = _hintFactory();
     }
     /// <summary>課題文を保ったまま敵の反復状況を表示する。</summary>
-    public void SetCue(string cue) { if (_cue != null) _cue.text = cue; }
+    public void SetCue(string cue)
+    {
+        if (_cue != null)
+            _cue.text = cue;
+    }
     /// <summary>中断または完了メニューを開いて戦闘入力を止める。</summary>
     public void OpenMenu(bool complete)
     {
-        _complete = complete; _director.SetPaused(true); Group(_menu, true); Group(_confirmation, false);
+        _complete = complete;
+        _director.SetPaused(true);
+        Group(_menu, true);
+        Group(_confirmation, false);
         _menuTitle.text = complete ? "修練完了" : "修練を中断";
-        if (_menuSubtitle != null) _menuSubtitle.text = complete ? "剣の道を学んだ。いざ、実戦へ。" : "一息ついて、再び構えよう。";
-        _fadingMenu = true; _menu.alpha = .01f;
-        _resume.gameObject.SetActive(!complete); _pause.interactable = false;
+        if (_menuSubtitle != null)
+            _menuSubtitle.text = complete ? "剣の道を学んだ。いざ、実戦へ。" : "一息ついて、再び構えよう。";
+        _fadingMenu = true;
+        _menu.alpha = .01f;
+        _resume.gameObject.SetActive(!complete);
+        _pause.interactable = false;
         _boss.GetComponentInChildren<TMP_Text>().text = complete ? "ボス戦へ" : "修練をスキップしてボス戦へ";
         EventSystem.current?.SetSelectedGameObject(complete ? _boss.gameObject : _resume.gameObject);
     }
     /// <summary>完了前の修練を再開し、カーソルと時間を戻す。</summary>
     public void CloseMenu()
     {
-        if (_complete) return;
-        Group(_menu, false); Group(_confirmation, false); _pause.interactable = true;
+        if (_complete)
+            return;
+        Group(_menu, false);
+        Group(_confirmation, false);
+        _pause.interactable = true;
         _fadingMenu = false;
-        EventSystem.current?.SetSelectedGameObject(null); _director.SetPaused(false);
+        EventSystem.current?.SetSelectedGameObject(null);
+        _director.SetPaused(false);
     }
     /// <summary>スキップを即実行せず確認画面へ進む。</summary>
-    private void ShowConfirmation() { _menu.interactable = false; _menu.blocksRaycasts = false; Group(_confirmation, true); EventSystem.current?.SetSelectedGameObject(_cancel.gameObject); }
+    private void ShowConfirmation()
+    {
+        _menu.interactable = false;
+        _menu.blocksRaycasts = false;
+        Group(_confirmation, true);
+        EventSystem.current?.SetSelectedGameObject(_cancel.gameObject);
+    }
     /// <summary>スキップを取り消して中断メニューへ戻す。</summary>
-    private void HideConfirmation() { Group(_confirmation, false); _menu.interactable = _menu.blocksRaycasts = true; EventSystem.current?.SetSelectedGameObject(_boss.gameObject); }
+    private void HideConfirmation()
+    {
+        Group(_confirmation, false);
+        _menu.interactable = _menu.blocksRaycasts = true;
+        EventSystem.current?.SetSelectedGameObject(_boss.gameObject);
+    }
     /// <summary>Esc・パッドStartで中断し、キャンセルは確認画面から順に閉じる。</summary>
     private void Update()
     {
         if (!_initialized || _director.IsTransitioning) return;
-        if (_task != null) _task.alpha = Mathf.MoveTowards(_task.alpha, _complete ? 0 : 1, Time.unscaledDeltaTime / .25f);
-        if (_complete && _pause != null) _pause.gameObject.SetActive(false);
-        if (_fadingMenu) { _menu.alpha = Mathf.MoveTowards(_menu.alpha, 1, Time.unscaledDeltaTime / .2f); if (_menu.alpha >= 1) _fadingMenu = false; }
-        if (_achievement != null) { float t = (Time.unscaledTime - _achievementAt) / .65f; _achievement.text = "達成"; _achievement.alpha = t < 1 && !IsMenuOpen ? Mathf.Min(Mathf.Clamp01(t / .15f), Mathf.Clamp01((1 - t) / .35f)) : 0; }
-        bool cancel = (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) || (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame);
+        if (_task != null)
+            _task.alpha = Mathf.MoveTowards(_task.alpha, _complete ? 0 : 1, Time.unscaledDeltaTime / .25f);
+        if (_complete && _pause != null)
+            _pause.gameObject.SetActive(false);
+        if (_fadingMenu)
+        {
+            _menu.alpha = Mathf.MoveTowards(_menu.alpha, 1, Time.unscaledDeltaTime / .2f);
+            if (_menu.alpha >= 1)
+                _fadingMenu = false;
+        }
+        if (_achievement != null)
+        {
+            float t = (Time.unscaledTime - _achievementAt) / .65f;
+            _achievement.text = "達成";
+            _achievement.alpha = t < 1 && !IsMenuOpen ? Mathf.Min(Mathf.Clamp01(t / .15f), Mathf.Clamp01((1 - t) / .35f)) : 0;
+        }
+        bool cancel = (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            || (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame);
         bool pause = Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame;
         if (!cancel && !pause) return;
-        if (_confirmation.alpha > 0) HideConfirmation();
-        else if (IsMenuOpen) CloseMenu();
-        else if (pause || (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)) OpenMenu(false);
+        if (_confirmation.alpha > 0)
+            HideConfirmation();
+        else if (IsMenuOpen)
+            CloseMenu();
+        else if (pause || (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame))
+            OpenMenu(false);
     }
     /// <summary>表示・操作・Raycastをまとめて切り替える。</summary>
-    private static void Group(CanvasGroup group, bool show) { group.alpha = show ? 1 : 0; group.interactable = group.blocksRaycasts = show; }
+    private static void Group(CanvasGroup group, bool show)
+    {
+        group.alpha = show ? 1 : 0;
+        group.interactable = group.blocksRaycasts = show;
+    }
     /// <summary>Scene破棄後に入力通知を残さない。</summary>
-    private void OnDestroy() { InputSystem.onEvent -= ObserveDevice; }
+    private void OnDestroy()
+    {
+        InputSystem.onEvent -= ObserveDevice;
+    }
 }

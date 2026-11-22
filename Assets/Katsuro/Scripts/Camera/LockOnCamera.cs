@@ -8,6 +8,9 @@ using UnityEngine;
 /// <summary>通常・Lock-Onカメラの優先度とAnimatorフラグを切り替え、手動追従中のBrain停止と復帰を管理する。</summary>
 public class LockOnCamera
 {
+    private const int ActiveCameraPriority = 10;
+    private const int InactiveCameraPriority = 0;
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -87,8 +90,8 @@ public class LockOnCamera
 
         if (_camera != null && _lockOnCamera != null)
         {
-            _camera.Priority = 0;
-            _lockOnCamera.Priority = 10;
+            _camera.Priority = InactiveCameraPriority;
+            _lockOnCamera.Priority = ActiveCameraPriority;
         }
         if (_cinemachineBrain != null && _cinemachineBrain.enabled)
         {
@@ -110,8 +113,8 @@ public class LockOnCamera
         IsLockOn = false;
         if (_camera != null && _lockOnCamera != null)
         {
-            _camera.Priority = 10;
-            _lockOnCamera.Priority = 0;
+            _camera.Priority = ActiveCameraPriority;
+            _lockOnCamera.Priority = InactiveCameraPriority;
         }
         // 無効化していたカメラ制御を再び有効にする。
         if (_cinemachineBrain != null && _brainDisabledByLockOn)

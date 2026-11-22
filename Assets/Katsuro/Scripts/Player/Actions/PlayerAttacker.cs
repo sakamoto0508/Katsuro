@@ -69,9 +69,11 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>ゲーム進行とHitStopの参照を一度だけ接続する。</summary>
     public void Init(GameManager game, HitStopManager hitStop)
     {
-        if (_initialized) return;
+        if (_initialized)
+            return;
         _initialized = true;
-        _game = game; _hitStop = hitStop;
+        _game = game;
+        _hitStop = hitStop;
     }
 
     /// <summary>抜刀アニメを再生し、完了イベントで攻撃準備完了に遷移する。</summary>
@@ -113,7 +115,7 @@ public sealed class PlayerAttacker : IDisposable
         {
             _animController?.PlayBool(_animName.IsDrawingSword, false);
         }
-        CombatLog.Trace($"PlayerAttacker: CompleteDrawSword called. IsSwordReady={_isSwordReady}");
+        CombatLog.Trace($"PlayerAttacker: 抜刀完了。IsSwordReady={_isSwordReady}");
     }
 
     /// <summary>弱攻撃の段階とLock-On種別に応じた共通処理へ委譲し、対応するAnimator攻撃を要求する。</summary>
@@ -165,8 +167,16 @@ public sealed class PlayerAttacker : IDisposable
     public void EnableWeaponHitbox()
     {
         _hitboxIsCounter = IsJustAvoidCounterAttack;
-        _hitboxCounterStrike = _hitboxIsCounter ? (_ownerAnimator.GetComponent<JustAvoidCounterAnimation>()?.Strike ?? JustAvoidCounterStrike.None) : JustAvoidCounterStrike.None;
-        _weapon?.SetTrailStyle(_hitboxIsCounter ? SwordTrail.AttackStyle.JustAvoidCounter : _currentIsStrongAttack ? SwordTrail.AttackStyle.Heavy : SwordTrail.AttackStyle.Light, _hitboxCounterStrike);
+        _hitboxCounterStrike = _hitboxIsCounter
+            ? (_ownerAnimator.GetComponent<JustAvoidCounterAnimation>()?.Strike ?? JustAvoidCounterStrike.None)
+            : JustAvoidCounterStrike.None;
+        _weapon?.SetTrailStyle(
+            _hitboxIsCounter
+                ? SwordTrail.AttackStyle.JustAvoidCounter
+                : _currentIsStrongAttack
+                    ? SwordTrail.AttackStyle.Heavy
+                    : SwordTrail.AttackStyle.Light,
+            _hitboxCounterStrike);
         _hitTargets.Clear();
         _isHitboxActive = true;
         _weapon?.EnableHitbox();
@@ -199,7 +209,7 @@ public sealed class PlayerAttacker : IDisposable
     {
         if (string.IsNullOrEmpty(triggerName))
         {
-            Debug.LogWarning("PlayerAttacker: Attack trigger is not assigned.");
+            Debug.LogWarning("PlayerAttacker: 攻撃トリガーが未設定です。");
             return;
         }
 
@@ -276,7 +286,7 @@ public sealed class PlayerAttacker : IDisposable
         // Debug: ログ出力（ダメージが発生する場合）
         if (damage > 0f)
         {
-            CombatLog.Trace($"PlayerAttacker: Hit target={other.gameObject.name} damage={damage}");
+            CombatLog.Trace($"PlayerAttacker: 攻撃命中 対象={other.gameObject.name} ダメージ={damage}");
         }
 
         damageable.ApplyDamage(damageInfo);
@@ -352,7 +362,8 @@ public sealed class PlayerAttacker : IDisposable
 
             var effect = UnityEngine.Object.Instantiate(entry.OnHitEffectPrefab, damageInfo.HitPoint, rotation);
             // 命中ごとに生成するため、寿命を設定してScene内に残し続けない。
-            if (entry.OnHitEffectLifetime > 0f) UnityEngine.Object.Destroy(effect, entry.OnHitEffectLifetime);
+            if (entry.OnHitEffectLifetime > 0f)
+                UnityEngine.Object.Destroy(effect, entry.OnHitEffectLifetime);
         }
     }
 }

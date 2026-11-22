@@ -83,8 +83,12 @@ public abstract class TitleImageWarp : MaskableGraphic, ITitleAmbientElement
             {
                 float u = (float)x / columns;
                 var position = new Vector2(Mathf.Lerp(rect.xMin, rect.xMax, u), Mathf.Lerp(rect.yMin, rect.yMax, v));
-                if (animate) position += Offset(u, v);
-                vh.AddVert(position, tint, new Vector4(Mathf.Lerp(uvMin.x, uvMax.x, u), Mathf.Lerp(uvMin.y, uvMax.y, v), 0f, 0f));
+                if (animate)
+                    position += Offset(u, v);
+                vh.AddVert(
+                    position,
+                    tint,
+                    new Vector4(Mathf.Lerp(uvMin.x, uvMax.x, u), Mathf.Lerp(uvMin.y, uvMax.y, v), 0f, 0f));
             }
         }
         for (int y = 0; y < rows; y++)

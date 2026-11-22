@@ -34,7 +34,9 @@ public sealed class EnemyComboStageSound
     public static bool HasAny(ComboSoundLayer[] layers)
     {
         if (layers == null) return false;
-        foreach (var layer in layers) if (layer != null && layer.Clip != null && layer.Volume > 0f) return true;
+        foreach (var layer in layers)
+            if (layer != null && layer.Clip != null && layer.Volume > 0f)
+                return true;
         return false;
     }
 
@@ -44,7 +46,8 @@ public sealed class EnemyComboStageSound
     {
         if (audio == null || !HasAny(layers)) return false;
         foreach (var layer in layers)
-            if (layer != null && layer.Clip != null && layer.Volume > 0f) audio.PlaySE(layer.Clip, layer.Volume, layer.StartOffset);
+            if (layer != null && layer.Clip != null && layer.Volume > 0f)
+                audio.PlaySE(layer.Clip, layer.Volume, layer.StartOffset);
         return true;
     }
 }

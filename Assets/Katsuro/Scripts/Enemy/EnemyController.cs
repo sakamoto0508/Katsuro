@@ -7,6 +7,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Rigidbody))]
 public partial class EnemyController : MonoBehaviour, IDamageable
 {
+    // 終了イベントが届かず攻撃アニメーションも終了した場合の復帰判定（秒）。
+    private const float AttackCompletionTimeoutSeconds = 8f;
+
     /// <summary>
     /// 敵の現在のHP比率を取得します。0.0f（死亡）から1.0f（満タン）の範囲で返されます。
     /// </summary>
@@ -85,23 +88,40 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     private bool _reactionInterruptedAttack;
 
     /// <summary>EnemyのHP・AI・移動・武器・演出を作成し、ゲーム進行と命中通知を一度だけ接続する。</summary>
-    public void Init(Transform playerPosition, DamageNumbers damageNumbers, GameManager game, AudioManager audio, HitStopManager hitStop, FinalBlowManager finalBlow, LoadSceneManager loader, CameraManager cameraManager = null, VFXConfig vfxConfig = null)
+    public void Init(
+        Transform playerPosition,
+        DamageNumbers damageNumbers,
+        GameManager game,
+        AudioManager audio,
+        HitStopManager hitStop,
+        FinalBlowManager finalBlow,
+        LoadSceneManager loader,
+        CameraManager cameraManager = null,
+        VFXConfig vfxConfig = null)
     {
-        if (_initialized) return;
+        if (_initialized)
+            return;
         _initialized = true;
-        _game = game; _audio = audio; _finalBlow = finalBlow; _loader = loader;
+        _game = game;
+        _audio = audio;
+        _finalBlow = finalBlow;
+        _loader = loader;
         _attackTarget = playerPosition;
         _damageNumbers = damageNumbers;
         _combatFeedback = GetComponent<CombatFeedback>();
-        if (_combatFeedback != null) _combatFeedback.Init(audio, vfxConfig, cameraManager, hitStop, false);
-        else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
+        if (_combatFeedback != null)
+            _combatFeedback.Init(audio, vfxConfig, cameraManager, hitStop, false);
+        else
+            Debug.LogWarning("キャラクターのルートに CombatFeedback を設定してください。戦闘演出を無効にします。", this);
         var navMeshAgent = GetComponent<NavMeshAgent>();
-        if (navMeshAgent != null && !IsTraining) navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
+        if (navMeshAgent != null && !IsTraining)
+            navMeshAgent.speed *= RunSession.EnemyMoveSpeed;
         gameObject.name = IsTraining ? "修練の相手" : RunSession.Opponent?.Name ?? gameObject.name;
         var rb = GetComponent<Rigidbody>();
         _enemyAnimController = GetComponent<EnemyAnimationController>();
         _enemyAnimController.Init();
-        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true)) speed.Init();
+        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true))
+            speed.Init();
         hitStop?.RegisterTarget(gameObject);
         //クラスの初期化
         _mover = new EnemyMover(_enemyStuts, this.transform, playerPosition, _enemyAnimController, rb
@@ -110,23 +130,31 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         var fallback = _enemyStuts != null ? _enemyStuts.EnemyPower : 0f;
         var wrapper = new EnemyWeapon(_enemyWeaponColliders, fallback);
         wrapper.Init();
-        _attacker = new EnemyAttacker(_enemyAnimController, _attackData, new EnemyWeapon[] { wrapper }, _enemyStuts, this.transform);
+        _attacker = new EnemyAttacker(
+            _enemyAnimController,
+            _attackData,
+            new EnemyWeapon[] { wrapper },
+            _enemyStuts,
+            this.transform);
         _attacker.Init(hitStop);
         EnsurePatternRunner();
         _ai = IsTraining ? null : new EnemyAI(this, playerPosition, navMeshAgent, _decisionConfig);
-        if (IsTraining && navMeshAgent != null && navMeshAgent.isOnNavMesh) _mover.StopMove();
+        if (IsTraining && navMeshAgent != null && navMeshAgent.isOnNavMesh)
+            _mover.StopMove();
 
 
         GetComponent<StatusEffectManager>()?.Init();
         PlayEffectNextFrame("Dark").Forget();
-        if (_characterEffect != null) _characterEffect.PlayEffect_CharacterEffect();
+        if (_characterEffect != null)
+            _characterEffect.PlayEffect_CharacterEffect();
     }
 
     /// <summary>戦闘中の有効な攻撃StateだけにRoot Motionの所有権を渡す。死亡・被弾中は開始しない。</summary>
     /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
     public void BeginAnimationAttackRootMotion(int stateHash)
     {
-        if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return;
+        if (_dead || (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting))
+            return;
         if (!IsAttackPatternActive && _animator != null)
         {
             var current = _animator.GetCurrentAnimatorStateInfo(0);
@@ -144,13 +172,19 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     {
         if (_attackAnimationHash != stateHash) return;
         _attackAnimationHash = 0;
-        if (IsAttackPatternActive) _mover?.EndAttackRootMotion();
-        else _mover?.ReleaseMovementAfterAttack();
+        if (IsAttackPatternActive)
+            _mover?.EndAttackRootMotion();
+        else
+            _mover?.ReleaseMovementAfterAttack();
     }
     /// <summary>戦闘中の攻撃Root Motionを物理更新へ反映する。死亡・戦闘終了時は移動受付を解除する。</summary>
     private void FixedUpdate()
     {
-        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+        if (_dead || (_game != null && !_game.IsCombatActive))
+        {
+            _mover?.EndAttackRootMotion();
+            return;
+        }
         _mover?.FixedUpdateAttackRootMotion();
     }
     /// <summary>攻撃Stateの所有権と被弾・攻撃による移動停止を解除する。</summary>
@@ -166,21 +200,33 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     /// <summary>相手の既存Clipを一回再生する。通常AIと被弾中の割り込みは変更しない。</summary>
     public bool BeginTrainingAttack(EnemyAttackData data)
     {
-        if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
-        TrainingAttackInProgress = true; _mover?.FacePlayerInstant(); _mover?.HoldMovementForAttack();
+        if (!IsTraining || !_game.IsCombatActive || TrainingAttackInProgress || data == null || (_enemyAnimController != null && _enemyAnimController.IsReacting))
+            return false;
+        TrainingAttackInProgress = true;
+        _mover?.FacePlayerInstant();
+        _mover?.HoldMovementForAttack();
         bool started = _attacker != null && _attacker.PerformAttack(data);
         TrainingAttackInProgress = started;
-        if (started) { _attackCompletionPending = true; _attackElapsed = 0f; }
-        else _mover?.ReleaseMovementAfterAttack();
+        if (started)
+        {
+            _attackCompletionPending = true;
+            _attackElapsed = 0f;
+        }
+        else
+            _mover?.ReleaseMovementAfterAttack();
         return started;
     }
     /// <summary>課題変更時に武器と攻撃移動を止める。被弾Reactionの復帰は既存処理へ任せる。</summary>
     public void CancelTrainingAttack()
     {
-        if (!IsTraining) return;
+        if (!IsTraining)
+            return;
         _attackCompletionPending = false;
-        TrainingAttackInProgress = false; _pendingAction = null; _attacker?.DisableWeaponHitbox();
-        _enemyAnimController?.InterruptAttackForHitReaction(); _mover?.ReleaseMovementAfterAttack();
+        TrainingAttackInProgress = false;
+        _pendingAction = null;
+        _attacker?.DisableWeaponHitbox();
+        _enemyAnimController?.InterruptAttackForHitReaction();
+        _mover?.ReleaseMovementAfterAttack();
     }
 
     /// <summary>生成直後の初期化を一フレーム待ってCharacterEffectを再生する。破棄時は待機をキャンセルする。</summary>
@@ -190,7 +236,7 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         await UniTask.NextFrame(cancellationToken: this.GetCancellationTokenOnDestroy());
         if (_characterEffect == null)
         {
-            Debug.LogWarning("CharacterEffect is null when trying to play effect: " + key);
+            Debug.LogWarning("CharacterEffect が未設定のため再生できません。演出=" + key);
             return;
         }
         _characterEffect.PlayEffectByKey(key);
@@ -227,14 +273,19 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         if (_health == null || _dead || (_game != null && !_game.IsCombatActive)) return;
 
         float before = _health.CurrentHp;
-        if (IsTraining) { _health.RestoreForTraining(); before = _health.CurrentHp; }
+        if (IsTraining)
+        {
+            _health.RestoreForTraining();
+            before = _health.CurrentHp;
+        }
         _health.ApplyDamage(info.DamageAmount * (IsTraining ? 1f : RunSession.EnemyDefense));
         float dealt = before - _health.CurrentHp;
         if (dealt > 0f)
         {
             bool lethal = _health.CurrentHp <= 0f;
             bool counter = !lethal && info.IsJustAvoidCounter;
-            if (counter || lethal) _combatFeedback?.CancelNormalHitReaction();
+            if (counter || lethal)
+                _combatFeedback?.CancelNormalHitReaction();
             if (counter)
             {
                 CancelAttackPattern(false);
@@ -246,16 +297,19 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                 _enemyAnimController?.InterruptAttackForHitReaction();
             }
             bool animated = counter && _enemyAnimController != null && _enemyAnimController.TryPlayHitReaction(info);
-            if (counter) MaintainPatternWeaponGrip(); // Reaction evaluation may sample outgoing Rush weapon curves.
+            if (counter)
+                MaintainPatternWeaponGrip(); // Reaction evaluation may sample outgoing Rush weapon curves.
             if (animated)
             {
                 _reactionInterruptedAttack = true;
                 _mover?.HoldMovementForReaction();
             }
-            else if (counter) _ai?.OnAttackFinished();
+            else if (counter)
+                _ai?.OnAttackFinished();
             bool boneReaction = !lethal && !animated && !(_enemyAnimController != null && _enemyAnimController.IsReacting);
             _combatFeedback?.Hit(info, boneReaction);
-            if (_combatFeedback == null) _audio?.PlaySE("Damage");
+            if (_combatFeedback == null)
+                _audio?.PlaySE("Damage");
             _damageNumbers?.Show(transform.position, dealt, isCritical);
             HitReceived?.Invoke(info);
         }
@@ -278,14 +332,20 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     /// <summary>戦闘中だけ被弾の復帰・AI判断・予約行動・移動を順に進める。死亡時は歩行表示を停止する。</summary>
     private void Update()
     {
-        if (_dead || (_game != null && !_game.IsCombatActive)) { CancelAttackPattern(false); _mover?.ResetLocomotionAnimation(); return; }
+        if (_dead || (_game != null && !_game.IsCombatActive))
+        {
+            CancelAttackPattern(false);
+            _mover?.ResetLocomotionAnimation();
+            return;
+        }
         if (_enemyAnimController != null && _enemyAnimController.IsReacting)
         {
             _mover?.ResetLocomotionAnimation();
             if (_enemyAnimController.TickHitReaction(Time.deltaTime))
             {
                 _mover?.ReleaseMovementAfterReaction();
-                if (_reactionInterruptedAttack) _ai?.OnAttackFinished();
+                if (_reactionInterruptedAttack)
+                    _ai?.OnAttackFinished();
                 _reactionInterruptedAttack = false;
             }
             else return;
@@ -298,16 +358,21 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         if (_attackCompletionPending && _animator != null)
         {
             _attackElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
-            if (_attackElapsed > 8f && !IsAttackAnimationActive && !_animator.IsInTransition(0) &&
+            if (_attackElapsed > AttackCompletionTimeoutSeconds && !IsAttackAnimationActive && !_animator.IsInTransition(0) &&
                 !_animator.GetCurrentAnimatorStateInfo(0).IsTag("NormalAttack"))
             {
-                Debug.LogWarning("Enemy attack finished without completion event; recovering AI.", this);
+                Debug.LogWarning("敵の攻撃終了イベントを受信できなかったため、AI を復帰させます。", this);
                 _enemyAnimController?.InterruptAttackForHitReaction();
                 _attacker?.DisableWeaponHitbox();
                 _attackCompletionPending = false;
                 _mover?.ReleaseMovementAfterAttack();
-                if (IsTraining) { TrainingAttackInProgress = false; TrainingAttackFinished?.Invoke(); }
-                else _ai?.OnActionFailed();
+                if (IsTraining)
+                {
+                    TrainingAttackInProgress = false;
+                    TrainingAttackFinished?.Invoke();
+                }
+                else
+                    _ai?.OnActionFailed();
             }
         }
         // 後退の終了Eventが欠落した場合も、AIが行動中のまま停止しないよう復帰する。
@@ -316,14 +381,15 @@ public partial class EnemyController : MonoBehaviour, IDamageable
             _stepBackElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
             if (_stepBackElapsed > _stepBackTimeout)
             {
-                Debug.LogWarning("Enemy step back finished without completion event; recovering AI.", this);
+                Debug.LogWarning("敵の後退終了イベントを受信できなかったため、AI を復帰させます。", this);
                 _stepBackElapsed = 0f;
                 _mover.EndStepBack();
                 _ai?.OnAttackFinished();
             }
         }
         // AI の Tick を先に呼び、意思決定を行わせる
-        if (!IsTraining) _ai?.Tick(Time.deltaTime);
+        if (!IsTraining)
+            _ai?.Tick(Time.deltaTime);
 
         // AI が設定したペンディングの行動を先に実行してから移動更新を行う。
         // これにより WaitWalk 等が選択されたフレームで即座に振る舞いを反映できます。
@@ -371,7 +437,8 @@ public partial class EnemyController : MonoBehaviour, IDamageable
                     break;
                 case EnemyActionType.StepBack:
                     _stepBackElapsed = 0f;
-                    if (_mover == null || !_mover.StartStepBack()) _ai?.OnActionFailed();
+                    if (_mover == null || !_mover.StartStepBack())
+                        _ai?.OnActionFailed();
                     break;
                 case EnemyActionType.Wait:
                     _mover?.StopMove();
@@ -380,14 +447,20 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         }
 
         // 毎フレーム移動更新を行う（EnemyMover が内部で追跡判定を行う）
-        if (IsTraining) _mover?.ResetLocomotionAnimation();
-        else _mover?.Update();
+        if (IsTraining)
+            _mover?.ResetLocomotionAnimation();
+        else
+            _mover?.Update();
     }
 
     /// <summary>死亡を確定して攻撃・AI更新・移動を停止し、既存死亡ClipとFinal Blowまたは遷移を要求する。</summary>
     private void EnemyDead()
     {
-        if (IsTraining) { _health.RestoreForTraining(); return; }
+        if (IsTraining)
+        {
+            _health.RestoreForTraining();
+            return;
+        }
         CancelAttackPattern(false);
         _combatFeedback?.CancelNormalHitReaction();
         _attackAnimationHash = 0;
@@ -411,15 +484,21 @@ public partial class EnemyController : MonoBehaviour, IDamageable
     private void OnAnimatorMove()
     {
         MaintainPatternWeaponGrip();
-        if (_dead || (_game != null && !_game.IsCombatActive)) { _mover?.EndAttackRootMotion(); return; }
+        if (_dead || (_game != null && !_game.IsCombatActive))
+        {
+            _mover?.EndAttackRootMotion();
+            return;
+        }
         if (_mover != null && _mover.IsUsingAttackRootMotion)
         {
             var state = _animator.IsInTransition(0) ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
             if (state.fullPathHash != _attackAnimationHash)
             {
                 _attackAnimationHash = 0;
-                if (IsAttackPatternActive) _mover.EndAttackRootMotion();
-                else _mover.ReleaseMovementAfterAttack();
+                if (IsAttackPatternActive)
+                    _mover.EndAttackRootMotion();
+                else
+                    _mover.ReleaseMovementAfterAttack();
                 return;
             }
         }
@@ -482,7 +561,11 @@ public partial class EnemyController : MonoBehaviour, IDamageable
         _ai?.OnAttackFinished();
         // 攻撃終了時に一時停止していた移動制御を復帰させる
         _mover?.ReleaseMovementAfterAttack();
-        if (IsTraining) { TrainingAttackInProgress = false; TrainingAttackFinished?.Invoke(); }
+        if (IsTraining)
+        {
+            TrainingAttackInProgress = false;
+            TrainingAttackFinished?.Invoke();
+        }
     }
 
     /// <summary>有効な後退終了Eventで移動を再開し、AIへ行動完了を通知する。死亡・大被弾中は無視する。</summary>

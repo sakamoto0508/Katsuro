@@ -7,7 +7,13 @@ using UnityEngine;
 public sealed class AbilityManager
 {
     /// <summary>移動状態とは独立して能力を継続するため、Context・各能力・HP・回避設定を保持する。</summary>
-    public AbilityManager(PlayerStateContext context, PlayerGhost ghost, PlayerSelfSacrifice selfSacrifice, PlayerHeal healer, PlayerResource playerResource, PlayerStateConfig stateConfig)
+    public AbilityManager(
+        PlayerStateContext context,
+        PlayerGhost ghost,
+        PlayerSelfSacrifice selfSacrifice,
+        PlayerHeal healer,
+        PlayerResource playerResource,
+        PlayerStateConfig stateConfig)
     {
         _context = context;
         _ghost = ghost;
@@ -40,7 +46,8 @@ public sealed class AbilityManager
 
         // 継続処理を直接各 Ability に委譲
         _ghost?.Tick(deltaTime);
-        if (_selfSacrifice != null) _selfSacrifice.CostMultiplier = GameplayRules.Current.SelfCost(_playerResource.CurrentHpRatio);
+        if (_selfSacrifice != null)
+            _selfSacrifice.CostMultiplier = GameplayRules.Current.SelfCost(_playerResource.CurrentHpRatio);
         _selfSacrifice?.Tick(deltaTime);
         _healer?.Tick(deltaTime);
 

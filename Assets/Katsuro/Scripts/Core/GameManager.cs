@@ -113,7 +113,8 @@ public class GameManager : MonoBehaviour
     /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 
     /// <summary>Playerの初期化・入力・戦闘状態を管理する参照。</summary>
@@ -140,19 +141,33 @@ public class GameManager : MonoBehaviour
         _fader = _scene.Fader;
         if (!IsTutorial)
         {
-            if (RunSession.PendingStart) RunSession.Begin(RunSession.PlayerName, RunSession.Attack, RunSession.Defense);
-            else RunSession.EnsureRun();
+            if (RunSession.PendingStart)
+                RunSession.Begin(RunSession.PlayerName, RunSession.Attack, RunSession.Defense);
+            else
+                RunSession.EnsureRun();
         }
-        if (_damageNumbers != null) _damageNumbers.Init(_camera);
-        else Debug.LogError("GameManagerにDamageNumbersを割り当ててください。", this);
+        if (_damageNumbers != null)
+            _damageNumbers.Init(_camera);
+        else
+            Debug.LogError("GameManagerにDamageNumbersを割り当ててください。", this);
         _lockOnCamera = new LockOnCamera(_playerPosition, _enemyPosition
             , _cinemachineCamera, _cinemachineLockOncamera, _playerAnimationController, _animationName);
         _playerController?.Init(_inputBuffer, _enemyPosition, _camera
             , _cameraManager, _lockOnCamera, this, _audio, _scene.HitStop, _scene.PlayerDead, _scene.Loader);
-        _enemyController?.Init(_playerPosition, _damageNumbers, this, _audio, _scene.HitStop, _scene.FinalBlow, _scene.Loader, _cameraManager, _playerController != null ? _playerController.FeedbackConfig : null);
+        _enemyController?.Init(
+            _playerPosition,
+            _damageNumbers,
+            this,
+            _audio,
+            _scene.HitStop,
+            _scene.FinalBlow,
+            _scene.Loader,
+            _cameraManager,
+            _playerController != null ? _playerController.FeedbackConfig : null);
         _cameraManager?.Init(_inputBuffer, _playerPosition
             , _enemyPosition, _cameraConfig, _lockOnCamera, _cinemachineCamera, _camera);
-        if (_playerController != null) _cameraManager?.SetJustAvoidSustain(() => _playerController != null && _playerController.IsJustAvoidActionPlaying);
+        if (_playerController != null)
+            _cameraManager?.SetJustAvoidSustain(() => _playerController != null && _playerController.IsJustAvoidActionPlaying);
     }
 
     /// <summary>
@@ -176,12 +191,12 @@ public class GameManager : MonoBehaviour
             if (newState == GameState.Title)
             {
                 _audio.StopAllBGMs();
-                _audio.PlayBGM(_audioConfig.TitleBGM, 0.5f);
+                _audio.PlayBGM(_audioConfig.TitleBGM, _audioConfig.SceneBgmVolume);
             }
             else if (newState == GameState.InGame)
             {
                 _audio.StopAllBGMs();
-                _audio.PlayBGM(_audioConfig.InGameBGM, 0.5f);
+                _audio.PlayBGM(_audioConfig.InGameBGM, _audioConfig.SceneBgmVolume);
             }
         }
         // イベント発行

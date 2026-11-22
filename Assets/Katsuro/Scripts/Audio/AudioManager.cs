@@ -19,7 +19,7 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
     /// <summary>タイトル・戦闘・命中などの再生登録名を共有する設定。</summary>
-    public AudioConfig AudioConfig => _audioConfig; 
+    public AudioConfig AudioConfig => _audioConfig;
 
     /// <summary>単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。</summary>
     [UnityEngine.Tooltip("単一BGM Sourceの互換参照。複数BGMチャンネルの初期化に使用する。")]
@@ -67,7 +67,7 @@ public class AudioManager : MonoBehaviour
     private bool _initialized;
     /// <summary>Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。</summary>
     [UnityEngine.Tooltip("Just Avoid成功中のBGM音量倍率。0で無音、1で基準音量。SEには適用しない。")]
-    [Header("Just Avoid BGM Duck (unscaled seconds)")]
+    [Header("ジャスト回避時の BGM 減衰（実時間の秒）")]
     [SerializeField, Range(0, 1)] private float _justAvoidDuckVolume = .25f;
     /// <summary>BGMが一時音量へ下がる時間（実時間の秒）。</summary>
     [UnityEngine.Tooltip("BGMが一時音量へ下がる時間（実時間の秒）。")]
@@ -88,20 +88,29 @@ public class AudioManager : MonoBehaviour
     /// <summary>再利用・新規SE Sourceにも適用するユーザー音量倍率。</summary>
     public float SEVolume { get; private set; } = 1f;
     private readonly Dictionary<AudioSource, float> _sfxBaseVolumes = new();
+    // チャンネル番号は 0 始まり。自己犠牲の BGM は通常の BGM に重ねて再生する。
+    internal const int BuffBgmChannel = 2;
+
     private const string VolumeKey = "Katsuro.Audio.";
     /// <summary>保存値の異常を除外し、音量を0～1に収める。</summary>
     private static float ValidVolume(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 1f : Mathf.Clamp01(value);
     /// <summary>三つのユーザー倍率を即時反映し、再生状態に触れず保存値を更新する。</summary>
     public void SetUserVolumes(float master, float bgm, float se)
     {
-        MasterVolume = ValidVolume(master); BGMVolume = ValidVolume(bgm); SEVolume = ValidVolume(se);
+        MasterVolume = ValidVolume(master);
+        BGMVolume = ValidVolume(bgm);
+        SEVolume = ValidVolume(se);
         PlayerPrefs.SetFloat(VolumeKey + "Master", MasterVolume);
         PlayerPrefs.SetFloat(VolumeKey + "BGM", BGMVolume);
         PlayerPrefs.SetFloat(VolumeKey + "SE", SEVolume);
         ApplyUserVolumes();
     }
     /// <summary>ユーザー倍率のみを100%へ戻し、個別音量とDuckingを保持して保存する。</summary>
-    public void ResetUserVolumes() { SetUserVolumes(1f, 1f, 1f); SaveUserVolumes(); }
+    public void ResetUserVolumes()
+    {
+        SetUserVolumes(1f, 1f, 1f);
+        SaveUserVolumes();
+    }
     /// <summary>設定終了・アプリ終了時に音量設定をディスクへ保存する。</summary>
     public void SaveUserVolumes() => PlayerPrefs.Save();
     /// <summary>保存済みの倍率を復元し、初回起動では各100%にする。</summary>
@@ -115,15 +124,26 @@ public class AudioManager : MonoBehaviour
     /// <summary>基準音量から全Sourceの実音量を再計算する。停止した音を再開しない。</summary>
     private void ApplyUserVolumes()
     {
-        if (bgmSources != null) foreach (var source in bgmSources)
-            if (source != null) source.volume = BaseVolume(source) * BGMVolume * _duckMultiplier * MasterVolume;
-        foreach (var source in _sfxPool) if (source != null)
-            source.volume = (_sfxBaseVolumes.TryGetValue(source, out var baseline) ? baseline : 1f) * SEVolume * MasterVolume;
+        if (bgmSources != null)
+            foreach (var source in bgmSources)
+                if (source != null)
+                    source.volume = BaseVolume(source) * BGMVolume * _duckMultiplier * MasterVolume;
+        foreach (var source in _sfxPool)
+            if (source != null)
+                source.volume = (_sfxBaseVolumes.TryGetValue(source, out var baseline) ? baseline : 1f) * SEVolume * MasterVolume;
     }
     /// <summary>アプリ終了時に変更済み音量を保存する。</summary>
-    private void OnApplicationQuit() { if (_initialized) SaveUserVolumes(); }
+    private void OnApplicationQuit()
+    {
+        if (_initialized)
+            SaveUserVolumes();
+    }
     /// <summary>アプリの中断時に変更済み音量を保存する。</summary>
-    private void OnApplicationPause(bool paused) { if (paused && _initialized) SaveUserVolumes(); }
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused && _initialized)
+            SaveUserVolumes();
+    }
     /// <summary>チャンネルの基準音量を取得し、未登録なら現在のAudioSource音量を保存する。</summary>
     /// <returns>一時倍率を掛ける前のチャンネル音量。</returns>
     private float BaseVolume(AudioSource source)
@@ -152,11 +172,17 @@ public class AudioManager : MonoBehaviour
     {
         _duckMultiplier = Mathf.Lerp(1, _justAvoidDuckVolume,
             _duckEnvelope.Evaluate(now, _justAvoidDuckEnter, _justAvoidDuckHold, _justAvoidDuckRestore));
-        if (bgmSources != null) foreach (var source in bgmSources)
-            if (source != null) source.volume = BaseVolume(source) * _duckMultiplier * BGMVolume * MasterVolume;
+        if (bgmSources != null)
+            foreach (var source in bgmSources)
+                if (source != null)
+                    source.volume = BaseVolume(source) * _duckMultiplier * BGMVolume * MasterVolume;
     }
     /// <summary>一時倍率を通常へ戻す。基準音量・Clip・停止状態を保持し、BGMを再生し直さない。</summary>
-    public void CancelJustAvoidDuck() { _duckEnvelope.Reset(); UpdateDuck(Time.unscaledTime); }
+    public void CancelJustAvoidDuck()
+    {
+        _duckEnvelope.Reset();
+        UpdateDuck(Time.unscaledTime);
+    }
     /// <summary>Scene切り替え時に回避用Duckingを解除する。</summary>
     private void SceneChanged(UnityEngine.SceneManagement.Scene previous, UnityEngine.SceneManagement.Scene next) => CancelJustAvoidDuck();
     /// <summary>SceneのUnload時に一時Duckingを通常音量へ戻す。</summary>
@@ -164,7 +190,8 @@ public class AudioManager : MonoBehaviour
     /// <summary>勝利・敗北・Titleなど戦闘外へ移った場合にDuckingを解除する。</summary>
     private void GameStateChanged(GameManager.GameState state)
     {
-        if (state != GameManager.GameState.InGame && state != GameManager.GameState.Pause) CancelJustAvoidDuck();
+        if (state != GameManager.GameState.InGame && state != GameManager.GameState.Pause)
+            CancelJustAvoidDuck();
     }
     /// <summary>Sceneとゲーム進行の中断通知を購読する。</summary>
     private void OnEnable()
@@ -191,11 +218,13 @@ public class AudioManager : MonoBehaviour
             return;
         }
         bool listenerChanged = listener != null && listener != _audioListener;
-        if (listenerChanged) _audioListener = listener;
+        if (listenerChanged)
+            _audioListener = listener;
         if (_audioListener != null && (listenerChanged || _lowPass == null))
         {
             _lowPass = _audioListener.GetComponent<AudioLowPassFilter>();
-            if (_lowPass == null) _lowPass = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
+            if (_lowPass == null)
+                _lowPass = _audioListener.gameObject.AddComponent<AudioLowPassFilter>();
             _lowPass.enabled = false;
         }
         if (_initialized) return;
@@ -220,7 +249,8 @@ public class AudioManager : MonoBehaviour
         // BGM 用 AudioSource を準備する（複数チャンネル対応）。
         EnsureBGMSources();
         CreateBgmChannels();
-        foreach (var source in bgmSources) RetainSceneSource(source);
+        foreach (var source in bgmSources)
+            RetainSceneSource(source);
         RetainSceneSource(sfxSourcePrefab);
         LoadUserVolumes();
 
@@ -259,7 +289,8 @@ public class AudioManager : MonoBehaviour
     private void EnsureBGMSources()
     {
         // bgmSources リストを保証し、既存の単一 bgmSource が割り当てられている場合はそれを利用する。
-        if (bgmSources == null) bgmSources = new List<AudioSource>();
+        if (bgmSources == null)
+            bgmSources = new List<AudioSource>();
 
         // 既存の inspector で設定された単一 bgmSource があり、リストが空なら追加する。
         if ((bgmSource != null && !bgmSource.Equals(null)) && bgmSources.Count == 0)
@@ -284,7 +315,7 @@ public class AudioManager : MonoBehaviour
     /// <summary>設定数のBGMチャンネルを確保し、SEから独立したAudioSourceを生成する。</summary>
     private void CreateBgmChannels()
     {
-        while (bgmSources.Count < Mathf.Max(3, _bgmChannelCount))
+        while (bgmSources.Count < Mathf.Max(BuffBgmChannel + 1, _bgmChannelCount))
         {
             var sourceObject = new GameObject("BGM_Source_" + bgmSources.Count);
             sourceObject.transform.SetParent(transform, false);
@@ -356,7 +387,8 @@ public class AudioManager : MonoBehaviour
 
         // 既に指定チャンネルで同じクリップ・同じ音量で再生中なら処理しない。
         float clampedVolume = Mathf.Clamp01(volume);
-        if (source.clip == clip && source.isPlaying && Mathf.Approximately(BaseVolume(source), clampedVolume)) return;
+        if (source.clip == clip && source.isPlaying && Mathf.Approximately(BaseVolume(source), clampedVolume))
+            return;
 
         source.Stop();
         source.clip = clip;
@@ -465,13 +497,15 @@ public class AudioManager : MonoBehaviour
             if (bgmSources == null) return;
             foreach (var s in bgmSources)
             {
-                if (s != null) SetBaseVolume(s, volume);
+                if (s != null)
+                    SetBaseVolume(s, volume);
             }
         }
         else
         {
             var src = GetBgmSource(channel);
-            if (src != null) SetBaseVolume(src, volume);
+            if (src != null)
+                SetBaseVolume(src, volume);
         }
     }
 
@@ -526,7 +560,10 @@ public class AudioManager : MonoBehaviour
         var src = GetAvailableSfxSource();
         if (src == null) return;
         src.clip = clip;
-        src.timeSamples = Mathf.Clamp(Mathf.RoundToInt(Mathf.Max(0f, startSeconds) * clip.frequency), 0, Mathf.Max(0, clip.samples - 1));
+        src.timeSamples = Mathf.Clamp(
+            Mathf.RoundToInt(Mathf.Max(0f, startSeconds) * clip.frequency),
+            0,
+            Mathf.Max(0, clip.samples - 1));
         _sfxBaseVolumes[src] = Mathf.Clamp01(volume);
         src.volume = _sfxBaseVolumes[src] * SEVolume * MasterVolume;
         src.Play();
@@ -555,7 +592,8 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void RemoveLowPassFromListener()
     {
-        if (_lowPass != null) _lowPass.enabled = false;
+        if (_lowPass != null)
+            _lowPass.enabled = false;
     }
 
     /// <summary>
@@ -578,6 +616,7 @@ public class AudioManager : MonoBehaviour
     private void OnDestroy()
     {
         CancelJustAvoidDuck();
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 }

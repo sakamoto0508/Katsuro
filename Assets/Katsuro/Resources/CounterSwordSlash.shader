@@ -26,7 +26,7 @@ Shader "Katsuro/CounterSwordSlash"
         Pass
         {
             Tags { "LightMode"="ForwardOnly" }
-            // A luminous ribbon does not absorb the background. RGB=0 must leave it untouched.
+            // 発光する帯は加算合成し、RGB=0 の箇所では背景色を維持する。
             Blend One One
             ColorMask RGB
             ZWrite Off
@@ -46,41 +46,59 @@ Shader "Katsuro/CounterSwordSlash"
             float _WhiteFrontSpan, _FacetContrast;
             float _ContactRadius, _ExposureWeight, _Intensity, _Impact;
             CBUFFER_END
-            struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; };
-            struct V { float4 positionCS:SV_POSITION; float2 uv:TEXCOORD0; float2 dynamics:TEXCOORD1; float4 highlight:TEXCOORD2; float4 color:COLOR; float3 world:TEXCOORD3; };
+            struct A
+            {
+                float3 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                float2 dynamics : TEXCOORD1;
+                float4 highlight : TEXCOORD2;
+                float4 color : COLOR;
+            };
+            struct V
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float2 dynamics : TEXCOORD1;
+                float4 highlight : TEXCOORD2;
+                float4 color : COLOR;
+                float3 world : TEXCOORD3;
+            };
             V Vert(A a)
             {
-                V o; o.positionCS=TransformObjectToHClip(a.positionOS);
-                o.world=GetAbsolutePositionWS(TransformObjectToWorld(a.positionOS));
-                o.uv=a.uv; o.dynamics=a.dynamics; o.highlight=a.highlight; o.color=a.color;
+                V o; o.positionCS = TransformObjectToHClip(a.positionOS);
+                o.world = GetAbsolutePositionWS(TransformObjectToWorld(a.positionOS));
+                o.uv = a.uv; o.dynamics = a.dynamics; o.highlight = a.highlight; o.color = a.color;
                 return o;
             }
-            float Gaussian(float x) { return exp(-x*x); }
+            float Gaussian(float x)
+            {
+                return exp(-x*x);
+            }
             float4 Frag(V i):SV_Target
             {
-                float age=saturate(i.uv.x), blade=saturate(i.uv.y), along=saturate(i.dynamics.y);
-                float endMask=smoothstep(0,.14,along)*(1-smoothstep(.93,1,along));
-                float border=smoothstep(0,max(.02,_SheetSoftness),blade)*(1-smoothstep(.98,1,blade));
-                // One temporal fade; core leaves before the silver surface and trailing glow.
-                float coreLife=1-smoothstep(.25,1,saturate(i.highlight.z));
-                float surfaceLife=1-smoothstep(.08,.85,age);
-                float residual=smoothstep(.15,.6,age)*(1-smoothstep(.65,1,age));
-                float whiteFront=smoothstep(1-max(.1,_WhiteFrontSpan),.99,along);
-                float whiteLife=coreLife*(1-smoothstep(.1,.65,age));
-                float core=Gaussian((blade-_CorePosition)/max(.01,_CoreWidth))*max(0,i.highlight.x)*whiteLife*whiteFront;
-                float edge=Gaussian((blade-.955)/max(.01,_EdgeWidth))*_EdgeIntensity*whiteLife*whiteFront;
-                float facet=lerp(1,lerp(.25,.85,smoothstep(.15,.8,blade))+Gaussian((blade-.78)/.045)*.22,_FacetContrast);
-                float surface=sin(blade*PI)*_SheetIntensity*surfaceLife*facet;
-                float wake=Gaussian((blade-.7)/.28)*_AfterglowIntensity*max(0,i.highlight.y)*residual*lerp(.4,1,along);
-                float3 distanceToContact=(i.world-_ContactPoint.xyz)/max(.05,_ContactRadius);
-                float localContact=exp(-dot(distanceToContact,distanceToContact));
-                float impact=1+max(0,_Impact)*_ImpactGain*(.3+localContact);
-                float directional=lerp(.55,1,smoothstep(0,.85,along));
-                float3 rgb=(_CoreTint.rgb*(core+edge)+_SheetTint.rgb*(surface+wake))*max(0,i.color.rgb);
+                float age = saturate(i.uv.x), blade = saturate(i.uv.y), along = saturate(i.dynamics.y);
+                float endMask = smoothstep(0, .14, along)*(1-smoothstep(.93, 1, along));
+                float border = smoothstep(0, max(.02, _SheetSoftness), blade)*(1-smoothstep(.98, 1, blade));
+                // 時間フェードは一度だけ掛け、銀色の面や残光より先に芯を消す。
+                float coreLife = 1-smoothstep(.25, 1, saturate(i.highlight.z));
+                float surfaceLife = 1-smoothstep(.08, .85, age);
+                float residual = smoothstep(.15, .6, age)*(1-smoothstep(.65, 1, age));
+                float whiteFront = smoothstep(1-max(.1, _WhiteFrontSpan), .99, along);
+                float whiteLife = coreLife*(1-smoothstep(.1, .65, age));
+                float core = Gaussian((blade-_CorePosition)/max(.01, _CoreWidth))*max(0, i.highlight.x)*whiteLife*whiteFront;
+                float edge = Gaussian((blade-.955)/max(.01, _EdgeWidth))*_EdgeIntensity*whiteLife*whiteFront;
+                float facet = lerp(1, lerp(.25, .85, smoothstep(.15, .8, blade))+Gaussian((blade-.78)/.045)*.22, _FacetContrast);
+                float surface = sin(blade*PI)*_SheetIntensity*surfaceLife*facet;
+                float wake = Gaussian((blade-.7)/.28)*_AfterglowIntensity*max(0, i.highlight.y)*residual*lerp(.4, 1, along);
+                float3 distanceToContact = (i.world-_ContactPoint.xyz)/max(.05, _ContactRadius);
+                float localContact = exp(-dot(distanceToContact, distanceToContact));
+                float impact = 1+max(0, _Impact)*_ImpactGain*(.3+localContact);
+                float directional = lerp(.55, 1, smoothstep(0, .85, along));
+                float3 rgb = (_CoreTint.rgb*(core+edge)+_SheetTint.rgb*(surface+wake))*max(0, i.color.rgb);
                 rgb*=endMask*border*directional*impact*_Intensity;
-                // Exposure-compensated unlit VFX by default, with optional scene exposure influence.
-                rgb*=lerp(1,GetCurrentExposureMultiplier(),saturate(_ExposureWeight));
-                return float4(max(0,rgb),0);
+                // 既定では露出を補正した非ライティング VFX とし、設定に応じてシーン露出を反映する。
+                rgb*=lerp(1, GetCurrentExposureMultiplier(), saturate(_ExposureWeight));
+                return float4(max(0, rgb), 0);
             }
             ENDHLSL
         }

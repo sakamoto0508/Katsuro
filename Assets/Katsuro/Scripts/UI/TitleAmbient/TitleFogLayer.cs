@@ -110,8 +110,10 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
     private void OnDestroy()
     {
         if (_generated == null) return;
-        if (Application.isPlaying) Destroy(_generated);
-        else DestroyImmediate(_generated);
+        if (Application.isPlaying)
+            Destroy(_generated);
+        else
+            DestroyImmediate(_generated);
         _generated = null;
     }
 
@@ -138,7 +140,8 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
         // 非再生中に毎回書き換えるとシーンが変更扱いになるため、プレビュー指定時だけ表示する
         if (!Application.isPlaying && !_previewInEditMode)
         {
-            if (_image.texture != null && _image.texture == _generated) _image.texture = null;
+            if (_image.texture != null && _image.texture == _generated)
+                _image.texture = null;
             return;
         }
         Texture texture = _overrideTexture;
@@ -149,7 +152,8 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
         }
         _image.texture = texture;
         // 実行前のシーン表示でも霧の配置を確認できるよう、基本不透明度で表示しておく
-        if (!Application.isPlaying) Apply(_opacity, 0f);
+        if (!Application.isPlaying)
+            Apply(_opacity, 0f);
     }
 
     /// <summary>UVと色をRawImageへ反映する。</summary>
@@ -167,7 +171,8 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
         int size = _textureSize;
         if (_generated == null || _generated.width != size)
         {
-            if (_generated != null) DestroyImmediate(_generated);
+            if (_generated != null)
+                DestroyImmediate(_generated);
             _generated = new Texture2D(size, size, TextureFormat.RGBA32, false)
             {
                 name = $"{name}_FogNoise",
@@ -220,6 +225,7 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
         float fx = x - x0, fy = y - y0;
         int xa = Wrap(x0, period), xb = Wrap(x0 + 1, period);
         int ya = Wrap(y0, period), yb = Wrap(y0 + 1, period);
+        // Perlin ノイズの補間曲線 6t⁵ − 15t⁴ + 10t³。格子の継ぎ目で値の変化を滑らかにする。
         float u = fx * fx * fx * (fx * (fx * 6f - 15f) + 10f);
         float w = fy * fy * fy * (fy * (fy * 6f - 15f) + 10f);
         float bottom = Mathf.Lerp(Hash(xa, ya, seed), Hash(xb, ya, seed), u);
@@ -236,7 +242,8 @@ public sealed class TitleFogLayer : MonoBehaviour, ITitleAmbientElement
     {
         unchecked
         {
-            uint h = (uint)(x * 374761393 + y * 668265263 + seed * 1442695041);
+            // 格子座標とシードを混ぜ、下位 24 ビットを 0〜1 の値に正規化する。
+        uint h = (uint)(x * 374761393 + y * 668265263 + seed * 1442695041);
             h = (h ^ (h >> 13)) * 1274126177u;
             h ^= h >> 16;
             return (h & 0xFFFFFF) / 16777215f;

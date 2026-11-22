@@ -3,7 +3,13 @@ using System;
 /// <summary>1Clipの再生・複数斬撃・Recoveryを管理。Animator/武器/AIはControllerへ委譲。</summary>
 public sealed class EnemyAttackPatternRunner
 {
-    public enum Phase { Inactive, Windup, Playing, Recovery }
+    public enum Phase
+    {
+        Inactive,
+        Windup,
+        Playing,
+        Recovery
+    }
     public Phase CurrentPhase { get; private set; }
     public bool IsActive => CurrentPhase != Phase.Inactive;
     public EnemyAttackPattern Pattern { get; private set; }
@@ -17,7 +23,12 @@ public sealed class EnemyAttackPatternRunner
     private readonly Action<bool> _finished;
     public EnemyAttackPatternRunner(Func<EnemyAttackPattern, bool> start, Action closeHitbox, Action<bool> finished,
         Action<EnemyAttackPattern> windupFinished = null)
-    { _start = start; _closeHitbox = closeHitbox; _finished = finished; _windupFinished = windupFinished; }
+    {
+        _start = start;
+        _closeHitbox = closeHitbox;
+        _finished = finished;
+        _windupFinished = windupFinished;
+    }
 
     public bool Begin(EnemyAttackPattern pattern)
     {
@@ -33,12 +44,17 @@ public sealed class EnemyAttackPatternRunner
     public void Tick(float deltaTime)
     {
         if (!IsActive || !float.IsFinite(deltaTime) || deltaTime <= 0f) return;
-        if (Pattern == null || !Pattern.IsValid) { Finish(false); return; }
+        if (Pattern == null || !Pattern.IsValid)
+        {
+            Finish(false);
+            return;
+        }
         // Idleで待たず、最初の更新から同じClipの構えを開始する。
         if (!_started)
         {
             _started = true;
-            if (!_start(Pattern)) Finish(false);
+            if (!_start(Pattern))
+                Finish(false);
             return;
         }
         _elapsed += deltaTime;
@@ -46,20 +62,24 @@ public sealed class EnemyAttackPatternRunner
         {
             case Phase.Windup:
                 // Trigger未消費・Animator停止などでも永久Busyにしない。
-                if (_elapsed >= Pattern.ActiveWindupDuration + 1f) Finish(false);
+                if (_elapsed >= Pattern.ActiveWindupDuration + 1f)
+                    Finish(false);
                 break;
             case Phase.Playing:
-                if (_elapsed >= Pattern.BodyTimeout) Finish(false);
+                if (_elapsed >= Pattern.BodyTimeout)
+                    Finish(false);
                 break;
             case Phase.Recovery:
-                if (_elapsed >= Pattern.RecoveryDuration) Finish(true);
+                if (_elapsed >= Pattern.RecoveryDuration)
+                    Finish(true);
                 break;
         }
     }
     public void ObserveClipTime(float clipTime, int stateHash)
     {
         if (CurrentPhase != Phase.Windup || !_started || Pattern == null || !Pattern.IsValid ||
-            stateHash != Pattern.StateHash || !float.IsFinite(clipTime) || clipTime < Pattern.WindupEndTime) return;
+            stateHash != Pattern.StateHash || !float.IsFinite(clipTime) || clipTime < Pattern.WindupEndTime)
+            return;
         CurrentPhase = Phase.Playing;
         _elapsed = 0f;
         _windupFinished?.Invoke(Pattern);
@@ -102,5 +122,9 @@ public sealed class EnemyAttackPatternRunner
         _started = false;
         _closeHitbox();
     }
-    private void Finish(bool success) { Cancel(); _finished(success); }
+    private void Finish(bool success)
+    {
+        Cancel();
+        _finished(success);
+    }
 }

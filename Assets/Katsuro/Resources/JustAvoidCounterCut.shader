@@ -66,100 +66,115 @@ Shader "Katsuro/JustAvoidCounterCut"
             float _FlashDuration, _FlashStrength, _FlashHold;
             float _DebugMode;
             CBUFFER_END
-            struct A { float3 vertex:POSITION; float2 uv:TEXCOORD0; };
-            struct V { float4 pos:SV_POSITION; float2 uv:TEXCOORD0; };
-            V Vert(A a) { V o; o.pos=TransformObjectToHClip(a.vertex); o.uv=a.uv; return o; }
+            struct A
+            {
+                float3 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+            struct V
+            {
+                float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+            V Vert(A a)
+            {
+                V o;
+                o.pos = TransformObjectToHClip(a.vertex);
+                o.uv = a.uv;
+                return o;
+            }
             void BladeLens(float x, float tail, float tip, float taperStrength,
                 out float segment, out float along, out float taper)
             {
-                float aa=max(fwidth(x),.0001);
-                segment=smoothstep(tail-aa,tail+aa,x)*(1-smoothstep(tip-aa,tip+aa,x));
-                along=saturate((x-tail)/max(.001,tip-tail));
-                taper=pow(saturate(4*along*(1-along)),max(.1,taperStrength));
+                float aa = max(fwidth(x), .0001);
+                segment = smoothstep(tail-aa, tail+aa, x)*(1-smoothstep(tip-aa, tip+aa, x));
+                along = saturate((x-tail)/max(.001, tip-tail));
+                taper = pow(saturate(4*along*(1-along)), max(.1, taperStrength));
             }
             float4 Frag(V i):SV_Target
             {
-                // Bypass all masks and exposure: show the depth-tested renderer footprint.
-                if (_DebugMode>.5 && _DebugMode<1.5) return float4(1,0,1,1);
-                float2 p=i.uv*2-1;
-                float x=p.x/max(.01,_CoreLength);
-                float age=max(0,_Age);
-                float sweep=max(.001,_SweepDuration);
-                float travel=saturate(age/sweep);
-                travel=1-pow(1-travel,3); // fast attack, then settle into the incision
-                // Most of the silver silhouette is present on the very first contact frame.
-                // Extension supplies the forward snap, rather than delaying the impact peak.
-                float coreEnd=max(0,_LineHold)+max(.001,_FadeDuration);
-                float withdrawal=smoothstep(max(0,_LineHold),coreEnd,age);
-                // Peel the short heel forward as the incision expires, instead of fading a static bar.
-                float tail=-.88+_ForwardExtension*.55*(1-travel)+withdrawal*.55;
-                float tip=.98-_ForwardExtension*(1-travel);
-                float aaY=max(fwidth(p.y),.0001);
-                float segment,along,taper;
-                BladeLens(x,tail,tip,_TaperStrength,segment,along,taper);
-                // A narrow receding heel and a fuller forward shoulder, with two needle tips.
-                float impact=1+_ImpactBoost*(1-smoothstep(0,sweep+.025,age));
-                float width=_CoreWidth*taper*lerp(.55,1.25,along)*lerp(1.12,1,travel);
-                // The pixel floor dies with the tips: it must not turn the cut into a white rod.
-                width=max(width,aaY*_MinCorePixels*saturate(taper*5));
-                float y=p.y-_BladeCurve*p.x*p.x;
-                float ridge=1-smoothstep(width*.35,width+aaY,abs(y));
-                float coreLife=1-smoothstep(max(0,_LineHold),coreEnd,age);
-                float recovery=saturate((age-sweep)/max(.001,coreEnd-sweep));
-                float heelFade=lerp(1,smoothstep(0,.65,along),recovery*.7);
-                float core=ridge*segment*coreLife*heelFade;
-                float edge=(1-smoothstep(width+aaY,width+aaY*3+.035,abs(y)))
+                // マスクと露出の影響を外し、深度テスト後に描画される範囲を表示する。
+                if (_DebugMode>.5 && _DebugMode<1.5) return float4(1, 0, 1, 1);
+                float2 p = i.uv*2-1;
+                float x = p.x/max(.01, _CoreLength);
+                float age = max(0, _Age);
+                float sweep = max(.001, _SweepDuration);
+                float travel = saturate(age/sweep);
+                travel = 1-pow(1-travel, 3); // 斬線を素早く伸ばし、終端付近で減速させる。
+                // 命中初フレームで銀色の輪郭の大半を表示する。
+                // 前方へ伸ばして勢いを加えつつ、命中時のピークを保つ。
+                float coreEnd = max(0, _LineHold)+max(.001, _FadeDuration);
+                float withdrawal = smoothstep(max(0, _LineHold), coreEnd, age);
+                // 斬線が消えるにつれ、短い後端を前方へ引き上げる。
+                float tail = -.88+_ForwardExtension*.55*(1-travel)+withdrawal*.55;
+                float tip = .98-_ForwardExtension*(1-travel);
+                float aaY = max(fwidth(p.y), .0001);
+                float segment, along, taper;
+                BladeLens(x, tail, tip, _TaperStrength, segment, along, taper);
+                // 後方は細く前方は太くし、両端は針状に尖らせる。
+                // ピーク直後の 25 ms を含めて、命中光の減衰を滑らかにつなぐ。
+                float impact = 1+_ImpactBoost*(1-smoothstep(0, sweep+.025, age));
+                float width = _CoreWidth*taper*lerp(.55, 1.25, along)*lerp(1.12, 1, travel);
+                // 先端に向けて最小ピクセル幅もゼロへ絞り、白い棒状になるのを防ぐ。
+                width = max(width, aaY*_MinCorePixels*saturate(taper*5));
+                float y = p.y-_BladeCurve*p.x*p.x;
+                float ridge = 1-smoothstep(width*.35, width+aaY, abs(y));
+                float coreLife = 1-smoothstep(max(0, _LineHold), coreEnd, age);
+                float recovery = saturate((age-sweep)/max(.001, coreEnd-sweep));
+                float heelFade = lerp(1, smoothstep(0, .65, along), recovery*.7);
+                float core = ridge*segment*coreLife*heelFade;
+                float edge = (1-smoothstep(width+aaY, width+aaY*3+.035, abs(y)))
                     *segment*coreLife*heelFade;
-                float head=exp(-pow((x-tip+.1)/.13,2))*ridge*segment
-                    *(1-smoothstep(sweep,sweep+.025,age));
-                float glowEnd=coreEnd+max(.001,_ResidualGlowDuration);
-                float glowLife=1-smoothstep(sweep,max(sweep+.001,glowEnd),age);
-                float glow=exp(-pow(y/max(.01,_GlowWidth),2))*segment*taper
+                float head = exp(-pow((x-tip+.1)/.13, 2))*ridge*segment
+                    *(1-smoothstep(sweep, sweep+.025, age));
+                float glowEnd = coreEnd+max(.001, _ResidualGlowDuration);
+                float glowLife = 1-smoothstep(sweep, max(sweep+.001, glowEnd), age);
+                float glow = exp(-pow(y/max(.01, _GlowWidth), 2))*segment*taper
                     *_GlowIntensity*glowLife;
-                float air=exp(-pow((y-.22-p.x*.07)/.025,2));
-                air+=exp(-pow((y+.18-p.x*.04)/.02,2))*.5;
+                float air = exp(-pow((y-.22-p.x*.07)/.025, 2));
+                air+=exp(-pow((y+.18-p.x*.04)/.02, 2))*.5;
                 air*=_AirStrength*segment*taper*glowLife;
-                // Independent crescent plate: broad curved upper face, a short sharp lower edge.
-                // Its length and silhouette no longer collapse into the core's thin symmetric lens.
-                float sheetX=p.x/max(.01,_SheetLength);
-                float sheetSegment,sheetAlong,sheetTaper;
-                BladeLens(sheetX,tail,tip,_TaperStrength*.8,sheetSegment,sheetAlong,sheetTaper);
-                float sheetUpper=max(.001,_SheetWidth*sheetTaper*lerp(.4,1.25,sheetAlong));
-                float sheetLower=max(.001,_SheetWidth*sheetTaper*lerp(.18,.42,sheetAlong));
-                float sheetBound=y>=0?sheetUpper:sheetLower;
-                float soft=max(aaY,sheetBound*_SheetSoftness);
-                float sheetMask=1-smoothstep(max(0,sheetBound-soft),sheetBound+aaY,abs(y));
-                float sheetPeak=lerp(.42,1.4,1-smoothstep(0,sweep+.03,age));
-                float sheetLife=sheetPeak*(1-smoothstep(max(0,coreEnd-.03),glowEnd,age));
-                float sheetHeel=lerp(1,smoothstep(0,.65,sheetAlong),withdrawal*.8);
-                float sheet=sheetMask*sheetSegment*sheetTaper*sheetHeel*sheetLife*_SheetIntensity;
-                float facet=1-smoothstep(aaY,aaY*2+sheetUpper*.14,abs(y-sheetUpper*.7));
-                float silverGradient=saturate((y+sheetLower)/max(.001,sheetUpper+sheetLower));
-                float3 silver=_SheetTint.rgb*(lerp(.35,.95,silverGradient)+facet*.6);
-                // Reuse the same contact flare; no second flash object or particle system.
-                float2 flashSize=max(abs(_FlashSize.xy),float2(.005,.005));
-                float contact=exp(-pow(p.x/flashSize.x,2)-pow(p.y/flashSize.y,2));
-                contact+=exp(-pow(p.x/(flashSize.x*.25),2)-pow(p.y/(flashSize.y*1.65),2))*.18;
-                float contactMask=contact*(1-smoothstep(max(0,_FlashHold),
-                    max(_FlashHold+.001,_FlashDuration),age));
-                contact*=max(0,_FlashStrength)*(1-smoothstep(max(0,_FlashHold),
-                    max(_FlashHold+.001,_FlashDuration),age));
-                // Premultiplied white masks: outside the mask alpha is zero, not a black card.
-                // Retain shape and lifetime, excluding color, intensity and camera exposure.
+                // 三日月形の面を独立させ、上側は幅広い曲線に、下側は短く鋭い縁にする。
+                // 長さと輪郭は中心線の細い対称形状から独立させる。
+                float sheetX = p.x/max(.01, _SheetLength);
+                float sheetSegment, sheetAlong, sheetTaper;
+                BladeLens(sheetX, tail, tip, _TaperStrength*.8, sheetSegment, sheetAlong, sheetTaper);
+                float sheetUpper = max(.001, _SheetWidth*sheetTaper*lerp(.4, 1.25, sheetAlong));
+                float sheetLower = max(.001, _SheetWidth*sheetTaper*lerp(.18, .42, sheetAlong));
+                float sheetBound = y>=0?sheetUpper:sheetLower;
+                float soft = max(aaY, sheetBound*_SheetSoftness);
+                float sheetMask = 1-smoothstep(max(0, sheetBound-soft), sheetBound+aaY, abs(y));
+                float sheetPeak = lerp(.42, 1.4, 1-smoothstep(0, sweep+.03, age));
+                float sheetLife = sheetPeak*(1-smoothstep(max(0, coreEnd-.03), glowEnd, age));
+                float sheetHeel = lerp(1, smoothstep(0, .65, sheetAlong), withdrawal*.8);
+                float sheet = sheetMask*sheetSegment*sheetTaper*sheetHeel*sheetLife*_SheetIntensity;
+                float facet = 1-smoothstep(aaY, aaY*2+sheetUpper*.14, abs(y-sheetUpper*.7));
+                float silverGradient = saturate((y+sheetLower)/max(.001, sheetUpper+sheetLower));
+                float3 silver = _SheetTint.rgb*(lerp(.35, .95, silverGradient)+facet*.6);
+                // 同じ命中フラッシュを再利用する。
+                float2 flashSize = max(abs(_FlashSize.xy), float2(.005, .005));
+                float contact = exp(-pow(p.x/flashSize.x, 2)-pow(p.y/flashSize.y, 2));
+                contact+=exp(-pow(p.x/(flashSize.x*.25), 2)-pow(p.y/(flashSize.y*1.65), 2))*.18;
+                float contactMask = contact*(1-smoothstep(max(0, _FlashHold),
+                    max(_FlashHold+.001, _FlashDuration), age));
+                contact*=max(0, _FlashStrength)*(1-smoothstep(max(0, _FlashHold),
+                    max(_FlashHold+.001, _FlashDuration), age));
+                // 白色の乗算済みアルファマスクを使い、マスク外を完全に透過させる。
+                // 形状と寿命だけを反映し、色、強さ、カメラ露出の影響を外す。
                 if (_DebugMode>1.5)
                 {
                     float mask;
-                    if (_DebugMode<2.5) mask=saturate(core);
-                    else if (_DebugMode<3.5) mask=saturate(sheetMask*sheetSegment*sheetTaper*sheetHeel*sheetLife);
-                    else mask=saturate(contactMask);
-                    return float4(mask,mask,mask,mask);
+                    if (_DebugMode<2.5) mask = saturate(core);
+                    else if (_DebugMode<3.5) mask = saturate(sheetMask*sheetSegment*sheetTaper*sheetHeel*sheetLife);
+                    else mask = saturate(contactMask);
+                    return float4(mask, mask, mask, mask);
                 }
-                float alpha=saturate(core*.95+edge*_EdgeContrast+contact*.75+sheet*.32+glow+air);
-                // Keep the localized contact brighter than the sustained full-length blade.
-                float3 emission=_Tint.rgb*(core*_CoreGain*impact+head*.3+contact*(1+_CoreGain*.9)*.72)
+                float alpha = saturate(core*.95+edge*_EdgeContrast+contact*.75+sheet*.32+glow+air);
+                // 命中点付近は斬線全体の持続光より明るくする。
+                float3 emission = _Tint.rgb*(core*_CoreGain*impact+head*.3+contact*(1+_CoreGain*.9)*.72)
                     +silver*sheet+_GlowTint.rgb*(glow+air);
-                // HDRP's emissive path uses pre-exposure. Bloom/tonemapping remain camera-owned.
-                return float4(emission*_StrikeMultiplier*GetCurrentExposureMultiplier(),alpha);
+                // HDRP の発光には事前露出を適用する。ブルームとトーンマッピングはカメラ側で処理する。
+                return float4(emission*_StrikeMultiplier*GetCurrentExposureMultiplier(), alpha);
             }
             ENDHLSL
         }

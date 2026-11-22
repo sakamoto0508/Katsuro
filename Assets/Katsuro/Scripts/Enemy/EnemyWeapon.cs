@@ -35,11 +35,21 @@ public sealed class EnemyWeapon
             var effect = collider.GetComponent<SwordTrail>();
             if (effect == null)
                 foreach (var candidate in _weaponColliders)
-                    if (candidate != null && (effect = candidate.GetComponent<SwordTrail>()) != null) break;
-            if (effect != null) { effect.Init(); _trails[collider] = effect; }
+                    if (candidate != null && (effect = candidate.GetComponent<SwordTrail>()) != null)
+                        break;
+            if (effect != null)
+            {
+                effect.Init();
+                _trails[collider] = effect;
+            }
             var relay = collider.GetComponent<WeaponHitboxRelay>();
-            if (relay != null) { relay.Init(); _relayCache[collider] = relay; }
-            else Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
+            if (relay != null)
+            {
+                relay.Init();
+                _relayCache[collider] = relay;
+            }
+            else
+                Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
             collider.enabled = false;
         }
     }
@@ -73,11 +83,15 @@ public sealed class EnemyWeapon
 
     public void SetSweptHits(bool active)
     {
-        foreach (var relay in EnumerateRelays()) if (relay != null) relay.SetSweptHits(active);
+        foreach (var relay in EnumerateRelays())
+            if (relay != null)
+                relay.SetSweptHits(active);
     }
     public void FlushSweptHits()
     {
-        foreach (var relay in EnumerateRelays()) if (relay != null) relay.FlushSweptHits();
+        foreach (var relay in EnumerateRelays())
+            if (relay != null)
+                relay.FlushSweptHits();
     }
 
     /// <summary>武器がヒットした際の通知先を登録する。</summary>
@@ -125,7 +139,11 @@ public sealed class EnemyWeapon
             if (blade == null || !blade.enabled) continue;
             Vector3 candidate = target.ClosestPoint(blade.bounds.center);
             float distance = (candidate - blade.bounds.center).sqrMagnitude;
-            if (distance < nearest) { nearest = distance; point = candidate; }
+            if (distance < nearest)
+            {
+                nearest = distance;
+                point = candidate;
+            }
         }
         return point;
     }
@@ -150,7 +168,8 @@ public sealed class EnemyWeapon
     /// <summary>攻撃判定を変えず、刀の軌跡だけを攻撃種別に応じた表示へ切り替える。</summary>
     public void SetTrailStyle(SwordTrail.AttackStyle style)
     {
-        foreach (var trail in _trails.Values) trail.SetStyle(style);
+        foreach (var trail in _trails.Values)
+            trail.SetStyle(style);
     }
 
     /// <summary>武器Colliderと軌跡の有効状態を切り替え、攻撃判定区間と表示を同期する。</summary>
@@ -169,8 +188,10 @@ public sealed class EnemyWeapon
             }
 
             weaponCollider.enabled = isActive;
-            if (_relayCache.TryGetValue(weaponCollider, out var relay)) relay.ResetSweepSample();
-            if (_trails.TryGetValue(weaponCollider, out var trail)) trail.SetActive(isActive);
+            if (_relayCache.TryGetValue(weaponCollider, out var relay))
+                relay.ResetSweepSample();
+            if (_trails.TryGetValue(weaponCollider, out var trail))
+                trail.SetActive(isActive);
         }
 
         if (!isActive)

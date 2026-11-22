@@ -5,6 +5,10 @@ using UnityEngine.UI;
 /// <summary>シーンに配置したゲーム内表示の文字を更新する。表示要素の生成や配置変更は行わない。</summary>
 public sealed class RunHUD : MonoBehaviour
 {
+    // 時計や状態のテキストは毎フレーム再生成せず、実時間で間引く。
+    private const float RefreshIntervalSeconds = .1f;
+    private const int MaxStatusLabels = 3;
+
     /// <summary>HP・スキルゲージ・無敵・Just Avoidボーナスを表示するPlayer参照。</summary>
     [UnityEngine.Tooltip("HP・スキルゲージ・無敵・Just Avoidボーナスを表示するPlayer参照。")]
     [SerializeField] private PlayerController _player;
@@ -83,14 +87,18 @@ public sealed class RunHUD : MonoBehaviour
         bool training = GameManager.Instance != null && GameManager.Instance.IsTutorial;
         bool visible = (RunSession.Active || training) && _player != null
             && !(_fader != null && _fader.IsTransitioning);
-        if (_visibility != null && !_presentationControlsVisibility) _visibility.alpha = visible ? 1f : 0f;
+        if (_visibility != null && !_presentationControlsVisibility)
+            _visibility.alpha = visible ? 1f : 0f;
         float enemyHp = _enemy != null ? Mathf.Clamp01(_enemy.HpRatio) : 0f;
-        if (_enemyGauge != null) _enemyGauge.SetNormalized(enemyHp);
-        else if (_enemyHpFill != null) _enemyHpFill.fillAmount = enemyHp;
+        if (_enemyGauge != null)
+            _enemyGauge.SetNormalized(enemyHp);
+        else if (_enemyHpFill != null)
+            _enemyHpFill.fillAmount = enemyHp;
         if (!visible || Time.unscaledTime < _nextRefresh) return;
         for (int i = 0; i < _lifeOrbs.Length; i++)
-            if (_lifeOrbs[i] != null) _lifeOrbs[i].color = i < RunSession.Lives ? _lifeActiveColor : _lifeEmptyColor;
-        _nextRefresh = Time.unscaledTime + .1f;
+            if (_lifeOrbs[i] != null)
+                _lifeOrbs[i].color = i < RunSession.Lives ? _lifeActiveColor : _lifeEmptyColor;
+        _nextRefresh = Time.unscaledTime + RefreshIntervalSeconds;
 
         SetLabel(_challenger, RunSession.PlayerName);
         SetLabel(_opponent, training ? "修練の相手" : RunSession.Opponent?.Name ?? "名もなき守人");
@@ -119,13 +127,14 @@ public sealed class RunHUD : MonoBehaviour
         if (_player.IsBuffActiveForHUD)
             SetStatus(ref index, "バフ　継続中", new Color(.88f, .63f, .49f));
         for (; index < _statusLabels.Length; index++)
-            if (_statusLabels[index] != null) _statusLabels[index].transform.parent.gameObject.SetActive(false);
+            if (_statusLabels[index] != null)
+                _statusLabels[index].transform.parent.gameObject.SetActive(false);
     }
 
     /// <summary>空き行に状態名・時間と識別色を反映する。上限を超えた低優先状態は表示しない。</summary>
     private void SetStatus(ref int index, string value, Color color)
     {
-        if (index >= Mathf.Min(3, _statusLabels.Length)) return;
+        if (index >= Mathf.Min(MaxStatusLabels, _statusLabels.Length)) return;
         var label = _statusLabels[index++];
         if (label == null) return;
         label.transform.parent.gameObject.SetActive(true);
@@ -136,6 +145,7 @@ public sealed class RunHUD : MonoBehaviour
     /// <summary>参照があり文字列が変わった場合だけTMPテキストを更新する。</summary>
     private static void SetLabel(TMP_Text label, string value)
     {
-        if (label != null && label.text != value) label.text = value;
+        if (label != null && label.text != value)
+            label.text = value;
     }
 }

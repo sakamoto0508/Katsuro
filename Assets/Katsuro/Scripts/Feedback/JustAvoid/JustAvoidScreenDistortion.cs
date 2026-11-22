@@ -22,12 +22,14 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
     {
         if (!Application.isPlaying || !isActiveAndEnabled || _material == null ||
             config == null || !config.ScreenDistortionEnable) return;
-        if (_manager == null) _manager = GetComponent<CameraManager>();
+        if (_manager == null)
+            _manager = GetComponent<CameraManager>();
         _config = config;
         _worldCenter = worldPosition;
         _fallbackCenter = bodyCenter;
         _started = Time.unscaledTime;
-        if (_pass == null) _pass = new DistortionPass(this);
+        if (_pass == null)
+            _pass = new DistortionPass(this);
         if (_playing) return; // 同じPassを再利用し、連続成功では時刻だけリセットする。
         _playing = true;
         CustomPassVolume.RegisterGlobalCustomPass(CustomPassInjectionPoint.AfterPostProcess, _pass);
@@ -37,7 +39,8 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
     private void Update()
     {
         if (_playing && (_config == null || !_config.ScreenDistortionEnable ||
-            Time.unscaledTime - _started >= Mathf.Max(.01f, _config.DistortionDuration))) Stop();
+            Time.unscaledTime - _started >= Mathf.Max(.01f, _config.DistortionDuration)))
+            Stop();
     }
 
     /// <summary>自身が登録したGlobal Custom Passを解除し、歪みの再生状態を終了する。</summary>
@@ -49,9 +52,17 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
     }
 
     /// <summary>Global Custom Passを解除して画面複製用のRTリソースを解放する。</summary>
-    private void OnDisable() { Stop(); _pass?.ReleaseResources(); }
+    private void OnDisable()
+    {
+        Stop();
+        _pass?.ReleaseResources();
+    }
     /// <summary>歪みPassと所有する描画リソースを破棄時に解放する。</summary>
-    private void OnDestroy() { Stop(); _pass?.ReleaseResources(); }
+    private void OnDestroy()
+    {
+        Stop();
+        _pass?.ReleaseResources();
+    }
 
     /// <summary>命中点を画面へ投影し、使用できなければ身体中心を代替として使用する。</summary>
     /// <returns>画面内の有効な中心を求められた場合はtrue。</returns>
@@ -66,7 +77,8 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
     private static bool TryProject(Camera camera, Vector3 world, out Vector2 center)
     {
         center = default;
-        if (!float.IsFinite(world.x) || !float.IsFinite(world.y) || !float.IsFinite(world.z)) return false;
+        if (!float.IsFinite(world.x) || !float.IsFinite(world.y) || !float.IsFinite(world.z))
+            return false;
         var p = camera.WorldToViewportPoint(world);
         if (!float.IsFinite(p.x) || !float.IsFinite(p.y) || !float.IsFinite(p.z) ||
             p.z <= camera.nearClipPlane || p.x < 0 || p.x > 1 || p.y < 0 || p.y > 1) return false;
@@ -101,7 +113,8 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
         protected override void Execute(CustomPassContext ctx)
         {
             if (_owner == null || !_owner._playing || !Application.isPlaying ||
-                _owner._manager == null || ctx.hdCamera.camera != _owner._manager.OutputCamera) return;
+                _owner._manager == null || ctx.hdCamera.camera != _owner._manager.OutputCamera)
+                return;
             var config = _owner._config;
             float age = (Time.unscaledTime - _owner._started) / Mathf.Max(.01f, config.DistortionDuration);
             if (age < 0 || age >= 1 || !TryProjectCenter(ctx.hdCamera.camera,
@@ -133,7 +146,11 @@ public sealed class JustAvoidScreenDistortion : MonoBehaviour
         }
 
         /// <summary>Passが所有する画面複製用RTHandleを解放する。</summary>
-        public void ReleaseResources() { _source?.Release(); _source = null; }
+        public void ReleaseResources()
+        {
+            _source?.Release();
+            _source = null;
+        }
         /// <summary>HDRPがPassを片付ける際に所有するRTHandleを解放する。</summary>
         protected override void Cleanup() => ReleaseResources();
     }

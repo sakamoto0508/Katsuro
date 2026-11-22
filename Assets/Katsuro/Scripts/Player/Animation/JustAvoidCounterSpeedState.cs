@@ -14,6 +14,7 @@ public sealed class JustAvoidCounterSpeedState : StateMachineBehaviour
     /// <summary>ベースLayerの終了Stateを通知し、所有者に一致する追撃速度だけを解除する。</summary>
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (layerIndex == 0) animator.GetComponent<JustAvoidCounterAnimation>()?.ExitCounter(stateInfo.fullPathHash);
+        if (layerIndex == 0)
+            animator.GetComponent<JustAvoidCounterAnimation>()?.ExitCounter(stateInfo.fullPathHash);
     }
 }

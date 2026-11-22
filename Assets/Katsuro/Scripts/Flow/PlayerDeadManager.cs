@@ -86,9 +86,14 @@ public class PlayerDeadManager : MonoBehaviour
     /// <summary>敗北演出の依存先と共有インスタンスを接続し、既存Volume・暗転・死亡文字を初期化する。</summary>
     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
-        if (_initialized) return;
+        if (_initialized)
+            return;
         _initialized = true;
-        _game = game; _audio = audio; _hitStop = hitStop; _loader = loader; _fader = fader;
+        _game = game;
+        _audio = audio;
+        _hitStop = hitStop;
+        _loader = loader;
+        _fader = fader;
         if (Instance == null)
         {
             Instance = this;
@@ -129,7 +134,7 @@ public class PlayerDeadManager : MonoBehaviour
         if (_isPlaying) return;
         if (playerObject == null)
         {
-            Debug.LogWarning("StartDefeatSequence called with null playerObject");
+            Debug.LogWarning("StartDefeatSequence にプレイヤーのオブジェクトが渡されていません。");
             return;
         }
         _isPlaying = true;
@@ -191,9 +196,15 @@ public class PlayerDeadManager : MonoBehaviour
             }
         }
 
-        await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _slowDuration)), ignoreTimeScale: true, cancellationToken: token);
+        await UniTask.Delay(
+            System.TimeSpan.FromSeconds(Mathf.Max(0f, _slowDuration)),
+            ignoreTimeScale: true,
+            cancellationToken: token);
         _audio?.StopAllAudioImmediate();
-        await UniTask.Delay(System.TimeSpan.FromSeconds(Mathf.Max(0f, _silenceDuration)), ignoreTimeScale: true, cancellationToken: token);
+        await UniTask.Delay(
+            System.TimeSpan.FromSeconds(Mathf.Max(0f, _silenceDuration)),
+            ignoreTimeScale: true,
+            cancellationToken: token);
 
         // フェーズ3: タイトルへ遷移
         var config = _loader != null ? _loader.SceneNameConfig : null;
@@ -301,7 +312,8 @@ public class PlayerDeadManager : MonoBehaviour
             }
             await UniTask.Yield(PlayerLoopTiming.Update, this.GetCancellationTokenOnDestroy());
         }
-        if (red != null) red.color = new Color(redStart.r, redStart.g, redStart.b, targetAlpha);
+        if (red != null)
+            red.color = new Color(redStart.r, redStart.g, redStart.b, targetAlpha);
         if (blackMat != null)
         {
             var c = blackMat.GetColor("_Color");
@@ -341,8 +353,10 @@ public class PlayerDeadManager : MonoBehaviour
     {
         if (Instance != this) return;
         Instance = null;
-        if (_deadText != null) _deadText.DOKill();
-        if (_blackMaterialInstance != null) Destroy(_blackMaterialInstance);
+        if (_deadText != null)
+            _deadText.DOKill();
+        if (_blackMaterialInstance != null)
+            Destroy(_blackMaterialInstance);
         _audio?.RemoveLowPassFromListener();
     }
 }

@@ -54,8 +54,10 @@ public class InputBuffer : MonoBehaviour
     private static void SetActionEnabled(InputAction action, bool value)
     {
         if (action == null) return;
-        if (value) action.Enable();
-        else action.Disable();
+        if (value)
+            action.Enable();
+        else
+            action.Disable();
     }
 
     private bool _initialized;

@@ -23,7 +23,8 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
     /// <summary>追撃Stateの所有権を記録し、命中・終了フラグと振りかぶり速度を初期化する。</summary>
     public void BeginCounter(int stateHash, JustAvoidCounterStrike strike)
     {
-        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_animator == null)
+            _animator = GetComponent<Animator>();
         _stateHash = stateHash;
         Strike = strike;
         _finished = _contacted = false;
@@ -34,7 +35,8 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
     public void ExitCounter(int stateHash)
     {
         // 追撃1から追撃2へBlendした場合、出ていくStateが新Stateの倍率を消さない。
-        if (_stateHash == stateHash) ResetSpeed();
+        if (_stateHash == stateHash)
+            ResetSpeed();
     }
 
     /// <summary>現在の追撃Clipからの有効Eventであれば、振りかぶりから斬撃速度へ切り替える。</summary>
@@ -47,14 +49,16 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
     /// <summary>現在の追撃ClipからのEventだけを受け付けて速度倍率を通常へ戻す。</summary>
     public void AnimEvent_JustAvoidCounterResetSpeed(AnimationEvent animationEvent)
     {
-        if (AcceptEvent(animationEvent)) ResetSpeed();
+        if (AcceptEvent(animationEvent))
+            ResetSpeed();
     }
 
     // 既存終了Eventも受け取り、Clip追加Eventが省略された場合にも復帰する。
     /// <summary>追撃の終了Eventで速度倍率を解除し、Clip側の追加Eventがなくても復帰させる。</summary>
     public void AnimEvent_OnAttackFinished(AnimationEvent animationEvent)
     {
-        if (AcceptEvent(animationEvent)) ResetSpeed();
+        if (AcceptEvent(animationEvent))
+            ResetSpeed();
     }
 
     /// <summary>Event発生元のStateと現在の追撃所有者が一致するか検証する。</summary>
@@ -85,14 +89,17 @@ public sealed class JustAvoidCounterAnimation : MonoBehaviour
         _finished = true;
         _stateHash = 0;
         Strike = JustAvoidCounterStrike.None;
-        if (_animator == null) _animator = GetComponent<Animator>();
-        if (_animator != null && _animator.runtimeAnimatorController != null) _animator.SetFloat(SpeedHash, 1f);
+        if (_animator == null)
+            _animator = GetComponent<Animator>();
+        if (_animator != null && _animator.runtimeAnimatorController != null)
+            _animator.SetFloat(SpeedHash, 1f);
     }
 
     /// <summary>追撃Stateから離れた場合の取り残された速度倍率を解除する。</summary>
     private void LateUpdate()
     {
-        if (_stateHash != 0 && !IsCurrentCounter()) ResetSpeed();
+        if (_stateHash != 0 && !IsCurrentCounter())
+            ResetSpeed();
     }
     /// <summary>停止時に追撃速度を通常倍率へ戻す。</summary>
     private void OnDisable() => ResetSpeed();

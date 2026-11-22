@@ -18,19 +18,27 @@ public sealed class BossBarSilhouette : BaseMeshEffect
     /// <summary>通常の四角形Imageを指定輪郭の三角形群へ置き換え、バーの装飾外側を描画しない。</summary>
     public override void ModifyMesh(VertexHelper vh)
     {
-        if (!IsActive() || vh.currentVertCount!=4 || _outline==null || _outline.Length<3) return;
-        var bottom=UIVertex.simpleVert;var top=UIVertex.simpleVert;
-        vh.PopulateUIVertex(ref bottom,0);vh.PopulateUIVertex(ref top,2);
+        if (!IsActive() || vh.currentVertCount != 4 || _outline == null || _outline.Length < 3)
+            return;
+        var bottom = UIVertex.simpleVert;
+        var top = UIVertex.simpleVert;
+        vh.PopulateUIVertex(ref bottom, 0);
+        vh.PopulateUIVertex(ref top, 2);
         vh.Clear();
-        Add(vh,bottom,top,new Vector2(.5f,.35f));
-        foreach(var point in _outline) Add(vh,bottom,top,point);
-        for(int i=0;i<_outline.Length;i++)vh.AddTriangle(0,i+1,(i+1)%_outline.Length+1);
+        Add(vh, bottom, top, new Vector2(.5f, .35f));
+        foreach (var point in _outline)
+            Add(vh, bottom, top, point);
+        for (int i = 0; i < _outline.Length; i++)
+            vh.AddTriangle(0, i + 1, (i + 1) % _outline.Length + 1);
     }
     /// <summary>輪郭の正規化座標から元Imageの位置とUVを補間し、描画頂点を追加する。</summary>
     private static void Add(VertexHelper vh,UIVertex bottom,UIVertex top,Vector2 point)
     {
         var vertex=bottom;
-        vertex.position=new Vector3(Mathf.Lerp(bottom.position.x,top.position.x,point.x),Mathf.Lerp(bottom.position.y,top.position.y,point.y),bottom.position.z);
+        vertex.position=new Vector3(
+            Mathf.Lerp(bottom.position.x,top.position.x,point.x),
+            Mathf.Lerp(bottom.position.y,top.position.y,point.y),
+            bottom.position.z);
         vertex.uv0=new Vector4(Mathf.Lerp(bottom.uv0.x,top.uv0.x,point.x),Mathf.Lerp(bottom.uv0.y,top.uv0.y,point.y),0,0);
         vh.AddVert(vertex);
     }

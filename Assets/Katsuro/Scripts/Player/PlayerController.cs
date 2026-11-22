@@ -122,23 +122,35 @@ public class PlayerController : MonoBehaviour, IDamageable
     private bool _couldFight;
 
     /// <summary>入力・状態・移動・能力・武器・表示の依存先を組み立て、必要な通知を購読する。</summary>
-    public void Init(InputBuffer inputBuffer, Transform enemyPosition, Camera camera
-        , CameraManager cameraManager, LockOnCamera lockOnCamera, GameManager game, AudioManager audio, HitStopManager hitStop, PlayerDeadManager playerDead, LoadSceneManager loader)
+    public void Init(
+        InputBuffer inputBuffer,
+        Transform enemyPosition,
+        Camera camera,
+        CameraManager cameraManager,
+        LockOnCamera lockOnCamera,
+        GameManager game,
+        AudioManager audio,
+        HitStopManager hitStop,
+        PlayerDeadManager playerDead,
+        LoadSceneManager loader)
     {
         if (_initialized) return;
         _initialized = true;
         _game = game;
         _audio = audio;
         _combatFeedback = GetComponent<CombatFeedback>();
-        if (_combatFeedback != null) _combatFeedback.Init(audio, _vfxConfig, cameraManager, hitStop);
-        else Debug.LogWarning("Assign CombatFeedback on the character root. Feedback is disabled.", this);
+        if (_combatFeedback != null)
+            _combatFeedback.Init(audio, _vfxConfig, cameraManager, hitStop);
+        else
+            Debug.LogWarning("キャラクターのルートに CombatFeedback を設定してください。戦闘演出を無効にします。", this);
 
         _inputBuffer = inputBuffer;
         InputEventRegistry(_inputBuffer);
         Rigidbody rb = GetComponent<Rigidbody>();
         _animationController = GetComponent<PlayerAnimationController>();
         _animationController.Init();
-        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true)) speed.Init();
+        foreach (var speed in GetComponentsInChildren<AnimationSpeedController>(true))
+            speed.Init();
         hitStop?.RegisterTarget(gameObject);
         GetComponent<StatusEffectManager>()?.Init();
         _lookOnCamera = lockOnCamera;
@@ -160,7 +172,14 @@ public class PlayerController : MonoBehaviour, IDamageable
         _appliedHitboxPadding = _weaponHitboxPadding;
         var skillGauge = new SkillGauge(maxGauge, passiveRecovery);
         var skillGaugeCostConfig = _playerStatus?.SkillGaugeCost ?? new SkillGaugeCostConfig();
-        var playerMover = new PlayerMover(_playerStatus, rb, this.transform, enemyPosition, camera.transform, _animationController, _attackRootMotionScale);
+        var playerMover = new PlayerMover(
+            _playerStatus,
+            rb,
+            this.transform,
+            enemyPosition,
+            camera.transform,
+            _animationController,
+            _attackRootMotionScale);
         var playerSprint = new PlayerSprint(skillGauge, skillGaugeCostConfig);
         var playerGhost = new PlayerGhost(skillGauge, skillGaugeCostConfig);
         var playerHeal = new PlayerHeal(skillGauge, playerMover, skillGaugeCostConfig);
@@ -202,22 +221,31 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>修練でのみ能力を終了し、回復課題用HPと気力を準備する。</summary>
     public void PrepareTrainingVitals(float hpRatio)
     {
-        if (_game == null || !_game.IsTutorial || _stateContext == null) return;
+        if (_game == null || !_game.IsTutorial || _stateContext == null)
+            return;
         _stateMachine.ChangeState(PlayerStateId.Locomotion);
-        _stateContext.Healer.End(); _stateContext.SelfSacrifice.End(); StopBuffAudio();
-        _playerResource.SetTrainingHpRatio(hpRatio); RefillTrainingGauge();
+        _stateContext.Healer.End();
+        _stateContext.SelfSacrifice.End();
+        StopBuffAudio();
+        _playerResource.SetTrainingHpRatio(hpRatio);
+        RefillTrainingGauge();
     }
     /// <summary>気力不足で修練が止まらないよう、修練でのみ気力を補充する。</summary>
     public void RefillTrainingGauge()
     {
-        if (_game != null && _game.IsTutorial) _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
+        if (_game != null && _game.IsTutorial)
+            _stateContext?.SkillGauge?.Add(_stateContext.SkillGauge.Max);
     }
-    
+
     /// <summary>戦闘可能なときだけ攻撃Stateのハッシュを記録し、MoverのRoot Motion受付を開始する。</summary>
     /// <param name="stateHash">Root Motionを所有する攻撃StateのfullPathHash。</param>
     public void BeginAnimationAttackRootMotion(int stateHash)
     {
-        if (!CanFight) { StopAttackRootMotion(); return; }
+        if (!CanFight)
+        {
+            StopAttackRootMotion();
+            return;
+        }
         _attackAnimationHash = stateHash;
         _stateContext?.Mover?.BeginAttackRootMotion();
     }
@@ -225,7 +253,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <param name="stateHash">終了したStateのfullPathHash。別Stateの終了では所有権を解除しない。</param>
     public void EndAnimationAttackRootMotion(int stateHash)
     {
-        if (_attackAnimationHash == stateHash) StopAttackRootMotion();
+        if (_attackAnimationHash == stateHash)
+            StopAttackRootMotion();
     }
     /// <summary>攻撃Stateの所有権とMoverの保留移動・攻撃速度を解除する。</summary>
     public void StopAttackRootMotion()
@@ -236,10 +265,19 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>所有中の攻撃Stateの水平移動をMoverへ渡す。戦闘終了や別Stateへの遷移では受付を解除する。</summary>
     private void OnAnimatorMove()
     {
-        if (!CanFight) { StopAttackRootMotion(); return; }
+        if (!CanFight)
+        {
+            StopAttackRootMotion();
+            return;
+        }
         if (OwnerAnimator == null) return;
+
         var state = _rootMotionAnimator.IsInTransition(0) ? _rootMotionAnimator.GetNextAnimatorStateInfo(0) : _rootMotionAnimator.GetCurrentAnimatorStateInfo(0);
-        if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash) { StopAttackRootMotion(); return; }
+        if (_attackAnimationHash == 0 || state.fullPathHash != _attackAnimationHash)
+        {
+            StopAttackRootMotion();
+            return;
+        }
         _stateContext?.Mover?.QueueAttackRootMotion(_rootMotionAnimator.deltaPosition, _rootMotionAnimator.speed > 0f);
     }
     /// <summary>無効化時に保留中の攻撃Root Motionを消去する。</summary>
@@ -262,11 +300,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         _stateContext.Attacker.EndAttack();
         _stateContext.SkillGauge.Add(_stateContext.SkillGauge.Max);
         _justBuffRemaining = 0f;
-        _audio?.StopBGM(2);
-        if (_game != null && _game.IsTutorial) TrainingRecovered?.Invoke();
+        _audio?.StopBGM(AudioManager.BuffBgmChannel);
+        if (_game != null && _game.IsTutorial)
+            TrainingRecovered?.Invoke();
     }
 
-   
+
     /// <summary>戦闘不能になった時点で回復能力を終了し、回復状態に残っていれば抜けて回復演出を止める。他の能力・状態は変更しない。</summary>
     private void StopHealOnCombatStop()
     {
@@ -276,15 +315,16 @@ public class PlayerController : MonoBehaviour, IDamageable
             _stateMachine.ChangeState(PlayerStateId.Locomotion);
     }
 
-    /// <summary>バフ用BGMを専用の第2チャンネルへ要求する。</summary>
-    public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", 2, 1f);
-    /// <summary>バフ用の第2BGMチャンネルを停止する。</summary>
-    public void StopBuffAudio() => _audio?.StopBGM(2);
-    
+    /// <summary>バフ用BGMを専用チャンネル（インデックス 2）へ要求する。</summary>
+    public void PlayBuffAudio() => _audio?.PlayBGM("BuffBGM", AudioManager.BuffBgmChannel, 1f);
+    /// <summary>バフ専用 BGM チャンネルを停止する。</summary>
+    public void StopBuffAudio() => _audio?.StopBGM(AudioManager.BuffBgmChannel);
+
     /// <summary>ダメージを適用する。</summary>
     public void ApplyDamage(DamageInfo info)
     {
-        if (!CanFight || info.DamageAmount <= 0f || Time.time < _playerResource.InvulnerableUntil) return;
+        if (!CanFight || info.DamageAmount <= 0f || Time.time < _playerResource.InvulnerableUntil)
+            return;
         // ジャスト回避ウィンドウ内であればダメージを無効化し、ジャスト回避スタックを加算する。
         if (_stateContext?.IsInJustAvoidWindow ?? false)
         {
@@ -299,7 +339,7 @@ public class PlayerController : MonoBehaviour, IDamageable
                 _stateContext?.SkillGauge?.Add(bonus);
             }
             // デバッグログ: ジャスト回避成功を出力
-            CombatLog.Trace($"PlayerController: JustAvoid succeeded stacks={_stateContext.JustAvoidStacks} bonus={bonus}");
+            CombatLog.Trace($"PlayerController: ジャスト回避成功 蓄積数={_stateContext.JustAvoidStacks} ボーナス={bonus}");
             _animationController?.PlayTrigger(_animationName?.JustAvoidWindow);
             // ジャスト回避スロウ効果を付与する。
             var instigator = info.Instigator;
@@ -324,7 +364,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         _combatFeedback?.Hit(info);
         _playerResource?.ApplyDamage(info.DamageAmount * RunSession.IncomingMultiplier, _combatFeedback == null);
-        if (!CanFight) StopAttackRootMotion();
+        if (!CanFight)
+            StopAttackRootMotion();
     }
 
     /// <summary>Root Motionと入力購読を停止し、Playerが所有する状態・能力・武器のリソースを解放する。</summary>
@@ -365,13 +406,19 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         bool canFight = CanFight;
         // 敗北・戦闘終了・Pauseで戦闘不能になった瞬間に、入力のcanceled通知を待たず回復と回復演出を止める。
-        if (!canFight && _couldFight) StopHealOnCombatStop();
+        if (!canFight && _couldFight)
+            StopHealOnCombatStop();
         _couldFight = canFight;
-        if (!canFight) { StopAttackRootMotion(); return; }
+        if (!canFight)
+        {
+            StopAttackRootMotion();
+            return;
+        }
         if (_justBuffRemaining > 0f)
         {
             _justBuffRemaining -= Time.deltaTime;
-            if (_justBuffRemaining <= 0f) _stateContext.ClearJustAvoidStacks();
+            if (_justBuffRemaining <= 0f)
+                _stateContext.ClearJustAvoidStacks();
         }
         if (_stateContext?.Mover != null && _lookOnCamera != null)
         {
@@ -386,7 +433,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>戦闘可能な間だけ攻撃Root Motionと現在状態の物理更新を進める。</summary>
     private void FixedUpdate()
     {
-        if (!CanFight) { StopAttackRootMotion(); return; }
+        if (!CanFight)
+        {
+            StopAttackRootMotion();
+            return;
+        }
         _stateContext?.Mover?.FixedUpdateAttackRootMotion(_rootMotionAnimator != null && _rootMotionAnimator.speed > 0f);
         _stateMachine?.FixedUpdate(Time.fixedDeltaTime);
     }
@@ -418,7 +469,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         float applied = Mathf.Min(damage, maxAllowedDamage);
         // SelfSacrifice による毎フレームのダメージは効果音を鳴らさない
         _playerResource?.ApplyDamage(applied, false);
-        if (applied > 0f) BuffSucceeded?.Invoke();
+        if (applied > 0f)
+            BuffSucceeded?.Invoke();
 
         // もし要求ダメージが大きく、残量が不足している場合は自動停止
         if (applied < damage)
@@ -434,7 +486,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         float before = _playerResource.CurrentHp;
         _playerResource.HealByPercent(healedPercent);
         float actual = _playerResource.CurrentHp - before;
-        if (actual > 0f) HealSucceeded?.Invoke(actual);
+        if (actual > 0f)
+            HealSucceeded?.Invoke(actual);
     }
 
     /// <summary>必要な 入力Action を購読する。</summary>
@@ -489,7 +542,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
-        if (_stateContext != null && _stateContext.IsGhostMode) _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        if (_stateContext != null && _stateContext.IsGhostMode)
+            _stateMachine.ChangeState(PlayerStateId.Locomotion);
         TryDrawSword();
         // SelfSacrifice 中は攻撃を即時遷移させる（抜刀が未完でもステートを切り替え、攻撃中に抜刀完了を待つ）
         if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
@@ -500,7 +554,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (!_stateContext?.Attacker?.IsSwordReady ?? true)
         {
-            CombatLog.Trace("PlayerController: Attack input ignored, sword not ready.");
+            CombatLog.Trace("PlayerController: 抜刀前のため攻撃入力を受け付けません。");
             return;
         }
         _stateMachine?.HandleLightAttack();
@@ -514,7 +568,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
-        if (_stateContext != null && _stateContext.IsGhostMode) _stateMachine.ChangeState(PlayerStateId.Locomotion);
+        if (_stateContext != null && _stateContext.IsGhostMode)
+            _stateMachine.ChangeState(PlayerStateId.Locomotion);
         TryDrawSword();
         if (_stateContext?.SelfSacrifice?.IsSacrificing ?? false)
         {
@@ -538,14 +593,14 @@ public class PlayerController : MonoBehaviour, IDamageable
             }
             else
             {
-                CombatLog.Trace("Ghost Failed to begin (hold)");
+                CombatLog.Trace("回避を開始できませんでした（押下）。");
             }
         }
         else if (context.canceled)
         {
             _stateContext?.Ghost?.End();
             _stateMachine?.HandleGhostCanceled();
-            CombatLog.Trace("Ghost Ended (release)");
+            CombatLog.Trace("回避を終了しました（入力解除）。");
         }
     }
 
@@ -558,13 +613,13 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (started)
             {
                 _stateMachine?.HandleSelfSacrificeStarted();
-                CombatLog.Trace("SelfSacrifice Started (via AbilityManager)");
+                CombatLog.Trace("AbilityManager が自己犠牲を開始しました。");
             }
             else
             {
                 // 切り替え結果が無効なら、終了したか開始に失敗している。
                 _stateMachine?.HandleSelfSacrificeCanceled();
-                CombatLog.Trace("SelfSacrifice Canceled/Failed (via AbilityManager)");
+                CombatLog.Trace("AbilityManager で自己犠牲を解除したか、開始できませんでした。");
             }
         }
     }
@@ -576,14 +631,14 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             // 開始の可否と開始処理はPlayerHealStateが持つ。Locomotion以外の状態はこの要求を無視する。
             _stateMachine?.HandleHealStarted();
-            CombatLog.Trace("Heal Requested");
+            CombatLog.Trace("回復を要求しました。");
         }
         else if (context.canceled)
         {
             // 回復状態以外で能力だけが残らないよう、能力の終了は状態を介さず確実に行う。
             _stateContext?.Healer?.End();
             _stateMachine?.HandleHealCanceled();
-            CombatLog.Trace("Heal Canceled");
+            CombatLog.Trace("回復を解除しました。");
         }
     }
 
@@ -669,9 +724,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>抜刀・納刀で刀と鞘側モデルの表示を切り替える。刀はRendererだけを切り替え、判定Colliderの階層を無効化しない。</summary>
     private void SetDrawnWeaponVisible(bool drawn)
     {
-        if (_playerWeaponRenderer == null && _playerWeapon != null) _playerWeaponRenderer = _playerWeapon.GetComponent<MeshRenderer>();
-        if (_playerWeaponRenderer != null) _playerWeaponRenderer.enabled = drawn;
-        if (_playerStartWeapon != null) _playerStartWeapon.SetActive(!drawn);
+        if (_playerWeaponRenderer == null && _playerWeapon != null)
+            _playerWeaponRenderer = _playerWeapon.GetComponent<MeshRenderer>();
+        if (_playerWeaponRenderer != null)
+            _playerWeaponRenderer.enabled = drawn;
+        if (_playerStartWeapon != null)
+            _playerStartWeapon.SetActive(!drawn);
     }
 
     /// <summary>ジャスト回避のAnimator Boolがtrue、またはJust Avoid追撃Stateの再生中ならtrue。演出の継続判定に使う。</summary>
@@ -680,9 +738,11 @@ public class PlayerController : MonoBehaviour, IDamageable
         get
         {
             var animator = OwnerAnimator;
-            if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null) return false;
+            if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+                return false;
             string justAvoidBool = _animationName?.JustAvoid;
-            if (!string.IsNullOrEmpty(justAvoidBool) && animator.GetBool(justAvoidBool)) return true;
+            if (!string.IsNullOrEmpty(justAvoidBool) && animator.GetBool(justAvoidBool))
+                return true;
             var state = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
             return state.IsTag(PlayerAttacker.JustAvoidCounterTag) && state.normalizedTime < 1f;
         }
@@ -692,7 +752,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>ジャスト回避Clip開始Eventで専用Animator Boolを有効にする。</summary>
     public void AnimEvent_OnJustAvoidStarted()
     {
-        if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+        if (_animationController == null)
+            _animationController = GetComponent<PlayerAnimationController>();
         string justAvoidBool = _animationName?.JustAvoid;
         if (!string.IsNullOrEmpty(justAvoidBool))
         {
@@ -704,7 +765,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>ジャスト回避Clip終了Eventで専用Animator Boolを解除する。</summary>
     public void AnimEvent_OnJustAvoidFinished()
     {
-        if (_animationController == null) _animationController = GetComponent<PlayerAnimationController>();
+        if (_animationController == null)
+            _animationController = GetComponent<PlayerAnimationController>();
         string justAvoidBool = _animationName?.JustAvoid;
         if (!string.IsNullOrEmpty(justAvoidBool))
         {

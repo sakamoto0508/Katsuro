@@ -68,11 +68,13 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
         _initialized = true;
         _selectable = GetComponent<Selectable>();
         _toggle = _selectable as Toggle;
-        if (_scaleTarget == null) _scaleTarget = (RectTransform)transform;
+        if (_scaleTarget == null)
+            _scaleTarget = (RectTransform)transform;
         SetAlpha(_focusFrame, 0f);
         SetAlpha(_hoverLayer, 0f);
         SetAlpha(_pressFlash, 0f);
-        if (_toggle != null) _toggle.onValueChanged.AddListener(value => ShowSelected(value, true));
+        if (_toggle != null)
+            _toggle.onValueChanged.AddListener(value => ShowSelected(value, true));
         ShowSelected(_toggle != null && _toggle.isOn, false);
     }
 
@@ -102,8 +104,10 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnSelect(BaseEventData eventData)
     {
         _focused = true;
-        if (_blessingPreview != null) _blessingPreview.Show(_selectable);
-        if (_focusFrame != null) _focusFrame.transform.localScale = Vector3.one * _focusFrameStartScale;
+        if (_blessingPreview != null)
+            _blessingPreview.Show(_selectable);
+        if (_focusFrame != null)
+            _focusFrame.transform.localScale = Vector3.one * _focusFrameStartScale;
         Apply();
     }
 
@@ -118,7 +122,8 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         _hovered = true;
-        if (_blessingPreview != null && _selectable != null && _selectable.IsInteractable()) _blessingPreview.Show(_selectable);
+        if (_blessingPreview != null && _selectable != null && _selectable.IsInteractable())
+            _blessingPreview.Show(_selectable);
         Apply();
     }
 
@@ -126,14 +131,16 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     public void OnPointerExit(PointerEventData eventData)
     {
         _hovered = false;
-        if (_blessingPreview != null) _blessingPreview.RestoreFocus();
+        if (_blessingPreview != null)
+            _blessingPreview.RestoreFocus();
         Apply();
     }
 
     /// <summary>クリックによる決定を短く押し込んで返す。</summary>
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left) PlayPress();
+        if (eventData.button == PointerEventData.InputButton.Left)
+            PlayPress();
     }
 
     /// <summary>キーボード・ゲームパッドの決定を短く押し込んで返す。</summary>
@@ -168,7 +175,11 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
         _scaleTween?.Kill();
         float scale = _focused ? _focusScale : _hovered ? _hoverScale : 1f;
         _scaleTarget.localScale = Vector3.one * scale;
-        _scaleTween = _scaleTarget.DOPunchScale(Vector3.one * _pressPunch, _pressDuration, 6, 0.6f).SetUpdate(true).SetLink(gameObject);
+        _scaleTween = _scaleTarget.DOPunchScale(
+            Vector3.one * _pressPunch,
+            _pressDuration,
+            6,
+            0.6f).SetUpdate(true).SetLink(gameObject);
         if (_pressFlash == null) return;
         _flashTween?.Kill();
         _pressFlash.alpha = 1f;
@@ -184,8 +195,10 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
         SetAlpha(_focusFrame, 0f);
         SetAlpha(_hoverLayer, 0f);
         SetAlpha(_pressFlash, 0f);
-        if (_scaleTarget != null) _scaleTarget.localScale = Vector3.one;
-        if (_selectedLayer != null) _selectedLayer.transform.localScale = Vector3.one;
+        if (_scaleTarget != null)
+            _scaleTarget.localScale = Vector3.one;
+        if (_selectedLayer != null)
+            _selectedLayer.transform.localScale = Vector3.one;
     }
 
     /// <summary>このコンポーネントが所有するTweenをすべて停止する。</summary>
@@ -201,5 +214,9 @@ public sealed class RunSetupSelectableEffect : MonoBehaviour,
     }
 
     /// <summary>未設定を許容してCanvasGroupの不透明度を即時設定する。</summary>
-    private static void SetAlpha(CanvasGroup group, float alpha) { if (group != null) group.alpha = alpha; }
+    private static void SetAlpha(CanvasGroup group, float alpha)
+    {
+        if (group != null)
+            group.alpha = alpha;
+    }
 }

@@ -34,7 +34,8 @@ internal sealed class CounterHitPose
     private void Add(Animator animator, HumanBodyBones id, float weight, int kind)
     {
         var bone = animator.GetBoneTransform(id);
-        if (bone != null) _bones.Add(new Bone { Transform = bone, Weight = weight, Kind = kind });
+        if (bone != null)
+            _bones.Add(new Bone { Transform = bone, Weight = weight, Kind = kind });
     }
 
     public void Begin(DamageInfo info, JustAvoidCounterConfig.Strike style, float duration)
@@ -55,13 +56,24 @@ internal sealed class CounterHitPose
         foreach (var bone in _bones)
         {
             if (bone.Transform == null || bone.Transform.parent == null) continue;
-            // Chest leads; head and hips settle slightly later, all on the existing reaction clock.
+            // 胸が先に動き、頭と腰は少し遅れて収まる。すべて同じリアクションの時計を使う。
             float delay = bone.Kind == 1 ? _style.FollowThroughPeak * .12f : bone.Kind == 2 ? _style.FollowThroughPeak * .2f : 0f;
-            Vector2 envelope = EvaluateEnvelope(elapsed, _duration, _style.FollowThroughPeak, _style.FollowThroughHold, delay);
+            Vector2 envelope = EvaluateEnvelope(
+                elapsed,
+                _duration,
+                _style.FollowThroughPeak,
+                _style.FollowThroughHold,
+                delay);
             Vector3 rotation = bone.Kind == 0
-                ? Vector3.Lerp(_impactAxis * _style.TorsoImpact, _followAxis * _style.TorsoFollowThrough, envelope.x) * (envelope.y * bone.Weight)
+                ? Vector3.Lerp(
+                    _impactAxis * _style.TorsoImpact,
+                    _followAxis * _style.TorsoFollowThrough,
+                    envelope.x) * (envelope.y * bone.Weight)
                 : bone.Kind == 1
-                ? Vector3.Lerp(-_impactAxis * _style.HeadRecoil, _followAxis * (_style.HeadRecoil * .65f), envelope.x) * (envelope.y * bone.Weight)
+                ? Vector3.Lerp(
+                    -_impactAxis * _style.HeadRecoil,
+                    _followAxis * (_style.HeadRecoil * .65f),
+                    envelope.x) * (envelope.y * bone.Weight)
                 : _followAxis * (_style.HipFollowThrough * Mathf.Lerp(.25f, 1f, envelope.x) * envelope.y);
             bone.Base = bone.Transform.localRotation;
             Vector3 worldAxis = _root.TransformDirection(rotation);
@@ -72,7 +84,7 @@ internal sealed class CounterHitPose
         }
     }
 
-    // x = impact-to-collapse blend, y = recovery weight. Every bone returns by the same visual end.
+    // x は命中から崩れ姿勢へのブレンド率、y は復帰のウェイト。全ボーンが演出の終了時刻までに戻る。
     public static Vector2 EvaluateEnvelope(float elapsed, float duration, float peak, float hold, float delay)
     {
         duration = Mathf.Max(.01f, duration);
@@ -95,5 +107,9 @@ internal sealed class CounterHitPose
         }
     }
 
-    public void Clear() { RemoveOffsets(); _style = null; }
+    public void Clear()
+    {
+        RemoveOffsets();
+        _style = null;
+    }
 }

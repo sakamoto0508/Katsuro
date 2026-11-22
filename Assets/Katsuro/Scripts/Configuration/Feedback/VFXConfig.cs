@@ -277,7 +277,10 @@ public class VFXConfig : ScriptableObject
     public Vector3 GetContactFlashStyle(bool heavy, bool counter)
     {
         int index = counter ? 2 : heavy ? 1 : 0;
-        return new Vector3(Mathf.Max(.01f, _contactFlashSizes[index]), Mathf.Max(.01f, _contactFlashDurations[index]), Mathf.Clamp01(_contactFlashStrengths[index]));
+        return new Vector3(
+            Mathf.Max(.01f, _contactFlashSizes[index]),
+            Mathf.Max(.01f, _contactFlashDurations[index]),
+            Mathf.Clamp01(_contactFlashStrengths[index]));
     }
     /// <summary>斬撃線のワールド長。XはLight、YはHeavy、Zは追撃。</summary>
     [SerializeField, Tooltip("命中斬撃線の長さ（m）。X=Light、Y=Heavy、Z=Just Avoid追撃。")]
@@ -292,7 +295,10 @@ public class VFXConfig : ScriptableObject
     public Vector3 GetSlashLineStyle(bool heavy, bool counter)
     {
         int index = counter ? 2 : heavy ? 1 : 0;
-        return new Vector3(Mathf.Max(.01f, _slashLineLengths[index]), Mathf.Max(.001f, _slashLineWidths[index]), Mathf.Max(.01f, _slashLineDurations[index]));
+        return new Vector3(
+            Mathf.Max(.01f, _slashLineLengths[index]),
+            Mathf.Max(.001f, _slashLineWidths[index]),
+            Mathf.Max(.01f, _slashLineDurations[index]));
     }
     /// <summary>追加のParticleSystem Prefab。未設定でも小さい接触フラッシュは表示する。</summary>
     public GameObject HitVFX => _hitVFX;

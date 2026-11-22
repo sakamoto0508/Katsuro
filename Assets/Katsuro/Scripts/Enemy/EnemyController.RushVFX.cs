@@ -13,8 +13,10 @@ public partial class EnemyController
             Transform tip = null, bladeBase = null;
             foreach (var t in GetComponentsInChildren<Transform>(true))
             {
-                if (t.name == "TrailBladeTip") tip = t;
-                else if (t.name == "TrailBladeBase") bladeBase = t;
+                if (t.name == "TrailBladeTip")
+                    tip = t;
+                else if (t.name == "TrailBladeBase")
+                    bladeBase = t;
             }
             _rushVfx = gameObject.AddComponent<GatotsuRushVFX>();
             _rushVfx.Initialize(pattern.RushVFX, _animator, tip, bladeBase);

@@ -33,7 +33,8 @@ public sealed class PlanarReflectionRefresh : MonoBehaviour
     /// <summary>元の更新方式を保持してOn Demandへ切り替え、初回の反射撮影を要求する。</summary>
     private void OnEnable()
     {
-        if (_probe == null) _probe = GetComponent<PlanarReflectionProbe>();
+        if (_probe == null)
+            _probe = GetComponent<PlanarReflectionProbe>();
         if (_probe == null || _probe.mode != ProbeSettings.Mode.Realtime) return;
         _originalMode = _probe.realtimeMode;
         _ownsMode = true;
@@ -45,13 +46,15 @@ public sealed class PlanarReflectionRefresh : MonoBehaviour
     /// <summary>通常のCamera更新後に、経過時間と視点変化を調べて必要な反射撮影だけを要求する。</summary>
     private void LateUpdate()
     {
-        if (!_ownsMode || _probe == null || _viewerCamera == null || !_viewerCamera.isActiveAndEnabled) return;
+        if (!_ownsMode || _probe == null || _viewerCamera == null || !_viewerCamera.isActiveAndEnabled)
+            return;
         var viewer = _viewerCamera.transform;
         bool moved = (viewer.position - _lastPosition).sqrMagnitude >= _positionThreshold * _positionThreshold;
         bool turned = Quaternion.Angle(viewer.rotation, _lastRotation) >= _rotationThreshold;
         bool lensChanged = Mathf.Abs(_viewerCamera.fieldOfView - _lastFieldOfView) >= 1
                            || Mathf.Abs(_viewerCamera.aspect - _lastAspect) >= 0.01f;
-        if (Time.unscaledTimeAsDouble >= _nextRefresh || moved || turned || lensChanged) Refresh();
+        if (Time.unscaledTimeAsDouble >= _nextRefresh || moved || turned || lensChanged)
+            Refresh();
     }
 
     /// <summary>HDRPへ次回描画の更新を要求し、比較に用いるCamera姿勢と次の更新時刻を記録する。</summary>

@@ -110,7 +110,8 @@ public sealed class TitleBladeBlood : MaskableGraphic, ITitleAmbientElement
         _initialized = true;
         _beads = new Bead[_beadCount];
         float length = BladeLength();
-        for (int i = 0; i < _beads.Length; i++) ResetBead(ref _beads[i], Random.Range(0f, length));
+        for (int i = 0; i < _beads.Length; i++)
+            ResetBead(ref _beads[i], Random.Range(0f, length));
         _nextDrop = Random.Range(_dropInterval.x * 0.3f, _dropInterval.x);
     }
 
@@ -126,7 +127,8 @@ public sealed class TitleBladeBlood : MaskableGraphic, ITitleAmbientElement
         {
             ref var bead = ref _beads[i];
             bead.Distance += bead.Speed * deltaTime;
-            if (bead.Distance > length) ResetBead(ref bead, 0f);
+            if (bead.Distance > length)
+                ResetBead(ref bead, 0f);
         }
         _nextDrop -= deltaTime;
         if (_nextDrop <= 0f && _dripPoints.Length > 0)
@@ -143,12 +145,14 @@ public sealed class TitleBladeBlood : MaskableGraphic, ITitleAmbientElement
             drop.Age += deltaTime;
             if (!drop.Falling)
             {
-                if (drop.Age >= drop.GrowTime) drop.Falling = true;
+                if (drop.Age >= drop.GrowTime)
+                    drop.Falling = true;
                 continue;
             }
             drop.Velocity += new Vector2(context.Wind.x * _windInfluence, -_gravity) * deltaTime;
             drop.Position += drop.Velocity * deltaTime;
-            if (drop.Position.y < drop.GroundY) drop.Active = false;
+            if (drop.Position.y < drop.GroundY)
+                drop.Active = false;
         }
         SetVerticesDirty();
     }
@@ -208,7 +212,13 @@ public sealed class TitleBladeBlood : MaskableGraphic, ITitleAmbientElement
                 // 刀身の下側で垂れ下がりながら膨らむ
                 float grow = Mathf.SmoothStep(0f, 1f, drop.Age / drop.GrowTime);
                 float size = drop.Size * Mathf.Lerp(0.35f, 1f, grow);
-                AddBlob(vh, drop.Position + Vector2.down * size * 0.5f * grow, Vector2.down, size * Mathf.Lerp(1f, 1.5f, grow), size, 1f);
+                AddBlob(
+                    vh,
+                    drop.Position + Vector2.down * size * 0.5f * grow,
+                    Vector2.down,
+                    size * Mathf.Lerp(1f, 1.5f, grow),
+                    size,
+                    1f);
                 continue;
             }
             float speed = drop.Velocity.magnitude;
@@ -282,7 +292,11 @@ public sealed class TitleBladeBlood : MaskableGraphic, ITitleAmbientElement
             {
                 float dx = (x + 0.5f) / size * 2f - 1f, dy = (y + 0.5f) / size * 2f - 1f;
                 float r = Mathf.Sqrt(dx * dx + dy * dy);
-                pixels[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((1f - r) / 0.45f)) * 255f));
+                pixels[y * size + x] = new Color32(
+                    255,
+                    255,
+                    255,
+                    (byte)(Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((1f - r) / 0.45f)) * 255f));
             }
         }
         s_dropTexture.SetPixels32(pixels);

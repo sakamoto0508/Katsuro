@@ -42,20 +42,24 @@ public sealed class TitleAmbientDirector : MonoBehaviour
     {
         if (_initialized) return;
         _initialized = true;
-        if (_wind == null) _wind = GetComponent<TitleWind>();
+        if (_wind == null)
+            _wind = GetComponent<TitleWind>();
         _wind?.Init();
         // 非表示の要素も登録しておき、後から有効化しても更新対象に入るようにする
         GetComponentsInChildren(true, _elements);
         _currentIntensity = _fadeInOnStart ? 0f : _intensity;
         // スクリプト参照が外れると演出が無言で止まるため、原因を追えるよう一度だけ知らせる
-        if (_elements.Count == 0) Debug.LogWarning("TitleAmbientDirector: 子に演出要素が見つかりません。スクリプト参照を確認してください。", this);
-        if (_wind == null) Debug.LogWarning("TitleAmbientDirector: TitleWindが未設定のため無風で動作します。", this);
+        if (_elements.Count == 0)
+            Debug.LogWarning("TitleAmbientDirector: 子に演出要素が見つかりません。スクリプト参照を確認してください。", this);
+        if (_wind == null)
+            Debug.LogWarning("TitleAmbientDirector: TitleWindが未設定のため無風で動作します。", this);
     }
 
     /// <summary>実行中に生成した演出要素を追加する。</summary>
     public void Register(ITitleAmbientElement element)
     {
-        if (element != null && !_elements.Contains(element)) _elements.Add(element);
+        if (element != null && !_elements.Contains(element))
+            _elements.Add(element);
     }
 
     /// <summary>破棄する演出要素を更新対象から外す。</summary>
@@ -73,6 +77,7 @@ public sealed class TitleAmbientDirector : MonoBehaviour
         _wind?.Tick(deltaTime);
         var context = new TitleAmbientContext(deltaTime, _time,
             _wind != null ? _wind.Current : Vector2.zero, _wind != null ? _wind.Gust : 0f, _currentIntensity);
-        for (int i = 0; i < _elements.Count; i++) _elements[i].Tick(in context);
+        for (int i = 0; i < _elements.Count; i++)
+            _elements[i].Tick(in context);
     }
 }

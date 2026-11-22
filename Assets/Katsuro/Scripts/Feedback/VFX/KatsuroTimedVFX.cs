@@ -62,7 +62,9 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
         get
         {
             float end = 0f;
-            foreach (var track in _tracks) if (track != null) end = Mathf.Max(end, track.End);
+            foreach (var track in _tracks)
+                if (track != null)
+                    end = Mathf.Max(end, track.End);
             return end;
         }
     }
@@ -72,7 +74,8 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     private void Awake()
     {
         Prepare();
-        if (!_playing) HideAll();
+        if (!_playing)
+            HideAll();
     }
 
     /// <summary>位置・向き・一様スケールを決めて最初から再生する。向きはローカルX=斬撃方向、Z=正面法線。</summary>
@@ -98,7 +101,9 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     /// <summary>再生中、指定Transformへ追従させる（刀先など）。faceCameraで面を常にカメラへ向ける。nullで解除。</summary>
     public void Follow(Transform target, Vector3 worldOffset = default, bool faceCamera = false)
     {
-        _follow = target; _followOffset = worldOffset; _faceCamera = faceCamera;
+        _follow = target;
+        _followOffset = worldOffset;
+        _faceCamera = faceCamera;
     }
 
     /// <summary>今の見た目のまま指定秒数止める（命中時のHitStopと同期）。boostで保持中の明るさを上げる。</summary>
@@ -106,7 +111,8 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
     {
         if (!_playing || seconds <= 0f) return;
         float now = FeedbackVisualTime.Now;
-        if (now >= _holdUntil) _heldTime = (now - _started) / _timeScale;
+        if (now >= _holdUntil)
+            _heldTime = (now - _started) / _timeScale;
         _holdUntil = Mathf.Max(_holdUntil, now + seconds);
         _holdBoost = Mathf.Max(0f, boost);
     }
@@ -126,17 +132,26 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
         {
             transform.position = _follow.position + _followOffset;
             var view = _faceCamera ? Camera.main : null;
-            if (view != null) transform.rotation = KatsuroVFXOrientation.FacingCamera(transform.position, view);
+            if (view != null)
+                transform.rotation = KatsuroVFXOrientation.FacingCamera(transform.position, view);
         }
         float now = FeedbackVisualTime.Now;
         if (_holdUntil > 0f)
         {
-            if (now < _holdUntil) { Apply(_heldTime, _holdBoost); return; }
+            if (now < _holdUntil)
+            {
+                Apply(_heldTime, _holdBoost);
+                return;
+            }
             _started = _holdUntil - _heldTime * _timeScale;   // resume exactly where the hold began
             _holdUntil = 0f;
         }
         float t = (now - _started) / _timeScale;
-        if (t >= Duration) { Stop(); return; }
+        if (t >= Duration)
+        {
+            Stop();
+            return;
+        }
         Apply(t);
     }
 
@@ -162,7 +177,11 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
             var track = _tracks[i];
             if (track == null || track.Renderer == null) continue;
             float t = time - track.Delay;
-            if (t < 0f || t >= track.FadeIn + track.Hold + track.FadeOut) { track.Renderer.enabled = false; continue; }
+            if (t < 0f || t >= track.FadeIn + track.Hold + track.FadeOut)
+            {
+                track.Renderer.enabled = false;
+                continue;
+            }
             float rise = Mathf.Clamp01(t / track.FadeIn);
             float fall = Mathf.Clamp01((t - track.FadeIn - track.Hold) / track.FadeOut);
             float life = Mathf.Clamp01(t / (track.FadeIn + track.Hold + track.FadeOut));
@@ -171,7 +190,7 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
             track.Renderer.GetPropertyBlock(_block);
             if (track.Smoke)
             {
-                // Smoke thickens quickly, then thin wisps erode away before the dense cores.
+                // 煙を素早く濃くし、その後は濃い部分より先に薄い筋を消す。
                 _block.SetFloat(AlphaId, track.Peak * Mathf.SmoothStep(0f, 1f, rise));
                 _block.SetFloat(ErodeId, Mathf.Lerp(0f, 1.1f, fall));
                 _block.SetFloat(ScrollId, track.Scroll * shaped);
@@ -190,7 +209,9 @@ public sealed class KatsuroTimedVFX : MonoBehaviour
 
     private void HideAll()
     {
-        foreach (var track in _tracks) if (track != null && track.Renderer != null) track.Renderer.enabled = false;
+        foreach (var track in _tracks)
+            if (track != null && track.Renderer != null)
+                track.Renderer.enabled = false;
     }
 
 #if UNITY_EDITOR
@@ -206,10 +227,12 @@ public static class KatsuroVFXOrientation
     public static Quaternion FacingCamera(Vector3 position, Vector3 slashDirection, Camera view)
     {
         Vector3 toCamera = view.transform.position - position;
-        if (toCamera.sqrMagnitude < .0001f) toCamera = -view.transform.forward;
+        if (toCamera.sqrMagnitude < .0001f)
+            toCamera = -view.transform.forward;
         toCamera.Normalize();
         Vector3 along = Vector3.ProjectOnPlane(slashDirection, toCamera);
-        if (along.sqrMagnitude < .0001f) along = Vector3.ProjectOnPlane(view.transform.right, toCamera);
+        if (along.sqrMagnitude < .0001f)
+            along = Vector3.ProjectOnPlane(view.transform.right, toCamera);
         along.Normalize();
         return Quaternion.LookRotation(toCamera, Vector3.Cross(toCamera, along));
     }

@@ -29,9 +29,9 @@ MonoBehaviour:
   _justAvoidPushIn: 0.4
   _justAvoidLowAngle: 17.1
   _justAvoidMinHeight: 0.25
-  _justAvoidCameraEnter: 0.12
+  _justAvoidCameraEnter: 0.28
   _justAvoidCameraHold: 0.35
-  _justAvoidCameraRestore: 0.3
+  _justAvoidCameraRestore: 0.45
   _justAvoidCameraMaxSustain: 2
   _cameraDistance: 4.2
   _cameraHeight: 2.1

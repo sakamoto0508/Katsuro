@@ -34,8 +34,10 @@ public class PlayerGhostState : PlayerState
     {
         Context.Mover.Update();
         _justRemaining -= deltaTime;
-        if (_justRemaining <= 0f) Context.SetJustAvoidWindow(false);
-        if (!Context.Ghost.IsGhosting) StateMachine.ChangeState(PlayerStateId.Locomotion);
+        if (_justRemaining <= 0f)
+            Context.SetJustAvoidWindow(false);
+        if (!Context.Ghost.IsGhosting)
+            StateMachine.ChangeState(PlayerStateId.Locomotion);
     }
     /// <summary>幽体化中の移動をMoverの物理更新へ委譲する。</summary>
     public override void FixedUpdate(float deltaTime) => Context.Mover.FixedUpdate();

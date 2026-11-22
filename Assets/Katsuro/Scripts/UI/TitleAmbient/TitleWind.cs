@@ -49,7 +49,8 @@ public sealed class TitleWind : MonoBehaviour
     /// <summary>風のノイズを進め、目標へ補間する。</summary>
     public void Tick(float deltaTime)
     {
-        if (!_initialized) Init();
+        if (!_initialized)
+            Init();
         if (deltaTime <= 0f) return;
         _noiseTime += deltaTime * _variationSpeed;
         var target = Evaluate(out float gust);

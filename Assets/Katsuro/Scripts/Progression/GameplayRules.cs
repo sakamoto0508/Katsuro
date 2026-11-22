@@ -72,8 +72,10 @@ public sealed class GameplayRules : ScriptableObject
     {
         get
         {
-            if (_instance == null) _instance = Resources.Load<GameplayRules>("KatsuroRules");
-            if (_instance == null) _instance = CreateInstance<GameplayRules>();
+            if (_instance == null)
+                _instance = Resources.Load<GameplayRules>("KatsuroRules");
+            if (_instance == null)
+                _instance = CreateInstance<GameplayRules>();
             return _instance;
         }
     }

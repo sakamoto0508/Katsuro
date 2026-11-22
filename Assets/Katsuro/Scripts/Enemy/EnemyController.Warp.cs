@@ -29,13 +29,19 @@ public partial class EnemyController
     {
         target = default;
         return _mover != null && _mover.CanTeleportDuringAttack &&
-            EnemyWarpDestination.TryFind(_attackTarget, GetComponent<CapsuleCollider>(), GetComponent<NavMeshAgent>(), pattern, out target);
+            EnemyWarpDestination.TryFind(
+                _attackTarget,
+                GetComponent<CapsuleCollider>(),
+                GetComponent<NavMeshAgent>(),
+                pattern,
+                out target);
     }
 
     private bool BeginWarpPreparation(EnemyAttackPattern pattern)
     {
         int departure = Animator.StringToHash("Base Layer.Attacks.WarpDeparture");
-        if (!TryFindWarpDestination(pattern, out _) || !_animator.HasState(0, departure)) return false;
+        if (!TryFindWarpDestination(pattern, out _) || !_animator.HasState(0, departure))
+            return false;
         _preparingWarp = pattern;
         _warpElapsed = 0f;
         _warpHidden = false;
@@ -57,7 +63,11 @@ public partial class EnemyController
     {
         if (_warpStrikeHold < 0f) return;
         var pattern = _patternRunner != null ? _patternRunner.Pattern : null;
-        if (pattern == null || !pattern.IsWarp || !IsAttackPatternActive) { _warpStrikeHold = -1f; return; }
+        if (pattern == null || !pattern.IsWarp || !IsAttackPatternActive)
+        {
+            _warpStrikeHold = -1f;
+            return;
+        }
         var state = _animator.GetCurrentAnimatorStateInfo(0);
         var clips = _animator.GetCurrentAnimatorClipInfo(0);
         if (state.fullPathHash == pattern.StateHash && clips.Length > 0 && !_animator.IsInTransition(0))
@@ -67,7 +77,11 @@ public partial class EnemyController
                 _animator.Play(pattern.StateHash, 0, pattern.WarpRaiseTime / Mathf.Max(.01f, length));
         }
         _warpStrikeHold -= deltaTime;
-        if (_warpStrikeHold > 0f) { _animator.SetFloat("EnemyComboPlaybackSpeed", 0f); return; }
+        if (_warpStrikeHold > 0f)
+        {
+            _animator.SetFloat("EnemyComboPlaybackSpeed", 0f);
+            return;
+        }
         _warpStrikeHold = -1f;
         _animator.SetFloat("EnemyComboPlaybackSpeed", pattern.PlaybackSpeed);
     }
@@ -81,8 +95,9 @@ public partial class EnemyController
         var clips = next ? _animator.GetNextAnimatorClipInfo(0) : _animator.GetCurrentAnimatorClipInfo(0);
         if (clips.Length == 0) return;
         float clipTime = state.normalizedTime * clips[0].clip.length;
-        // The Animator advances after Update, so stop one frame early to land on the raised pose rather than past it.
-        if (clipTime + Time.deltaTime >= pattern.WarpRaiseTime) _animator.SetFloat("EnemyComboPlaybackSpeed", 0f);
+        // Animator は Update 後に進むため、刀を挙げ切った姿勢を通り越さないよう 1 フレーム早く止める。
+        if (clipTime + Time.deltaTime >= pattern.WarpRaiseTime)
+            _animator.SetFloat("EnemyComboPlaybackSpeed", 0f);
     }
 
     private void TickAttackPattern(float deltaTime)
@@ -96,7 +111,11 @@ public partial class EnemyController
         }
         if (!float.IsFinite(deltaTime) || deltaTime <= 0) return;
         var pattern = _preparingWarp;
-        if (!pattern.IsValid || _animator == null || !_animator.isActiveAndEnabled) { CancelAttackPattern(true); return; }
+        if (!pattern.IsValid || _animator == null || !_animator.isActiveAndEnabled)
+        {
+            CancelAttackPattern(true);
+            return;
+        }
         _warpElapsed += deltaTime;
         if (!_warpHidden)
         {
@@ -105,7 +124,11 @@ public partial class EnemyController
                 // 刀を挙げ切ったら止めて「間」を取る（今から攻撃するという予兆）。
                 HoldWarpRaise(pattern);
                 if (_warpElapsed < pattern.WarpDepartureDuration) return;
-                if (!TryFindWarpDestination(pattern, out _)) { CancelAttackPattern(true); return; }
+                if (!TryFindWarpDestination(pattern, out _))
+                {
+                    CancelAttackPattern(true);
+                    return;
+                }
                 PlayWarpCue(pattern, true);
                 _warpVanishStarted = true;
                 _warpElapsed = 0f;
@@ -113,7 +136,11 @@ public partial class EnemyController
             }
             if (_warpElapsed < (pattern.UsesArtWarpVFX ? pattern.WarpVanishLead : 0f)) return;
             // 先に検証。候補が無効なら見えるまま中止する。
-            if (!TryFindWarpDestination(pattern, out _)) { CancelAttackPattern(true); return; }
+            if (!TryFindWarpDestination(pattern, out _))
+            {
+                CancelAttackPattern(true);
+                return;
+            }
             // 消失：今の姿勢を黒い影に焼き付けて足元から崩す。実体はこの直後に隠す。
             WarpGhost(pattern)?.Vanish();
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))
@@ -137,8 +164,8 @@ public partial class EnemyController
             ghost.Form(formAt, facing, pattern.DisappearDuration - _warpElapsed);
             _warpFormStarted = true;
         }
-        // A long frame can skip the entire lead window. Start convergence before
-        // testing reappearance, and preserve its lead time even in that case.
+        // 処理が遅いフレームでは、出現前の収束演出を始める区間を飛び越えることがある。
+        // 出現を判定する前に収束を始め、演出に必要な先行時間を確保する。
         float lead = Mathf.Min(pattern.WarpAppearLead, pattern.DisappearDuration);
         if (!_warpAppearStarted && pattern.WarpAppearVFX != null &&
             _warpElapsed >= pattern.DisappearDuration - lead &&
@@ -151,7 +178,10 @@ public partial class EnemyController
         if (_warpElapsed < pattern.DisappearDuration) return;
         // 消失中にPlayerが動いても、現在の背後を再検証してからWarpする。
         if (!TryFindWarpDestination(pattern, out var destination) || !_mover.TryTeleportDuringAttack(destination))
-        { CancelAttackPattern(true); return; }
+        {
+            CancelAttackPattern(true);
+            return;
+        }
         CompleteWarpReappearance(pattern);
     }
 
@@ -167,7 +197,12 @@ public partial class EnemyController
         // 出現後は刀を挙げた姿勢で完全に止めて構え（速度0）、構え時間が終わったら通常速度で振り下ろす。
         _animator.SetFloat("EnemyComboPlaybackSpeed", 0f);
         _warpStrikeHold = pattern.ReappearWindupDuration;
-        if (!_patternRunner.Begin(pattern)) { ClearPatternExecution(); _mover.ReleaseMovementAfterAttack(); _ai?.OnActionFailed(); }
+        if (!_patternRunner.Begin(pattern))
+        {
+            ClearPatternExecution();
+            _mover.ReleaseMovementAfterAttack();
+            _ai?.OnActionFailed();
+        }
     }
 
     private void PlayWarpCue(EnemyAttackPattern pattern, bool disappear)
@@ -183,8 +218,10 @@ public partial class EnemyController
             else if (pattern.WarpAppearVFX != null)
             {
                 // 収束が先に始まっていれば、再検証後の実位置へ合わせるだけ。
-                if (_warpAppearStarted && _warpAppear != null && _warpAppear.IsPlaying) _warpAppear.MoveTo(WarpEffectPoint(pattern));
-                else PlayWarpAppear(pattern, transform.position);
+                if (_warpAppearStarted && _warpAppear != null && _warpAppear.IsPlaying)
+                    _warpAppear.MoveTo(WarpEffectPoint(pattern));
+                else
+                    PlayWarpAppear(pattern, transform.position);
             }
             return;
         }
@@ -194,10 +231,16 @@ public partial class EnemyController
         foreach (var binder in effect.GetComponentsInChildren<UnityEngine.VFX.Utility.VFXBinderBase>(true))
         {
             var visual = binder.GetComponent<UnityEngine.VFX.VisualEffect>();
-            if (visual != null && binder.IsValid(visual)) binder.UpdateBinding(visual);
+            if (visual != null && binder.IsValid(visual))
+                binder.UpdateBinding(visual);
         }
-        foreach (var visual in effect.GetComponentsInChildren<UnityEngine.VFX.VisualEffect>(true)) { visual.Reinit(); visual.Play(); }
-        foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true)) particles.Play();
+        foreach (var visual in effect.GetComponentsInChildren<UnityEngine.VFX.VisualEffect>(true))
+        {
+            visual.Reinit();
+            visual.Play();
+        }
+        foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
+            particles.Play();
         _warpEffects.Add(effect);
         Destroy(effect, 2f);
     }
@@ -214,7 +257,8 @@ public partial class EnemyController
     /// <summary>出現後の最初の攻撃判定が開いた瞬間に一閃を出す。Warp以外・2回目以降の判定では何もしない。</summary>
     private void OnWarpHitboxOpened(EnemyAttackPattern pattern)
     {
-        if (!_warpSlashPending || pattern == null || !pattern.IsWarp || pattern.WarpSlashVFX == null) return;
+        if (!_warpSlashPending || pattern == null || !pattern.IsWarp || pattern.WarpSlashVFX == null)
+            return;
         _warpSlashPending = false;
         Vector3 point = WarpEffectPoint(pattern) + transform.forward * pattern.WarpSlashForward;
         Vector3 direction = Quaternion.AngleAxis(pattern.WarpSlashRoll, transform.forward) * transform.right;
@@ -239,7 +283,9 @@ public partial class EnemyController
 
     private void RestoreWarpRenderers()
     {
-        foreach (var pair in _warpRenderers) if (pair.Key != null) pair.Key.enabled = pair.Value;
+        foreach (var pair in _warpRenderers)
+            if (pair.Key != null)
+                pair.Key.enabled = pair.Value;
         _warpRenderers.Clear();
         _warpHidden = false;
     }
@@ -247,11 +293,14 @@ public partial class EnemyController
     {
         _preparingWarp = null;
         RestoreWarpRenderers();
-        foreach (var effect in _warpEffects) if (effect != null) Destroy(effect);
+        foreach (var effect in _warpEffects)
+            if (effect != null)
+                Destroy(effect);
         _warpEffects.Clear();
         _warpElapsed = 0f;
         // 中断・被弾・死亡で出現光が浮いたまま残らないようにする。消失の黒霧は自然に消えるまで残す。
-        if (_warpAppear != null) _warpAppear.Stop();
+        if (_warpAppear != null)
+            _warpAppear.Stop();
         // 予兆中・消失中の中断は揺らぎと形成中の影をすぐ消す。出現後に抜けていく揺らぎだけは自然に終わらせる。
         _warpGhost?.Interrupt();
         _warpAppearStarted = _warpSlashPending = _warpVanishStarted = _warpFormStarted = false;
@@ -261,6 +310,8 @@ public partial class EnemyController
     /// <summary>Enemyと一緒に、使い回していたワープVFXのインスタンスも破棄する。</summary>
     private void DestroyWarpVFX()
     {
-        foreach (var vfx in new[] { _warpVanish, _warpAppear, _warpSlash }) if (vfx != null) Destroy(vfx.gameObject);
+        foreach (var vfx in new[] { _warpVanish, _warpAppear, _warpSlash })
+            if (vfx != null)
+                Destroy(vfx.gameObject);
     }
 }

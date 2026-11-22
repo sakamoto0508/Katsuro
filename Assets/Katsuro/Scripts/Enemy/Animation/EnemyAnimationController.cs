@@ -111,16 +111,18 @@ public class EnemyAnimationController : MonoBehaviour
         _moveVectorYHash = Animator.StringToHash(_animName.MoveVectorY);
     }
 
-    // Direction identifies the side the attacker occupies in the enemy's local space.
+    // 方向は敵のローカル座標から見た攻撃者の位置を示す。
     /// <summary>攻撃者位置または命中情報をEnemyのローカル方向へ変換し、四方向の被弾Clipを選ぶ。</summary>
     /// <returns>前・後・左・右を表す方向インデックス。</returns>
     public static int GetHitDirection(Transform enemy, DamageInfo info)
     {
         Vector3 source = info.Instigator != null ? info.Instigator.transform.position - enemy.position : Vector3.zero;
         source.y = 0f;
-        if (source.sqrMagnitude < .0001f) source = -info.HitNormal;
+        if (source.sqrMagnitude < .0001f)
+            source = -info.HitNormal;
         source.y = 0f;
-        if (source.sqrMagnitude < .0001f) source = info.HitPoint - enemy.position;
+        if (source.sqrMagnitude < .0001f)
+            source = info.HitPoint - enemy.position;
         source.y = 0f;
         Vector3 local = enemy.InverseTransformDirection(source);
         if (Mathf.Abs(local.x) > Mathf.Abs(local.z)) return local.x > 0f ? 3 : 2;
@@ -131,7 +133,8 @@ public class EnemyAnimationController : MonoBehaviour
     /// <returns>追撃専用の被弾Stateを開始した場合はtrue。</returns>
     public bool TryPlayHitReaction(DamageInfo info)
     {
-        if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled) return false;
+        if (!info.IsJustAvoidCounter || !_reactionConfigured || !_animator.isActiveAndEnabled)
+            return false;
         CancelNormalHitPose();
         int direction = GetHitDirection(transform, info);
         string state = _reactionLayerName + (info.IsCounterFirst ? ".Light" : ".Heavy") + HitDirections[direction];
@@ -145,9 +148,10 @@ public class EnemyAnimationController : MonoBehaviour
         if (_counterPresentation != null)
         {
             _reactionWeight = info.IsCounterFirst ? _counterPresentation.FirstReactionWeight : 1f;
-            if (!info.IsCounterFirst) _activeReactionBlendIn = _counterPresentation.SecondReactionBlendIn;
+            if (!info.IsCounterFirst)
+                _activeReactionBlendIn = _counterPresentation.SecondReactionBlendIn;
         }
-        // Blend from the visible layer weight, including consecutive counter hits.
+        // カウンターが連続しても、現在表示中のレイヤーウェイトを始点にブレンドする。
         _reactionStartWeight = _animator.GetLayerWeight(_reactionLayer);
         if (_counterPresentation != null && info.IsCounterFirst)
             _reactionStartWeight = Mathf.Min(_reactionStartWeight, _reactionWeight);
@@ -159,15 +163,20 @@ public class EnemyAnimationController : MonoBehaviour
         _animator.SetBool("IsJustAvoidCounter", true);
         _animator.SetFloat("HitPlaybackSpeed", 1f / _reactionDuration);
         _counterPose?.Clear();
-        // A zero-time trigger evaluation leaves the old transition pose during HitStop.
-        // Evaluate the actual impact sample directly on the dedicated layer before freezing.
+        // 時間を進めずにトリガーを評価すると、ヒットストップ中に遷移前のポーズが残る。
+        // 停止する前に、専用レイヤーで実際の命中ポーズを直接評価する。
         _animator.ResetTrigger("HitReaction");
         var style = _counterPresentation != null ? _counterPresentation.GetStrike(info.CounterStrike) : null;
         _visibleReactionDuration = style != null ? Mathf.Min(_reactionDuration, style.PoseDuration) : _reactionDuration;
         _animator.Play(Animator.StringToHash(state), _reactionLayer, style != null ? style.ImpactPoseTime : .05f);
-        if (info.IsCounterFirst) { _reactionStartWeight = _reactionWeight; _animator.SetLayerWeight(_reactionLayer, _reactionWeight); }
+        if (info.IsCounterFirst)
+        {
+            _reactionStartWeight = _reactionWeight;
+            _animator.SetLayerWeight(_reactionLayer, _reactionWeight);
+        }
         _animator.Update(0f);
-        if (style != null) _counterPose?.Begin(info, style, _visibleReactionDuration);
+        if (style != null)
+            _counterPose?.Begin(info, style, _visibleReactionDuration);
         return true;
     }
 
@@ -176,12 +185,13 @@ public class EnemyAnimationController : MonoBehaviour
     {
         GetComponent<EnemyController>()?.CancelAttackPattern(true);
         if (_animator == null) return;
-        // Even when reaction clips are unavailable, cancel the outgoing attack.
+        // リアクションクリップを再生できない場合も、進行中の攻撃は中断する。
         foreach (var parameter in _animator.parameters)
             if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name != "HitReaction" && parameter.name != _animName.EnemyDead)
                 _animator.ResetTrigger(parameter.nameHash);
         int idle = Animator.StringToHash("Base Layer.Idle");
-        if (_animator.HasState(0, idle)) _animator.CrossFadeInFixedTime(idle, _reactionBlendIn, 0, 0f);
+        if (_animator.HasState(0, idle))
+            _animator.CrossFadeInFixedTime(idle, _reactionBlendIn, 0, 0f);
     }
 
     /// <summary>Animator速度に合わせて被弾Layerと減速移動の進行を更新し、復帰完了を通知する。</summary>
@@ -191,9 +201,12 @@ public class EnemyAnimationController : MonoBehaviour
         if (!IsReacting) return false;
         _reactionElapsed += deltaTime * Mathf.Max(0f, _animator.speed);
         float blendIn = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_reactionElapsed / Mathf.Max(.01f, _activeReactionBlendIn)));
-        float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_reactionElapsed - _visibleReactionDuration) / _reactionBlendOut));
+        float fade = Mathf.SmoothStep(
+            0f,
+            1f,
+            Mathf.Clamp01((_reactionElapsed - _visibleReactionDuration) / _reactionBlendOut));
         _animator.SetLayerWeight(_reactionLayer, Mathf.Lerp(_reactionStartWeight, _reactionWeight, blendIn) * (1f - fade));
-        // Keep the original gameplay hold even when the first strike's visual pose ends earlier.
+        // 初撃の見た目が先に戻る場合も、行動を止める時間は維持する。
         if (_reactionElapsed < _reactionDuration + _reactionBlendOut) return false;
         CancelHitReaction();
         return true;
@@ -218,9 +231,11 @@ public class EnemyAnimationController : MonoBehaviour
         int state = Animator.StringToHash("NormalHeavyHit.Pose");
         if (!_enableNormalHeavyPose) return RejectNormalHeavyPose("C案無効");
         if (IsReacting) return RejectNormalHeavyPose("追撃専用Reaction中");
-        if (_animator == null || !_animator.isActiveAndEnabled) return RejectNormalHeavyPose("Animator未初期化または無効");
+        if (_animator == null || !_animator.isActiveAndEnabled)
+            return RejectNormalHeavyPose("Animator未初期化または無効");
         if (_normalHitLayer < 0) return RejectNormalHeavyPose("NormalHeavyHit Layerなし");
-        if (!_animator.HasState(_normalHitLayer, state)) return RejectNormalHeavyPose("NormalHeavyHit.Pose Stateなし");
+        if (!_animator.HasState(_normalHitLayer, state))
+            return RejectNormalHeavyPose("NormalHeavyHit.Pose Stateなし");
         _normalHitTarget = Mathf.Clamp01(_normalHitWeight) * Mathf.Clamp01(duringAttackScale);
         float impact = _normalHitTarget * Mathf.Clamp01(_normalHitImpactWeight);
         // 再被弾も衝撃姿勢まで戻すが、前回の角度を加算して累積させない。
@@ -237,7 +252,8 @@ public class EnemyAnimationController : MonoBehaviour
     private bool RejectNormalHeavyPose(string reason)
     {
 #if UNITY_EDITOR
-        if (_diagnoseNormalHeavyPose) RecordNormalHeavyPoseResult("失敗: " + reason);
+        if (_diagnoseNormalHeavyPose)
+            RecordNormalHeavyPoseResult("失敗: " + reason);
 #endif
         return false;
     }
@@ -247,7 +263,8 @@ public class EnemyAnimationController : MonoBehaviour
     private void RecordNormalHeavyPoseResult(string result)
     {
 #if UNITY_EDITOR
-        if (_diagnoseNormalHeavyPose) _normalHitResult = result;
+        if (_diagnoseNormalHeavyPose)
+            _normalHitResult = result;
 #endif
     }
 
@@ -259,7 +276,10 @@ public class EnemyAnimationController : MonoBehaviour
         if (!_diagnoseNormalHeavyPose || !info.IsHeavy) return;
         _normalHitResult = info.IsJustAvoidCounter ? "対象外: JustAvoid追撃" :
             !useBoneReaction ? "対象外: useBoneReaction=false" : "未要求";
-        Debug.Log($"[NormalHeavyHit] request IsHeavy={info.IsHeavy} counter={info.IsJustAvoidCounter} useBoneReaction={useBoneReaction} enabled={_enableNormalHeavyPose} attack={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
+        Debug.Log(
+            $"[NormalHeavyHit] 再生要求 強攻撃={info.IsHeavy} カウンター={info.IsJustAvoidCounter}" +
+            $" ボーンリアクション={useBoneReaction} 有効={_enableNormalHeavyPose}" +
+            $" 攻撃中={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
 #endif
     }
 
@@ -270,7 +290,8 @@ public class EnemyAnimationController : MonoBehaviour
 #if UNITY_EDITOR
         if (!_diagnoseNormalHeavyPose || !info.IsHeavy) return;
         LogNormalHeavyPoseSnapshot("HitStop要求後");
-        if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
+        if (_normalHitDiagnostic != null)
+            StopCoroutine(_normalHitDiagnostic);
         _normalHitDiagnostic = StartCoroutine(SampleNormalHeavyPoseDiagnostic());
 #endif
     }
@@ -292,7 +313,12 @@ public class EnemyAnimationController : MonoBehaviour
     {
         if (_animator == null) return;
         bool pose = _normalHitLayer >= 0 && _animator.GetCurrentAnimatorStateInfo(_normalHitLayer).IsName("NormalHeavyHit.Pose");
-        Debug.Log($"[NormalHeavyHit] {phase} result={_normalHitResult} layer={_normalHitLayer} state={(pose ? "NormalHeavyHit.Pose" : "未評価/別State")} weight={NormalHitPoseWeight:F3} target={_normalHitTarget:F3} elapsed={_normalHitElapsed:F3} speed={_animator.speed:F3} hitStop={(_animator.speed == 0f)} attack={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
+        Debug.Log(
+            $"[NormalHeavyHit] {phase} 結果={_normalHitResult} レイヤー={_normalHitLayer}" +
+            $" ステート={(pose ? "NormalHeavyHit.Pose" : "未評価または別ステート")}" +
+            $" ウェイト={NormalHitPoseWeight:F3} 目標={_normalHitTarget:F3} 経過秒={_normalHitElapsed:F3}" +
+            $" 速度={_animator.speed:F3} ヒットストップ={(_animator.speed == 0f)}" +
+            $" 攻撃中={GetComponent<EnemyController>()?.IsAttackAnimationActive}", this);
     }
 #endif
 
@@ -301,14 +327,22 @@ public class EnemyAnimationController : MonoBehaviour
     {
         _counterPose?.RemoveOffsets();
         if (!_normalHitActive) return;
-        if (!_enableNormalHeavyPose || IsReacting) { CancelNormalHitPose(); return; }
+        if (!_enableNormalHeavyPose || IsReacting)
+        {
+            CancelNormalHitPose();
+            return;
+        }
         _normalHitElapsed += Time.deltaTime * Mathf.Max(0f, _animator.speed);
         float fadeStart = _normalHitBlendIn + _normalHitHold;
         float weight = Mathf.Lerp(_normalHitStart, _normalHitTarget,
             Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_normalHitElapsed / Mathf.Max(.001f, _normalHitBlendIn))));
-        weight *= 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((_normalHitElapsed - fadeStart) / Mathf.Max(.001f, _normalHitBlendOut)));
+        weight *= 1f - Mathf.SmoothStep(
+            0f,
+            1f,
+            Mathf.Clamp01((_normalHitElapsed - fadeStart) / Mathf.Max(.001f, _normalHitBlendOut)));
         _animator.SetLayerWeight(_normalHitLayer, weight);
-        if (_normalHitElapsed >= fadeStart + _normalHitBlendOut) CancelNormalHitPose();
+        if (_normalHitElapsed >= fadeStart + _normalHitBlendOut)
+            CancelNormalHitPose();
     }
 
     /// <summary>通常の視覚ポーズだけを解除する。死亡・追撃・終了時にLayer重みを残さない。</summary>
@@ -316,7 +350,8 @@ public class EnemyAnimationController : MonoBehaviour
     {
         _normalHitActive = false;
         _normalHitElapsed = 0f;
-        if (_animator != null && _normalHitLayer >= 0) _animator.SetLayerWeight(_normalHitLayer, 0f);
+        if (_animator != null && _normalHitLayer >= 0)
+            _animator.SetLayerWeight(_normalHitLayer, 0f);
     }
 
     /// <summary>非表示・破棄へ通常被弾ポーズを持ち越さない。</summary>
@@ -325,7 +360,8 @@ public class EnemyAnimationController : MonoBehaviour
         _counterPose?.Clear();
         CancelNormalHitPose();
 #if UNITY_EDITOR
-        if (_normalHitDiagnostic != null) StopCoroutine(_normalHitDiagnostic);
+        if (_normalHitDiagnostic != null)
+            StopCoroutine(_normalHitDiagnostic);
         _normalHitDiagnostic = null;
 #endif
     }
@@ -333,7 +369,8 @@ public class EnemyAnimationController : MonoBehaviour
     /// <summary>HitStop中は命中姿勢を保持し、解除後は既存Reaction時計で胸・肩・頭・腰のFollow Throughを重ねる。</summary>
     private void LateUpdate()
     {
-        if (IsReacting) _counterPose?.Apply(_reactionElapsed);
+        if (IsReacting)
+            _counterPose?.Apply(_reactionElapsed);
     }
 
     /// <summary>
@@ -358,9 +395,11 @@ public class EnemyAnimationController : MonoBehaviour
     /// </summary>
     public bool HasTrigger(string trigger)
     {
-        if (_animator == null || !_animator.isActiveAndEnabled || _animator.runtimeAnimatorController == null || string.IsNullOrEmpty(trigger)) return false;
+        if (_animator == null || !_animator.isActiveAndEnabled || _animator.runtimeAnimatorController == null || string.IsNullOrEmpty(trigger))
+            return false;
         foreach (var parameter in _animator.parameters)
-            if (parameter.name == trigger && parameter.type == AnimatorControllerParameterType.Trigger) return true;
+            if (parameter.name == trigger && parameter.type == AnimatorControllerParameterType.Trigger)
+                return true;
         return false;
     }
 
@@ -413,7 +452,7 @@ public class EnemyAnimationController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("EnemyAnimationController: EnemyController not found in parents to forward AnimEvent_OnAttackFinished");
+            Debug.LogWarning("EnemyAnimationController: 親に EnemyController が見つからず、AnimEvent_OnAttackFinished を転送できません。");
         }
     }
 }

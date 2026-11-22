@@ -39,24 +39,34 @@ public sealed class WarpGhostPresenter : MonoBehaviour
 
     private sealed class Shadow
     {
-        public GameObject Root; public MeshRenderer[] Parts; public Material Material;
-        public float Start = -1f, Length = 1f; public bool Forming;
+        public GameObject Root;
+        public MeshRenderer[] Parts;
+        public Material Material;
+        public float Start = -1f;
+        public float Length = 1f;
+        public bool Forming;
     }
 
     public void Initialize(EnemyAttackPattern.WarpGhostSettings settings)
     {
         _s = settings;
         var glow = Resources.Load<Shader>("CombatGlow");
-        // Loaded from a Resources folder so the shader is always included in builds.
+        // ビルドに含めるため、シェーダーは Resources から読み込む。
         var dissolve = Resources.Load<Shader>("KatsuroGhostDissolve");
-        if (dissolve == null) dissolve = Shader.Find("Katsuro/GhostDissolve");
+        if (dissolve == null)
+            dissolve = Shader.Find("Katsuro/GhostDissolve");
         var list = new System.Collections.Generic.List<SkinnedMeshRenderer>();
-        // Only the visible body meshes; skip overlays made by this or other effects (JustAvoid flash etc.).
+        // 表示中の本体メッシュを取得する。ジャスト回避のフラッシュなど、演出用の追加メッシュは除外する。
         foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            if (smr.sharedMesh != null && smr.enabled && !smr.name.StartsWith(OverlayName) && !smr.name.StartsWith("JustAvoid")) list.Add(smr);
+            if (smr.sharedMesh != null && smr.enabled && !smr.name.StartsWith(OverlayName) && !smr.name.StartsWith("JustAvoid"))
+                list.Add(smr);
         _sources = list.ToArray();
         _baked = new Mesh[_sources.Length];
-        for (int i = 0; i < _baked.Length; i++) { _baked[i] = new Mesh { name = "Warp Ghost Pose" }; _baked[i].MarkDynamic(); }
+        for (int i = 0; i < _baked.Length; i++)
+        {
+            _baked[i] = new Mesh { name = "Warp Ghost Pose" };
+            _baked[i].MarkDynamic();
+        }
 
         if (glow != null)
         {
@@ -71,10 +81,13 @@ public sealed class WarpGhostPresenter : MonoBehaviour
                 go.layer = source.gameObject.layer;
                 go.transform.SetParent(source.transform, false);
                 var overlay = go.GetComponent<SkinnedMeshRenderer>();
-                overlay.sharedMesh = source.sharedMesh; overlay.bones = source.bones; overlay.rootBone = source.rootBone;
+                overlay.sharedMesh = source.sharedMesh;
+                overlay.bones = source.bones;
+                overlay.rootBone = source.rootBone;
                 overlay.localBounds = source.localBounds;
                 var mats = new Material[source.sharedMesh.subMeshCount];
-                for (int m = 0; m < mats.Length; m++) mats[m] = _overlayMaterial;
+                for (int m = 0; m < mats.Length; m++)
+                    mats[m] = _overlayMaterial;
                 overlay.sharedMaterials = mats;
                 overlay.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 overlay.receiveShadows = false;
@@ -88,7 +101,8 @@ public sealed class WarpGhostPresenter : MonoBehaviour
             _formShadow = CreateShadow(dissolve, "Warp Ghost Form");
         }
         var bounds = new Bounds(transform.position, Vector3.zero);
-        foreach (var smr in _sources) bounds.Encapsulate(smr.bounds);
+        foreach (var smr in _sources)
+            bounds.Encapsulate(smr.bounds);
         _figureHeight = Mathf.Max(1f, bounds.max.y - transform.position.y);
     }
 
@@ -128,7 +142,8 @@ public sealed class WarpGhostPresenter : MonoBehaviour
     /// <summary>中断・終了。予兆の揺らぎと形成中の影をすぐ消す。出現後に抜けていく揺らぎと、崩れている途中の影は自然に終わらせる。</summary>
     public void Interrupt()
     {
-        if (_overlay != Overlay.AppearFade) StopOverlay();
+        if (_overlay != Overlay.AppearFade)
+            StopOverlay();
         HideShadow(_formShadow);
     }
 
@@ -140,11 +155,13 @@ public sealed class WarpGhostPresenter : MonoBehaviour
         {
             float u = Mathf.Clamp01((now - _overlayStart) / _overlayLength);
             float strength = _overlay == Overlay.Warning ? u * u * (3f - 2f * u) : 1f - u;
-            var tint = _s.Color; tint.a = Mathf.Clamp01(_s.WarningStrength * strength) * 1.6f;
+            var tint = _s.Color;
+            tint.a = Mathf.Clamp01(_s.WarningStrength * strength) * 1.6f;
             _overlayMaterial.SetColor(TintId, tint);
             _overlayMaterial.SetFloat(GhostTimeId, now);
             _overlayMaterial.SetFloat(GhostSwayId, _s.WarningSway * (.4f + .6f * strength));
-            if (_overlay == Overlay.AppearFade && u >= 1f) StopOverlay();
+            if (_overlay == Overlay.AppearFade && u >= 1f)
+                StopOverlay();
         }
         TickShadow(_vanishShadow, now);
         TickShadow(_formShadow, now);
@@ -153,15 +170,20 @@ public sealed class WarpGhostPresenter : MonoBehaviour
     // ---------------------------------------------------------------- overlay on the live body
     private void StartOverlay(Overlay mode, float seconds)
     {
-        _overlay = mode; _overlayStart = FeedbackVisualTime.Now; _overlayLength = Mathf.Max(.01f, seconds);
+        _overlay = mode;
+        _overlayStart = FeedbackVisualTime.Now;
+        _overlayLength = Mathf.Max(.01f, seconds);
         for (int i = 0; i < _overlays.Length; i++)
-            if (_overlays[i] != null) _overlays[i].enabled = _sources[i] != null && _sources[i].enabled && _sources[i].gameObject.activeInHierarchy;
+            if (_overlays[i] != null)
+                _overlays[i].enabled = _sources[i] != null && _sources[i].enabled && _sources[i].gameObject.activeInHierarchy;
     }
 
     private void StopOverlay()
     {
         _overlay = Overlay.Off;
-        foreach (var overlay in _overlays) if (overlay != null) overlay.enabled = false;
+        foreach (var overlay in _overlays)
+            if (overlay != null)
+                overlay.enabled = false;
     }
 
     // ---------------------------------------------------------------- baked shadows
@@ -178,7 +200,8 @@ public sealed class WarpGhostPresenter : MonoBehaviour
             part.GetComponent<MeshFilter>().sharedMesh = _baked[i];
             var renderer = part.GetComponent<MeshRenderer>();
             var mats = new Material[_sources[i].sharedMesh.subMeshCount];
-            for (int m = 0; m < mats.Length; m++) mats[m] = shadow.Material;
+            for (int m = 0; m < mats.Length; m++)
+                mats[m] = shadow.Material;
             renderer.sharedMaterials = mats;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
@@ -195,10 +218,11 @@ public sealed class WarpGhostPresenter : MonoBehaviour
             var source = _sources[i];
             bool visible = source != null && source.enabled && source.gameObject.activeInHierarchy;
             foreach (var shadow in new[] { _vanishShadow, _formShadow })
-                if (shadow != null) shadow.Parts[i].enabled = visible;
+                if (shadow != null)
+                    shadow.Parts[i].enabled = visible;
             if (!visible) continue;
             source.BakeMesh(_baked[i], false);   // unscaled; the part transform carries the real scale
-            // Keep each part's pose relative to the enemy root so the shadow can be placed anywhere.
+            // 各パーツの姿勢を敵ルートからの相対座標で保持し、残像を任意の位置に配置できるようにする。
             var local = rootInverse * source.transform.localToWorldMatrix;
             foreach (var shadow in new[] { _vanishShadow, _formShadow })
             {
@@ -223,7 +247,9 @@ public sealed class WarpGhostPresenter : MonoBehaviour
 
     private void StartShadow(Shadow shadow, bool forming, float seconds)
     {
-        shadow.Forming = forming; shadow.Start = FeedbackVisualTime.Now; shadow.Length = Mathf.Max(.01f, seconds);
+        shadow.Forming = forming;
+        shadow.Start = FeedbackVisualTime.Now;
+        shadow.Length = Mathf.Max(.01f, seconds);
         shadow.Material.SetFloat(InvertId, forming ? 1f : 0f);
         shadow.Material.SetFloat(ProgressId, forming ? 1f : 0f);
         shadow.Root.SetActive(true);
@@ -233,10 +259,11 @@ public sealed class WarpGhostPresenter : MonoBehaviour
     {
         if (shadow == null || shadow.Start < 0f) return;
         float u = Mathf.Clamp01((now - shadow.Start) / shadow.Length);
-        // Vanish erodes 0 -> 1; forming goes 1 -> 0 and then waits fully formed until the body appears.
+        // 消失時は 0 から 1 へ削り、形成時は 1 から 0 へ戻して本体が出現するまで維持する。
         shadow.Material.SetFloat(ProgressId, shadow.Forming ? 1f - u : u);
         shadow.Material.SetFloat(FlowId, now);
-        if (!shadow.Forming && u >= 1f) HideShadow(shadow);
+        if (!shadow.Forming && u >= 1f)
+            HideShadow(shadow);
     }
 
     private static void HideShadow(Shadow shadow)
@@ -248,15 +275,22 @@ public sealed class WarpGhostPresenter : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (var overlay in _overlays) if (overlay != null) Destroy(overlay.gameObject);
+        foreach (var overlay in _overlays)
+            if (overlay != null)
+                Destroy(overlay.gameObject);
         foreach (var shadow in new[] { _vanishShadow, _formShadow })
         {
             if (shadow == null) continue;
-            if (shadow.Material != null) Destroy(shadow.Material);
-            if (shadow.Root != null) Destroy(shadow.Root);
+            if (shadow.Material != null)
+                Destroy(shadow.Material);
+            if (shadow.Root != null)
+                Destroy(shadow.Root);
         }
-        foreach (var mesh in _baked) if (mesh != null) Destroy(mesh);
-        if (_overlayMaterial != null) Destroy(_overlayMaterial);
+        foreach (var mesh in _baked)
+            if (mesh != null)
+                Destroy(mesh);
+        if (_overlayMaterial != null)
+            Destroy(_overlayMaterial);
     }
 }
 

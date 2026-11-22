@@ -64,33 +64,51 @@ public sealed class FinalBlowPresentation : MonoBehaviour
     /// <summary>元の文字・HUD状態を保存し、Flash・黒帯・討伐表示の実時間タイムラインを開始する。</summary>
     public void Begin(TMP_Text text, float flashDuration, float textDelay, float textDuration)
     {
-        if (_playing) ResetPresentation();
+        if (_playing)
+            ResetPresentation();
         _text = text;
         if (_text != null)
         {
-            _savedTextColor = _text.color; _savedTextScale = _text.transform.localScale;
+            _savedTextColor = _text.color;
+            _savedTextScale = _text.transform.localScale;
             _savedTextActive = _text.gameObject.activeSelf;
-            _text.alpha = 0; _text.gameObject.SetActive(false);
+            _text.alpha = 0;
+            _text.gameObject.SetActive(false);
         }
         int count = _hudGroups != null ? _hudGroups.Length : 0;
-        _savedAlpha = new float[count]; _savedInteractable = new bool[count]; _savedRaycasts = new bool[count];
+        _savedAlpha = new float[count];
+        _savedInteractable = new bool[count];
+        _savedRaycasts = new bool[count];
         for (int i = 0; i < count; i++)
         {
-            var group = _hudGroups[i]; if (group == null) continue;
-            _savedAlpha[i] = group.alpha; _savedInteractable[i] = group.interactable; _savedRaycasts[i] = group.blocksRaycasts;
+            var group = _hudGroups[i];
+            if (group == null)
+                continue;
+            _savedAlpha[i] = group.alpha;
+            _savedInteractable[i] = group.interactable;
+            _savedRaycasts[i] = group.blocksRaycasts;
             group.interactable = group.blocksRaycasts = false;
         }
         if (_hudVisibilityOwners != null)
-            foreach (var owner in _hudVisibilityOwners) if (owner != null) owner.SetPresentationVisibility(true);
-        if (_damageNumbers != null) _damageNumbers.SetPresentationSuppressed(true);
+            foreach (var owner in _hudVisibilityOwners)
+                if (owner != null)
+                    owner.SetPresentationVisibility(true);
+        if (_damageNumbers != null)
+            _damageNumbers.SetPresentationSuppressed(true);
         _flashDuration = Mathf.Max(.01f, flashDuration);
-        _textDelay = Mathf.Max(0, textDelay); _textDuration = Mathf.Max(.01f, textDuration);
-        _started = Time.unscaledTime; _playing = true;
+        _textDelay = Mathf.Max(0, textDelay);
+        _textDuration = Mathf.Max(.01f, textDuration);
+        _started = Time.unscaledTime;
+        _playing = true;
         RenderAt(0);
     }
 
     /// <summary>勝利UIが進行中の間だけ、開始からの実経過時間で表示を更新する。</summary>
-    private void Update() { if (_playing) RenderAt(Time.unscaledTime - _started); }
+    private void Update()
+    {
+        if (_playing)
+            RenderAt(Time.unscaledTime - _started);
+    }
 
     // Edit Modeでタイムラインを検証できるよう、時計と描画を分ける。
     /// <summary>指定経過秒でFlash、HUD非表示、黒帯と討伐文字の素早い出現・Scaleの落ち着きを反映する。</summary>
@@ -99,9 +117,12 @@ public sealed class FinalBlowPresentation : MonoBehaviour
     {
         if (!_playing) return;
         float flashAge = (elapsed - _flashDelay) / _flashDuration;
-        if (_whiteFlash != null) _whiteFlash.alpha = flashAge >= 0 && flashAge < 1 ? _flashStrength * Mathf.Pow(1 - flashAge, 2) : 0;
+        if (_whiteFlash != null)
+            _whiteFlash.alpha = flashAge >= 0 && flashAge < 1 ? _flashStrength * Mathf.Pow(1 - flashAge, 2) : 0;
         float hud = Mathf.SmoothStep(0, 1, Mathf.Clamp01((elapsed - _hudFadeDelay) / _hudFadeDuration));
-        for (int i = 0; i < _savedAlpha.Length; i++) if (_hudGroups[i] != null) _hudGroups[i].alpha = _savedAlpha[i] * (1 - hud);
+        for (int i = 0; i < _savedAlpha.Length; i++)
+            if (_hudGroups[i] != null)
+                _hudGroups[i].alpha = _savedAlpha[i] * (1 - hud);
         float bars = Mathf.SmoothStep(0, 1, Mathf.Clamp01((elapsed - _letterboxDelay) / _letterboxDuration));
         SetLetterbox(bars);
         if (_text != null)
@@ -113,7 +134,10 @@ public sealed class FinalBlowPresentation : MonoBehaviour
             float fade = 1 - Mathf.Pow(1 - rise, 3);
             _text.alpha = fade * _savedTextColor.a;
             float scale = age < _textRiseFraction ? Mathf.Lerp(_textStartScale, _textOvershootScale, fade)
-                : Mathf.Lerp(_textOvershootScale, 1, Mathf.SmoothStep(0, 1, (age - _textRiseFraction) / (1 - _textRiseFraction)));
+                : Mathf.Lerp(
+                    _textOvershootScale,
+                    1,
+                    Mathf.SmoothStep(0, 1, (age - _textRiseFraction) / (1 - _textRiseFraction)));
             _text.transform.localScale = _savedTextScale * scale;
         }
     }
@@ -139,21 +163,30 @@ public sealed class FinalBlowPresentation : MonoBehaviour
     /// <summary>Flashと黒帯を解除し、保存したHUD・文字の色・Scale・有効状態を復元する。</summary>
     public void ResetPresentation()
     {
-        if (_whiteFlash != null) _whiteFlash.alpha = 0;
+        if (_whiteFlash != null)
+            _whiteFlash.alpha = 0;
         SetLetterbox(0);
         if (!_playing) return;
         _playing = false;
         for (int i = 0; i < _savedAlpha.Length; i++)
         {
-            var group = _hudGroups[i]; if (group == null) continue;
-            group.alpha = _savedAlpha[i]; group.interactable = _savedInteractable[i]; group.blocksRaycasts = _savedRaycasts[i];
+            var group = _hudGroups[i];
+            if (group == null)
+                continue;
+            group.alpha = _savedAlpha[i];
+            group.interactable = _savedInteractable[i];
+            group.blocksRaycasts = _savedRaycasts[i];
         }
         if (_hudVisibilityOwners != null)
-            foreach (var owner in _hudVisibilityOwners) if (owner != null) owner.SetPresentationVisibility(false);
-        if (_damageNumbers != null) _damageNumbers.SetPresentationSuppressed(false);
+            foreach (var owner in _hudVisibilityOwners)
+                if (owner != null)
+                    owner.SetPresentationVisibility(false);
+        if (_damageNumbers != null)
+            _damageNumbers.SetPresentationSuppressed(false);
         if (_text != null)
         {
-            _text.color = _savedTextColor; _text.transform.localScale = _savedTextScale;
+            _text.color = _savedTextColor;
+            _text.transform.localScale = _savedTextScale;
             _text.gameObject.SetActive(_savedTextActive);
         }
     }

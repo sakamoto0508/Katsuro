@@ -13,16 +13,19 @@ public sealed class AnimationSpeedController : MonoBehaviour
     /// <summary>Animatorとその基準速度を一度だけ取得する。</summary>
     public void Init()
     {
-        if (_initialized) return;
-        _initialized = true; 
-        animator = GetComponent<Animator>(); baseSpeed = animator.speed; 
+        if (_initialized)
+            return;
+        _initialized = true;
+        animator = GetComponent<Animator>();
+        baseSpeed = animator.speed;
     }
 
     // 状態効果と一時演出の速度は別々に保持する。
     /// <summary>状態効果の持続倍率を更新し、基準速度と一時倍率を掛けてAnimatorへ反映する。</summary>
     public void SetStatus(float multiplier)
-    { 
-        status = Mathf.Max(0f, multiplier); Refresh(); 
+    {
+        status = Mathf.Max(0f, multiplier);
+        Refresh();
     }
 
     // HitStopの期限は実時間で管理する。
@@ -42,10 +45,12 @@ public sealed class AnimationSpeedController : MonoBehaviour
     }
 
     /// <summary>一時的な再生速度の設定をクリアします。</summary>
-    public void ClearTemporary() 
-    { 
-        temporary = 1f; expires = 0f; Refresh(); 
-    
+    public void ClearTemporary()
+    {
+        temporary = 1f;
+        expires = 0f;
+        Refresh();
+
     }
     /// <summary>実時間の期限を判定し、一時倍率の自動解除と合成速度の反映を行う。</summary>
     private void Update() => Refresh();
@@ -53,8 +58,10 @@ public sealed class AnimationSpeedController : MonoBehaviour
     /// <summary>アニメーションの再生速度を更新します。</summary>
     private void Refresh()
     {
-        if (Time.realtimeSinceStartup >= expires) temporary = 1f;
-        if (animator != null) animator.speed = baseSpeed * status * temporary;
+        if (Time.realtimeSinceStartup >= expires)
+            temporary = 1f;
+        if (animator != null)
+            animator.speed = baseSpeed * status * temporary;
     }
 
     /// <summary>持続・一時倍率と期限を解除し、Animatorを保存した基準速度へ戻す。</summary>
@@ -62,6 +69,7 @@ public sealed class AnimationSpeedController : MonoBehaviour
     {
         status = temporary = 1f;
         expires = 0f;
-        if (animator != null) animator.speed = baseSpeed;
+        if (animator != null)
+            animator.speed = baseSpeed;
     }
 }

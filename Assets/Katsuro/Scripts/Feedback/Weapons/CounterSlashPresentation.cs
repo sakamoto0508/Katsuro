@@ -34,7 +34,8 @@ internal sealed class CounterSlashPresentation
         lastUpdate = now;
         holdStart = holdUntil = 0f;
         contacted = false;
-        if (renderer != null) renderer.SetPropertyBlock(null);
+        if (renderer != null)
+            renderer.SetPropertyBlock(null);
         stroke?.Hide();
     }
 
@@ -43,8 +44,9 @@ internal sealed class CounterSlashPresentation
     public void Hit(Vector3 point, float now)
     {
         if (!Enabled) return;
-        // Keep the same time domain as the existing trail. Pause stops this clock.
-        if (!IsHolding(now)) holdStart = now;
+        // 既存の軌跡と同じ時計を使い、ポーズ中は進行を止める。
+        if (!IsHolding(now))
+            holdStart = now;
         holdUntil = Mathf.Max(holdUntil, now + Mathf.Max(0f, Settings.HitStop));
         contacted = true;
         contact = point;
@@ -55,8 +57,9 @@ internal sealed class CounterSlashPresentation
         if (Enabled && contacted)
         {
             float held = Mathf.Max(0f, Mathf.Min(now, holdUntil) - Mathf.Max(lastUpdate, holdStart));
-            // Freeze the existing history, rather than repeatedly sampling a stopped blade.
-            for (int i = 0; i < count; i++) sampleTimes[i] += held;
+            // 刀身が止まっている間はサンプルを追加せず、既存の履歴を保持する。
+            for (int i = 0; i < count; i++)
+                sampleTimes[i] += held;
             previousTime += held;
         }
         lastUpdate = now;
@@ -64,7 +67,7 @@ internal sealed class CounterSlashPresentation
 
     public float CoreAge(float sampleAge, float now)
     {
-        // Refresh the already generated arc at impact and retain it through HitStop.
+        // 命中時に生成済みの弧を更新し、ヒットストップ中はその形を保持する。
         return contacted ? Mathf.Min(sampleAge, .012f + Mathf.Max(0f, now - holdUntil)) : sampleAge;
     }
 
@@ -77,15 +80,23 @@ internal sealed class CounterSlashPresentation
         block.SetFloat(ImpactId, impact);
         renderer.SetPropertyBlock(block);
     }
-    public void PrepareStroke(int layer) { if (stroke == null) stroke = new CounterImpactStroke(layer); }
+    public void PrepareStroke(int layer)
+    {
+        if (stroke == null)
+            stroke = new CounterImpactStroke(layer);
+    }
     [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
     public void SetDebugVisibility(bool hidden)
     {
-        if (renderer != null) renderer.forceRenderingOff = hidden;
+        if (renderer != null)
+            renderer.forceRenderingOff = hidden;
         stroke?.SetDebugVisibility(hidden);
     }
     public void ShowStroke(Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
-    { if (Enabled) stroke?.Show(Settings, point, direction, bladeAxis, view, now); }
+    {
+        if (Enabled)
+            stroke?.Show(Settings, point, direction, bladeAxis, view, now);
+    }
     public void Dispose() => stroke?.Dispose();
 
     public static float Taper(float along)
@@ -96,10 +107,16 @@ internal sealed class CounterSlashPresentation
 
     public static Vector3 CurvedTip(Vector3 interpolatedBase, Vector3 bladeBefore, Vector3 bladeAfter, float t)
     {
-        // Reconstruct rotation between the same two endpoint samples at low FPS.
-        // Opposing/degenerate blades use a bounded chord instead of an ambiguous half-turn.
+        // 低 FPS では、同じ 2 点の刀身サンプルから途中の回転を補間する。
+        // 刀身の向きが反対か退化しているときは、半回転の向きを決められないため直線で補間する。
         bool safeArc = bladeBefore.sqrMagnitude > .0001f && bladeAfter.sqrMagnitude > .0001f &&
             Vector3.Dot(bladeBefore.normalized, bladeAfter.normalized) > -.5f;
-        return interpolatedBase + (safeArc ? Vector3.Slerp(bladeBefore, bladeAfter, t) : Vector3.Lerp(bladeBefore, bladeAfter, t));
+        return interpolatedBase + (safeArc ? Vector3.Slerp(
+            bladeBefore,
+            bladeAfter,
+            t) : Vector3.Lerp(
+            bladeBefore,
+            bladeAfter,
+            t));
     }
 }

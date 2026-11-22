@@ -52,6 +52,7 @@ public sealed class SceneInitialization
     {
         // シーン開始時にだけ配置済みの対象を収集する。実際の処理中には検索しない。
         foreach (var component in Object.FindObjectsByType<T>(FindObjectsSortMode.None))
-            if (component.isActiveAndEnabled) initialize(component);
+            if (component.isActiveAndEnabled)
+                initialize(component);
     }
 }
