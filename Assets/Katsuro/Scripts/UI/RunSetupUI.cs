@@ -56,9 +56,6 @@ public sealed class RunSetupUI : MonoBehaviour
     /// <summary>前回勝者と継承装備の説明を表示するTMPテキスト。</summary>
     [UnityEngine.Tooltip("前回勝者と継承装備の説明を表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _opponent;
-    /// <summary>残機・復活・勝者継承ルールを表示するTMPテキスト。</summary>
-    [UnityEngine.Tooltip("残機・復活・勝者継承ルールを表示するTMPテキスト。")]
-    [SerializeField] private TMP_Text _rules;
     /// <summary>前回の勝敗結果と保存エラーを表示するTMPテキスト。</summary>
     [UnityEngine.Tooltip("前回の勝敗結果と保存エラーを表示するTMPテキスト。")]
     [SerializeField] private TMP_Text _result;
@@ -99,22 +96,38 @@ public sealed class RunSetupUI : MonoBehaviour
     {
         if (_initialized) return;
         _initialized = true;
-        if (_content != null) _contentPosition = _content.anchoredPosition;
+        if (_content != null)
+            _contentPosition = _content.anchoredPosition;
         _attackEffectViews = EffectViews(_attackOptions);
         _defenseEffectViews = EffectViews(_defenseOptions);
         SetVisible(false);
         for (int i = 0; i < _attackOptions.Length; i++)
         {
             int option = i;
-            _attackOptions[i].onValueChanged.AddListener(value => { if (value) { _attack = option; RefreshDescriptions(); } });
+            _attackOptions[i].onValueChanged.AddListener(value =>
+            {
+                if (value)
+                {
+                    _attack = option;
+                    RefreshDescriptions();
+                }
+            });
         }
         for (int i = 0; i < _defenseOptions.Length; i++)
         {
             int option = i;
-            _defenseOptions[i].onValueChanged.AddListener(value => { if (value) { _defense = option; RefreshDescriptions(); } });
+            _defenseOptions[i].onValueChanged.AddListener(value =>
+            {
+                if (value)
+                {
+                    _defense = option;
+                    RefreshDescriptions();
+                }
+            });
         }
         _startButton.onClick.AddListener(Confirm);
-        if (_tutorialButton != null) _tutorialButton.onClick.AddListener(ConfirmTutorial);
+        if (_tutorialButton != null)
+            _tutorialButton.onClick.AddListener(ConfirmTutorial);
     }
     /// <summary>保存中の名前・装備・前回勝者を表示し、操作可能な設定画面とUI選択を開始する。</summary>
     public void Open(TitleManager title)
@@ -125,39 +138,49 @@ public sealed class RunSetupUI : MonoBehaviour
         _nameInput.SetTextWithoutNotify(RunSession.PlayerName);
         _attack = RunSession.Attack;
         _defense = RunSession.Defense;
-        for (int i = 0; i < _attackOptions.Length; i++) _attackOptions[i].SetIsOnWithoutNotify(i == _attack);
-        for (int i = 0; i < _defenseOptions.Length; i++) _defenseOptions[i].SetIsOnWithoutNotify(i == _defense);
+        for (int i = 0; i < _attackOptions.Length; i++)
+            _attackOptions[i].SetIsOnWithoutNotify(i == _attack);
+        for (int i = 0; i < _defenseOptions.Length; i++)
+            _defenseOptions[i].SetIsOnWithoutNotify(i == _defense);
         // 通知なしで切り替えたため、装備中の表示だけを即時に合わせる。
         SyncSelected(_attackOptions, _attackEffectViews);
         SyncSelected(_defenseOptions, _defenseEffectViews);
-        for (int i = 0; i < _attackEffects.Length; i++) if (_attackEffects[i] != null) _attackEffects[i].text = RunSession.AttackDescription(i);
-        for (int i = 0; i < _defenseEffects.Length; i++) if (_defenseEffects[i] != null) _defenseEffects[i].text = RunSession.DefenseDescription(i);
+        for (int i = 0; i < _attackEffects.Length; i++)
+            if (_attackEffects[i] != null)
+                _attackEffects[i].text = RunSession.AttackDescription(i);
+        for (int i = 0; i < _defenseEffects.Length; i++)
+            if (_defenseEffects[i] != null)
+                _defenseEffects[i].text = RunSession.DefenseDescription(i);
         RefreshDescriptions();
         var champion = RunSession.ReadChampion();
         _opponent.text = champion == null ? "最初の相手：名もなき守人"
             : $"前回の勝者：{champion.Name} / {RunSession.AttackNames[champion.Attack]}・{RunSession.DefenseNames[champion.Defense]}";
-        int lives = Mathf.Max(1, GameplayRules.Current.StartingLives);
-        _rules.text = lives == 1
-            ? $"命は{lives}つ。倒されれば挑戦終了。勝利すると痕跡を更新。"
-            : $"命は{lives}つ。復活してもボスのHPは維持。勝利すると痕跡を更新。";
         _result.text = string.Join("\n", new[] { RunSession.Result, RunSession.SaveError }).Trim();
-        if (_resultGroup != null) _resultGroup.SetActive(!string.IsNullOrEmpty(_result.text));
+        if (_resultGroup != null)
+            _resultGroup.SetActive(!string.IsNullOrEmpty(_result.text));
         _startButton.interactable = true;
-        if (_tutorialButton != null) _tutorialButton.interactable = true;
+        if (_tutorialButton != null)
+            _tutorialButton.interactable = true;
         SetVisible(true);
         PlayOpen();
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         _lastFocused = _attackOptions[_attack].gameObject;
-        if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(_lastFocused);
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(_lastFocused);
     }
     /// <summary>マウス操作で選択が外れた後でも、キーボード・ゲームパッド入力で直前の項目へフォーカスを戻す。</summary>
     private void Update()
     {
         if (!IsOpen || EventSystem.current == null) return;
         var current = EventSystem.current.currentSelectedGameObject;
-        if (current != null) { _lastFocused = current; return; }
-        if (_lastFocused != null && NavigationPressed()) EventSystem.current.SetSelectedGameObject(_lastFocused);
+        if (current != null)
+        {
+            _lastFocused = current;
+            return;
+        }
+        if (_lastFocused != null && NavigationPressed())
+            EventSystem.current.SetSelectedGameObject(_lastFocused);
     }
     /// <summary>フォーカス復帰のきっかけとなる方向・決定入力がこのフレームにあったか。</summary>
     /// <returns>キーボードの方向・決定キー、またはゲームパッドの方向・決定入力があればtrue。</returns>
@@ -166,7 +189,8 @@ public sealed class RunSetupUI : MonoBehaviour
         var keyboard = Keyboard.current;
         if (keyboard != null && (keyboard.upArrowKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame
             || keyboard.leftArrowKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame
-            || keyboard.tabKey.wasPressedThisFrame || keyboard.enterKey.wasPressedThisFrame)) return true;
+            || keyboard.tabKey.wasPressedThisFrame || keyboard.enterKey.wasPressedThisFrame))
+            return true;
         var gamepad = Gamepad.current;
         return gamepad != null && (gamepad.dpad.ReadValue().sqrMagnitude > 0.25f || gamepad.leftStick.ReadValue().sqrMagnitude > 0.25f
             || gamepad.buttonSouth.wasPressedThisFrame);
@@ -174,12 +198,16 @@ public sealed class RunSetupUI : MonoBehaviour
     /// <summary>現在選択中の攻撃・防御装備の名前と効果説明を更新する。</summary>
     private void RefreshDescriptions()
     {
-        if (_attackName != null) _attackName.text = RunSession.AttackNames[_attack];
-        if (_defenseName != null) _defenseName.text = RunSession.DefenseNames[_defense];
+        if (_attackName != null)
+            _attackName.text = RunSession.AttackNames[_attack];
+        if (_defenseName != null)
+            _defenseName.text = RunSession.DefenseNames[_defense];
         _attackDescription.text = RunSession.AttackDescription(_attack);
         _defenseDescription.text = RunSession.DefenseDescription(_defense);
-        if (_attackDetail != null) _attackDetail.text = Detail(_attackDetails, _attack);
-        if (_defenseDetail != null) _defenseDetail.text = Detail(_defenseDetails, _defense);
+        if (_attackDetail != null)
+            _attackDetail.text = Detail(_attackDetails, _attack);
+        if (_defenseDetail != null)
+            _defenseDetail.text = Detail(_defenseDetails, _defense);
     }
     /// <summary>未設定や要素不足を許容して詳しい説明文を取り出す。</summary>
     /// <returns>対応する説明文。なければ空文字。</returns>
@@ -199,9 +227,11 @@ public sealed class RunSetupUI : MonoBehaviour
         RunSession.Prepare(_nameInput.text, _attack, _defense);
         IsOpen = false;
         _startButton.interactable = false;
-        if (_tutorialButton != null) _tutorialButton.interactable = false;
+        if (_tutorialButton != null)
+            _tutorialButton.interactable = false;
         _panel.interactable = false;
-        if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
         _title.BeginConfiguredGame(tutorial);
     }
     /// <summary>設定パネルの表示と入力受付を切り替え、タイトル専用の開始案内を反対の表示状態にする。</summary>
@@ -242,14 +272,17 @@ public sealed class RunSetupUI : MonoBehaviour
     private static void SyncSelected(Toggle[] options, RunSetupSelectableEffect[] views)
     {
         // Editor上のGetComponentは未装着でも偽nullを返すため、?.ではなくUnityの比較で除外する。
-        for (int i = 0; i < views.Length; i++) if (views[i] != null) views[i].ShowSelected(options[i].isOn, false);
+        for (int i = 0; i < views.Length; i++)
+            if (views[i] != null)
+                views[i].ShowSelected(options[i].isOn, false);
     }
     /// <summary>各Toggleに付いた表示演出を取得する。</summary>
     /// <returns>Toggleと同じ順番の表示演出。付いていない要素はnull。</returns>
     private static RunSetupSelectableEffect[] EffectViews(Toggle[] options)
     {
         var views = new RunSetupSelectableEffect[options.Length];
-        for (int i = 0; i < options.Length; i++) views[i] = options[i].GetComponent<RunSetupSelectableEffect>();
+        for (int i = 0; i < options.Length; i++)
+            views[i] = options[i].GetComponent<RunSetupSelectableEffect>();
         return views;
     }
     /// <summary>破棄時に表示開始の演出を停止する。</summary>

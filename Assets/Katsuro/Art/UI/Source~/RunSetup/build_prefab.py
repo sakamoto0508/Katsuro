@@ -651,4 +651,4 @@ for n in Node.all:
 
 data = ''.join(o if o.endswith('\n') else o + '\n' for o in out)
 open(DST, 'w', encoding='utf-8', newline='\r\n').write(data)
-print('objects', len(Node.all), 'bytes', len(data))
+print('オブジェクト数', len(Node.all), 'バイト数', len(data))

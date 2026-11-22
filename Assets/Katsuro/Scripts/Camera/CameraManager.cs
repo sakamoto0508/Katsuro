@@ -6,6 +6,10 @@ using UnityEngine.Rendering;
 /// <summary>入力・Lock-On・Cinemachineと戦闘時の一時的な画面補正を接続し、勝利中は専用カメラへ制御を渡す。</summary>
 public class CameraManager : MonoBehaviour
 {
+    // Cinemachine のインパルス発生元と受け取り側で共有する戦闘用チャンネルマスク。
+    private const int CombatImpulseChannel = 2;
+    private const float MaxLockOnImpulseOffset = .15f;
+
     /// <summary>描画補正とHDRP Passの対象になるSceneの出力カメラ。</summary>
     public Camera OutputCamera => _outputCamera;
     /// <summary>命中時の揺れを発生させるCinemachine Impulse Source。</summary>
@@ -54,12 +58,13 @@ public class CameraManager : MonoBehaviour
         _victoryRig?.Init(playerPosition, outputCamera);
         _config = config;
         _playerPosition = playerPosition;
-        if (_combatImpulse == null) _combatImpulse = GetComponent<CinemachineImpulseSource>();
+        if (_combatImpulse == null)
+            _combatImpulse = GetComponent<CinemachineImpulseSource>();
         if (_combatImpulse != null)
         {
             _combatImpulse.ImpulseDefinition.ImpulseType = CinemachineImpulseDefinition.ImpulseTypes.Uniform;
             _combatImpulse.ImpulseDefinition.ImpulseShape = CinemachineImpulseDefinition.ImpulseShapes.Bump;
-            _combatImpulse.ImpulseDefinition.ImpulseChannel = 2;
+            _combatImpulse.ImpulseDefinition.ImpulseChannel = CombatImpulseChannel;
         }
         CinemachineImpulseManager.Instance.IgnoreTimeScale = true;
         SubscribeRendering();
@@ -84,7 +89,8 @@ public class CameraManager : MonoBehaviour
     /// <summary>攻撃種別に応じた短いCinemachine Impulseを命中位置から発生させる。</summary>
     public void PlayHitFeedback(bool heavy, Vector3 contactPoint, bool counter = false, bool counterFirst = false)
     {
-        if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying || _combatImpulse == null || _config == null) return;
+        if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying || _combatImpulse == null || _config == null)
+            return;
         float strength = _config.GetHitCameraStrength(heavy, counter, counterFirst);
         _combatImpulse.ImpulseDefinition.ImpulseDuration = _config.GetHitCameraDuration(heavy, counter, counterFirst);
         _combatImpulse.GenerateImpulseAtPositionWithVelocity(contactPoint, Vector3.down * strength);
@@ -108,11 +114,27 @@ public class CameraManager : MonoBehaviour
         _victoryRig?.Begin(delay);
     }
     /// <summary>勝利補正を解除し、出力カメラとCinemachineの通常制御を復元する。</summary>
-    public void StopFinalBlowFeedback() { _finalBlowPlaying = false; RestoreCamera(); _victoryRig?.Stop(); }
+    public void StopFinalBlowFeedback()
+    {
+        _finalBlowPlaying = false;
+        RestoreCamera();
+        _victoryRig?.Stop();
+    }
     /// <summary>初期化済みなら描画前後の補正イベントを再登録する。</summary>
-    private void OnEnable() { if (_initialized) SubscribeRendering(); }
+    private void OnEnable()
+    {
+        if (_initialized)
+            SubscribeRendering();
+    }
     /// <summary>描画購読を解除し、回避・勝利の一時カメラ補正を消去する。</summary>
-    private void OnDisable() { UnsubscribeRendering(); _justAvoidEnvelope.Reset(); _releaseStarted = float.NegativeInfinity; _wasLocked = false; StopFinalBlowFeedback(); }
+    private void OnDisable()
+    {
+        UnsubscribeRendering();
+        _justAvoidEnvelope.Reset();
+        _releaseStarted = float.NegativeInfinity;
+        _wasLocked = false;
+        StopFinalBlowFeedback();
+    }
     /// <summary>出力カメラの描画前後で一時補正を適用・解除するイベントを重複なく登録する。</summary>
     private void SubscribeRendering()
     {
@@ -154,14 +176,18 @@ public class CameraManager : MonoBehaviour
             }
         }
         if (!_finalBlowPlaying && _combatImpulse != null && CinemachineImpulseManager.Instance.GetImpulseAt(
-            _savedPosition, false, 2, out var offset, out var rotation))
-            camera.transform.position += Vector3.ClampMagnitude(offset, .15f);
+            _savedPosition, false, CombatImpulseChannel, out var offset, out var rotation))
+            camera.transform.position += Vector3.ClampMagnitude(offset, MaxLockOnImpulseOffset);
         if (_finalBlowPlaying)
         {
-            float push = Mathf.SmoothStep(0, 1, Mathf.Clamp01((Time.unscaledTime - _finalBlowStarted) / Mathf.Max(.01f, _finalBlowPushDuration)));
+            float push = Mathf.SmoothStep(
+                0,
+                1,
+                Mathf.Clamp01((Time.unscaledTime - _finalBlowStarted) / Mathf.Max(.01f, _finalBlowPushDuration)));
             camera.fieldOfView = Mathf.Clamp(_savedFov + _finalBlowFOVOffset * push, 1f, 179f);
         }
-        else ApplyJustAvoid(camera);
+        else
+            ApplyJustAvoid(camera);
         _appliedPosition = camera.transform.position;
         _appliedRotation = camera.transform.rotation;
         _appliedFov = camera.fieldOfView;
@@ -170,7 +196,8 @@ public class CameraManager : MonoBehaviour
     private void ApplyJustAvoid(Camera camera)
     {
         float now = Time.unscaledTime;
-        if (_justAvoidEnvelope.Playing && IsJustAvoidSustained(now)) _justAvoidEnvelope.Sustain(now, _config.JustAvoidCameraEnter);
+        if (_justAvoidEnvelope.Playing && IsJustAvoidSustained(now))
+            _justAvoidEnvelope.Sustain(now, _config.JustAvoidCameraEnter);
         float weight = _justAvoidEnvelope.Evaluate(now, _config.JustAvoidCameraEnter
             , _config.JustAvoidCameraHold, _config.JustAvoidCameraRestore);
         if (weight <= 0f) return;
@@ -181,7 +208,8 @@ public class CameraManager : MonoBehaviour
         Quaternion orbit = Quaternion.AngleAxis(-_config.JustAvoidLowAngle * weight, camera.transform.right);
         Vector3 offset = orbit * (camera.transform.position - pivot);
         float distance = offset.magnitude;
-        if (distance > .01f) offset *= Mathf.Max(.3f, distance - _config.JustAvoidPushIn * weight) / distance;
+        if (distance > .01f)
+            offset *= Mathf.Max(.3f, distance - _config.JustAvoidPushIn * weight) / distance;
         Vector3 position = pivot + offset;
         position.y = Mathf.Max(position.y, Mathf.Min(camera.transform.position.y, _playerPosition.position.y + _config.JustAvoidMinHeight));
         camera.transform.SetPositionAndRotation(position, orbit * camera.transform.rotation);
@@ -195,13 +223,15 @@ public class CameraManager : MonoBehaviour
             _justAvoidSustainStarted = float.NegativeInfinity;
             return false;
         }
-        if (float.IsNegativeInfinity(_justAvoidSustainStarted)) _justAvoidSustainStarted = now;
+        if (float.IsNegativeInfinity(_justAvoidSustainStarted))
+            _justAvoidSustainStarted = now;
         return now - _justAvoidSustainStarted < _config.JustAvoidCameraMaxSustain;
     }
     /// <summary>描画終了後に位置・回転・FOVを戻し、次のCinemachine更新に補正を持ち越さない。</summary>
     private void EndRendering(ScriptableRenderContext context, Camera camera)
     {
-        if (camera == _outputCamera) RestoreCamera();
+        if (camera == _outputCamera)
+            RestoreCamera();
     }
     /// <summary>描画用に保存した位置・回転・FOVを一度だけ復元する。補正後に他から上書きされていれば新しい値を優先する。</summary>
     private void RestoreCamera()
@@ -219,7 +249,13 @@ public class CameraManager : MonoBehaviour
     /// <summary>勝利中は専用仮想カメラを進行し、それ以外はLock-Onの手動追従を更新する。</summary>
     private void LateUpdate()
     {
-        if (_finalBlowPlaying) { _releaseStarted = float.NegativeInfinity; _wasLocked = false; _victoryRig?.Tick(Time.unscaledTime); return; }
+        if (_finalBlowPlaying)
+        {
+            _releaseStarted = float.NegativeInfinity;
+            _wasLocked = false;
+            _victoryRig?.Tick(Time.unscaledTime);
+            return;
+        }
         _lockOnCameraMover?.LateUpdate();
         bool locked = _lookOnCamera != null && _lookOnCamera.IsLockOn;
         if (_wasLocked && !locked)

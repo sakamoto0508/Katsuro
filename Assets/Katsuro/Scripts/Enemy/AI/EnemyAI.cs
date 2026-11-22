@@ -143,7 +143,7 @@ public class EnemyAI
             _lastDecision,
             _config, CanSelectCandidate);
 
-        CombatLog.Trace($"AI decide {action.Action} / {(action.Pattern != null ? action.Pattern.PatternName : action.Attack?.name)}");
+        CombatLog.Trace($"AI の選択 {action.Action} / {(action.Pattern != null ? action.Pattern.PatternName : action.Attack?.name)}");
 
         _lastDecision = action;
         ExecuteAction(action);

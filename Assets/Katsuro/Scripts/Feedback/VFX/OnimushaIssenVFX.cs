@@ -61,7 +61,12 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
 
         // 1) Screen white-out.
         _flashPeak = first ? _s.FirstFlash : _s.SecondFlash;
-        if (_flash != null && _flashPeak > 0f && view != null) { _flashStart = now; _flash.enabled = true; PlaceFlash(view); }
+        if (_flash != null && _flashPeak > 0f && view != null)
+        {
+            _flashStart = now;
+            _flash.enabled = true;
+            PlaceFlash(view);
+        }
 
         // 2) Huge arc sweeping around the attacker, its rim passing through the hit point.
         if (_arc != null && (first ? _s.FirstArc : _s.SecondArc) && view != null)
@@ -76,9 +81,31 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
         }
 
         // 3) Radial streaks, white spray and lingering blue sparks from the contact point.
-        Burst(_streaks, hit, first ? _s.StreakCount / 2 : _s.StreakCount, _s.StreakSpeed * .6f, _s.StreakSpeed, .07f, .15f, .04f, .08f, _s.StreakColor, 2f);
+        Burst(
+            _streaks,
+            hit,
+            first ? _s.StreakCount / 2 : _s.StreakCount,
+            _s.StreakSpeed * .6f,
+            _s.StreakSpeed,
+            .07f,
+            .15f,
+            .04f,
+            .08f,
+            _s.StreakColor,
+            2f);
         Burst(_mist, hit, _s.MistCount, 2f, 5f, .3f, .55f, .45f, 1.1f, _s.MistColor, 1f);
-        Burst(_sparks, hit, first ? _s.SparkCount / 2 : _s.SparkCount, 1.5f, 6f, .35f, .8f, .02f, .05f, _s.SparkColor, _s.SparkIntensity);
+        Burst(
+            _sparks,
+            hit,
+            first ? _s.SparkCount / 2 : _s.SparkCount,
+            1.5f,
+            6f,
+            .35f,
+            .8f,
+            .02f,
+            .05f,
+            _s.SparkColor,
+            _s.SparkIntensity);
     }
 
     private void LateUpdate()
@@ -89,11 +116,18 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
         {
             float u = Mathf.Clamp01((now - _flashStart) / Mathf.Max(.01f, _s.FlashDuration));
             var view = Camera.main;
-            if (u >= 1f || view == null) { _flashStart = -1f; _flash.enabled = false; }
+            if (u >= 1f || view == null)
+            {
+                _flashStart = -1f;
+                _flash.enabled = false;
+            }
             else
             {
                 PlaceFlash(view);
-                float envelope = u < .15f ? 1f : 1f - Mathf.SmoothStep(0f, 1f, (u - .15f) / .85f);   // hit white, then fall away
+                float envelope = u < .15f ? 1f : 1f - Mathf.SmoothStep(
+                    0f,
+                    1f,
+                    (u - .15f) / .85f);   // hit white, then fall away
                 _flashMaterial.SetColor(ColorId, _s.FlashColor);
                 _flashMaterial.SetFloat(IntensityId, _flashPeak * envelope);
             }
@@ -102,7 +136,11 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
         {
             float t = now - _arcStart;
             float total = _s.ArcSweep + _s.ArcFade;
-            if (t >= total) { _arcStart = -1f; _arc.enabled = false; }
+            if (t >= total)
+            {
+                _arcStart = -1f;
+                _arc.enabled = false;
+            }
             else
             {
                 float sweep = Mathf.Clamp01(t / Mathf.Max(.01f, _s.ArcSweep));
@@ -118,7 +156,8 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
     /// <summary>扇形（環の一部）。u=尾(0)→先端(1)、v=外縁の明るい縁(0)→内側(1)。ローカルX=斬撃方向、面は+Y側。</summary>
     private static Mesh BuildArcMesh(float angleDeg)
     {
-        const int segments = 64, rows = 8; const float inner = .3f;
+        const int segments = 64, rows = 8;
+        const float inner = .3f;
         var verts = new Vector3[(segments + 1) * (rows + 1)];
         var uvs = new Vector2[verts.Length];
         var tris = new int[segments * rows * 6];
@@ -141,11 +180,18 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
             for (int j = 0; j < rows; j++)
             {
                 int a0 = i * (rows + 1) + j, a1 = a0 + rows + 1;
-                tris[t++] = a0; tris[t++] = a1; tris[t++] = a0 + 1;
-                tris[t++] = a0 + 1; tris[t++] = a1; tris[t++] = a1 + 1;
+                tris[t++] = a0;
+                tris[t++] = a1;
+                tris[t++] = a0 + 1;
+                tris[t++] = a0 + 1;
+                tris[t++] = a1;
+                tris[t++] = a1 + 1;
             }
         var mesh = new Mesh { name = "Issen Arc" };
-        mesh.vertices = verts; mesh.uv = uvs; mesh.triangles = tris; mesh.RecalculateBounds();
+        mesh.vertices = verts;
+        mesh.uv = uvs;
+        mesh.triangles = tris;
+        mesh.RecalculateBounds();
         return mesh;
     }
 
@@ -177,20 +223,35 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
         var ps = go.AddComponent<ParticleSystem>();
         ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         var main = ps.main;
-        main.loop = false; main.playOnAwake = false; main.duration = .1f; main.useUnscaledTime = true;
-        main.simulationSpace = ParticleSystemSimulationSpace.World; main.maxParticles = 200;
-        var emission = ps.emission; emission.rateOverTime = 0f;
-        var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Sphere; shape.radius = .06f;
-        var color = ps.colorOverLifetime; color.enabled = true;
+        main.loop = false;
+        main.playOnAwake = false;
+        main.duration = .1f;
+        main.useUnscaledTime = true;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        main.maxParticles = 200;
+        var emission = ps.emission;
+        emission.rateOverTime = 0f;
+        var shape = ps.shape;
+        shape.shapeType = ParticleSystemShapeType.Sphere;
+        shape.radius = .06f;
+        var color = ps.colorOverLifetime;
+        color.enabled = true;
         var gradient = new Gradient();
         gradient.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
             new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(.8f, .35f), new GradientAlphaKey(0f, 1f) });
         color.color = gradient;
-        var limit = ps.limitVelocityOverLifetime; limit.enabled = true; limit.limit = 1000f; limit.drag = 2.5f;
+        var limit = ps.limitVelocityOverLifetime;
+        limit.enabled = true;
+        limit.limit = 1000f;
+        limit.drag = 2.5f;
         var renderer = go.GetComponent<ParticleSystemRenderer>();
         renderer.sharedMaterial = material;
         renderer.renderMode = mode;
-        if (mode == ParticleSystemRenderMode.Stretch) { renderer.lengthScale = 3f; renderer.velocityScale = .05f; }
+        if (mode == ParticleSystemRenderMode.Stretch)
+        {
+            renderer.lengthScale = 3f;
+            renderer.velocityScale = .05f;
+        }
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
         return ps;
@@ -215,8 +276,14 @@ public sealed class OnimushaIssenVFX : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (var r in new Renderer[] { _arc, _flash }) if (r != null) Destroy(r.gameObject);
-        foreach (var p in new[] { _streaks, _mist, _sparks }) if (p != null) Destroy(p.gameObject);
-        foreach (var m in new[] { _arcMaterial, _flashMaterial, _additiveParticle, _alphaParticle, _sparkParticle }) if (m != null) Destroy(m);
+        foreach (var r in new Renderer[] { _arc, _flash })
+            if (r != null)
+                Destroy(r.gameObject);
+        foreach (var p in new[] { _streaks, _mist, _sparks })
+            if (p != null)
+                Destroy(p.gameObject);
+        foreach (var m in new[] { _arcMaterial, _flashMaterial, _additiveParticle, _alphaParticle, _sparkParticle })
+            if (m != null)
+                Destroy(m);
     }
 }

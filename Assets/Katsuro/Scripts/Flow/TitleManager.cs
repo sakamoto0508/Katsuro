@@ -9,6 +9,8 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class TitleManager : MonoBehaviour
 {
+    private const int MillisecondsPerSecond = 1000;
+
     /// <summary>タイトルBGMと開始SEの登録名設定。</summary>
     [UnityEngine.Tooltip("タイトルBGMと開始SEの登録名設定。")]
     [SerializeField] private AudioConfig _audioConfig;
@@ -44,11 +46,12 @@ public class TitleManager : MonoBehaviour
         _audio = _scene.Audio;
         _fader = _scene.Fader;
         _scene.InitTitleTexts(this);
-        if (_audioSettings != null) _audioSettings.Init(this, _audio);
+        if (_audioSettings != null)
+            _audioSettings.Init(this, _audio);
         // タイトルBGM再生（null ガード）
         if (_audioConfig != null && _audio != null)
         {
-            _audio.PlayBGM(_audioConfig.TitleBGM, 0.5f);
+            _audio.PlayBGM(_audioConfig.TitleBGM, _audioConfig.SceneBgmVolume);
         }
     }
 
@@ -56,7 +59,8 @@ public class TitleManager : MonoBehaviour
     private void Update()
     {
         if (_isTransitioning || (_setup != null && _setup.IsOpen)) return;
-        if (_audioSettings != null && (_audioSettings.ConsumeTitleNavigation() || _audioSettings.BlocksStart)) return;
+        if (_audioSettings != null && (_audioSettings.ConsumeTitleNavigation() || _audioSettings.BlocksStart))
+            return;
         if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
         {
             OnPressStart();
@@ -78,8 +82,13 @@ public class TitleManager : MonoBehaviour
         if (_audioSettings != null && _audioSettings.BlocksStart) return;
         if (_isTransitioning || (_fader != null && _fader.IsTransitioning)) return;
         if (_setup != null && _setup.IsOpen) return;
-        if (_setup == null) { Debug.LogError("Assign the scene RunSetupUI to TitleManager.", this); return; }
-        if (_audioSettings != null) _audioSettings.SetTitleAvailable(false);
+        if (_setup == null)
+        {
+            Debug.LogError("シーンの RunSetupUI を TitleManager に設定してください。", this);
+            return;
+        }
+        if (_audioSettings != null)
+            _audioSettings.SetTitleAvailable(false);
         _setup.Open(this);
     }
 
@@ -114,9 +123,10 @@ public class TitleManager : MonoBehaviour
     {
         try
         {
-            await UniTask.Delay((int)(Mathf.Max(0f, _transitionDelay) * 1000), ignoreTimeScale: true,
+            await UniTask.Delay((int)(Mathf.Max(0f, _transitionDelay) * MillisecondsPerSecond), ignoreTimeScale: true,
                 cancellationToken: this.GetCancellationTokenOnDestroy());
-            if (_sceneNameConfig == null) throw new System.InvalidOperationException("SceneNameConfig is required.");
+            if (_sceneNameConfig == null)
+                throw new System.InvalidOperationException("SceneNameConfig を設定してください。");
             var sceneName = tutorial ? _sceneNameConfig.TutorialScene : _sceneNameConfig.GameScene;
             await _fader.FadeToScene(sceneName);
         }
@@ -124,7 +134,8 @@ public class TitleManager : MonoBehaviour
         catch (System.Exception error)
         {
             Debug.LogException(error);
-            if (this != null && _setup != null) _setup.Open(this);
+            if (this != null && _setup != null)
+                _setup.Open(this);
         }
         finally { _isTransitioning = false; }
     }

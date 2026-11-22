@@ -15,6 +15,7 @@ public sealed class TutorialGoal : MonoBehaviour
     private void Notify(Collider other)
     {
         var player = other.GetComponentInParent<PlayerController>();
-        if (player != null) Reached?.Invoke(player);
+        if (player != null)
+            Reached?.Invoke(player);
     }
 }

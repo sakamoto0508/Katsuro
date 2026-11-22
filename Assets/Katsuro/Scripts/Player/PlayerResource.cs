@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public class PlayerResource : IDisposable
 {
+    private const float TrainingRecoveryProtectionSeconds = .5f;
+    private const float MinTrainingHpRatio = .1f;
+
     /// <summary>最大HPと現在HPの通知を初期化し、能力コストや死亡処理で使う依存先を保持する。</summary>
     public PlayerResource(PlayerStatus status,PlayerAnimationController animController)
     {
@@ -46,15 +49,19 @@ public class PlayerResource : IDisposable
     /// <summary>ゲーム進行・Audio・死亡演出・遷移先を一度だけ接続する。</summary>
     public void Init(GameManager game, AudioManager audio, PlayerDeadManager playerDead, LoadSceneManager loader)
     {
-        if (_initialized) return;
+        if (_initialized)
+            return;
         _initialized = true;
-        _game = game; _audio = audio; _playerDead = playerDead; _loader = loader;
+        _game = game;
+        _audio = audio;
+        _playerDead = playerDead;
+        _loader = loader;
     }
     /// <summary>修練の回復課題用にHPを準備する。本編では呼ばれても値を変更しない。</summary>
     public void SetTrainingHpRatio(float ratio)
     {
         if (_game == null || !_game.IsTutorial || _dead) return;
-        _hpRx.Value = _maxHp * Mathf.Clamp(ratio, .1f, 1f);
+        _hpRx.Value = _maxHp * Mathf.Clamp(ratio, MinTrainingHpRatio, 1f);
     }
 
     /// <summary>
@@ -96,7 +103,7 @@ public class PlayerResource : IDisposable
         if (_game != null && _game.IsTutorial)
         {
             _hpRx.Value = _maxHp;
-            InvulnerableUntil = Time.time + .5f;
+            InvulnerableUntil = Time.time + TrainingRecoveryProtectionSeconds;
             Revived?.Invoke();
             return;
         }

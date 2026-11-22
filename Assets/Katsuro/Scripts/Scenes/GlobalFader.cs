@@ -42,7 +42,8 @@ public class GlobalFader : MonoBehaviour
     /// <summary>自身が共有Faderの場合に共有参照を解除する。</summary>
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 
     /// <summary>
@@ -53,7 +54,8 @@ public class GlobalFader : MonoBehaviour
         // シーンに属する画像は遷移途中で破棄されるため、永続オブジェクトの子に配置する。
         if (fadeImage == null || !fadeImage.transform.IsChildOf(transform))
         {
-            if (fadeImage != null) fadeImage.gameObject.SetActive(false);
+            if (fadeImage != null)
+                fadeImage.gameObject.SetActive(false);
             var canvasObject = new GameObject("GlobalFader_Canvas", typeof(Canvas));
             canvasObject.transform.SetParent(transform, false);
             var canvas = canvasObject.GetComponent<Canvas>();
@@ -85,7 +87,7 @@ public class GlobalFader : MonoBehaviour
     {
         if (IsTransitioning) return;
         if (string.IsNullOrWhiteSpace(sceneName) || !Application.CanStreamedLevelBeLoaded(sceneName))
-            throw new ArgumentException($"Scene is not available in Build Settings: {sceneName}", nameof(sceneName));
+            throw new ArgumentException($"ビルド設定にシーンが含まれていません。{sceneName}", nameof(sceneName));
         IsTransitioning = true;
         var token = this.GetCancellationTokenOnDestroy();
         try
@@ -95,7 +97,8 @@ public class GlobalFader : MonoBehaviour
             await FadeAlpha(1f, token);
             // シーン読み込み完了時と開始時の初期化が済むまで、画面を不透明に保つ。
             var operation = SceneManager.LoadSceneAsync(sceneName);
-            if (operation == null) throw new InvalidOperationException($"Could not load scene: {sceneName}");
+            if (operation == null)
+                throw new InvalidOperationException($"シーンを読み込めませんでした。{sceneName}");
             await operation.ToUniTask(cancellationToken: token);
             await UniTask.NextFrame(cancellationToken: token);
             await FadeAlpha(0f, token);

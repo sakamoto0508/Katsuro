@@ -66,9 +66,14 @@ public class FinalBlowManager : MonoBehaviour
     /// <summary>勝利演出に使用するゲーム・Audio・HitStop・遷移・Faderを接続し、討伐文字を待機状態へ戻す。</summary>
     public void Init(GameManager game, AudioManager audio, HitStopManager hitStop, LoadSceneManager loader, GlobalFader fader)
     {
-        if (_initialized) return;
+        if (_initialized)
+            return;
         _initialized = true;
-        _game = game; _audio = audio; _hitStop = hitStop; _loader = loader; _fader = fader;
+        _game = game;
+        _audio = audio;
+        _hitStop = hitStop;
+        _loader = loader;
+        _fader = fader;
         if (Instance == null)
         {
             Instance = this;
@@ -100,7 +105,8 @@ public class FinalBlowManager : MonoBehaviour
         _audio?.CancelJustAvoidDuck();
         _cameraFeedback?.GetComponent<VictoryContrast>()?.Begin();
         _sequenceCancellation = new CancellationTokenSource();
-        if (_presentation != null) _presentation.Begin(_finalBlowText, _whiteFlashDuration, _textDelay, _finalBlowTextFadeIn);
+        if (_presentation != null)
+            _presentation.Begin(_finalBlowText, _whiteFlashDuration, _textDelay, _finalBlowTextFadeIn);
         _game?.WinGame();
         DoFinalBlow().Forget();
         return true;
@@ -119,22 +125,26 @@ public class FinalBlowManager : MonoBehaviour
             if (_audio != null)
             {
                 _audio.StopAllBGMs();
-                if (_audioConfig != null) _audio.PlaySE(_audioConfig.EnemyDeadSound);
+                if (_audioConfig != null)
+                    _audio.PlaySE(_audioConfig.EnemyDeadSound);
             }
             // FOVの優先権は成立直後に取る。寄り始めだけ短く遅らせる。
-            if (_cameraFeedback != null) _cameraFeedback.PlayFinalBlowFeedback(_cameraPushDelay);
+            if (_cameraFeedback != null)
+                _cameraFeedback.PlayFinalBlowFeedback(_cameraPushDelay);
             await WaitUntil(started, Mathf.Max(_cameraPushDelay, _sheathingDelay), token);
             if (_player != null && _player.AnimController != null)
                 _player.AnimController.PlayTrigger(_player.AnimController.AnimName.SwordSheathing);
             await WaitUntil(started, Mathf.Max(_sheathingDelay + _phase2Duration, _textDelay + _finalBlowTextFadeIn), token);
             var config = _loader != null ? _loader.SceneNameConfig : null;
-            if (_fader != null) await _fader.FadeToScene(config != null ? config.TitleScene : "TitleScene").AttachExternalCancellation(token);
+            if (_fader != null)
+                await _fader.FadeToScene(config != null ? config.TitleScene : "TitleScene").AttachExternalCancellation(token);
         }
         catch (OperationCanceledException) { }
         finally
         {
             Cleanup();
-            if (_sequenceCancellation == source) _sequenceCancellation = null;
+            if (_sequenceCancellation == source)
+                _sequenceCancellation = null;
             source.Dispose();
         }
     }
@@ -142,7 +152,8 @@ public class FinalBlowManager : MonoBehaviour
     /// <summary>開始基準の実時刻までUpdateで待機し、TimeScaleに左右されずキャンセルを受け付ける。</summary>
     private static async UniTask WaitUntil(float started, float seconds, CancellationToken token)
     {
-        while (Time.unscaledTime - started < seconds) await UniTask.Yield(PlayerLoopTiming.Update, token);
+        while (Time.unscaledTime - started < seconds)
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
         token.ThrowIfCancellationRequested();
     }
 
@@ -155,13 +166,23 @@ public class FinalBlowManager : MonoBehaviour
     /// <summary>演出の一時状態と速度補正を解除する。勝利後の入力停止はGameManagerに任せて保持する。</summary>
     private void Cleanup()
     {
-        if (_cameraFeedback != null) _cameraFeedback.GetComponent<VictoryContrast>()?.Cancel();
-        if (_presentation != null) _presentation.ResetPresentation();
-        if (_cameraFeedback != null) _cameraFeedback.StopFinalBlowFeedback();
-        if (_finalBlowText != null) _finalBlowText.DOKill();
+        if (_cameraFeedback != null)
+            _cameraFeedback.GetComponent<VictoryContrast>()?.Cancel();
+        if (_presentation != null)
+            _presentation.ResetPresentation();
+        if (_cameraFeedback != null)
+            _cameraFeedback.StopFinalBlowFeedback();
+        if (_finalBlowText != null)
+            _finalBlowText.DOKill();
         if (!_isPlaying) return;
-        if (_player != null) foreach (var speed in _player.GetComponentsInChildren<AnimationSpeedController>(true)) if (speed != null) speed.ClearTemporary();
-        if (_enemyController != null) foreach (var speed in _enemyController.GetComponentsInChildren<AnimationSpeedController>(true)) if (speed != null) speed.ClearTemporary();
+        if (_player != null)
+            foreach (var speed in _player.GetComponentsInChildren<AnimationSpeedController>(true))
+                if (speed != null)
+                    speed.ClearTemporary();
+        if (_enemyController != null)
+            foreach (var speed in _enemyController.GetComponentsInChildren<AnimationSpeedController>(true))
+                if (speed != null)
+                    speed.ClearTemporary();
         _isPlaying = false;
         // Victoryの入力停止はGameManagerが所有する。演出Cleanupで再有効化しない。
     }
@@ -171,6 +192,7 @@ public class FinalBlowManager : MonoBehaviour
     private void OnDestroy()
     {
         CancelPresentation();
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 }

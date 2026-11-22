@@ -13,10 +13,10 @@ Shader "Katsuro/JustAvoidScreenDistortion"
             #pragma fragment FullScreenPass
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/RenderPass/CustomPass/CustomPassCommon.hlsl"
             TEXTURE2D_X(_DistortionSource);
-            float4 _SourceInfo; // RT scale xy, reciprocal viewport zw
-            float4 _CenterRadius; // viewport center xy, radius z, aspect w
-            float4 _Ring; // width, strength, radius noise, progress
-            float4 _NoiseTint; // angular frequency, tint strength
+            float4 _SourceInfo; // xy はレンダーターゲットの倍率、zw はビューポート寸法の逆数。
+            float4 _CenterRadius; // xy はビューポート内の中心、z は半径、w はアスペクト比。
+            float4 _Ring; // 幅、強さ、半径の揺らぎ、進行度。
+            float4 _NoiseTint; // 角度方向の周波数、色の強さ。
             float4 _EdgeTint;
 
             float4 FullScreenPass(Varyings input) : SV_Target

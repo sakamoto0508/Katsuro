@@ -8,6 +8,11 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public sealed class WeaponHitboxRelay : MonoBehaviour
 {
+    // 急な回転でも途中の刀身を判定するため、区間を最大 5 度ずつに分ける。
+    private const float MaxSweepStepDegrees = 5f;
+    private const float MinBoxCastDisplacementSquared = .0000001f;
+    private const float MinDirectionDisplacementSquared = .000001f;
+
     /// <summary>衝突を購読者へ通知するイベント。</summary>
     private event Action<Collider> _onHit;
 
@@ -41,31 +46,49 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
     private void SweepBox()
     {
         if (!_sweptHits || !(_ownerCollider is BoxCollider box) || !box.enabled)
-        { _hasBoxSample = false; return; }
+        {
+            _hasBoxSample = false;
+            return;
+        }
         Vector3 center = box.transform.TransformPoint(box.center);
         Quaternion rotation = box.transform.rotation;
         Vector3 scale = box.transform.lossyScale;
         Vector3 half = Vector3.Scale(box.size * .5f, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
-        if (!_hasBoxSample) { _previousBoxCenter = center; _previousBoxRotation = rotation; }
-        int steps = Mathf.Max(1, Mathf.CeilToInt(Quaternion.Angle(_previousBoxRotation, rotation) / 5f));
+        if (!_hasBoxSample)
+        {
+            _previousBoxCenter = center;
+            _previousBoxRotation = rotation;
+        }
+        int steps = Mathf.Max(1, Mathf.CeilToInt(Quaternion.Angle(_previousBoxRotation, rotation) / MaxSweepStepDegrees));
         Vector3 previous = _previousBoxCenter;
         for (int i = 1; i <= steps; i++)
         {
             Vector3 point = Vector3.Lerp(_previousBoxCenter, center, (float)i / steps);
             Quaternion q = Quaternion.Slerp(_previousBoxRotation, rotation, (float)i / steps);
             Vector3 delta = point - previous;
-            if (delta.sqrMagnitude > .0000001f)
-                foreach (var hit in Physics.BoxCastAll(previous, half, delta.normalized, q, delta.magnitude, ~0, QueryTriggerInteraction.Collide))
+            if (delta.sqrMagnitude > MinBoxCastDisplacementSquared)
+                foreach (var hit in Physics.BoxCastAll(
+                    previous,
+                    half,
+                    delta.normalized,
+                    q,
+                    delta.magnitude,
+                    ~0,
+                    QueryTriggerInteraction.Collide))
                     ReportSweptHit(hit.collider);
-            foreach (var other in Physics.OverlapBox(point, half, q, ~0, QueryTriggerInteraction.Collide)) ReportSweptHit(other);
+            foreach (var other in Physics.OverlapBox(point, half, q, ~0, QueryTriggerInteraction.Collide))
+                ReportSweptHit(other);
             previous = point;
         }
-        _previousBoxCenter = center; _previousBoxRotation = rotation; _hasBoxSample = true;
+        _previousBoxCenter = center;
+        _previousBoxRotation = rotation;
+        _hasBoxSample = true;
     }
     private void ReportSweptHit(Collider other)
     {
         if (!_sweptHits || !enabled || _ownerCollider == null || !_ownerCollider.enabled || other == null ||
-            Physics.GetIgnoreLayerCollision(gameObject.layer, other.gameObject.layer) || Physics.GetIgnoreCollision(_ownerCollider, other)) return;
+            Physics.GetIgnoreLayerCollision(gameObject.layer, other.gameObject.layer) || Physics.GetIgnoreCollision(_ownerCollider, other))
+            return;
         _onHit?.Invoke(other);
     }
 
@@ -76,7 +99,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         {
             if (_ownerCollider == null || !_hasSweepSample) return Vector3.zero;
             Vector3 delta = _ownerCollider.bounds.center - _previousSweepCenter;
-            return delta.sqrMagnitude > .000001f ? delta.normalized : _lastSweep;
+            return delta.sqrMagnitude > MinDirectionDisplacementSquared ? delta.normalized : _lastSweep;
         }
     }
 
@@ -95,7 +118,7 @@ public sealed class WeaponHitboxRelay : MonoBehaviour
         {
             Vector3 delta = center - _previousSweepCenter;
             // 静止時に前の斬撃方向を持ち越さない。
-            _lastSweep = delta.sqrMagnitude > .000001f ? delta.normalized : Vector3.zero;
+            _lastSweep = delta.sqrMagnitude > MinDirectionDisplacementSquared ? delta.normalized : Vector3.zero;
         }
         _previousSweepCenter = center;
         _hasSweepSample = true;

@@ -150,11 +150,13 @@ public sealed class TitleEmberEffect : MaskableGraphic, ITitleAmbientElement
             _prewarmed = true;
             // フェードイン前に粒を散らしておき、全粒が同じ高さから湧く不自然さを避ける
             const float step = 1f / 30f;
-            for (float t = 0f; t < _prewarmTime; t += step) Simulate(step, t, context.Wind, 1f);
+            for (float t = 0f; t < _prewarmTime; t += step)
+                Simulate(step, t, context.Wind, 1f);
         }
         Simulate(context.DeltaTime, context.Time, context.Wind, context.Intensity);
         // 粒が消えた直後の1回だけ空メッシュを送り、以降は再構築を止める
-        if (_activeCount > 0 || _wasVisible) SetVerticesDirty();
+        if (_activeCount > 0 || _wasVisible)
+            SetVerticesDirty();
         _wasVisible = _activeCount > 0;
     }
 
@@ -167,7 +169,8 @@ public sealed class TitleEmberEffect : MaskableGraphic, ITitleAmbientElement
         while (_emitAccumulator >= 1f)
         {
             _emitAccumulator -= 1f;
-            if (_activeCount < _particles.Length) Spawn(rect, wind);
+            if (_activeCount < _particles.Length)
+                Spawn(rect, wind);
         }
 
         float blend = 1f - Mathf.Exp(-_responsiveness * deltaTime);

@@ -949,6 +949,10 @@ PrefabInstance:
       value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 4735781494124217749, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
+      propertyPath: _cameraConfig
+      value:
+      objectReference: {fileID: 11400000, guid: f0289c7243b3acf44a8c6b3e876860b1, type: 2}
+    - target: {fileID: 4735781494124217749, guid: bb0c89abf55f1de44b4ade326178742e, type: 3}
       propertyPath: _cameraManager
       value: 
       objectReference: {fileID: 1106239549}

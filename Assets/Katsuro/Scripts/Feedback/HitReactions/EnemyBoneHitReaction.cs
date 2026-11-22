@@ -26,7 +26,8 @@ public sealed class EnemyBoneHitReaction
     public EnemyBoneHitReaction(Transform root, Animator animator)
     {
         _root = root;
-        if (animator == null || !animator.isHuman || animator.avatar == null || !animator.avatar.isValid) return;
+        if (animator == null || !animator.isHuman || animator.avatar == null || !animator.avatar.isValid)
+            return;
         Add(animator, HumanBodyBones.Spine, .22f, 0f);
         Add(animator, HumanBodyBones.Chest, .42f, 0f);
         Add(animator, HumanBodyBones.UpperChest, .16f, .004f);
@@ -35,8 +36,11 @@ public sealed class EnemyBoneHitReaction
         Add(animator, HumanBodyBones.Neck, .06f, .012f);
         Add(animator, HumanBodyBones.Head, .02f, .020f);
         float sum = 0f;
-        foreach (var bone in _bones) sum += bone.Weight;
-        if (sum > 0f) foreach (var bone in _bones) bone.Weight /= sum;
+        foreach (var bone in _bones)
+            sum += bone.Weight;
+        if (sum > 0f)
+            foreach (var bone in _bones)
+                bone.Weight /= sum;
     }
 
     void Add(Animator animator, HumanBodyBones id, float weight, float delay)
@@ -53,9 +57,12 @@ public sealed class EnemyBoneHitReaction
         if (root == null) return Vector3.back;
         Vector3 away = info.Instigator != null ? root.position - info.Instigator.transform.position : Vector3.zero;
         away.y = 0f;
-        if (!Usable(away)) away = Vector3.ProjectOnPlane(root.position - info.HitPoint, Vector3.up);
-        if (!Usable(away)) away = Vector3.ProjectOnPlane(info.HitNormal, Vector3.up);
-        if (!Usable(away)) away = -root.forward;
+        if (!Usable(away))
+            away = Vector3.ProjectOnPlane(root.position - info.HitPoint, Vector3.up);
+        if (!Usable(away))
+            away = Vector3.ProjectOnPlane(info.HitNormal, Vector3.up);
+        if (!Usable(away))
+            away = -root.forward;
         return root.InverseTransformDirection(away.normalized);
     }
 
@@ -64,7 +71,11 @@ public sealed class EnemyBoneHitReaction
         float impactFraction = .16f, float followThroughFraction = .14f)
     {
         if (!Finite(angle) || !Finite(duration) || !Finite(attackScale) || _root == null) return;
-        if (info.IsJustAvoidCounter) { Clear(); return; }
+        if (info.IsJustAvoidCounter)
+        {
+            Clear();
+            return;
+        }
         _continuing = _active;
         RemoveOffsets();
         Vector3 contact = _root.InverseTransformPoint(info.HitPoint);
@@ -120,13 +131,17 @@ public sealed class EnemyBoneHitReaction
     /// <returns>被弾経過時間に対応する0から1の重み。</returns>
     public static float Envelope(float age, float duration, float impactFraction = .16f, float followThroughFraction = .14f)
     {
-        if (!Finite(age) || !Finite(duration) || duration <= 0f || age < 0f || age >= duration) return 0f;
+        if (!Finite(age) || !Finite(duration) || duration <= 0f || age < 0f || age >= duration)
+            return 0f;
         float peak = duration * (Finite(impactFraction) ? Mathf.Clamp(impactFraction, .08f, .3f) : .16f);
         float follow = duration * (Finite(followThroughFraction) ? Mathf.Clamp(followThroughFraction, 0f, .25f) : .14f);
         if (age < peak) return Mathf.Lerp(.5f, 1f, Mathf.SmoothStep(0f, 1f, age / peak));
         if (follow > 0f && age < peak + follow)
             return Mathf.Lerp(1f, .88f, Mathf.SmoothStep(0f, 1f, (age - peak) / follow));
-        return (follow > 0f ? .88f : 1f) * (1f - Mathf.SmoothStep(0f, 1f, (age - peak - follow) / (duration - peak - follow)));
+        return (follow > 0f ? .88f : 1f) * (1f - Mathf.SmoothStep(
+            0f,
+            1f,
+            (age - peak - follow) / (duration - peak - follow)));
     }
 
     /// <summary>Animator速度を掛けた時間で骨反応を進め、HitStop中は進行を止める。</summary>
@@ -134,13 +149,14 @@ public sealed class EnemyBoneHitReaction
     {
         if (!_active || !Finite(deltaTime) || !Finite(animatorSpeed)) return;
         _elapsed += Mathf.Max(0f, deltaTime) * Mathf.Max(0f, animatorSpeed);
-        if (_elapsed >= _duration + .020f * _delayScale) Clear();
+        if (_elapsed >= _duration + .020f * _delayScale)
+            Clear();
     }
 
     /// <summary>Animatorが更新した基準姿勢へ重み付き骨回転を重ね、次の更新で除去する姿勢を記録する。</summary>
     public void Apply()
     {
-        // Also makes repeated LateUpdate/Hit calls safe when Animator did not evaluate.
+        // Animator が評価されない間に LateUpdate や命中処理が繰り返されても、補正を重複させない。
         RemoveOffsets();
         if (!_active) return;
         foreach (var bone in _bones)
@@ -148,7 +164,10 @@ public sealed class EnemyBoneHitReaction
             if (bone.Bone == null) continue;
             Vector3 target = _target * bone.HitWeight * Envelope(_elapsed - bone.Delay * _delayScale,
                 _duration, _impactFraction, _followThroughFraction);
-            float blend = _continuing ? Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(_elapsed / (_duration * _impactFraction))) : 1f;
+            float blend = _continuing ? Mathf.SmoothStep(
+                0f,
+                1f,
+                Mathf.Clamp01(_elapsed / (_duration * _impactFraction))) : 1f;
             bone.Current = Vector3.ClampMagnitude(Vector3.Lerp(bone.Start, target, blend), 16f * bone.Weight * 1.4f);
             bone.BasePose = bone.Bone.localRotation;
             Vector3 axis = bone.Bone.parent.InverseTransformDirection(_root.TransformDirection(bone.Current));
@@ -166,7 +185,7 @@ public sealed class EnemyBoneHitReaction
         {
             if (bone.Bone != null && bone.Applied && SamePose(bone.Bone.localRotation, bone.AppliedPose))
                 bone.Bone.localRotation = bone.BasePose;
-            // If Animator has already written a fresh pose, never subtract an old offset.
+            // Animator が新しい姿勢を反映済みの場合は、以前のオフセットを引かない。
             bone.Applied = false;
         }
     }
@@ -177,6 +196,7 @@ public sealed class EnemyBoneHitReaction
         RemoveOffsets();
         _active = _continuing = false;
         _elapsed = 0f;
-        foreach (var bone in _bones) bone.Start = bone.Current = Vector3.zero;
+        foreach (var bone in _bones)
+            bone.Start = bone.Current = Vector3.zero;
     }
 }

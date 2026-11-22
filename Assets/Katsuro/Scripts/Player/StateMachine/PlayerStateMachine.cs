@@ -80,7 +80,7 @@ public sealed class PlayerStateMachine : IDisposable
     {
         if (!_states.TryGetValue(next, out var state))
         {
-            Debug.LogWarning($"PlayerStateMachine: {next} is not registered.");
+            Debug.LogWarning($"PlayerStateMachine: ステート {next} が登録されていません。");
             return;
         }
 

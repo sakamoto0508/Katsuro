@@ -28,7 +28,8 @@ public sealed class PlayerGhost : AbilityBase
     /// <summary>幽体化を終了し、有効だった場合は再使用待ちを設定して短時間モードを解除する。</summary>
     public override void End()
     {
-        if (IsActive) _cooldownRemaining = Mathf.Max(0.01f, GameplayRules.Current.GhostCooldown);
+        if (IsActive)
+            _cooldownRemaining = Mathf.Max(0.01f, GameplayRules.Current.GhostCooldown);
         SetActive(false);
         _briefRemaining = 0f;
         _brief = false;
@@ -42,11 +43,16 @@ public sealed class PlayerGhost : AbilityBase
         if (_brief)
         {
             _briefRemaining -= deltaTime;
-            if (_briefRemaining <= 0f) End();
+            if (_briefRemaining <= 0f)
+                End();
             return;
         }
         float cost = GetGhostPerSecondCost() * RunSession.GhostCostMultiplier * deltaTime;
-        if (!_skillGauge.TryConsume(cost) || _skillGauge.Value <= Mathf.Epsilon) { End(); return; }
+        if (!_skillGauge.TryConsume(cost) || _skillGauge.Value <= Mathf.Epsilon)
+        {
+            End();
+            return;
+        }
         PublishConsumed(cost);
     }
 }

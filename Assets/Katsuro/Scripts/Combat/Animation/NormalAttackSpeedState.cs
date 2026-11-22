@@ -10,13 +10,15 @@ public sealed class NormalAttackSpeedState : StateMachineBehaviour
     /// <returns>現在または遷移先が所有する通常攻撃Event、または通常攻撃以外ならtrue。</returns>
     public static bool AcceptGameplayEvent(Animator animator, AnimationEvent animationEvent)
     {
-        // Counter and other existing clips keep their receivers and behavior.
-        if (animator == null || animationEvent == null || !animationEvent.animatorStateInfo.IsTag(AttackTag)) return true;
+        // カウンターなど既存クリップのイベントは従来の受信先へ渡す。
+        if (animator == null || animationEvent == null || !animationEvent.animatorStateInfo.IsTag(AttackTag))
+            return true;
         var current = animator.GetCurrentAnimatorStateInfo(0);
         if (animator.IsInTransition(0))
         {
             var next = animator.GetNextAnimatorStateInfo(0);
-            if (next.IsTag(AttackTag) || next.IsTag(PlayerAttacker.JustAvoidCounterTag)) current = next;
+            if (next.IsTag(AttackTag) || next.IsTag(PlayerAttacker.JustAvoidCounterTag))
+                current = next;
         }
         return animationEvent.animatorStateInfo.fullPathHash == current.fullPathHash;
     }
@@ -55,27 +57,30 @@ public sealed class NormalAttackSpeedState : StateMachineBehaviour
     /// <summary>ベースLayerの攻撃Stateに割り当てた速度パラメータを通常倍率で初期化する。</summary>
     public override void OnStateEnter(Animator animator, AnimatorStateInfo state, int layer)
     {
-        if (layer == 0) SetSpeed(animator, 1f);
+        if (layer == 0)
+            SetSpeed(animator, 1f);
     }
 
     /// <summary>Blend中は通常倍率を保ち、単独再生中だけClip時刻に応じた専用速度を設定する。</summary>
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo state, int layer)
     {
         if (layer != 0) return;
-        // Preserve the existing blend's time mapping and root extraction. Each state has
-        // its own parameter, so an outgoing combo cannot overwrite the incoming speed.
+        // 既存ブレンドの時間対応とルートモーションの抽出を維持する。
+        // ステートごとに速度パラメーターを持ち、遷移元のコンボによる上書きを防ぐ。
         SetSpeed(animator, animator.IsInTransition(layer) ? 1f : EvaluateSpeed(state.normalizedTime));
     }
 
     /// <summary>終了したState自身の速度パラメータを戻し、次のコンボ段階のパラメータを保護する。</summary>
     public override void OnStateExit(Animator animator, AnimatorStateInfo state, int layer)
     {
-        if (layer == 0) SetSpeed(animator, 1f);
+        if (layer == 0)
+            SetSpeed(animator, 1f);
     }
 
     /// <summary>割り当て済みの専用Animatorパラメータだけに速度倍率を反映する。</summary>
     private void SetSpeed(Animator animator, float speed)
     {
-        if (!string.IsNullOrEmpty(_speedParameter)) animator.SetFloat(_speedParameter, speed);
+        if (!string.IsNullOrEmpty(_speedParameter))
+            animator.SetFloat(_speedParameter, speed);
     }
 }

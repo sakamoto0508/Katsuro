@@ -30,11 +30,13 @@ namespace Mock.UI
         public void SetHpNormalized(float normalized)
         {
             normalized = Mathf.Clamp01(normalized);
-            if (_hpFill != null) _hpFill.fillAmount = normalized;
+            if (_hpFill != null)
+                _hpFill.fillAmount = normalized;
             if (!_initialized || normalized > _targetHp)
             {
                 // 初期表示・回復・復活時には、現在体力と遅延表示を一致させる。
-                if (_damageFill != null) _damageFill.fillAmount = normalized;
+                if (_damageFill != null)
+                    _damageFill.fillAmount = normalized;
                 _catchupAt = 0;
             }
             else if (normalized < _targetHp)
@@ -59,13 +61,15 @@ namespace Mock.UI
         /// <summary>スキルゲージ値を0から1へ制限してImageの充填量へ反映する。</summary>
         public void SetSkillNormalized(float normalized)
         {
-            if (_skillFill != null) _skillFill.fillAmount = Mathf.Clamp01(normalized);
+            if (_skillFill != null)
+                _skillFill.fillAmount = Mathf.Clamp01(normalized);
         }
 
         /// <summary>HPの遅延表示を現在値へ揃え、待機時刻をリセットする。</summary>
         private void OnDisable()
         {
-            if (_damageFill != null && _initialized) _damageFill.fillAmount = _targetHp;
+            if (_damageFill != null && _initialized)
+                _damageFill.fillAmount = _targetHp;
             _catchupAt = 0;
         }
     }

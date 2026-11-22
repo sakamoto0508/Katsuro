@@ -99,7 +99,7 @@ public abstract class PlayerAttackState : PlayerState
     public override void Update(float deltaTime)
     {
         Context.Mover?.Update();
-        // HitStop must not consume a buffered combo or expire the attack timer.
+        // ヒットストップ中はコンボ入力を消費せず、攻撃タイマーも進めない。
         if (_attackAnimator != null && _attackAnimator.speed <= 0f) return;
         _elapsedTime += deltaTime;
         if (TryConsumeComboRequest()) return;
@@ -203,8 +203,8 @@ public abstract class PlayerAttackState : PlayerState
         if (_attackAnimator == null || !_attackAnimator.isActiveAndEnabled) return false;
         var state = _attackAnimator.IsInTransition(0)
             ? _attackAnimator.GetNextAnimatorStateInfo(0) : _attackAnimator.GetCurrentAnimatorStateInfo(0);
-        // Finished events remain the primary exit. The clip-length timer is only a
-        // fallback after animation completion, rather than cutting off a slower clip.
+        // 攻撃は原則として終了イベントで抜ける。
+        // クリップ長に基づくタイマーは予備とし、再生が遅い場合でも完了を待つ。
         return (state.IsTag(NormalAttackSpeedState.AttackTag)
             || state.IsTag(PlayerAttacker.JustAvoidCounterTag)) && state.normalizedTime < 1f;
     }

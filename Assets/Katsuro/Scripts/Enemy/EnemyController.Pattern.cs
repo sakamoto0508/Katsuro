@@ -9,8 +9,10 @@ public partial class EnemyController
     public bool CanSelectAttackCandidate(EnemyDecisionConfig.ActionWeight candidate) => candidate.Pattern == null || CanUseAttackPattern(candidate.Pattern);
     private bool CanUseAttackPattern(EnemyAttackPattern pattern)
     {
-        if (pattern == null || !pattern.IsValid || (_patternCooldowns.TryGetValue(pattern, out float ready) && Time.time < ready)) return false;
-        if (_animator == null || _attacker == null || !_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
+        if (pattern == null || !pattern.IsValid || (_patternCooldowns.TryGetValue(pattern, out float ready) && Time.time < ready))
+            return false;
+        if (_animator == null || _attacker == null || !_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack))
+            return false;
         if (_attackTarget != null)
         {
             float distance = Vector3.Distance(transform.position, _attackTarget.position);
@@ -31,8 +33,10 @@ public partial class EnemyController
     private bool BeginAttackPattern(EnemyAttackPattern pattern)
     {
         if (IsTraining || _dead || pattern == null || !pattern.IsValid || _animator == null || _attacker == null ||
-            (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting)) return false;
-        if (!_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack)) return false;
+            (_game != null && !_game.IsCombatActive) || (_enemyAnimController != null && _enemyAnimController.IsReacting))
+            return false;
+        if (!_animator.HasState(0, pattern.StateHash) || !_attacker.CanPerformAttack(pattern.Attack))
+            return false;
         if (!CanUseAttackPattern(pattern)) return false;
         if (!HasComboSpeedParameter()) return false;
         EnsurePatternRunner();
@@ -42,7 +46,8 @@ public partial class EnemyController
         if (!pattern.IsWarp && !_patternRunner.Begin(pattern)) return false;
         _mover?.SetAttackRootMotionScale(pattern.RootMotionScale);
         _dashPreviousClipTime = 0f;
-        if (pattern.UsesDashTuning) _mover?.SetAttackRootMotionScale(0f);
+        if (pattern.UsesDashTuning)
+            _mover?.SetAttackRootMotionScale(0f);
         _mover?.SetAttackTravelLimit(pattern.MaximumTravelDistance);
         _patternCooldowns[pattern] = Time.time + pattern.Cooldown;
         _attacker.DisableWeaponHitbox();
@@ -99,8 +104,10 @@ public partial class EnemyController
         ClearPatternExecution();
         _enemyAnimController?.InterruptAttackForHitReaction();
         _mover?.ReleaseMovementAfterAttack();
-        if (success) _ai?.OnAttackFinished();
-        else _ai?.OnActionFailed();
+        if (success)
+            _ai?.OnAttackFinished();
+        else
+            _ai?.OnActionFailed();
     }
 
     /// <summary>追撃/死亡/戦闘終了/強制中断でコンボ予約を消去。被弾の終了まで通常抽選は再開しない。</summary>
@@ -119,10 +126,13 @@ public partial class EnemyController
             if (pattern != null && pattern.Attack != null && _enemyAnimController != null && _enemyAnimController.HasTrigger(pattern.Attack.AnimatorTrigger))
                 _animator.ResetTrigger(pattern.Attack.AnimatorTrigger);
             int idle = Animator.StringToHash("Base Layer.Idle");
-            if (_animator.HasState(0, idle)) _animator.CrossFadeInFixedTime(idle, .08f, 0, 0f);
+            if (_animator.HasState(0, idle))
+                _animator.CrossFadeInFixedTime(idle, .08f, 0, 0f);
         }
-        if (resumeAI) _ai?.OnActionFailed();
-        else _ai?.OnActionCancelled();
+        if (resumeAI)
+            _ai?.OnActionFailed();
+        else
+            _ai?.OnActionCancelled();
     }
 
     private void ClearPatternExecution()
@@ -138,7 +148,8 @@ public partial class EnemyController
         _mover?.SetAttackRootMotionScale(null);
         _mover?.SetAttackTravelLimit(0f);
         _dashPreviousClipTime = 0f;
-        if (_animator != null) _animator.SetFloat("EnemyComboPlaybackSpeed", 1f);
+        if (_animator != null)
+            _animator.SetFloat("EnemyComboPlaybackSpeed", 1f);
         ClearWarpPresentation();
         OnRushEnded(false);
     }
@@ -161,7 +172,8 @@ public partial class EnemyController
     private bool AcceptPatternEvent(AnimationEvent evt)
     {
         if (evt == null || _dead || (_game != null && !_game.IsCombatActive) ||
-            (_enemyAnimController != null && _enemyAnimController.IsReacting) || !IsAttackPatternActive) return false;
+            (_enemyAnimController != null && _enemyAnimController.IsReacting) || !IsAttackPatternActive)
+            return false;
         // 低FPSで予兆終端を跨いだフレームも、実Clip時刻で本体へ進めて初撃Eventを落とさない。
         _patternRunner.ObserveClipTime(evt.time, evt.animatorStateInfo.fullPathHash);
         return _patternRunner.AcceptsState(evt.animatorStateInfo.fullPathHash);
@@ -204,20 +216,25 @@ public partial class EnemyController
     /// <summary>開いている段の振り抜き音を鳴らす。段別SEが未設定ならClipのEventに書かれた登録名を使う。</summary>
     public void AnimEvent_ComboSound(AnimationEvent evt)
     {
-        if (!AcceptPatternEvent(evt) || !_patternRunner.WindowActive || _patternRunner.WindowIndex != evt.intParameter) return;
+        if (!AcceptPatternEvent(evt) || !_patternRunner.WindowActive || _patternRunner.WindowIndex != evt.intParameter)
+            return;
         var stage = _patternRunner.Pattern.GetStageSound(evt.intParameter);
-        if (!EnemyComboStageSound.Play(_audio, stage?.Swing)) _audio?.PlaySE(evt.stringParameter);
+        if (!EnemyComboStageSound.Play(_audio, stage?.Swing))
+            _audio?.PlaySE(evt.stringParameter);
     }
     public void AnimEvent_StopAttackRootMotion(AnimationEvent evt)
     {
-        if (!AcceptPatternEvent(evt)) return;
-        if (_patternRunner.Pattern.UsesDashTuning) return; // Final evaluated delta must reach FixedUpdate; subsequent scale is zero.
-        _attackAnimationHash = 0; _mover?.EndAttackRootMotion();
+        if (!AcceptPatternEvent(evt))
+            return;
+        if (_patternRunner.Pattern.UsesDashTuning)
+            return; // Final evaluated delta must reach FixedUpdate; subsequent scale is zero.
+        _attackAnimationHash = 0;
+        _mover?.EndAttackRootMotion();
     }
 
     private float _dashPreviousClipTime;
 
-    // Only the Rush state speed parameter changes; global Animator.speed remains owned by HitStop.
+    // 突進ステート専用の速度パラメーターを更新する。Animator 全体の速度はヒットストップが管理する。
     private void UpdateDashPlayback(float time)
     {
         var pattern = _patternRunner?.Pattern;
@@ -229,11 +246,12 @@ public partial class EnemyController
 
     public void AnimEvent_DashRecovery(AnimationEvent evt)
     {
-        if (AcceptPatternEvent(evt)) UpdateDashPlayback(evt.time);
+        if (AcceptPatternEvent(evt))
+            UpdateDashPlayback(evt.time);
     }
 
-    // OnAnimatorMove consumes the last evaluated segment, including the final event-crossing frame.
-    // Weight boundary-spanning samples rather than dropping the final dash delta at low FPS.
+    // OnAnimatorMove は最後のイベントをまたいだフレームも含め、評価済みの区間を使う。
+    // 区間の境界をまたぐサンプルに重みを掛け、低 FPS でも突進終端の移動量を反映する。
     private void PrepareDashRootMotion()
     {
         var pattern = _patternRunner?.Pattern;

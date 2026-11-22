@@ -27,25 +27,42 @@ Shader "Katsuro/HitBlood"
             float _Mist;
             float4 _EdgeTint;
             float _EdgeStrength;
-            struct A { float3 positionOS:POSITION; float2 uv:TEXCOORD0; float4 color:COLOR; };
-            struct V { float4 positionCS:SV_POSITION; float2 uv:TEXCOORD0; float4 color:COLOR; };
-            V Vert(A a) { V o; o.positionCS=TransformObjectToHClip(a.positionOS); o.uv=a.uv; o.color=a.color*_Tint; return o; }
+            struct A
+            {
+                float3 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                float4 color : COLOR;
+            };
+            struct V
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float4 color : COLOR;
+            };
+            V Vert(A a)
+            {
+                V o;
+                o.positionCS = TransformObjectToHClip(a.positionOS);
+                o.uv = a.uv;
+                o.color = a.color*_Tint;
+                return o;
+            }
             float4 Frag(V i):SV_Target
             {
-                float2 p=i.uv*2-1;
-                float4 color=i.color;
+                float2 p = i.uv*2-1;
+                float4 color = i.color;
                 // 非対称の滴：太い先端と細い尾。円形の血玉にしない。
-                float width=lerp(.38,.9,saturate(i.uv.y));
-                float wobble=.055*sin(p.y*13)+.03*sin(p.y*27);
-                float body=abs((p.x+wobble)/width);
-                float drop=1-smoothstep(.45,1,body*body+p.y*p.y);
-                float mist=1-smoothstep(.05,1,dot(p,p)*(1+.12*sin(p.x*11+p.y*7)));
-                float coverage=lerp(drop,mist,_Mist);
-                color.rgb*=lerp(.82,1,saturate(abs(p.x)/width));
+                float width = lerp(.38, .9, saturate(i.uv.y));
+                float wobble = .055*sin(p.y*13)+.03*sin(p.y*27);
+                float body = abs((p.x+wobble)/width);
+                float drop = 1-smoothstep(.45, 1, body*body+p.y*p.y);
+                float mist = 1-smoothstep(.05, 1, dot(p, p)*(1+.12*sin(p.x*11+p.y*7)));
+                float coverage = lerp(drop, mist, _Mist);
+                color.rgb*=lerp(.82, 1, saturate(abs(p.x)/width));
                 // 暗い芯を残し、滴の先端・縁にだけ深紅の色差を付ける。
                 // 透明ブレンドを維持し、加算発光にはしない。
-                float edge=smoothstep(.3,.8,body)*smoothstep(.35,.7,i.uv.y);
-                color.rgb=lerp(color.rgb,_EdgeTint.rgb,edge*_EdgeStrength*(1-_Mist));
+                float edge = smoothstep(.3, .8, body)*smoothstep(.35, .7, i.uv.y);
+                color.rgb = lerp(color.rgb, _EdgeTint.rgb, edge*_EdgeStrength*(1-_Mist));
                 color.a*=coverage;
                 // 露出に依存しない暗赤色を透明合成し、黒つぶれを防ぐ。
                 return color;

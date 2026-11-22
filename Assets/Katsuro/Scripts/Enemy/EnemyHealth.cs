@@ -33,7 +33,11 @@ public class EnemyHealth : IDisposable
     private readonly float _maxHp;
     private readonly bool _training;
     /// <summary>修練用に作成された個体だけ、次の命中練習へHPを戻す。</summary>
-    public void RestoreForTraining() { if (_training) _hpRx.Value = _maxHp; }
+    public void RestoreForTraining()
+    {
+        if (_training)
+            _hpRx.Value = _maxHp;
+    }
 
     /// <summary>
     /// 指定した量のダメージを適用する（0 以下は無視）。

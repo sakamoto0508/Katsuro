@@ -57,9 +57,16 @@ public class CameraConfig : ScriptableObject
     [SerializeField, Tooltip("Camera Impulse時間（秒）。X=Light、Y=Heavy、Z=追撃。")]
     private Vector3 _hitCameraDurations = new Vector3(.065f, .095f, .12f);
     /// <summary>命中種別のカメラ衝撃の強さを取得する。</summary>
-    public float GetHitCameraStrength(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraStrength : counter ? _counterHitCameraStrength : heavy ? _heavyHitCameraStrength : _lightHitCameraStrength;
+    public float GetHitCameraStrength(bool heavy, bool counter, bool counterFirst = false) =>
+        counter && counterFirst ? _counterFirstCameraStrength
+        : counter ? _counterHitCameraStrength
+        : heavy ? _heavyHitCameraStrength
+        : _lightHitCameraStrength;
     /// <summary>命中種別の短い衝撃時間を取得する。</summary>
-    public float GetHitCameraDuration(bool heavy, bool counter, bool counterFirst = false) => counter && counterFirst ? _counterFirstCameraDuration : Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
+    public float GetHitCameraDuration(bool heavy, bool counter, bool counterFirst = false) =>
+        counter && counterFirst
+            ? _counterFirstCameraDuration
+            : Mathf.Max(.01f, _hitCameraDurations[counter ? 2 : heavy ? 1 : 0]);
     /// <summary>命中時カメラ衝撃の継続時間（秒）。</summary>
     [UnityEngine.Tooltip("命中時カメラ衝撃の継続時間（秒）。")]
     [SerializeField, Min(.01f)] private float _cameraDuration = .12f;
@@ -78,13 +85,13 @@ public class CameraConfig : ScriptableObject
     [SerializeField, Min(0f)] private float _justAvoidMinHeight = .25f;
     /// <summary>Just Avoidのカメラ演出が最大へ達するまでの時間（実時間の秒）。</summary>
     [UnityEngine.Tooltip("Just Avoidのカメラ演出が最大へ達するまでの時間（実時間の秒）。")]
-    [SerializeField, Min(0f)] private float _justAvoidCameraEnter = .12f;
+    [SerializeField, Min(0f)] private float _justAvoidCameraEnter = .28f;
     /// <summary>Just Avoidのカメラ演出を最大のまま保持する時間（実時間の秒）。</summary>
     [UnityEngine.Tooltip("Just Avoidのカメラ演出を最大のまま保持する時間（実時間の秒）。")]
     [SerializeField, Min(0f)] private float _justAvoidCameraHold = .35f;
     /// <summary>Just Avoidのカメラ演出から通常構図へ戻る時間（実時間の秒）。</summary>
     [UnityEngine.Tooltip("Just Avoidのカメラ演出から通常構図へ戻る時間（実時間の秒）。")]
-    [SerializeField, Min(0f)] private float _justAvoidCameraRestore = .3f;
+    [SerializeField, Min(0f)] private float _justAvoidCameraRestore = .45f;
     /// <summary>ジャスト回避フラグや追撃中にカメラ演出を最大のまま維持できる上限時間（実時間の秒）。</summary>
     [UnityEngine.Tooltip("ジャスト回避フラグがtrue、または追撃攻撃中はカメラ演出を最大のまま維持する。その維持の上限時間（実時間の秒）。フラグの解除漏れ対策。")]
     [SerializeField, Min(0f)] private float _justAvoidCameraMaxSustain = 3f;

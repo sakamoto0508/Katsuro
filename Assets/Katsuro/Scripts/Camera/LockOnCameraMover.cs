@@ -4,6 +4,12 @@ using UnityEngine;
 /// <summary>ロックオン中に視点を手動制御する際のカメラ移動を行う。</summary>
 public class LockOnCameraMover
 {
+    private const float MinDirectionSqrMagnitude = 0.0001f;
+    private const float MinSphereCastDistance = .001f;
+    private const float MinCameraDistanceFromOrigin = .05f;
+    private const float ObstacleClearance = .05f;
+    private const int ObstacleHitCapacity = 32;
+
     /// <summary>追従対象とカメラ設定を保持し、Brainの有効状態に応じた追従先を準備する。</summary>
     public LockOnCameraMover(LockOnCamera lockOnCamera, Transform playerPosition,
         Transform enemyPosition, CinemachineCamera camera, CameraConfig config)
@@ -14,7 +20,8 @@ public class LockOnCameraMover
         _camera = camera;
         _cameraConfig = config;
         _mainCamera = Camera.main;
-        if (_mainCamera != null) _brain = _mainCamera.GetComponent<CinemachineBrain>();
+        if (_mainCamera != null)
+            _brain = _mainCamera.GetComponent<CinemachineBrain>();
     }
 
     private readonly LockOnCamera _lockOnCamera;
@@ -24,7 +31,7 @@ public class LockOnCameraMover
     private readonly CameraConfig _cameraConfig;
     private Camera _mainCamera;
     private CinemachineBrain _brain;
-    private readonly RaycastHit[] _obstacles = new RaycastHit[32];
+    private readonly RaycastHit[] _obstacles = new RaycastHit[ObstacleHitCapacity];
 
     /// <summary>有効なLock-On対象を向く位置と角度へ補間する。対象を失った場合はLock-Onを解除する。</summary>
     public void LateUpdate()
@@ -39,7 +46,8 @@ public class LockOnCameraMover
         if (_mainCamera == null)
         {
             _mainCamera = Camera.main;
-            if (_mainCamera != null) _brain = _mainCamera.GetComponent<CinemachineBrain>();
+            if (_mainCamera != null)
+                _brain = _mainCamera.GetComponent<CinemachineBrain>();
         }
         Transform cameraTransform = _mainCamera != null && _brain != null && !_brain.enabled
             ? _mainCamera.transform : _camera != null ? _camera.transform : null;
@@ -47,7 +55,8 @@ public class LockOnCameraMover
 
         Vector3 forward = _enemyPosition.position - _playerPosition.position;
         forward.y = 0f;
-        if (forward.sqrMagnitude < 0.0001f) return;
+        if (forward.sqrMagnitude < MinDirectionSqrMagnitude) return;
+
         forward.Normalize();
         Vector3 focus = Vector3.Lerp(_playerPosition.position, _enemyPosition.position,
             _cameraConfig.LockOnTargetWeight) + Vector3.up * _cameraConfig.LookAtHeight;
@@ -60,7 +69,8 @@ public class LockOnCameraMover
         Vector3 collisionOrigin = _playerPosition.position + Vector3.up * _cameraConfig.LookAtHeight;
         cameraTransform.position = ResolveObstacles(collisionOrigin, nextPosition);
         Vector3 lookDirection = focus - cameraTransform.position;
-        if (lookDirection.sqrMagnitude < 0.0001f) return;
+        if (lookDirection.sqrMagnitude < MinDirectionSqrMagnitude) return;
+
         cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation,
             Quaternion.LookRotation(lookDirection), 1f - Mathf.Exp(-Time.deltaTime * _cameraConfig.RotationSmooth));
     }
@@ -70,7 +80,9 @@ public class LockOnCameraMover
     {
         Vector3 direction = position - focus;
         float distance = direction.magnitude;
-        if (distance < .001f) return position;
+        if (distance < MinSphereCastDistance)
+            return position;
+
         direction /= distance;
         int count = Physics.SphereCastNonAlloc(focus, _cameraConfig.CameraCollisionRadius, direction,
             _obstacles, distance, _cameraConfig.LockOnObstacleMask, QueryTriggerInteraction.Ignore);
@@ -78,8 +90,9 @@ public class LockOnCameraMover
         for (int i = 0; i < count; i++)
         {
             Transform hit = _obstacles[i].transform;
-            if (hit == null || hit.IsChildOf(_playerPosition) || hit.IsChildOf(_enemyPosition)) continue;
-            nearest = Mathf.Min(nearest, Mathf.Max(.05f, _obstacles[i].distance - .05f));
+            if (hit == null || hit.IsChildOf(_playerPosition) || hit.IsChildOf(_enemyPosition))
+                continue;
+            nearest = Mathf.Min(nearest, Mathf.Max(MinCameraDistanceFromOrigin, _obstacles[i].distance - ObstacleClearance));
         }
         return focus + direction * nearest;
     }

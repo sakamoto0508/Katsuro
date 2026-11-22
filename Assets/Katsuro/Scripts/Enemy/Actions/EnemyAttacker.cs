@@ -59,7 +59,7 @@ public class EnemyAttacker : IDisposable
         var data = FindData(attackType);
         if (data == null)
         {
-            Debug.LogWarning($"EnemyAttacker: no attack data found for action={attackType}");
+            Debug.LogWarning($"EnemyAttacker: 攻撃データが見つかりません。行動={attackType}");
             return false;
         }
 
@@ -77,7 +77,7 @@ public class EnemyAttacker : IDisposable
         _currentHitSounds = null;
         if (!CanPerformAttack(data))
         {
-            Debug.LogWarning($"EnemyAttacker: invalid attack data, Animator trigger or weapon: {data?.name}");
+            Debug.LogWarning($"EnemyAttacker: 攻撃データ、Animator のトリガー、または武器の設定が無効です。{data?.name}");
             return false;
         }
         _currentIsHeavy = data.IsHeavy;
@@ -103,7 +103,8 @@ public class EnemyAttacker : IDisposable
         foreach (var d in _attackData)
         {
             if (d == null || d.ActionType != action) continue;
-            if (UnityEngine.Random.Range(0, ++count) == 0) selected = d;
+            if (UnityEngine.Random.Range(0, ++count) == 0)
+                selected = d;
         }
         // 同じ行動種別の攻撃データが複数ある場合は、ランダムに1つ選ぶ。
         return selected;
@@ -138,11 +139,13 @@ public class EnemyAttacker : IDisposable
     public void SetSweptHits(bool active)
     {
         if (_weapons == null) return;
-        foreach (var weapon in _weapons) weapon?.SetSweptHits(active);
+        foreach (var weapon in _weapons)
+            weapon?.SetSweptHits(active);
     }
     public void FlushSweptHits()
     {
-        if (_isHitboxActive) _currentWeapon?.FlushSweptHits();
+        if (_isHitboxActive)
+            _currentWeapon?.FlushSweptHits();
     }
 
     /// <summary>武器コライダーにヒットした相手へ一度だけダメージを適用する（Weaponごとのハンドラで呼ばれる）。</summary>
@@ -170,7 +173,7 @@ public class EnemyAttacker : IDisposable
         DamageInfo damageInfo = new DamageInfo(damage, hitPoint, hitNormal, _ownerTransform != null ? _ownerTransform.gameObject : null, other, _currentIsHeavy,
             sourceWeapon != null ? sourceWeapon.GetSlashDirection(other) : Vector3.zero, hitSounds: _currentHitSounds);
         // Debug: 出力（誰がどれだけのダメージを誰に与えたか）
-        CombatLog.Trace($"EnemyAttacker: Hit target={other.gameObject.name} damage={damage} instigator={_ownerTransform?.gameObject.name} hitPoint={hitPoint}");
+        CombatLog.Trace($"EnemyAttacker: 攻撃命中 対象={other.gameObject.name} ダメージ={damage} 攻撃者={_ownerTransform?.gameObject.name} 命中位置={hitPoint}");
         damageable.ApplyDamage(damageInfo);
     }
 

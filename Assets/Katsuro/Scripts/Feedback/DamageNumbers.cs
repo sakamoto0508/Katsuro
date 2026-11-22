@@ -52,17 +52,19 @@ public sealed class DamageNumbers : MonoBehaviour
     public void Init(Camera camera)
     {
         if (_initialized) return;
-        if (camera != null) _camera = camera;
+        if (camera != null)
+            _camera = camera;
         _initialized = Initialize();
     }
     /// <summary>参照を検証し、通常・Criticalの数値ラベルを固定数生成して非表示で待機させる。</summary>
     /// <returns>表示プールを使用可能になった場合はtrue。</returns>
     private bool Initialize()
     {
-        if (normal != null) return true;
+        if (normal != null)
+            return true;
         if (_container == null || _normalTemplate == null || _criticalTemplate == null)
         {
-            Debug.LogError("DamageNumbers requires a container and both uGUI text templates.", this);
+            Debug.LogError("DamageNumbers に表示コンテナと 2 種類の uGUI テキストテンプレートを設定してください。", this);
             return false;
         }
         canvas = _container.GetComponentInParent<Canvas>();
@@ -73,8 +75,12 @@ public sealed class DamageNumbers : MonoBehaviour
         }
         int count = Mathf.Clamp(_poolSize, 1, 128);
         criticalHit = new bool[count];
-        normal = new TMP_Text[count]; critical = new TMP_Text[count]; active = new TMP_Text[count];
-        positions = new Vector3[count]; started = new float[count]; opacity = new float[count];
+        normal = new TMP_Text[count];
+        critical = new TMP_Text[count];
+        active = new TMP_Text[count];
+        positions = new Vector3[count];
+        started = new float[count];
+        opacity = new float[count];
         randomOffsets = new Vector2[count];
         _normalTemplate.gameObject.SetActive(false);
         _criticalTemplate.gameObject.SetActive(false);
@@ -99,7 +105,8 @@ public sealed class DamageNumbers : MonoBehaviour
     {
         int index = next;
         next = (next + 1) % active.Length;
-        if (active[index] != null) active[index].gameObject.SetActive(false);
+        if (active[index] != null)
+            active[index].gameObject.SetActive(false);
         var label = isCritical ? critical[index] : normal[index];
         active[index] = label;
         criticalHit[index] = isCritical;
@@ -129,7 +136,9 @@ public sealed class DamageNumbers : MonoBehaviour
             float age = Time.unscaledTime - started[i];
             if (age >= Mathf.Max(.05f, _lifetime))
             {
-                active[i].gameObject.SetActive(false); active[i] = null; continue;
+                active[i].gameObject.SetActive(false);
+                active[i] = null;
+                continue;
             }
             PositionLabel(i, age);
         }
@@ -138,9 +147,17 @@ public sealed class DamageNumbers : MonoBehaviour
     private void PositionLabel(int index, float age)
     {
         var label = active[index];
-        if (_camera == null || !_camera.isActiveAndEnabled) { label.alpha = 0; return; }
+        if (_camera == null || !_camera.isActiveAndEnabled)
+        {
+            label.alpha = 0;
+            return;
+        }
         Vector3 screen = _camera.WorldToScreenPoint(positions[index] + Vector3.up * age * _riseSpeed);
-        if (screen.z <= 0) { label.alpha = 0; return; }
+        if (screen.z <= 0)
+        {
+            label.alpha = 0;
+            return;
+        }
         Camera uiCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(_container, screen, uiCamera, out var point);
         // アンカーが中央にあると仮定せず、ローカル座標でテンプレートの基準点とサイズを尊重する。
@@ -154,6 +171,11 @@ public sealed class DamageNumbers : MonoBehaviour
     private void OnDisable()
     {
         if (active == null) return;
-        for (int i = 0; i < active.Length; i++) if (active[i] != null) { active[i].gameObject.SetActive(false); active[i] = null; }
+        for (int i = 0; i < active.Length; i++)
+            if (active[i] != null)
+            {
+                active[i].gameObject.SetActive(false);
+                active[i] = null;
+            }
     }
 }

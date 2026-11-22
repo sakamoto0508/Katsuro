@@ -9,7 +9,12 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     [SerializeField, Tooltip("刀軌跡Slashを主役にし、このPrefabの旧Cut Quadを非表示にする。Bloodは維持し、既存ContactPulseで局所光を再生します。")]
     private bool _useLocalContactFlash;
     public bool UsesLocalContactFlash => _useLocalContactFlash;
-    public void UseExternalSlash() { _useLocalContactFlash = true; if (_cutRenderer != null) _cutRenderer.enabled = false; }
+    public void UseExternalSlash()
+    {
+        _useLocalContactFlash = true;
+        if (_cutRenderer != null)
+            _cutRenderer.enabled = false;
+    }
     [SerializeField] private ParticleSystem[] _blood;
     [SerializeField, Min(.01f), Tooltip("プールを返却するまでの秒数。Bloodの寿命も含むため、Cutだけの減衰は専用Materialで調整します。")]
     private float _duration = .38f;
@@ -42,37 +47,47 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
 #endif
     }
 
-    // Allocate with the pool instance, rather than on its first accepted hit.
+    // 最初の命中を処理する前に、プールのインスタンス生成時に確保する。
     private void Awake()
     {
-        if (_block == null) _block = new MaterialPropertyBlock();
+        if (_block == null)
+            _block = new MaterialPropertyBlock();
     }
 
     public void Play(Vector3 point, Vector3 slash, Vector3 normal, Camera viewingCamera = null)
     {
-        LogBloodSnapshot("Acquired");
+        LogBloodSnapshot("プールから取得");
         Stop();
-        if (_block == null) _block = new MaterialPropertyBlock();
-        if (slash.sqrMagnitude < .0001f) slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
+        if (_block == null)
+            _block = new MaterialPropertyBlock();
+        if (slash.sqrMagnitude < .0001f)
+            slash = normal.sqrMagnitude > .0001f ? normal : Vector3.forward;
         slash.Normalize();
         Vector3 bloodDirection = ResolveBloodDirection(slash, normal, _bloodOutwardBias);
         Vector3 bloodUp = Mathf.Abs(Vector3.Dot(bloodDirection, Vector3.up)) > .98f ? Vector3.forward : Vector3.up;
         Vector3 bloodPoint = ResolveBloodSpawnPoint(point, slash, normal, _bloodSpawnOffset);
         transform.SetPositionAndRotation(bloodPoint, Quaternion.LookRotation(bloodDirection, bloodUp));
-        // Blood follows the physical blade direction. The fine light faces the viewing camera.
+        // 血しぶきは実際の刀身の向きに沿わせ、細い光はカメラへ向ける。
         var camera = viewingCamera != null ? viewingCamera : Camera.main;
         Vector3 facing = camera != null ? (camera.transform.position - point).normalized : -normal.normalized;
-        if (facing.sqrMagnitude < .0001f) facing = Vector3.back;
-        // Cut is a contact accent, not the world-space blade trail. Retain the projected
-        // sweep direction while giving depthward cuts a readable, bounded screen-plane length.
+        if (facing.sqrMagnitude < .0001f)
+            facing = Vector3.back;
+        // 命中を強調する斬線は、刀身の軌道を画面に投影した向きに合わせる。
+        // 奥行き方向の斬撃にも画面上で判別できる長さを付け、伸びすぎないよう制限する。
         Vector3 projected = Vector3.ProjectOnPlane(slash, facing);
         float projection = projected.magnitude;
-        if (projection < .001f) projected = Vector3.ProjectOnPlane(normal, facing);
-        if (projected.sqrMagnitude < .000001f) projected = camera != null ? camera.transform.right : Vector3.Cross(facing, Vector3.up);
-        if (projected.sqrMagnitude < .000001f) projected = Vector3.right;
+        if (projection < .001f)
+            projected = Vector3.ProjectOnPlane(normal, facing);
+        if (projected.sqrMagnitude < .000001f)
+            projected = camera != null ? camera.transform.right : Vector3.Cross(facing, Vector3.up);
+        if (projected.sqrMagnitude < .000001f)
+            projected = Vector3.right;
         Vector3 right = projected.normalized;
         _cutRenderer.transform.SetPositionAndRotation(point + facing * _surfaceOffset, Quaternion.LookRotation(facing, Vector3.Cross(facing, right)));
-        _cutRenderer.transform.localScale = new Vector3(_cutSize.x * Mathf.Max(_minimumProjectedLength, projection), _cutSize.y, 1f);
+        _cutRenderer.transform.localScale = new Vector3(
+            _cutSize.x * Mathf.Max(_minimumProjectedLength, projection),
+            _cutSize.y,
+            1f);
         _started = FeedbackVisualTime.Now;
         _playing = true;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -80,21 +95,23 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         _cutRenderer.forceRenderingOff = _debugConfig != null && _debugConfig.IsBloodOnlyDebug;
 #endif
         gameObject.SetActive(true);
-        LogBloodSnapshot("RootEnabled");
-        // Both dedicated prefabs store the three Blood GameObjects inactive.
-        // They are direct children of this root; enabling the root alone cannot activate them.
-        // Keep the prepared world-space pose and playOnAwake=false, then explicitly play below.
+        LogBloodSnapshot("ルートを有効化");
+        // 専用プレハブはどちらも、3 個の血しぶきオブジェクトを非アクティブで保存している。
+        // ルート直下の子なので、ルートの有効化に加えて各オブジェクトの有効化も必要。
+        // セット済みのワールド姿勢と playOnAwake=false を維持し、下の処理で再生を開始する。
         ActivateBloodObjects();
-        LogBloodSnapshot("BloodEnabled");
+        LogBloodSnapshot("血しぶきを有効化");
         _cutRenderer.enabled = !_useLocalContactFlash;
-        foreach (var ps in _blood) ps.Play(false);
-        LogBloodSnapshot("Play");
+        foreach (var ps in _blood)
+            ps.Play(false);
+        LogBloodSnapshot("再生");
         Tick();
     }
 
     private void ActivateBloodObjects()
     {
-        foreach (var ps in _blood) ps.gameObject.SetActive(true);
+        foreach (var ps in _blood)
+            ps.gameObject.SetActive(true);
     }
 
     public void Tick()
@@ -107,16 +124,22 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
         while (bloodOnly && _debugSample < 3 && age >= (_debugSample == 0 ? .05f : _debugSample == 1 ? .1f : .2f))
         {
             _debugSample++;
-            LogBloodSnapshot(_debugSample == 1 ? "After50ms" : _debugSample == 2 ? "After100ms" : "After200ms");
+            LogBloodSnapshot(_debugSample == 1 ? "50 ms 後" : _debugSample == 2 ? "100 ms 後" : "200 ms 後");
         }
 #endif
-        if (age >= _duration) { Stop(); return; }
+        if (age >= _duration)
+        {
+            Stop();
+            return;
+        }
         _block.SetFloat(AgeId, age);
         _cutRenderer.SetPropertyBlock(_block);
         foreach (var ps in _blood)
         {
-            if (FeedbackVisualTime.IsPaused && ps.isPlaying) ps.Pause(false);
-            else if (!FeedbackVisualTime.IsPaused && ps.isPaused) ps.Play(false);
+            if (FeedbackVisualTime.IsPaused && ps.isPlaying)
+                ps.Pause(false);
+            else if (!FeedbackVisualTime.IsPaused && ps.isPaused)
+                ps.Play(false);
         }
     }
 
@@ -124,12 +147,16 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     {
         _playing = false;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        if (_cutRenderer != null) _cutRenderer.forceRenderingOff = false;
+        if (_cutRenderer != null)
+            _cutRenderer.forceRenderingOff = false;
         _debugSample = 3;
 #endif
-        if (_blood != null) foreach (var ps in _blood) if (ps != null) ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (_blood != null)
+            foreach (var ps in _blood)
+                if (ps != null)
+                    ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
         gameObject.SetActive(false);
-        LogBloodSnapshot("StopClearAndDeactivate", caller);
+        LogBloodSnapshot("停止・消去・無効化", caller);
     }
 
     [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
@@ -137,33 +164,47 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (_debugConfig == null || !_debugConfig.IsBloodOnlyDebug) return;
-        // Allocations and renderer lookups occur only at bounded diagnostic lifecycle checkpoints.
+        // メモリ確保と Renderer の取得は、診断対象のタイミングに限る。
         var text = new System.Text.StringBuilder(1024);
         var camera = Camera.main;
-        text.Append($"[CounterBlood] {phase} caller={caller} stage={_debugStrike} instance={name} entityId={GetEntityId()} age={FeedbackVisualTime.Now - _started:F3}s root.activeSelf={gameObject.activeSelf} root.activeInHierarchy={gameObject.activeInHierarchy} position={transform.position:F3} direction={transform.forward:F3}");
+        text.Append($"[CounterBlood] {phase} 呼び出し元={caller} 段={_debugStrike} インスタンス={name} ID={GetEntityId()} 経過={FeedbackVisualTime.Now - _started:F3}s ルート有効={gameObject.activeSelf} ルート階層内で有効={gameObject.activeInHierarchy}" +
+            $" 位置={transform.position:F3} 方向={transform.forward:F3}");
         if (camera != null)
-            text.Append($" camera={camera.name} viewport={camera.WorldToViewportPoint(transform.position):F3} cameraDistance={Vector3.Distance(camera.transform.position, transform.position):F2}");
-        else text.Append(" camera=NULL");
-        if (_blood == null) text.Append("\nBlood array=NULL");
-        else foreach (var ps in _blood)
-        {
-            if (ps == null) { text.Append("\nParticleSystem=NULL"); continue; }
-            var renderer = ps.GetComponent<ParticleSystemRenderer>();
-            var material = renderer != null ? renderer.sharedMaterial : null;
-            var shader = material != null ? material.shader : null;
-            text.Append($"\n{ps.name}: blood.activeSelf={ps.gameObject.activeSelf} blood.activeInHierarchy={ps.gameObject.activeInHierarchy} isPlaying={ps.isPlaying} isEmitting={ps.isEmitting} isPaused={ps.isPaused} particleCount={ps.particleCount} emission.enabled={ps.emission.enabled}");
-            text.Append($" renderer={(renderer != null ? renderer.enabled.ToString() : "NULL")} forceOff={(renderer != null && renderer.forceRenderingOff)} material={(material != null ? material.name : "NULL")} shader={(shader != null ? shader.name : "NULL")} supported={(shader != null && shader.isSupported)}");
-            if (camera != null) text.Append($" cameraLayerVisible={((camera.cullingMask & (1 << ps.gameObject.layer)) != 0)}");
-        }
+            text.Append($" カメラ={camera.name}" +
+                $" ビューポート={camera.WorldToViewportPoint(transform.position):F3} カメラ距離={Vector3.Distance(camera.transform.position, transform.position):F2}");
+        else
+            text.Append(" カメラ未設定");
+        if (_blood == null)
+            text.Append("\n血しぶき配列が未設定");
+        else
+            foreach (var ps in _blood)
+            {
+                if (ps == null)
+                {
+                    text.Append("\nParticleSystem が未設定");
+                    continue;
+                }
+                var renderer = ps.GetComponent<ParticleSystemRenderer>();
+                var material = renderer != null ? renderer.sharedMaterial : null;
+                var shader = material != null ? material.shader : null;
+                text.Append($"\n{ps.name}: 血しぶき有効={ps.gameObject.activeSelf} 血しぶき階層内で有効={ps.gameObject.activeInHierarchy}" +
+                    $" 再生中={ps.isPlaying} 放出中={ps.isEmitting} 一時停止中={ps.isPaused}" +
+                    $" 粒子数={ps.particleCount} 放出モジュール有効={ps.emission.enabled}");
+                text.Append($" レンダラー={(renderer != null ? renderer.enabled.ToString() : "NULL")} 強制非表示={(renderer != null && renderer.forceRenderingOff)}" +
+                    $" マテリアル={(material != null ? material.name : "NULL")} シェーダー={(shader != null ? shader.name : "NULL")} 対応={(shader != null && shader.isSupported)}");
+                if (camera != null)
+                    text.Append($" カメラ描画対象={((camera.cullingMask & (1 << ps.gameObject.layer)) != 0)}");
+            }
         Debug.Log(text.ToString(), this);
 #endif
     }
 
-    // The accepted player counter HitNormal points from the attacker to contact.
-    // Add only its cross-sweep component; never reverse the measured slash or move the origin.
+    // 成立したプレイヤーのカウンターの HitNormal は、攻撃者から命中点へ向く。
+    // 刀身の軌跡と直交する成分だけを加え、斬線の向きと始点を保つ。
     public static Vector3 ResolveBloodDirection(Vector3 slash, Vector3 awayFromAttacker, float bias)
     {
-        if (slash.sqrMagnitude < .0001f) return awayFromAttacker.sqrMagnitude > .0001f ? awayFromAttacker.normalized : Vector3.forward;
+        if (slash.sqrMagnitude < .0001f)
+            return awayFromAttacker.sqrMagnitude > .0001f ? awayFromAttacker.normalized : Vector3.forward;
         slash.Normalize();
         Vector3 outward = Vector3.ProjectOnPlane(awayFromAttacker.normalized, slash);
         return (slash + outward * Mathf.Clamp(bias, 0f, .5f)).normalized;
@@ -172,11 +213,13 @@ public sealed class JustAvoidCounterCutVFX : MonoBehaviour
     public static Vector3 ResolveBloodSpawnPoint(Vector3 point, Vector3 slash, Vector3 awayFromAttacker, Vector3 offset)
     {
         Vector3 forward = Vector3.ProjectOnPlane(awayFromAttacker, Vector3.up);
-        if (forward.sqrMagnitude < .0001f) forward = Vector3.ProjectOnPlane(slash, Vector3.up);
+        if (forward.sqrMagnitude < .0001f)
+            forward = Vector3.ProjectOnPlane(slash, Vector3.up);
         if (forward.sqrMagnitude < .0001f) return point; // No measured horizontal basis: do not invent an offset axis.
         forward.Normalize();
         Vector3 tangent = Vector3.Cross(Vector3.up, forward);
-        if (Vector3.Dot(tangent, slash) < 0f) tangent = -tangent;
+        if (Vector3.Dot(tangent, slash) < 0f)
+            tangent = -tangent;
         offset = Vector3.ClampMagnitude(offset, .1f);
         return point + tangent * offset.x + Vector3.up * offset.y + forward * offset.z;
     }

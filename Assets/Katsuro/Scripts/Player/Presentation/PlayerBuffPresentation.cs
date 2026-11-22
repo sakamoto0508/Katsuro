@@ -20,8 +20,11 @@ public sealed class PlayerBuffPresentation : MonoBehaviour
     {
         _subscription?.Dispose();
         GameManager.OnGameStateChanged -= OnGameStateChanged;
-        _ability = ability; _audio = audio; _config = config;
-        if (_ability != null) _subscription = _ability.IsActiveRx.Subscribe(SetActive);
+        _ability = ability;
+        _audio = audio;
+        _config = config;
+        if (_ability != null)
+            _subscription = _ability.IsActiveRx.Subscribe(SetActive);
         GameManager.OnGameStateChanged += OnGameStateChanged;
     }
 
@@ -48,7 +51,7 @@ public sealed class PlayerBuffPresentation : MonoBehaviour
                     _buffEffect.PlayEffectByKey(_config.PlayEffectBuff);
                 }
             }
-            _audio?.PlayBGM("BuffBGM", 2, 1f);
+            _audio?.PlayBGM("BuffBGM", AudioManager.BuffBgmChannel, 1f);
         }
         else
         {
@@ -56,10 +59,11 @@ public sealed class PlayerBuffPresentation : MonoBehaviour
             {
                 _buffEffect.StopEffect();
                 _buffEffect.effectState = UniformMeshSample.EffectState.Off;
-                if (_buffEffect.instantiatedEffectPrefab != null) _buffEffect.instantiatedEffectPrefab.SetActive(false);
+                if (_buffEffect.instantiatedEffectPrefab != null)
+                    _buffEffect.instantiatedEffectPrefab.SetActive(false);
                 _buffEffect.enabled = false;
             }
-            _audio?.StopBGM(2);
+            _audio?.StopBGM(AudioManager.BuffBgmChannel);
         }
     }
 
@@ -71,15 +75,24 @@ public sealed class PlayerBuffPresentation : MonoBehaviour
     }
 
     /// <summary>再有効化時は能力の現在状態を表示へ反映する。</summary>
-    private void OnEnable() { if (_ability != null) SetActive(_ability.IsActive); }
+    private void OnEnable()
+    {
+        if (_ability != null)
+            SetActive(_ability.IsActive);
+    }
 
     /// <summary>所有者の無効化で能力と表示を終了し、Sceneを離れたオーラや専用BGMを残さない。</summary>
-    private void OnDisable() { _ability?.End(); SetActive(false); }
+    private void OnDisable()
+    {
+        _ability?.End();
+        SetActive(false);
+    }
 
     /// <summary>能力とゲーム進行の購読を解除して、RetryやScene遷移で購読を蓄積させない。</summary>
     private void OnDestroy()
     {
-        _subscription?.Dispose(); _subscription = null;
+        _subscription?.Dispose();
+        _subscription = null;
         GameManager.OnGameStateChanged -= OnGameStateChanged;
     }
 }

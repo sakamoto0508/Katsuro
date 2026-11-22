@@ -25,15 +25,18 @@ public static class ControlGuideBindingDisplay
             if (binding.isComposite)
             {
                 int end = i + 1;
-                while (end < action.bindings.Count && action.bindings[end].isPartOfComposite) end++;
+                while (end < action.bindings.Count && action.bindings[end].isPartOfComposite)
+                    end++;
                 string composite = Composite(action, i + 1, end, gamepad, device);
-                if (!string.IsNullOrEmpty(composite) && !result.Contains(composite)) result.Add(composite);
+                if (!string.IsNullOrEmpty(composite) && !result.Contains(composite))
+                    result.Add(composite);
                 i = end - 1;
                 continue;
             }
             if (binding.isPartOfComposite || !Matches(binding.effectivePath, gamepad)) continue;
             string display = Single(action, i, device);
-            if (!string.IsNullOrEmpty(display) && !result.Contains(display)) result.Add(display);
+            if (!string.IsNullOrEmpty(display) && !result.Contains(display))
+                result.Add(display);
         }
         return result.Count == 0 ? "未割当" : string.Join(" / ", result);
     }
@@ -46,28 +49,36 @@ public static class ControlGuideBindingDisplay
         {
             var binding = action.bindings[i];
             if (!Matches(binding.effectivePath, gamepad)) continue;
-            if (!parts.TryGetValue(binding.name, out var values)) parts[binding.name] = values = new List<string>();
+            if (!parts.TryGetValue(binding.name, out var values))
+                parts[binding.name] = values = new List<string>();
             string display = Single(action, i, device);
-            if (!values.Contains(display)) values.Add(display);
+            if (!values.Contains(display))
+                values.Add(display);
         }
         if (parts.Count == 0) return "";
         var directions = new[] { "up", "left", "down", "right" };
         bool directional = parts.Count == 4;
-        foreach (var direction in directions) directional &= parts.ContainsKey(direction);
+        foreach (var direction in directions)
+            directional &= parts.ContainsKey(direction);
         var result = new List<string>();
         if (directional)
         {
             int alternatives = 0;
-            foreach (var direction in directions) alternatives = System.Math.Max(alternatives, parts[direction].Count);
+            foreach (var direction in directions)
+                alternatives = System.Math.Max(alternatives, parts[direction].Count);
             for (int n = 0; n < alternatives; n++)
             {
                 var keys = new List<string>();
-                foreach (var direction in directions) if (n < parts[direction].Count) keys.Add(parts[direction][n]);
+                foreach (var direction in directions)
+                    if (n < parts[direction].Count)
+                        keys.Add(parts[direction][n]);
                 bool compact = keys.TrueForAll(x => x.Length == 1);
                 result.Add(string.Join(compact ? "" : "・", keys));
             }
         }
-        else foreach (var pair in parts) result.Add(string.Join(" / ", pair.Value));
+        else
+            foreach (var pair in parts)
+                result.Add(string.Join(" / ", pair.Value));
         return string.Join(directional ? " / " : " + ", result);
     }
 
@@ -79,7 +90,8 @@ public static class ControlGuideBindingDisplay
         if (device is Gamepad)
         {
             var control = InputControlPath.TryFindControl(device, path);
-            if (control != null) return string.IsNullOrEmpty(control.shortDisplayName) ? control.displayName : control.shortDisplayName;
+            if (control != null)
+                return string.IsNullOrEmpty(control.shortDisplayName) ? control.displayName : control.shortDisplayName;
         }
         switch (path)
         {

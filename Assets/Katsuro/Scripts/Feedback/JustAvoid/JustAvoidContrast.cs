@@ -24,7 +24,8 @@ public sealed class JustAvoidContrast : MonoBehaviour
     /// <summary>勝利・敗北が優先中でなければ、現在値から回避用モノクロとBGM Duckを同時に開始する。</summary>
     public void Play(AudioManager audio)
     {
-        if (!isActiveAndEnabled || _blocked || (FinalBlowManager.Instance != null && FinalBlowManager.Instance.IsPlaying)) return;
+        if (!isActiveAndEnabled || _blocked || (FinalBlowManager.Instance != null && FinalBlowManager.Instance.IsPlaying))
+            return;
         _audio = audio;
         _envelope.Evaluate(Time.unscaledTime, _enter, _hold, _restore);
         _envelope.Begin(Time.unscaledTime);
@@ -34,13 +35,15 @@ public sealed class JustAvoidContrast : MonoBehaviour
     /// <summary>実時間の包絡線を専用Volume重みへ反映し、指定時間後に通常表示へ戻す。</summary>
     private void Update()
     {
-        if (_volume != null) _volume.weight = _envelope.Evaluate(Time.unscaledTime, _enter, _hold, _restore);
+        if (_volume != null)
+            _volume.weight = _envelope.Evaluate(Time.unscaledTime, _enter, _hold, _restore);
     }
     /// <summary>専用Volumeと回避用BGM Duckを即解除する。BGMの再生状態は変更しない。</summary>
     public void Cancel()
     {
         _envelope.Reset();
-        if (_volume != null) _volume.weight = 0;
+        if (_volume != null)
+            _volume.weight = 0;
         _audio?.CancelJustAvoidDuck();
     }
     /// <summary>アクティブScene変更時に回避用の色と音を通常へ戻す。</summary>
@@ -51,12 +54,24 @@ public sealed class JustAvoidContrast : MonoBehaviour
     private void GameStateChanged(GameManager.GameState state)
     {
         _blocked = state != GameManager.GameState.InGame && state != GameManager.GameState.Pause;
-        if (_blocked) Cancel();
+        if (_blocked)
+            Cancel();
     }
     /// <summary>Scene変更とゲーム進行の通知を購読して中断時の復帰を保証する。</summary>
-    private void OnEnable() { SceneManager.activeSceneChanged += SceneChanged; SceneManager.sceneUnloaded += SceneUnloaded; GameManager.OnGameStateChanged += GameStateChanged; }
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += SceneChanged;
+        SceneManager.sceneUnloaded += SceneUnloaded;
+        GameManager.OnGameStateChanged += GameStateChanged;
+    }
     /// <summary>Scene・進行通知を解除し、回避演出の色と音を戻す。</summary>
-    private void OnDisable() { SceneManager.activeSceneChanged -= SceneChanged; SceneManager.sceneUnloaded -= SceneUnloaded; GameManager.OnGameStateChanged -= GameStateChanged; Cancel(); }
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= SceneChanged;
+        SceneManager.sceneUnloaded -= SceneUnloaded;
+        GameManager.OnGameStateChanged -= GameStateChanged;
+        Cancel();
+    }
     /// <summary>破棄時に回避用Volumeと音量倍率を通常へ戻す。</summary>
     private void OnDestroy() => Cancel();
 }

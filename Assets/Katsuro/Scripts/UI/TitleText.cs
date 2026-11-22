@@ -33,11 +33,16 @@ public class TitleText : MonoBehaviour
         _initialized = true;
         _title = title;
         _fader = fader;
-        if (isActiveAndEnabled) StartPulse();
+        if (isActiveAndEnabled)
+            StartPulse();
     }
 
     /// <summary>初期化済みのTitle文字に点滅Tweenを再開する。</summary>
-    private void OnEnable() { if (_initialized) StartPulse(); }
+    private void OnEnable()
+    {
+        if (_initialized)
+            StartPulse();
+    }
     /// <summary>文字のFadeと待機を繰り返すTweenを実時間更新で組み立てる。</summary>
     private void StartPulse()
     {
@@ -74,7 +79,10 @@ public class TitleText : MonoBehaviour
     /// <summary>共有FaderでGameSceneへ遷移し、成功・中断にかかわらず遷移中フラグを解除する。</summary>
     private async UniTask StartGame()
     {
-        try { await _fader.FadeToScene(_gameSceneName); }
+        try
+        {
+            await _fader.FadeToScene(_gameSceneName);
+        }
         finally { _isTransitioning = false; }
     }
 }

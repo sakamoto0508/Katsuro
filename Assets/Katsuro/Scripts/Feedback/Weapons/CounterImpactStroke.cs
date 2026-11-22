@@ -23,94 +23,149 @@ internal sealed class CounterImpactStroke
 
     public CounterImpactStroke(int layer)
     {
-        mesh = new Mesh { name = "Counter Impact Straight Blade" }; mesh.MarkDynamic();
-        for (int i=0;i<Sections;i++)
+        mesh = new Mesh { name = "Counter Impact Straight Blade" };
+        mesh.MarkDynamic();
+        for (int i = 0; i < Sections; i++)
         {
-            float u=i/(float)(Sections-1);
-            for (int row=0;row<3;row++) uvs[i*3+row]=new Vector2(u,row*.5f);
-            if (i==Sections-1) continue;
-            for (int row=0;row<2;row++)
+            float u = i / (float)(Sections - 1);
+            for (int row = 0; row < 3; row++)
+                uvs[i * 3 + row] = new Vector2(u, row * .5f);
+            if (i == Sections - 1)
+                continue;
+            for (int row = 0; row < 2; row++)
             {
-                int v=i*3+row, k=i*12+row*6;
-                indices[k]=v; indices[k+1]=v+1; indices[k+2]=v+3;
-                indices[k+3]=v+1; indices[k+4]=v+4; indices[k+5]=v+3;
+                int v = i * 3 + row, k = i * 12 + row * 6;
+                indices[k] = v;
+                indices[k + 1] = v + 1;
+                indices[k + 2] = v + 3;
+                indices[k + 3] = v + 1;
+                indices[k + 4] = v + 4;
+                indices[k + 5] = v + 3;
             }
         }
-        surface = new GameObject("Counter Impact Straight Blade",typeof(MeshFilter),typeof(MeshRenderer));
-        surface.layer=layer; surface.GetComponent<MeshFilter>().sharedMesh=mesh;
-        renderer=surface.GetComponent<MeshRenderer>();
-        renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
-        renderer.receiveShadows=false; renderer.enabled=false;
+        surface = new GameObject("Counter Impact Straight Blade", typeof(MeshFilter), typeof(MeshRenderer));
+        surface.layer = layer;
+        surface.GetComponent<MeshFilter>().sharedMesh = mesh;
+        renderer = surface.GetComponent<MeshRenderer>();
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        renderer.enabled = false;
     }
 
     public static Vector3 ResolveDirection(Vector3 sweep, Vector3 history)
     {
-        // Use exactly the same accepted sweep as Blood. Averaging an older curved
-        // history here can tilt the straight incision away from that contact direction.
+        // 血しぶきと同じ刀身の軌跡を使い、命中時の向きに斬線を合わせる。
+        // 過去の曲がった軌跡まで平均すると、斬線が命中時の向きからずれる。
         return sweep.sqrMagnitude>=.000001f ? sweep.normalized : history.normalized;
     }
 
     public static Vector3 SelectMotionDirection(Vector3 instantaneousVelocity, Vector3 recentVelocity, Vector3 sweep, float minimumSpeed)
     {
         float threshold=Mathf.Max(.1f,minimumSpeed);
-        if(instantaneousVelocity.sqrMagnitude>=threshold*threshold) return instantaneousVelocity.normalized;
-        if(recentVelocity.sqrMagnitude>=threshold*threshold) return recentVelocity.normalized;
+        if (instantaneousVelocity.sqrMagnitude >= threshold * threshold)
+            return instantaneousVelocity.normalized;
+        if (recentVelocity.sqrMagnitude>=threshold*threshold) return recentVelocity.normalized;
         return sweep.normalized;
     }
 
     public static Vector3 ProjectDirection(Vector3 direction, Vector3 historyHint, Vector3 view, float minimumProjection, float maxDegrees)
     {
-        if(direction.sqrMagnitude<.000001f || view.sqrMagnitude<.000001f) return direction.normalized;
-        direction.Normalize();view.Normalize();
-        float minimum=Mathf.Clamp(minimumProjection,0f,.8f);
-        Vector3 projected=Vector3.ProjectOnPlane(direction,view);
-        if(projected.magnitude>=minimum || maxDegrees<=0f) return direction;
-        if(projected.sqrMagnitude<.000001f) projected=Vector3.ProjectOnPlane(historyHint,view);
-        // No measured screen azimuth means no invented horizontal/vertical stroke.
-        if(projected.sqrMagnitude<.000001f) return direction;
-        float depthSign=Vector3.Dot(direction,view)<0f?-1f:1f;
-        Vector3 target=projected.normalized*minimum+view*(depthSign*Mathf.Sqrt(1f-minimum*minimum));
-        return Vector3.RotateTowards(direction,target,Mathf.Clamp(maxDegrees,0f,30f)*Mathf.Deg2Rad,0f).normalized;
+        if (direction.sqrMagnitude < .000001f || view.sqrMagnitude < .000001f)
+            return direction.normalized;
+        direction.Normalize();
+        view.Normalize();
+        float minimum = Mathf.Clamp(minimumProjection, 0f, .8f);
+        Vector3 projected = Vector3.ProjectOnPlane(direction, view);
+        if (projected.magnitude >= minimum || maxDegrees <= 0f)
+            return direction;
+        if (projected.sqrMagnitude < .000001f)
+            projected = Vector3.ProjectOnPlane(historyHint, view);
+        // 画面上の向きを計測できない場合は、斬線を表示しない。
+        if (projected.sqrMagnitude < .000001f)
+            return direction;
+        float depthSign = Vector3.Dot(direction, view) < 0f ? -1f : 1f;
+        Vector3 target = projected.normalized * minimum + view * (depthSign * Mathf.Sqrt(1f - minimum * minimum));
+        return Vector3.RotateTowards(direction, target, Mathf.Clamp(maxDegrees, 0f, 30f) * Mathf.Deg2Rad, 0f).normalized;
     }
 
     public static Vector3 BladeVertex(Vector3 point, Vector3 direction, Vector3 side, float length, float width, float u, float across)
     {
         float taper=Mathf.Pow(Mathf.Max(0f,Mathf.Sin(Mathf.PI*u)),.8f)*Mathf.Lerp(.55f,1f,u);
-        // Anchor the geometric center at the real contact. Direction comes from the reveal/light,
-        // rather than displacing the entire stroke forward beside the enemy.
+        // 斬線の中心を実際の命中点に置き、伸び方と発光で斬撃の向きを示す。
+        // 斬線自体の位置は動かさない。
         return point+direction*((u-.5f)*length)+side*(across*width*.5f*taper);
     }
 
     public void Show(JustAvoidCounterConfig.Strike settings, Vector3 point, Vector3 direction, Vector3 bladeAxis, Vector3 view, float now)
     {
-        if (settings.StrokeMaterial==null || direction.sqrMagnitude<.000001f) { Hide(); return; }
+        if (settings.StrokeMaterial == null || direction.sqrMagnitude < .000001f)
+        {
+            Hide();
+            return;
+        }
         direction.Normalize();
-        Vector3 side=Vector3.Cross(view,direction);
-        if (side.sqrMagnitude<.000001f) side=Vector3.ProjectOnPlane(bladeAxis,direction);
-        if (side.sqrMagnitude<.000001f) side=Vector3.Cross(Mathf.Abs(direction.y)<.95f?Vector3.up:Vector3.right,direction);
+        Vector3 side = Vector3.Cross(view, direction);
+        if (side.sqrMagnitude < .000001f)
+            side = Vector3.ProjectOnPlane(bladeAxis, direction);
+        if (side.sqrMagnitude < .000001f)
+            side = Vector3.Cross(Mathf.Abs(direction.y) < .95f ? Vector3.up : Vector3.right, direction);
         side.Normalize();
-        for (int i=0;i<Sections;i++) for (int row=0;row<3;row++)
-            vertices[i*3+row]=BladeVertex(point,direction,side,Mathf.Max(.2f,settings.StrokeLength),Mathf.Max(.01f,settings.StrokeWidth),i/(float)(Sections-1),row-1f);
-        mesh.SetVertices(vertices); mesh.SetUVs(0,uvs); mesh.SetTriangles(indices,0); mesh.RecalculateBounds();
-        renderer.sharedMaterial=settings.StrokeMaterial;
-        block.SetFloat(CoreId,Mathf.Max(.033f,settings.StrokeCoreDuration));
-        block.SetFloat(HoldId,Mathf.Clamp(settings.StrokeCoreHold,0f,Mathf.Max(.032f,settings.StrokeCoreDuration-.001f)));
-        block.SetFloat(PeakId,Mathf.Clamp(settings.StrokePeakDuration,.02f,Mathf.Max(.033f,settings.StrokeCoreDuration)));
-        block.SetFloat(HitPeakId,Mathf.Clamp(settings.StrokeHitPeak,1f,3f));
-        duration=Mathf.Max(settings.StrokeCoreDuration+.01f,settings.StrokeDuration);
-        block.SetFloat(DurationId,duration); block.SetFloat(IntensityId,Mathf.Max(0f,settings.StrokeIntensity));
-        started=now; active=true; renderer.enabled=true; Tick(now);
+        for (int i = 0; i < Sections; i++)
+            for (int row = 0; row < 3; row++)
+                vertices[i * 3 + row] = BladeVertex(
+                    point,
+                    direction,
+                    side,
+                    Mathf.Max(.2f, settings.StrokeLength),
+                    Mathf.Max(.01f, settings.StrokeWidth),
+                    i / (float)(Sections - 1),
+                    row - 1f);
+        mesh.SetVertices(vertices);
+        mesh.SetUVs(0, uvs);
+        mesh.SetTriangles(indices, 0);
+        mesh.RecalculateBounds();
+        renderer.sharedMaterial = settings.StrokeMaterial;
+        block.SetFloat(CoreId, Mathf.Max(.033f, settings.StrokeCoreDuration));
+        block.SetFloat(HoldId, Mathf.Clamp(settings.StrokeCoreHold, 0f, Mathf.Max(.032f, settings.StrokeCoreDuration - .001f)));
+        block.SetFloat(PeakId, Mathf.Clamp(settings.StrokePeakDuration, .02f, Mathf.Max(.033f, settings.StrokeCoreDuration)));
+        block.SetFloat(HitPeakId, Mathf.Clamp(settings.StrokeHitPeak, 1f, 3f));
+        duration = Mathf.Max(settings.StrokeCoreDuration + .01f, settings.StrokeDuration);
+        block.SetFloat(DurationId, duration);
+        block.SetFloat(IntensityId, Mathf.Max(0f, settings.StrokeIntensity));
+        started = now;
+        active = true;
+        renderer.enabled = true;
+        Tick(now);
     }
 
     public void Tick(float now)
     {
-        if (!active) return;
-        float age=Mathf.Max(0f,now-started);
-        if (age>=duration) { Hide(); return; }
-        block.SetFloat(AgeId,age); renderer.SetPropertyBlock(block);
+        if (!active)
+            return;
+        float age = Mathf.Max(0f, now - started);
+        if (age >= duration)
+        {
+            Hide();
+            return;
+        }
+        block.SetFloat(AgeId, age);
+        renderer.SetPropertyBlock(block);
     }
-    public void Hide() { active=false; if (renderer != null) renderer.enabled=false; }
+    public void Hide()
+    {
+        active = false;
+        if (renderer != null)
+            renderer.enabled = false;
+    }
     [System.Diagnostics.Conditional("UNITY_EDITOR"), System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
-    public void SetDebugVisibility(bool hidden) { if (renderer != null) renderer.forceRenderingOff = hidden; }
-    public void Dispose() { Object.Destroy(mesh); Object.Destroy(surface); }
+    public void SetDebugVisibility(bool hidden)
+    {
+        if (renderer != null)
+            renderer.forceRenderingOff = hidden;
+    }
+    public void Dispose()
+    {
+        Object.Destroy(mesh);
+        Object.Destroy(surface);
+    }
 }

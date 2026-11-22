@@ -45,45 +45,62 @@ Shader "Katsuro/CounterImpactStroke"
             float _EdgeSoftness, _ExtensionDuration, _ExposureWeight;
             float _StrokeAge, _CoreDuration, _CoreHold, _PeakDuration, _HitPeak, _Duration, _StrokeIntensity;
             CBUFFER_END
-            struct A { float3 position:POSITION; float2 uv:TEXCOORD0; };
-            struct V { float4 position:SV_POSITION; float2 uv:TEXCOORD0; };
-            V Vert(A a) { V o; o.position=TransformObjectToHClip(a.position); o.uv=a.uv; return o; }
-            float Gaussian(float x) { return exp(-x*x); }
+            struct A
+            {
+                float3 position : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+            struct V
+            {
+                float4 position : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
+            V Vert(A a)
+            {
+                V o;
+                o.position = TransformObjectToHClip(a.position);
+                o.uv = a.uv;
+                return o;
+            }
+            float Gaussian(float x)
+            {
+                return exp(-x*x);
+            }
             float4 Frag(V i):SV_Target
             {
-                float x=saturate(i.uv.x), y=i.uv.y*2-1;
-                float age=max(0,_StrokeAge);
-                float coreEnd=max(.033,_CoreDuration);
-                float coreLife=1-smoothstep(clamp(_CoreHold,0,coreEnd-.001),coreEnd,age);
-                float faceLife=1-smoothstep(.015,max(.05,_Duration),age);
-                float residual=smoothstep(.02,max(.033,_CoreDuration),age)*faceLife;
-                float front=lerp(.8,1,smoothstep(0,max(.005,_ExtensionDuration),age));
-                float longitudinal=smoothstep(0,.18,x)*(1-smoothstep(front-.16,front,x));
-                float border=1-smoothstep(1-max(.02,_EdgeSoftness),1,abs(y));
-                float feather=1-smoothstep(.15,.95,abs(y));
-                float contactFocus=lerp(.22,1.15,Gaussian((x-.5)/.18));
-                float pixel=max(.0001,fwidth(y));
-                // Crisp blade ridge with a bounded pixel floor, rather than a Gaussian light cloud.
-                float radius=max(max(.01,_CoreWidth),pixel*_MinCorePixels);
-                float coreShape=1-smoothstep(radius*.3,radius+pixel*.3,abs(y));
-                // Preserve the peak over one 30fps interval, then release it by time, not frame count.
-                float peakEnd=max(.02,_PeakDuration);
-                float hitPeak=1+(clamp(_HitPeak,1,3)-1)*(1-smoothstep(min(1.0/30.0,peakEnd*.65),peakEnd,age));
-                float core=coreShape*_CoreIntensity*coreLife*contactFocus*hitPeak;
-                float brightEdge=Gaussian((y-.68)/max(.055,pixel*.65))*smoothstep(.4,.85,x);
-                float tip=Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
-                // A small, short forward glint is hotter than the sustained incision.
-                float frontLife=1-smoothstep(.008,max(.02,_PeakDuration),age);
-                float frontWhite=(brightEdge*feather+tip*(1.5+_CoreIntensity))*_FrontIntensity*coreLife*frontLife;
-                float facet=lerp(1,lerp(.18,.8,smoothstep(-.75,.7,y))+Gaussian((y-.4)/.08)*.25,_FacetContrast);
-                float face=Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);
-                float3 rgb=(_WhiteTint.rgb*(core+frontWhite)+_SteelTint.rgb*face)*longitudinal*border*_StrokeIntensity;
-                // The rear heel leaves rapidly; keep the contact and forward blade readable.
-                float rearLife=1-smoothstep(0,max(.025,_ExtensionDuration*1.8),age);
-                rgb*=lerp(rearLife,1,smoothstep(.12,.5,x));
-                rgb*=lerp(1,GetCurrentExposureMultiplier(),saturate(_ExposureWeight));
-                // Emissive transparency: unlit pixels contribute no RGB and no occluding alpha.
-                return float4(max(0,rgb),0);
+                float x = saturate(i.uv.x), y = i.uv.y*2-1;
+                float age = max(0, _StrokeAge);
+                float coreEnd = max(.033, _CoreDuration);
+                float coreLife = 1-smoothstep(clamp(_CoreHold, 0, coreEnd-.001), coreEnd, age);
+                float faceLife = 1-smoothstep(.015, max(.05, _Duration), age);
+                float residual = smoothstep(.02, max(.033, _CoreDuration), age)*faceLife;
+                float front = lerp(.8, 1, smoothstep(0, max(.005, _ExtensionDuration), age));
+                float longitudinal = smoothstep(0, .18, x)*(1-smoothstep(front-.16, front, x));
+                float border = 1-smoothstep(1-max(.02, _EdgeSoftness), 1, abs(y));
+                float feather = 1-smoothstep(.15, .95, abs(y));
+                float contactFocus = lerp(.22, 1.15, Gaussian((x-.5)/.18));
+                float pixel = max(.0001, fwidth(y));
+                // 刃の稜線をくっきり見せるため、ピクセル単位の最小幅に上限を設ける。
+                float radius = max(max(.01, _CoreWidth), pixel*_MinCorePixels);
+                float coreShape = 1-smoothstep(radius*.3, radius+pixel*.3, abs(y));
+                // 30 FPS の 1 フレーム分だけピークを保ち、その後は経過時間に応じて減衰させる。
+                float peakEnd = max(.02, _PeakDuration);
+                float hitPeak = 1+(clamp(_HitPeak, 1, 3)-1)*(1-smoothstep(min(1.0/30.0, peakEnd*.65), peakEnd, age));
+                float core = coreShape*_CoreIntensity*coreLife*contactFocus*hitPeak;
+                float brightEdge = Gaussian((y-.68)/max(.055, pixel*.65))*smoothstep(.4, .85, x);
+                float tip = Gaussian((x-(front-.1))/.055)*Gaussian(y/.16);
+                // 前方の小さな閃光は短時間だけ、持続する斬線より強く発光する。
+                float frontLife = 1-smoothstep(.008, max(.02, _PeakDuration), age);
+                float frontWhite = (brightEdge*feather+tip*(1.5+_CoreIntensity))*_FrontIntensity*coreLife*frontLife;
+                float facet = lerp(1, lerp(.18, .8, smoothstep(-.75, .7, y))+Gaussian((y-.4)/.08)*.25, _FacetContrast);
+                float face = Gaussian(y/.55)*_SurfaceIntensity*facet*feather*(faceLife*.65+residual*.08);
+                float3 rgb = (_WhiteTint.rgb*(core+frontWhite)+_SteelTint.rgb*face)*longitudinal*border*_StrokeIntensity;
+                // 後端を素早く消し、命中点と前方の刃を見やすく保つ。
+                float rearLife = 1-smoothstep(0, max(.025, _ExtensionDuration*1.8), age);
+                rgb*=lerp(rearLife, 1, smoothstep(.12, .5, x));
+                rgb*=lerp(1, GetCurrentExposureMultiplier(), saturate(_ExposureWeight));
+                // 加算発光のため、発光しないピクセルでは RGB と遮蔽に寄与するアルファがともにゼロになる。
+                return float4(max(0, rgb), 0);
             }
             ENDHLSL
         }

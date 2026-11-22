@@ -23,13 +23,16 @@ public sealed class DamageTrailGauge : MonoBehaviour
     public void SetNormalized(float value)
     {
         value = Mathf.Clamp01(value);
-        if (_currentFill != null) _currentFill.fillAmount = value;
+        if (_currentFill != null)
+            _currentFill.fillAmount = value;
         if (!_initialized || value > _target)
         {
-            if (_trailFill != null) _trailFill.fillAmount = value;
+            if (_trailFill != null)
+                _trailFill.fillAmount = value;
             _catchupAt = 0;
         }
-        else if (value < _target) _catchupAt = Time.unscaledTime + Mathf.Max(0, _delay);
+        else if (value < _target)
+            _catchupAt = Time.unscaledTime + Mathf.Max(0, _delay);
         _target = value;
         _initialized = true;
     }
@@ -48,7 +51,8 @@ public sealed class DamageTrailGauge : MonoBehaviour
     /// <summary>遅延表示を現在値へ揃えて待機時刻を解除する。</summary>
     private void OnDisable()
     {
-        if (_initialized && _trailFill != null) _trailFill.fillAmount = _target;
+        if (_initialized && _trailFill != null)
+            _trailFill.fillAmount = _target;
         _catchupAt = 0;
     }
 }

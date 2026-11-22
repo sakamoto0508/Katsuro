@@ -38,7 +38,11 @@ namespace Mock.UI
         /// <param name="hpReactive">現在 HP のリアクティブプロパティ（生値）。</param>
         /// <param name="maxHp">HP の最大値（正規化に使用）。</param>
         /// <param name="skillNormalizedReactive">スキルゲージの正規化リアクティブプロパティ（0..1）。</param>
-        public PlayerHUDPresenter(IKatsuroPlayerHUDView view, IReadOnlyReactiveProperty<float> hpReactive, float maxHp, IReadOnlyReactiveProperty<float> skillNormalizedReactive)
+        public PlayerHUDPresenter(
+            IKatsuroPlayerHUDView view,
+            IReadOnlyReactiveProperty<float> hpReactive,
+            float maxHp,
+            IReadOnlyReactiveProperty<float> skillNormalizedReactive)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
             _hpReactive = hpReactive ?? throw new ArgumentNullException(nameof(hpReactive));

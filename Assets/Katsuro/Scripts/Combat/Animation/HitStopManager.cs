@@ -31,7 +31,11 @@ public class HitStopManager : MonoBehaviour
     {
         if (_initialized) return;
         _initialized = true;
-        if (Instance != null) { Destroy(gameObject); return; }
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -41,12 +45,16 @@ public class HitStopManager : MonoBehaviour
     {
         if (owner == null) return;
         var speeds = owner.GetComponentsInChildren<AnimationSpeedController>(true);
-        foreach (var speed in speeds) speed.Init();
+        foreach (var speed in speeds)
+            speed.Init();
         foreach (var child in owner.GetComponentsInChildren<Transform>(true))
             _targets[child.gameObject] = speeds;
         var stale = new List<GameObject>();
-        foreach (var entry in _targets) if (entry.Key == null) stale.Add(entry.Key);
-        foreach (var key in stale) _targets.Remove(key);
+        foreach (var entry in _targets)
+            if (entry.Key == null)
+                stale.Add(entry.Key);
+        foreach (var key in stale)
+            _targets.Remove(key);
     }
     
     /// <summary>登録済みの対象へ指定実時間の完全停止を要求する。TimeScaleは変更しない。</summary>
@@ -64,13 +72,17 @@ public class HitStopManager : MonoBehaviour
         affected.RemoveAll(item => item == null);
         foreach (var target in targets)
         {
-            if (target == null) continue;
-            if (!_targets.TryGetValue(target, out var speeds)) continue;
+            if (target == null) 
+                continue;
+            if (!_targets.TryGetValue(target, out var speeds)) 
+                continue;
             foreach (var speed in speeds)
             {
-                if (speed == null) continue;
+                if (speed == null) 
+                    continue;
                 speed.SetTemporary(slowSpeed, durationRealtime);
-                if (!affected.Contains(speed)) affected.Add(speed);
+                if (!affected.Contains(speed))
+                    affected.Add(speed);
             }
         }
 
@@ -78,9 +90,15 @@ public class HitStopManager : MonoBehaviour
     /// <summary>自身が影響を与えた速度制御の一時倍率を全解除する。</summary>
     private void OnDisable()
     {
-        foreach (var speed in affected) if (speed != null) speed.ClearTemporary();
+        foreach (var speed in affected)
+            if (speed != null)
+                speed.ClearTemporary();
         affected.Clear();
     }
     /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
-    private void OnDestroy() { if (Instance == this) Instance = null; }
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 }

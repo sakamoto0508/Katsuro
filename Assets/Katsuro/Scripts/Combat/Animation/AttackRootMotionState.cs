@@ -1,5 +1,5 @@
 using UnityEngine;
-// Incoming combo states replace ownership before the outgoing state's Exit.
+// コンボ遷移先は、遷移元の Exit より先にルートモーションの制御を引き継ぐ。
 /// <summary>攻撃Stateへの入退場をControllerへ通知し、Root Motionを適用するStateの所有権を管理する。</summary>
 public sealed class AttackRootMotionState : StateMachineBehaviour
 {

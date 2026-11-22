@@ -18,7 +18,8 @@ internal static class FeedbackVisualTime
             if (_frame != Time.frameCount)
             {
                 _frame = Time.frameCount;
-                if (!IsPaused) _elapsed += Time.unscaledDeltaTime;
+                if (!IsPaused)
+                    _elapsed += Time.unscaledDeltaTime;
             }
             return _elapsed;
         }
@@ -28,11 +29,16 @@ internal static class FeedbackVisualTime
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset()
     {
-        _frame = -1; _elapsed = 0f; _gamePaused = false;
+        _frame = -1;
+        _elapsed = 0f;
+        _gamePaused = false;
         GameManager.OnGameStateChanged -= OnGameStateChanged;
         GameManager.OnGameStateChanged += OnGameStateChanged;
     }
 
     /// <summary>TimeScaleを変更しない中断画面でも、命中演出だけは停止する。</summary>
-    private static void OnGameStateChanged(GameManager.GameState state) { _gamePaused = state == GameManager.GameState.Pause; }
+    private static void OnGameStateChanged(GameManager.GameState state)
+    {
+        _gamePaused = state == GameManager.GameState.Pause;
+    }
 }

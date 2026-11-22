@@ -27,9 +27,15 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         _animator = GetComponent<Animator>();
         _agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         // 乗算の基準となる速度を保存
-        if (_agent != null) _baseAgentSpeed = _agent.speed;
-        if (_animator != null) { _speed = _animator.GetComponent<AnimationSpeedController>(); _speed?.Init(); }
-        if (_speed == null) Debug.LogWarning("AnimationSpeedControllerがないため、状態効果のAnimator速度倍率は反映されません。", this);
+        if (_agent != null)
+            _baseAgentSpeed = _agent.speed;
+        if (_animator != null)
+        {
+            _speed = _animator.GetComponent<AnimationSpeedController>();
+            _speed?.Init();
+        }
+        if (_speed == null)
+            Debug.LogWarning("AnimationSpeedControllerがないため、状態効果のAnimator速度倍率は反映されません。", this);
     }
 
     /// <summary>効果の残り時間を進め、期限切れのVFXを除去して倍率の変更を再計算する。</summary>
@@ -46,13 +52,15 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
             if (inst.Remaining <= 0f)
             {
                 // 期限切れ: 表示 VFX を破棄してリストから削除
-                if (inst.Vfx != null) Destroy(inst.Vfx);
+                if (inst.Vfx != null)
+                    Destroy(inst.Vfx);
                 _effects.RemoveAt(i);
                 changed = true;
             }
         }
         // 変化があれば修飾値を再計算して反映
-        if (changed) RecalculateModifiers();
+        if (changed)
+            RecalculateModifiers();
     }
 
     /// <summary>同じIDの効果を定義の更新・置換・加算方式で合成し、新規の場合はVFXを生成して倍率を反映する。</summary>
@@ -102,7 +110,8 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
         {
             if (_effects[i].Def.Id == id)
             {
-                if (_effects[i].Vfx != null) Destroy(_effects[i].Vfx);
+                if (_effects[i].Vfx != null)
+                    Destroy(_effects[i].Vfx);
                 _effects.RemoveAt(i);
             }
         }
@@ -122,10 +131,14 @@ public class StatusEffectManager : MonoBehaviour, IStatusEffectReceiver
     /// <summary>全効果とVFXを解除し、Animator倍率とAgent移動速度を基準へ戻す。</summary>
     private void OnDisable()
     {
-        foreach (var effect in _effects) if (effect.Vfx != null) Destroy(effect.Vfx);
+        foreach (var effect in _effects)
+            if (effect.Vfx != null)
+                Destroy(effect.Vfx);
         _effects.Clear();
-        if (_speed != null) _speed.SetStatus(1f);
-        if (_agent != null) _agent.speed = _baseAgentSpeed;
+        if (_speed != null)
+            _speed.SetStatus(1f);
+        if (_agent != null)
+            _agent.speed = _baseAgentSpeed;
     }
 
     /// <summary>

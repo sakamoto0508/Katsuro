@@ -31,12 +31,22 @@ public sealed class PlayerWeapon
         foreach (var collider in _weaponColliders)
         {
             if (collider == null) continue;
-            if (collider is BoxCollider box) _authoredSizes[box] = box.size;
+            if (collider is BoxCollider box)
+                _authoredSizes[box] = box.size;
             var effect = collider.GetComponent<SwordTrail>();
-            if (effect != null) { effect.Init(); _trails[collider] = effect; }
+            if (effect != null)
+            {
+                effect.Init();
+                _trails[collider] = effect;
+            }
             var relay = collider.GetComponent<WeaponHitboxRelay>();
-            if (relay != null) { relay.Init(); _relayCache[collider] = relay; }
-            else Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
+            if (relay != null)
+            {
+                relay.Init();
+                _relayCache[collider] = relay;
+            }
+            else
+                Debug.LogError("武器ColliderにWeaponHitboxRelayを配置してください。", collider);
             collider.enabled = false;
         }
         SetHitboxPadding(padding);
@@ -48,7 +58,8 @@ public sealed class PlayerWeapon
     {
         padding = Vector3.Max(Vector3.zero, padding);
         foreach (var entry in _authoredSizes)
-            if (entry.Key != null) entry.Key.size = entry.Value + padding;
+            if (entry.Key != null)
+                entry.Key.size = entry.Value + padding;
     }
 
     /// <summary>ヒットボックスを有効化する。</summary>
@@ -60,7 +71,8 @@ public sealed class PlayerWeapon
     /// <summary>保持している刀の軌跡を攻撃種別に応じた表示へ切り替える。</summary>
     public void SetTrailStyle(SwordTrail.AttackStyle style, JustAvoidCounterStrike strike = JustAvoidCounterStrike.None)
     {
-        foreach (var trail in _trails.Values) trail.SetStyle(style, strike);
+        foreach (var trail in _trails.Values)
+            trail.SetStyle(style, strike);
     }
 
     /// <summary>武器がヒットした際の通知先を登録する。</summary>
@@ -107,7 +119,11 @@ public sealed class PlayerWeapon
             if (blade == null || !blade.enabled) continue;
             Vector3 candidate = target.ClosestPoint(blade.bounds.center);
             float distance = (candidate - blade.bounds.center).sqrMagnitude;
-            if (distance < nearest) { nearest = distance; point = candidate; }
+            if (distance < nearest)
+            {
+                nearest = distance;
+                point = candidate;
+            }
         }
         return point;
     }
@@ -146,7 +162,8 @@ public sealed class PlayerWeapon
             }
 
             weaponCollider.enabled = isActive;
-            if (_trails.TryGetValue(weaponCollider, out var trail)) trail.SetActive(isActive);
+            if (_trails.TryGetValue(weaponCollider, out var trail))
+                trail.SetActive(isActive);
         }
     }
 

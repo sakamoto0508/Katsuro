@@ -24,7 +24,8 @@ public sealed class RunSetupBlessingPreview : MonoBehaviour
     private void OnEnable()
     {
         _lastFocus = null;
-        if (_entries != null && _entries.Length > 0) Show(_entries[0].Option);
+        if (_entries != null && _entries.Length > 0)
+            Show(_entries[0].Option);
     }
 
     private void LateUpdate()
@@ -38,7 +39,8 @@ public sealed class RunSetupBlessingPreview : MonoBehaviour
     public void RestoreFocus()
     {
         var focus = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
-        if (focus != null) Show(focus.GetComponent<UnityEngine.UI.Selectable>());
+        if (focus != null)
+            Show(focus.GetComponent<UnityEngine.UI.Selectable>());
     }
 
     public void Show(UnityEngine.UI.Selectable option)
@@ -46,10 +48,14 @@ public sealed class RunSetupBlessingPreview : MonoBehaviour
         if (option == null || _entries == null) return;
         foreach (var entry in _entries)
         {
-            if (entry.Option != option || entry.Symbol == null || entry.Name == null || entry.Effect == null) continue;
-            if (_symbol != null) _symbol.text = entry.Symbol.text;
-            if (_name != null) _name.text = entry.Name.text;
-            if (_effect != null) _effect.text = entry.Effect.text;
+            if (entry.Option != option || entry.Symbol == null || entry.Name == null || entry.Effect == null)
+                continue;
+            if (_symbol != null)
+                _symbol.text = entry.Symbol.text;
+            if (_name != null)
+                _name.text = entry.Name.text;
+            if (_effect != null)
+                _effect.text = entry.Effect.text;
             return;
         }
     }

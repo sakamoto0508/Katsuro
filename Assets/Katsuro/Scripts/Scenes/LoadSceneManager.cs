@@ -53,6 +53,7 @@ public class LoadSceneManager : MonoBehaviour
     /// <summary>自身が共有インスタンスの場合に参照を解除する。</summary>
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 }

@@ -5,6 +5,11 @@ using UnityEngine;
 /// <summary>移動入力・旋回・Rigidbody移動と攻撃Root Motionの物理反映を担当する。攻撃や能力の選択は行わない。</summary>
 public class PlayerMover
 {
+    private const float MinMoveDirectionSquared = 0.001f;
+    private const float InputDeadZoneSquared = 0.01f;
+    private const float MinForceVelocitySquared = 0.01f;
+    private const float MinLookVelocitySquared = 0.1f;
+
     /// <summary>移動設定・Rigidbody・PlayerとEnemyのTransform・Animatorを保持する。</summary>
     public PlayerMover(PlayerStatus playerStatus, Rigidbody rb, Transform playerPosition,Transform enemy
         , Transform cameraPosition, PlayerAnimationController animationController, float attackRootMotionScale = 1f)
@@ -50,14 +55,20 @@ public class PlayerMover
     public void EndAttackRootMotion()
     {
         _pendingAttackRootMotion = Vector3.zero;
-        if (IsUsingAttackRootMotion) StopAttackVelocity();
+        if (IsUsingAttackRootMotion)
+            StopAttackVelocity();
         IsUsingAttackRootMotion = false;
     }
     /// <summary>再生中の攻撃から水平移動量を蓄積する。HitStop中の移動は蓄積しない。</summary>
     public void QueueAttackRootMotion(Vector3 delta, bool animationRunning)
     {
         if (!IsUsingAttackRootMotion) return;
-        if (!animationRunning) { _pendingAttackRootMotion = Vector3.zero; StopAttackVelocity(); return; }
+        if (!animationRunning)
+        {
+            _pendingAttackRootMotion = Vector3.zero;
+            StopAttackVelocity();
+            return;
+        }
         delta.y = 0f;
         _pendingAttackRootMotion += delta * _attackRootMotionScale;
     }
@@ -67,14 +78,15 @@ public class PlayerMover
         if (!IsUsingAttackRootMotion) return;
         Vector3 delta = animationRunning ? AttackRootMotionPhysics.LimitDisplacement(_rb, _pendingAttackRootMotion) : Vector3.zero;
         _pendingAttackRootMotion = Vector3.zero;
-        // Dynamic Rigidbody remains under physics collision/gravity control.
+        // 動的 Rigidbody の衝突と重力は物理演算に委ねる。
         Vector3 velocity = delta / Time.fixedDeltaTime;
         _rb.linearVelocity = new Vector3(velocity.x, _rb.linearVelocity.y, velocity.z);
     }
     /// <summary>自身が適用した攻撃速度を停止し、垂直方向の速度を保持する。</summary>
     private void StopAttackVelocity()
     {
-        if (_rb != null && !_rb.isKinematic) _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+        if (_rb != null && !_rb.isKinematic)
+            _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
     }
 
     /// <summary>入力に応じた移動速度・方向と表示用Animator値を更新する。</summary>
@@ -118,7 +130,7 @@ public class PlayerMover
         _isLockOn = isLockOn;
 
         lockOnDirection.y = 0;
-        _lockOnDirection = lockOnDirection.sqrMagnitude > 0.001f
+        _lockOnDirection = lockOnDirection.sqrMagnitude > MinMoveDirectionSquared
             ? lockOnDirection.normalized
             : Vector3.zero;
     }
@@ -129,11 +141,15 @@ public class PlayerMover
         // KinematicではAddForceも速度設定も効かないため、従来どおり何もしない。
         if (_rb == null || _rb.isKinematic || _playerStatus == null) return;
         _velXZ = new Vector3(_rb.linearVelocity.x, 0, _rb.linearVelocity.z);
-        if (_velXZ.sqrMagnitude <= 0.01f) return;
+        if (_velXZ.sqrMagnitude <= MinForceVelocitySquared) return;
 
         // 1ステップの減速量が残り速度を超えると逆向きに振動するため、その場合は水平速度をゼロにして止める。
         float brakeStep = _playerStatus.BreakForce * Time.fixedDeltaTime;
-        if (brakeStep >= _velXZ.magnitude) { _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f); return; }
+        if (brakeStep >= _velXZ.magnitude)
+        {
+            _rb.linearVelocity = new Vector3(0f, _rb.linearVelocity.y, 0f);
+            return;
+        }
 
         Vector3 brakeForce = -_velXZ.normalized * _playerStatus.BreakForce;
         _rb.AddForce(brakeForce, ForceMode.Acceleration);
@@ -179,7 +195,11 @@ public class PlayerMover
     /// <summary>Rigidbodyの補間と衝突しないよう、Rigidbodyがあれば MoveRotation で回転させる。</summary>
     private void ApplyRotation(Quaternion rotation)
     {
-        if (_rb != null) { _rb.MoveRotation(rotation); return; }
+        if (_rb != null)
+        {
+            _rb.MoveRotation(rotation);
+            return;
+        }
         _playerPosition.rotation = rotation;
     }
 
@@ -204,9 +224,9 @@ public class PlayerMover
         cameraRight.Normalize();
 
         Vector3 worldDirection = cameraForward * _currentInput.y + cameraRight * _currentInput.x;
-        _moveDirection = worldDirection.sqrMagnitude > 0.001f ? worldDirection.normalized : Vector3.zero;
+        _moveDirection = worldDirection.sqrMagnitude > MinMoveDirectionSquared ? worldDirection.normalized : Vector3.zero;
 
-        if (_isLockOn && _lockOnDirection.sqrMagnitude > 0.001f)
+        if (_isLockOn && _lockOnDirection.sqrMagnitude > MinMoveDirectionSquared)
         {
             // 敵方向(forward)とカメラ右方向(lateral)を直交化し、純粋なストレーフ軸を作る。
             Vector3 forward = _lockOnDirection;
@@ -215,7 +235,7 @@ public class PlayerMover
             Vector3.OrthoNormalize(ref up, ref forward, ref lateral);
 
             Vector3 lockMove = forward * _currentInput.y + lateral * _currentInput.x;
-            _moveDirection = lockMove.sqrMagnitude > 0.001f ? lockMove.normalized : Vector3.zero;
+            _moveDirection = lockMove.sqrMagnitude > MinMoveDirectionSquared ? lockMove.normalized : Vector3.zero;
 
             // ロックオン時は常に敵方向を向く。
             _lookDirection = forward;
@@ -225,13 +245,13 @@ public class PlayerMover
         // 非ロックオン時は移動速度が十分あれば速度方向を、なければ入力方向を向く。
         Vector3 vel = _rb.linearVelocity;
         vel.y = 0;
-        _lookDirection = vel.sqrMagnitude > 0.1f ? vel.normalized : _moveDirection;
+        _lookDirection = vel.sqrMagnitude > MinLookVelocitySquared ? vel.normalized : _moveDirection;
     }
 
     /// <summary>水平移動方向と速度をRigidbodyへ反映し、垂直速度を維持する。</summary>
     private void Movement()
     {
-        if (_moveDirection.sqrMagnitude < 0.001f)
+        if (_moveDirection.sqrMagnitude < MinMoveDirectionSquared)
         {
             // 入力が極小なら力を加えない。
             return;
@@ -259,7 +279,7 @@ public class PlayerMover
     /// <summary>移動またはLock-Onの向きへPlayerを補間旋回させる。</summary>
     private void UpdateRotation()
     {
-        if (_lookDirection.sqrMagnitude <= 0.1f) return;
+        if (_lookDirection.sqrMagnitude <= MinLookVelocitySquared) return;
 
         Quaternion targetRotation = Quaternion.LookRotation(_lookDirection);
         // 係数は0.02秒ステップ基準の値として扱い、ステップ間隔が変わっても同じ速さで向くように換算する。
@@ -282,7 +302,7 @@ public class PlayerMover
             _rb.linearVelocity = new Vector3(limited.x, _rb.linearVelocity.y, limited.z);
         }
         // 入力が無いときは減速力を与えるか完全停止させる。
-        if (_currentInput.sqrMagnitude < 0.01f)
+        if (_currentInput.sqrMagnitude < InputDeadZoneSquared)
         {
             MoveStop();
         }

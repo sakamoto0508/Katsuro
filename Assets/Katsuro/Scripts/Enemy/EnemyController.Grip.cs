@@ -16,10 +16,11 @@ public partial class EnemyController
     {
         RestorePatternWeaponGrip();
         _releasedPatternGripWeapon = null;
-        if (pattern == null || !pattern.UsesDashTuning || !pattern.OverrideWeaponGrip || _animator == null || !_animator.isHuman) return;
+        if (pattern == null || !pattern.UsesDashTuning || !pattern.OverrideWeaponGrip || _animator == null || !_animator.isHuman)
+            return;
         var hand = _animator.GetBoneTransform(HumanBodyBones.RightHand);
         if (hand == null) return;
-        // The existing sword mesh owns its colliders and trail underneath RightHand.
+        // RightHand 配下の既存の刀メッシュが Collider と軌跡を持つ。
         foreach (var mesh in hand.GetComponentsInChildren<MeshFilter>(true))
         {
             if (mesh.GetComponentInChildren<WeaponHitboxRelay>(true) == null) continue;
@@ -42,12 +43,13 @@ public partial class EnemyController
             return;
         }
         if (_releasedPatternGripWeapon == null || _animator == null) return;
-        // The outgoing Rush clip can still evaluate its baked weapon curves during a reaction blend.
+        // リアクションへのブレンド中も、遷移元の突進クリップが刀の記録済みカーブを評価することがある。
         bool outgoing = _animator.GetCurrentAnimatorStateInfo(0).fullPathHash == _releasedPatternGripStateHash;
         bool incoming = _animator.IsInTransition(0) && _animator.GetNextAnimatorStateInfo(0).fullPathHash == _releasedPatternGripStateHash;
         if (outgoing || incoming)
             _releasedPatternGripWeapon.SetLocalPositionAndRotation(_patternGripPosition, _patternGripRotation);
-        else _releasedPatternGripWeapon = null;
+        else
+            _releasedPatternGripWeapon = null;
     }
 
     private void RestorePatternWeaponGrip()

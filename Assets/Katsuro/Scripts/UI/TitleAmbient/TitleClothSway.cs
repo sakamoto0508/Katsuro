@@ -62,7 +62,10 @@ public sealed class TitleClothSway : TitleImageWarp
         if (weight <= 0f) return Vector2.zero;
         float lag = (1f - v) * _waveDelay;
         float noise = Mathf.PerlinNoise(_seed * 0.17f, (_time - lag) * _swaySpeed) * 2f - 1f;
-        float x = Mathf.Clamp(_windOffset + noise * _swayAmplitude * (1f + _gust * _gustBoost), -_maxOffset, _maxOffset) * weight;
+        float x = Mathf.Clamp(
+            _windOffset + noise * _swayAmplitude * (1f + _gust * _gustBoost),
+            -_maxOffset,
+            _maxOffset) * weight;
         return new Vector2(x, Mathf.Abs(x) * _lift);
     }
 }
