@@ -186,6 +186,13 @@ public abstract class PlayerAttackState : PlayerState
             return false;
         }
 
+        // 追撃1への遷移中は次段を割り込ませられないため、予約を保持する。
+        if (_attackAnimator != null && _attackAnimator.IsInTransition(0)
+            && _attackAnimator.GetNextAnimatorStateInfo(0).IsTag(PlayerAttacker.JustAvoidCounterTag))
+        {
+            return false;
+        }
+
         _comboQueued = false;
         _comboWindowOpen = false;
         _comboStepIndex = Mathf.Min(_comboStepIndex + 1, MaxComboSteps - 1);
@@ -205,7 +212,8 @@ public abstract class PlayerAttackState : PlayerState
             ? _attackAnimator.GetNextAnimatorStateInfo(0) : _attackAnimator.GetCurrentAnimatorStateInfo(0);
         // 攻撃は原則として終了イベントで抜ける。
         // クリップ長に基づくタイマーは予備とし、再生が遅い場合でも完了を待つ。
-        return (state.IsTag(NormalAttackSpeedState.AttackTag)
+        return state.IsTag(PlayerAttacker.JustAvoidCounterStartTag)
+            || (state.IsTag(NormalAttackSpeedState.AttackTag)
             || state.IsTag(PlayerAttacker.JustAvoidCounterTag)) && state.normalizedTime < 1f;
     }
 }
