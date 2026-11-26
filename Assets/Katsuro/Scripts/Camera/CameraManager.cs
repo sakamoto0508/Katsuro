@@ -9,6 +9,7 @@ public class CameraManager : MonoBehaviour
     // Cinemachine のインパルス発生元と受け取り側で共有する戦闘用チャンネルマスク。
     private const int CombatImpulseChannel = 2;
     private const float MaxLockOnImpulseOffset = .15f;
+    private const float MaxJustAvoidCameraFrameTime = 1f / 30f;
 
     /// <summary>描画補正とHDRP Passの対象になるSceneの出力カメラ。</summary>
     public Camera OutputCamera => _outputCamera;
@@ -28,6 +29,8 @@ public class CameraManager : MonoBehaviour
     private Camera _outputCamera;
     private CameraConfig _config;
     private JustAvoidEnvelope _justAvoidEnvelope;
+    private float _justAvoidCameraTime;
+    private int _justAvoidCameraFrame;
     private Transform _playerPosition;
     private System.Func<bool> _justAvoidSustain;
     private float _justAvoidSustainStarted = float.NegativeInfinity;
@@ -99,7 +102,9 @@ public class CameraManager : MonoBehaviour
     public void PlayJustAvoidFeedback()
     {
         if (!_initialized || !isActiveAndEnabled || _finalBlowPlaying) return;
-        _justAvoidEnvelope.Begin(Time.unscaledTime);
+        _justAvoidCameraTime = 0f;
+        _justAvoidCameraFrame = Time.frameCount;
+        _justAvoidEnvelope.Begin(_justAvoidCameraTime);
         _justAvoidSustainStarted = float.NegativeInfinity;
     }
     /// <summary>ジャスト回避のカメラ演出を最大のまま維持する条件を登録する。trueの間は復帰を始めない。</summary>
@@ -195,11 +200,19 @@ public class CameraManager : MonoBehaviour
     /// <summary>ジャスト回避の包絡線に応じ、Playerの注視点を軸に下へ回り込みながら寄せ、FOVを補正する。</summary>
     private void ApplyJustAvoid(Camera camera)
     {
-        float now = Time.unscaledTime;
-        if (_justAvoidEnvelope.Playing && IsJustAvoidSustained(now))
-            _justAvoidEnvelope.Sustain(now, _config.JustAvoidCameraEnter);
-        float weight = _justAvoidEnvelope.Evaluate(now, _config.JustAvoidCameraEnter
-            , _config.JustAvoidCameraHold, _config.JustAvoidCameraRestore);
+        if (!_justAvoidEnvelope.Playing) return;
+        if (_justAvoidCameraFrame != Time.frameCount)
+        {
+            _justAvoidCameraFrame = Time.frameCount;
+            // 長いフレームでも寄りや復帰の途中を飛ばさない。
+            _justAvoidCameraTime += Mathf.Min(Time.unscaledDeltaTime, MaxJustAvoidCameraFrameTime);
+        }
+
+        float enter = _config.JustAvoidCameraEnter;
+        float weight = _justAvoidEnvelope.Evaluate(_justAvoidCameraTime, enter,
+            _config.JustAvoidCameraHold, _config.JustAvoidCameraRestore);
+        if (_justAvoidEnvelope.Playing && IsJustAvoidSustained(Time.unscaledTime))
+            _justAvoidEnvelope.Sustain(_justAvoidCameraTime, enter);
         if (weight <= 0f) return;
         camera.fieldOfView = Mathf.Clamp(camera.fieldOfView + _config.JustAvoidFOVOffset * weight, 1f, 179f);
         if (_playerPosition == null) return;

@@ -690,15 +690,24 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>アニメーションイベントでコンボ受付が開いたタイミングを通知する。</summary>
     public void AnimEvent_OnComboWindowOpened(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
+        if (!AcceptComboWindowEvent(animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowOpened);
     }
 
     /// <summary>アニメーションイベントでコンボ受付が閉じたタイミングを通知する。</summary>
     public void AnimEvent_OnComboWindowClosed(AnimationEvent animationEvent)
     {
-        if (!NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent)) return;
+        if (!AcceptComboWindowEvent(animationEvent)) return;
         _animationEventStream?.Publish(AnimationEventType.ComboWindowClosed);
+    }
+
+    private bool AcceptComboWindowEvent(AnimationEvent animationEvent)
+    {
+        // 構え中の入力は追撃1のクリップが受付を開くまで予約しておく。
+        if (animationEvent != null && animationEvent.animatorStateInfo.IsTag(PlayerAttacker.JustAvoidCounterStartTag))
+            return false;
+
+        return NormalAttackSpeedState.AcceptGameplayEvent(OwnerAnimator, animationEvent);
     }
 
     /// <summary>攻撃アニメーション完了を現在ステートへ伝える。</summary>

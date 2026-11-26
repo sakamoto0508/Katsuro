@@ -36,6 +36,7 @@ public sealed class PlayerAttacker : IDisposable
     /// <summary>実行中の既存コンボ段階。入力回数ではなく、成立した攻撃段階を修練の命中確認へ渡す。</summary>
     public int CurrentComboStep => _currentComboStep;
     public const string JustAvoidCounterTag = "JustAvoidCounter";
+    public const string JustAvoidCounterStartTag = "JustAvoidCounterStart";
 
     private readonly PlayerAnimationController _animController;
     private readonly AnimationName _animName;
